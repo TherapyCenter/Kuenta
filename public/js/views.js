@@ -1,5 +1,5 @@
 'use strict';
-/* global h, $, $$, fmt, api, qs, parseNum, LK, ENT, Win, toast, showError, confirmDlg, promptDlg, dialog, alertDlg, Overview, miniGrid, editRecord, pickKunde, pickRecord, Vorgang, Zahlung, Print, App, today, addDays, addMonths, downloadUrl, pickFile, saveBlob, kname, r2, Pref, EsUI, GbUI, UsUI, FrUI, AtUI, ChUI, ItUI */
+/* global h, $, $$, fmt, api, qs, parseNum, LK, ENT, Win, toast, showError, confirmDlg, promptDlg, dialog, alertDlg, Overview, miniGrid, editRecord, pickKunde, pickRecord, Vorgang, Zahlung, Print, App, today, addDays, addMonths, downloadUrl, pickFile, saveBlob, kname, r2, Pref, EsUI, GbUI, UsUI, FrUI, AtUI, ChUI, ItUI, NlUI */
 
 const Views = {};
 const title = (t, sub) => h('div', { class: 'view-title' }, t, sub ? h('span', { class: 'sub' }, sub) : null);
@@ -351,6 +351,7 @@ Views.fibu = async (main) => {
   if (AtUI.activo()) return Views.atSteuer(main); // Austria: UVA (FinanzOnline) and RKSV
   if (ChUI.activo()) return Views.chMwst(main); // Switzerland: MWST return
   if (ItUI.activo()) return Views.itIva(main); // Italy: IVA settlement and sales VAT register
+  if (NlUI.activo()) return Views.nlAangifte(main); // Netherlands: VAT return by rubrieken
   let von = addMonths(today().slice(0, 7) + '-01', -1), bis = addDays(today().slice(0, 7) + '-01', -1);
   const alle = h('input', { type: 'checkbox' });
   const wrap = h('div', { class: 'overview' }); let g, rows = [];
@@ -611,7 +612,7 @@ Views.einstellungen = async (main) => {
   });
   addTab('Steuer / Mahnung / Kasse', p => p.append(h('div', { class: 'groups' },
     grp('Steuersystem / Tax system', (() => {
-      const x = h('select', null, [['DE', 'Deutschland (UStG, TSE, DATEV, XRechnung)'], ['ES', 'España (IVA, VERI*FACTU, Facturae)'], ['GB', 'United Kingdom (VAT, Making Tax Digital, £)'], ['US', 'United States (sales tax, $)'], ['FR', 'France (TVA, Factur-X, NF525, FEC)'], ['AT', 'Österreich (USt, RKSV, UVA, ebInterface)'], ['CH', 'Schweiz (MWST, QR-Rechnung, CHF)'], ['IT', 'Italia (IVA, fattura elettronica SdI)']].map(([v, l]) => h('option', { value: v, selected: (s.sw['steuer.land'] || 'DE') === v }, l)));
+      const x = h('select', null, [['DE', 'Deutschland (UStG, TSE, DATEV, XRechnung)'], ['ES', 'España (IVA, VERI*FACTU, Facturae)'], ['GB', 'United Kingdom (VAT, Making Tax Digital, £)'], ['US', 'United States (sales tax, $)'], ['FR', 'France (TVA, Factur-X, NF525, FEC)'], ['AT', 'Österreich (USt, RKSV, UVA, ebInterface)'], ['CH', 'Schweiz (MWST, QR-Rechnung, CHF)'], ['IT', 'Italia (IVA, fattura elettronica SdI)'], ['NL', 'Nederland (btw, KOR, Peppol)']].map(([v, l]) => h('option', { value: v, selected: (s.sw['steuer.land'] || 'DE') === v }, l)));
       x.addEventListener('change', () => { changes.sw['steuer.land'] = x.value; });
       return fld('Steuersystem dieses Mandanten', x);
     })(), h('div', { class: 'fld hint' }, 'Gilt nur für den aktuellen Mandanten. Vorhandene Rechnungen, Sicherungen und der Import aus KFZ-Faktura bleiben unverändert. Großbritannien rechnet in Pfund (£), die Schweiz in Franken (CHF). Die Belegsprache stellen Sie unter Vorgabewerte → Sprache ein. Nach dem Umstellen speichern und das Programm neu laden.')),
@@ -625,6 +626,7 @@ Views.einstellungen = async (main) => {
   addTab('Österreich', p => AtUI.settingsTab(p, { s, changes, si, sb, grp, fld, ob }));
   addTab('Schweiz', p => ChUI.settingsTab(p, { s, changes, si, sb, grp, fld, ob }));
   addTab('Italia', p => ItUI.settingsTab(p, { s, changes, si, sb, grp, fld, ob }));
+  addTab('Nederland', p => NlUI.settingsTab(p, { s, changes, si, sb, grp, fld, ob }));
   addTab('Nummernkreise', p => p.append(h('div', { class: 'note info', style: { marginBottom: '8px' } }, 'Eingetragen ist jeweils die zuletzt vergebene Nummer. Die nächste Nummer ist um 1 höher.'),
     h('div', { class: 'groups' }, grp('Stammdaten', oi('Nummernkreis Kunden', 'Kunden', true), oi('Nummerkreis Fahrzeuge', 'Fahrzeuge', true), oi('Nummerkreis Artikel', 'Artikel', true), oi('Nummernkreis Arbeitswert', 'Arbeitswerte', true), oi('Nummernkreis Liefranten', 'Lieferanten', true), oi('Reifeneinlagerung', 'Reifeneinlagerung', true)),
       grp('Vorgänge', oi('Nummernkreis Angebot', 'Angebote', true), oi('Nummernkreis Auftrag', 'Aufträge', true), oi('Nummerkreis Lieferschein', 'Lieferscheine', true), oi('Nummernkreis Rechnung', 'Rechnungen', true), oi('Nummerkreis Gutschrift', 'Rechnungskorrekturen', true)))));

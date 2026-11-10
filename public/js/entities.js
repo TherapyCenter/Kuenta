@@ -100,6 +100,8 @@
           { f: 'IT_SDI', l: 'Italien: Codice destinatario SdI (7 Zeichen, Behörden 6)' },
           { f: 'IT_PEC', l: 'Italien: PEC-Adresse', t: 'email' },
           { f: 'IT_SPLIT', l: 'Italien: Split payment (öffentliche Verwaltung, art. 17-ter)', t: 'bool' },
+          { f: 'NL_KVK', l: 'Niederlande: KvK-Nummer' },
+          { f: 'NL_OIN', l: 'Niederlande: OIN (Behörden, Peppol)' },
           { f: 'TAXEXEMPT', l: 'USA: steuerbefreit (Exemption certificate)', t: 'bool' },
           { f: 'EXEMPTCERT', l: 'USA: Nummer des Exemption Certificate' },
           { f: 'EXEMPTREASON', l: 'USA: Grund (z. B. Resale, Government, Non-profit)' },

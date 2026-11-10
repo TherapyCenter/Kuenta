@@ -11,7 +11,7 @@ const { I18N, docLang } = require('../i18n');
 // Number and date format follow the document language (set when a Layout is created)
 let LANG = 'de';
 const loc = () => I18N.locale(LANG);
-const sep = () => (LANG === 'de' ? '.' : '/');
+const sep = () => ({ de: '.', nl: '-' }[LANG] || '/'); // 24.11.2026, 24-11-2026 (Dutch), otherwise 24/11/2026
 const money = v => v == null || v === '' ? '' : L.geld(v, loc());
 const num = (v, d = 3) => v == null || v === '' ? '' : new Intl.NumberFormat(loc(), { maximumFractionDigits: d }).format(Number(v));
 const date = v => !v ? '' : L.land() === 'US' ? [String(v).slice(5, 7), String(v).slice(8, 10), String(v).slice(0, 4)].join('/') : [String(v).slice(8, 10), String(v).slice(5, 7), String(v).slice(0, 4)].join(sep());
@@ -84,7 +84,7 @@ class Layout {
           [f.FIRMENNAME, f.FIRMENZUSATZ, f.STRASSE, plzOrt(f.PLZ, f.ORT)],
           [f.TELEFON && 'Tel.: ' + f.TELEFON, f.FAX && 'Fax: ' + f.FAX, f.EMAIL, f.INTERNETSEITE],
           [f.BANKNAME, f.IBAN && 'IBAN: ' + f.IBAN, f.BIC && 'BIC: ' + f.BIC, f.BANKINHABER && 'Inhaber: ' + f.BANKINHABER],
-          [...(L.land() === 'FR' ? require('../fr').pied() : ['AT', 'CH', 'IT'].includes(L.land()) ? require({ AT: '../at', CH: '../ch', IT: '../it' }[L.land()]).pied() : require('../es').activo() ? [(f.STEUERNR || f.USTNR) && 'NIF: ' + (f.STEUERNR || f.USTNR)] : L.land() === 'US' ? [L.sw('us.reg.nr', '') && `${L.sw('us.reg.label', 'Registration No.')}: ${L.sw('us.reg.nr', '')}`] : L.land() === 'GB' ? [f.USTNR && 'VAT-Reg.-Nr.: ' + f.USTNR] : [f.USTNR && 'USt-IdNr.: ' + f.USTNR, f.STEUERNR && 'Steuer-Nr.: ' + f.STEUERNR]), f.HANDELSREGISTER, f.GESCHAEFTSFUEHRER && 'Inhaber/GF: ' + f.GESCHAEFTSFUEHRER],
+          [...(L.land() === 'FR' ? require('../fr').pied() : ['AT', 'CH', 'IT', 'NL'].includes(L.land()) ? require({ AT: '../at', CH: '../ch', IT: '../it', NL: '../nl' }[L.land()]).pied() : require('../es').activo() ? [(f.STEUERNR || f.USTNR) && 'NIF: ' + (f.STEUERNR || f.USTNR)] : L.land() === 'US' ? [L.sw('us.reg.nr', '') && `${L.sw('us.reg.label', 'Registration No.')}: ${L.sw('us.reg.nr', '')}`] : L.land() === 'GB' ? [f.USTNR && 'VAT-Reg.-Nr.: ' + f.USTNR] : [f.USTNR && 'USt-IdNr.: ' + f.USTNR, f.STEUERNR && 'Steuer-Nr.: ' + f.STEUERNR]), f.HANDELSREGISTER, f.GESCHAEFTSFUEHRER && 'Inhaber/GF: ' + f.GESCHAEFTSFUEHRER],
         ];
         cols.forEach((c, ci) => { let y = 278 + dy; for (const l of c.filter(Boolean)) { d.text(this.L + ci * 44.5, y, l.slice(0, 48), { size: 6.8, color: GREY }); y += 3.1; } });
       }

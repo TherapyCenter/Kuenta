@@ -1,7 +1,8 @@
 'use strict';
 // Tax IDs: Spanish DNI (12345678Z), NIE (X1234567L), CIF of companies (B12345674) and special NIF (K/L/M);
 // UK VAT registration numbers (GB123456782); French SIREN (9 digits) and SIRET (14 digits);
-// Austrian UID (ATU12345678), Swiss UID (CHE-123.456.789), Italian partita IVA and codice fiscale. Shared by server and browser (UMD).
+// Austrian UID (ATU12345678), Swiss UID (CHE-123.456.789), Italian partita IVA and codice fiscale,
+// Dutch btw-id (NL123456789B01) and KvK number. Shared by server and browser (UMD).
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
   else root.NIF = factory();
@@ -125,5 +126,19 @@
     return { ok: String.fromCharCode(65 + sum % 26) === x[15], cf: x, persona: true };
   }
 
-  return { validar, limpiar, extranjero, gbVat, frSiren, atUid, chUid, itPiva, itCf };
+  // Dutch btw-identificatienummer NL + 9 digits + B + 2 digits: either the eleven test on the 9 digits (older
+  // numbers) or ISO 7064 modulo 97 over the whole number (numbers of sole traders since 2020)
+  function nlBtw(s) {
+    const x = String(s || '').toUpperCase().replace(/[\s.\-]/g, '');
+    const m = /^NL(\d{9})B(\d{2})$/.exec(x);
+    if (!m) return { ok: false, btw: x };
+    const d = m[1].split('').map(Number);
+    const elf = d.slice(0, 8).reduce((a, v, i) => a + v * (9 - i), 0) - d[8];
+    let r = 0; for (const c of x.replace(/[A-Z]/g, c => String(c.charCodeAt(0) - 55))) r = (r * 10 + Number(c)) % 97;
+    return { ok: elf % 11 === 0 || r === 1, btw: x };
+  }
+  // KvK number: 8 digits (Kamer van Koophandel, no check digit)
+  function nlKvk(s) { const x = String(s || '').replace(/\D/g, ''); return { ok: /^\d{8}$/.test(x), kvk: x }; }
+
+  return { validar, limpiar, extranjero, gbVat, frSiren, atUid, chUid, itPiva, itCf, nlBtw, nlKvk };
 });

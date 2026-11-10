@@ -565,6 +565,18 @@ docker compose up -d --build</code></pre></div>
       </ul>
     </section>
 
+    <section id="niederlande">
+      <h2>Países Bajos: btw y Peppol</h2>
+      <p>Elija “Nederland” en <span class="path">Ajustes → Impuestos / reclamaciones / caja → Sistema fiscal</span>, guarde y recargue. La configuración está en la pestaña <span class="path">Nederland</span>. Para documentos en neerlandés elija el idioma de documentos “Nederlands”.</p>
+      <ul>
+        <li><strong>Datos de la empresa:</strong> btw-id (NL123456782B01) en NIF-IVA y número KvK en la pestaña Nederland. Ambos aparecen en el pie de cada documento.</li>
+        <li><strong>Tipos:</strong> 21 %, 9 % y 0 % exento. Se puede activar el régimen de pequeños empresarios (KOR). Inversión del sujeto pasivo, entregas intracomunitarias, exportaciones, régimen del margen y suplidos llevan el texto obligatorio.</li>
+        <li><strong>Factura electrónica (Peppol):</strong> registre las administraciones con su OIN (20 cifras) y las empresas con su número KvK; la referencia del comprador va en el campo Leitweg-ID o en el número de pedido de la factura. En la ventana de la factura <em>E-factuur (Peppol) → descargar</em> y envíela mediante su proveedor Peppol o el Leveranciersportaal.</li>
+        <li><strong>Declaración de IVA:</strong> <span class="path">Finanzas → Exportación contable</span> muestra las rúbricas 1a–5g (volumen en euros enteros redondeado a la baja, impuesto redondeado a su favor) y las exporta en CSV. Introduzca los importes en Mijn Belastingdienst Zakelijk; las prestaciones a empresarios de la UE van además en la declaración ICP.</li>
+        <li><strong>Caja:</strong> en los Países Bajos no hay obligación de caja fiscal; el ticket muestra el btw-id.</li>
+      </ul>
+    </section>
+
     <section id="datev">
       <h2>Exportación DATEV para el asesor fiscal</h2>
       <p class="lead">Kuenta contabiliza automáticamente facturas, pagos, facturas de proveedor y ventas de caja y los exporta como archivos DATEV. Su asesor fiscal los importa directamente en DATEV, el programa contable habitual en Alemania.</p>
@@ -863,7 +875,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>Compruebe la TSE con una cuenta de prueba de fiskaly antes de usarla en real y comunique la caja a Hacienda (alemana).</li>
             <li>Compruebe el terminal de tarjetas y la DSFinV-K antes de usarlos o de una inspección.</li>
-            <li>Kuenta está pensado para Alemania, España, el Reino Unido, Estados Unidos, Francia, Austria, Suiza e Italia (vea <a href="#spanien">España</a>, <a href="#uk">Reino Unido</a>, <a href="#usa">Estados Unidos</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Suiza</a> e <a href="#italien">Italia</a>). TicketBAI, Navarra e IGIC no están soportados.</li>
+            <li>Kuenta está pensado para Alemania, España, el Reino Unido, Estados Unidos, Francia, Austria, Suiza, Italia y los Países Bajos (vea <a href="#spanien">España</a>, <a href="#uk">Reino Unido</a>, <a href="#usa">Estados Unidos</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Suiza</a>, <a href="#italien">Italia</a> y <a href="#niederlande">Países Bajos</a>). TicketBAI, Navarra e IGIC no están soportados.</li>
             <li>Los contratos de compraventa son modelos y no sustituyen el asesoramiento jurídico.</li>
           </ul></div>
       </div>

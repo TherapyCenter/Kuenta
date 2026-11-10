@@ -5,6 +5,7 @@ const I18N = require('../public/js/i18n');
 I18N.add('en', require('../public/js/lang/en'));
 I18N.add('es', require('../public/js/lang/es'));
 I18N.add('it', require('../public/js/lang/it')); // documents only
+I18N.add('nl', require('../public/js/lang/nl')); // documents only
 
 function docLang() {
   try { return require('./lib').sw('beleg.sprache', 'de') || 'de'; } catch { return 'de'; }

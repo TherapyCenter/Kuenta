@@ -561,6 +561,18 @@ docker compose up -d --build</code></pre></div>
       </ul>
     </section>
 
+    <section id="niederlande">
+      <h2>Niederlande: btw und Peppol</h2>
+      <p>Unter <span class="path">Einstellungen → Steuer / Mahnung / Kasse → Steuersystem</span> „Nederland“ wählen, speichern und neu laden. Die Einstellungen stehen im Reiter <span class="path">Nederland</span>. Für niederländische Belege die Belegsprache „Nederlands“ wählen.</p>
+      <ul>
+        <li><strong>Firmendaten:</strong> btw-id (NL123456782B01) unter USt-IdNr., KvK-Nummer im Reiter Nederland. Beide stehen in der Fußzeile jedes Belegs.</li>
+        <li><strong>Steuersätze:</strong> 21 % (volle MwSt), 9 % (ermäßigte MwSt), 0 % vrijgesteld. Kleineondernemersregeling (KOR) ist wählbar. Btw verlegd, ICL, Uitvoer, Margeregeling und doorlopende posten erhalten den vorgeschriebenen Text.</li>
+        <li><strong>E-factuur (Peppol):</strong> Kunden der öffentlichen Hand mit OIN (20 Ziffern), Unternehmen mit KvK-Nummer anlegen; die Referenz des Auftraggebers ins Feld Leitweg-ID oder die Bestell-Nr. der Rechnung. Im Rechnungsfenster <em>E-factuur (Peppol) → herunterladen</em> und über Ihren Peppol-Dienstleister oder das Leveranciersportaal senden.</li>
+        <li><strong>Btw-aangifte:</strong> <span class="path">Finanzen → FIBU-Export</span> zeigt die Rubriken 1a–5g (Umsätze in ganzen Euro abgerundet, Steuer zu Ihren Gunsten gerundet) und exportiert sie als CSV. Die Werte tragen Sie in Mijn Belastingdienst Zakelijk ein; Leistungen an EU-Unternehmer gehören zusätzlich in die ICP-Meldung.</li>
+        <li><strong>Kasse:</strong> in den Niederlanden gibt es keine Pflicht zur fiskalischen Kasse; der Bon zeigt die btw-id.</li>
+      </ul>
+    </section>
+
     <section id="datev">
       <h2>DATEV-Export für den Steuerberater</h2>
       <p class="lead">Kuenta bucht Rechnungen, Zahlungen, Eingangsrechnungen und Kassenumsätze automatisch und exportiert sie als DATEV-Dateien. Ihr Steuerberater liest sie direkt in DATEV ein.</p>
@@ -858,7 +870,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>TSE vor dem Echtbetrieb mit fiskaly-Testzugang prüfen und die Kasse beim Finanzamt melden.</li>
             <li>EC-Terminal und DSFinV-K vor dem Einsatz bzw. vor einer Prüfung kontrollieren.</li>
-            <li>Kuenta ist auf Deutschland, Spanien, Großbritannien, die USA, Frankreich, Österreich, die Schweiz und Italien ausgelegt (siehe <a href="#spanien">Spanien</a>, <a href="#uk">Großbritannien</a>, <a href="#usa">USA</a>, <a href="#oesterreich">Österreich</a>, <a href="#schweiz">Schweiz</a> und <a href="#italien">Italien</a>). Andere Länder werden nicht unterstützt.</li>
+            <li>Kuenta ist auf Deutschland, Spanien, Großbritannien, die USA, Frankreich, Österreich, die Schweiz, Italien und die Niederlande ausgelegt (siehe <a href="#spanien">Spanien</a>, <a href="#uk">Großbritannien</a>, <a href="#usa">USA</a>, <a href="#oesterreich">Österreich</a>, <a href="#schweiz">Schweiz</a>, <a href="#italien">Italien</a> und <a href="#niederlande">Niederlande</a>). Andere Länder werden nicht unterstützt.</li>
             <li>Kaufverträge sind Muster und ersetzen keine Rechtsberatung.</li>
           </ul></div>
       </div>

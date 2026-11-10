@@ -63,6 +63,8 @@ Object.assign(EXT_COLUMNS.KUNDEN, { TAXEXEMPT: 'INTEGER DEFAULT 0', EXEMPTCERT: 
 EXT_COLUMNS.KUNDEN.SIREN = 'TEXT'; // France: SIREN/SIRET of business customers
 // Italy: codice fiscale, recipient code of the SdI, PEC address, split payment (public bodies)
 Object.assign(EXT_COLUMNS.KUNDEN, { IT_CF: 'TEXT', IT_SDI: 'TEXT', IT_PEC: 'TEXT', IT_SPLIT: 'INTEGER DEFAULT 0' });
+// Netherlands: KvK number and OIN (government) of the customer, electronic address in the Peppol network
+Object.assign(EXT_COLUMNS.KUNDEN, { NL_KVK: 'TEXT', NL_OIN: 'TEXT' });
 for (const t of ['ANGEBOTE', 'AUFTRAEGE', 'LIEFERSCHEIN', 'RECHNUNGEN']) Object.assign(EXT_COLUMNS[t], { FAHRKMOUT: 'INTEGER', USALTTEILE: 'TEXT', USFREIGABE: 'TEXT' });
 for (const t of ['ANGEBOTE_POS', 'AUFTRAEGE_POS', 'LIEFERSCHEIN_POS', 'RECHNUNGEN_POS']) EXT_COLUMNS[t] = { ...(EXT_COLUMNS[t] || {}), TEILEZUSTAND: 'TEXT' };
 const EXT_TABLES = `

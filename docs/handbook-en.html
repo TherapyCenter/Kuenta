@@ -565,6 +565,18 @@ docker compose up -d --build</code></pre></div>
       </ul>
     </section>
 
+    <section id="niederlande">
+      <h2>Netherlands: VAT and Peppol</h2>
+      <p>Choose “Nederland” under <span class="path">Settings → Tax / dunning / register → Tax system</span>, save and reload. The settings are on the tab <span class="path">Nederland</span>. For Dutch documents choose the document language “Nederlands”.</p>
+      <ul>
+        <li><strong>Company data:</strong> btw-id (NL123456782B01) into VAT ID, KvK number on the tab Nederland. Both appear in the footer of every document.</li>
+        <li><strong>Rates:</strong> 21 % (full VAT), 9 % (reduced VAT), 0 % exempt. The small business scheme (KOR) can be switched on. Reverse charge, intra-community supplies, exports, margin scheme and disbursements get the required text.</li>
+        <li><strong>E-invoice (Peppol):</strong> enter public bodies with their OIN (20 digits) and businesses with their KvK number; the buyer's reference goes into the Leitweg-ID field or the invoice's order number. In the invoice window <em>E-factuur (Peppol) → download</em> and send it through your Peppol service provider or the Leveranciersportaal.</li>
+        <li><strong>VAT return:</strong> <span class="path">Finance → FIBU export</span> shows rubrieken 1a–5g (turnover in whole euros rounded down, tax rounded in your favour) and exports them as CSV. Enter the figures in Mijn Belastingdienst Zakelijk; services and supplies to EU businesses also go into the ICP listing.</li>
+        <li><strong>Register:</strong> the Netherlands have no fiscal cash register obligation; the receipt shows the btw-id.</li>
+      </ul>
+    </section>
+
     <section id="datev">
       <h2>DATEV export for the tax adviser</h2>
       <p class="lead">Kuenta books invoices, payments, incoming invoices and register sales automatically and exports them as DATEV files. Your tax adviser reads them directly into DATEV, the accounting software common in Germany.</p>
@@ -863,7 +875,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>Check the TSE with a fiskaly test account before going live and register the register with the tax office.</li>
             <li>Check the card terminal and DSFinV-K before use or before an audit.</li>
-            <li>Kuenta is designed for Germany, Spain, the United Kingdom, the United States, France, Austria, Switzerland and Italy (see <a href="#spanien">Spain</a>, <a href="#uk">United Kingdom</a>, <a href="#usa">United States</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Switzerland</a> and <a href="#italien">Italy</a>). Other countries are not supported.</li>
+            <li>Kuenta is designed for Germany, Spain, the United Kingdom, the United States, France, Austria, Switzerland, Italy and the Netherlands (see <a href="#spanien">Spain</a>, <a href="#uk">United Kingdom</a>, <a href="#usa">United States</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Switzerland</a>, <a href="#italien">Italy</a> and <a href="#niederlande">the Netherlands</a>). Other countries are not supported.</li>
             <li>Purchase contracts are templates and do not replace legal advice.</li>
           </ul></div>
       </div>
