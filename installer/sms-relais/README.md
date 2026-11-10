@@ -1,28 +1,30 @@
-# Kuenta-SMS-Relais (Surfstick mit SIM-Karte)
+# Kuenta SMS relay (USB modem with SIM card)
 
-Das Relais läuft auf einem eigenen Rechner (z. B. altem PC, Mini-PC oder Raspberry Pi), an dem ein USB-Surfstick mit SIM-Karte steckt. Kuenta schickt die Erinnerungs-SMS über das Netzwerk an das Relais, das Relais verschickt sie über den Stick.
+**English** · [Deutsch](README.de.md)
+
+The relay runs on a separate computer (e.g. an old PC, mini PC or Raspberry Pi) with a USB modem stick and SIM card plugged in. Kuenta sends the reminder SMS over the network to the relay, and the relay sends them via the stick.
 
 ```
-Kuenta  ──(Netzwerk, POST /sms)──►  Relais-Rechner  ──(gammu)──►  Surfstick + SIM  ──►  Kunde
+Kuenta  ──(network, POST /sms)──►  relay computer  ──(gammu)──►  USB modem + SIM  ──►  customer
 ```
 
-## Was Sie brauchen
+## What you need
 
-- **Surfstick, der SMS über AT-Befehle versenden kann.** Geeignet sind Sticks, die sich als Modem (serielle Schnittstelle) anmelden. Sticks, die nur als Netzwerkkarte erscheinen (z. B. Huawei „HiLink“ wie E3372h), müssen erst in den Modem-Modus umgestellt werden oder sind ungeeignet.
-- **SIM-Karte mit SMS-Tarif** und abgeschalteter PIN (oder PIN in der gammu-Konfiguration).
-- **Node.js ab Version 18** und **gammu** auf dem Relais-Rechner.
+- **A USB modem that can send SMS via AT commands.** Suitable are sticks that register as a modem (serial interface). Sticks that only appear as a network card (e.g. Huawei "HiLink" such as the E3372h) must first be switched to modem mode or are unsuitable.
+- **A SIM card with an SMS plan** and the PIN switched off (or the PIN in the gammu configuration).
+- **Node.js 18 or later** and **gammu** on the relay computer.
 
-> **UMTS ist in Deutschland abgeschaltet** (alle Netzbetreiber seit 2021/2022). Ein reiner UMTS-Stick verschickt SMS dann nur noch über das alte GSM-Netz (2G), solange es noch betrieben wird. Besser ist ein **LTE-Stick mit Modem-Modus**. Für SMS reicht die Netzanbindung völlig, auch ohne Datenvolumen.
+> **UMTS has been switched off in Germany** (all network operators since 2021/2022). A pure UMTS stick then only sends SMS over the old GSM network (2G) as long as it is still operated. Better use an **LTE stick with modem mode**. The network connection is fully sufficient for SMS, even without a data plan.
 
-## Einrichtung unter Linux (Debian, Ubuntu, Raspberry Pi OS)
+## Setup on Linux (Debian, Ubuntu, Raspberry Pi OS)
 
 ```sh
 sudo apt install gammu nodejs
-ls /dev/ttyUSB*            # Schnittstellen des Sticks, meist ttyUSB0 bis ttyUSB2
-gammu-detect               # zeigt gefundene Modems
+ls /dev/ttyUSB*            # interfaces of the stick, usually ttyUSB0 to ttyUSB2
+gammu-detect               # shows the modems found
 ```
 
-Datei `~/.gammurc` anlegen (Schnittstelle anpassen):
+Create the file `~/.gammurc` (adjust the interface):
 
 ```ini
 [gammu]
@@ -30,30 +32,30 @@ device = /dev/ttyUSB0
 connection = at
 ```
 
-Testen:
+Test:
 
 ```sh
-gammu identify                                   # Stick wird erkannt?
-gammu sendsms TEXT +4917012345678 -text "Test"   # Test-SMS an Ihr Handy
+gammu identify                                   # is the stick recognised?
+gammu sendsms TEXT +4917012345678 -text "Test"   # test SMS to your phone
 ```
 
-Funktioniert das, das Relais starten (Token frei wählen, langes Zufallswort):
+If that works, start the relay (choose any token, a long random word):
 
 ```sh
-KUENTA_SMS_TOKEN=IhrGeheimesToken node kuenta-sms-relais.js
+KUENTA_SMS_TOKEN=YourSecretToken node kuenta-sms-relais.js
 ```
 
-### Als Dienst im Hintergrund
+### As a background service
 
 ```ini
 # /etc/systemd/system/kuenta-sms-relais.service
 [Unit]
-Description=Kuenta-SMS-Relais
+Description=Kuenta SMS relay
 After=network-online.target
 
 [Service]
 User=pi
-Environment=KUENTA_SMS_TOKEN=IhrGeheimesToken
+Environment=KUENTA_SMS_TOKEN=YourSecretToken
 ExecStart=/usr/bin/node /opt/kuenta-sms-relais/kuenta-sms-relais.js
 Restart=on-failure
 
@@ -65,52 +67,52 @@ WantedBy=multi-user.target
 sudo systemctl daemon-reload && sudo systemctl enable --now kuenta-sms-relais
 ```
 
-Der Benutzer braucht Zugriff auf den Stick: `sudo usermod -aG dialout pi`.
+The user needs access to the stick: `sudo usermod -aG dialout pi`.
 
-## Einrichtung unter Windows
+## Setup on Windows
 
-1. gammu für Windows installieren und den Ordner mit `gammu.exe` zum `PATH` hinzufügen.
-2. Im Geräte-Manager unter „Anschlüsse (COM & LPT)“ den Modem-Anschluss des Sticks ablesen, z. B. `COM5`.
-3. `gammurc` anlegen, z. B. `C:\kuenta-sms\gammurc`:
+1. Install gammu for Windows and add the folder containing `gammu.exe` to the `PATH`.
+2. In Device Manager under "Ports (COM & LPT)", read the modem port of the stick, e.g. `COM5`.
+3. Create a `gammurc`, e.g. `C:\kuenta-sms\gammurc`:
    ```ini
    [gammu]
    device = COM5:
    connection = at
    ```
-4. Testen: `gammu -c C:\kuenta-sms\gammurc identify`
-5. Starten (PowerShell):
+4. Test: `gammu -c C:\kuenta-sms\gammurc identify`
+5. Start (PowerShell):
    ```powershell
-   $env:KUENTA_SMS_TOKEN = "IhrGeheimesToken"
+   $env:KUENTA_SMS_TOKEN = "YourSecretToken"
    $env:KUENTA_SMS_GAMMURC = "C:\kuenta-sms\gammurc"
    node kuenta-sms-relais.js
    ```
-6. In der Windows-Firewall Port 3790 für das private Netzwerk freigeben.
+6. Allow port 3790 for the private network in the Windows firewall.
 
-## In Kuenta eintragen
+## Entering it in Kuenta
 
-*Einstellungen → Erinnerungen & SMS → SMS-Gateway → Vorlage „Kuenta-SMS-Relais“* einsetzen und anpassen:
+Insert and adjust the template *Settings → Reminders & SMS → SMS gateway → template "Kuenta SMS relay"*:
 
-| Feld | Wert |
+| Field | Value |
 |---|---|
-| Adresse (URL) | `http://<Relais-Rechner>:3790/sms`, z. B. `http://192.168.1.50:3790/sms` |
-| Kopfzeilen | `X-Token: IhrGeheimesToken` |
-| Inhalt | `{"nummer":"{nummer}","text":"{text}"}` |
+| Address (URL) | `http://<relay computer>:3790/sms`, e.g. `http://192.168.1.50:3790/sms` |
+| Headers | `X-Token: YourSecretToken` |
+| Body | `{"nummer":"{nummer}","text":"{text}"}` |
 
-Dann „Einstellungen speichern & Test-SMS senden“.
+Then "Save settings & send test SMS".
 
-## Einstellungen des Relais
+## Relay settings
 
-| Variable | Standard | Bedeutung |
+| Variable | Default | Meaning |
 |---|---|---|
-| `KUENTA_SMS_TOKEN` | – (Pflicht) | Muss mit der Kopfzeile `X-Token` in Kuenta übereinstimmen |
-| `PORT` | `3790` | Port des Relais |
-| `HOST` | `0.0.0.0` | Netzwerkkarte; `127.0.0.1`, wenn Kuenta auf demselben Rechner läuft |
-| `KUENTA_SMS_BEFEHL` | `gammu` | Mit laufendem `gammu-smsd` stattdessen `gammu-smsd-inject` |
-| `KUENTA_SMS_GAMMURC` | – | Pfad zur gammu-Konfiguration |
+| `KUENTA_SMS_TOKEN` | – (required) | must match the header `X-Token` in Kuenta |
+| `PORT` | `3790` | port of the relay |
+| `HOST` | `0.0.0.0` | network interface; `127.0.0.1` if Kuenta runs on the same computer |
+| `KUENTA_SMS_BEFEHL` | `gammu` | with a running `gammu-smsd` use `gammu-smsd-inject` instead |
+| `KUENTA_SMS_GAMMURC` | – | path to the gammu configuration |
 
-## Hinweise
+## Notes
 
-- Das Relais sendet eine SMS nach der anderen. 50 Erinnerungen dauern einige Minuten.
-- Texte mit Zeichen außerhalb des SMS-Standardzeichensatzes (z. B. Emojis) werden als Unicode-SMS mit nur 70 Zeichen je Teil verschickt. Deutsche Umlaute und ß gehören zum Standardzeichensatz.
-- Das Relais nur im eigenen Netzwerk betreiben, nicht aus dem Internet erreichbar machen.
-- Prüfen Sie beim Tarif, ob der Versand vieler SMS erlaubt ist. Manche Privattarife verbieten Massenversand.
+- The relay sends one SMS after the other. 50 reminders take a few minutes.
+- Texts with characters outside the SMS default character set (e.g. emojis) are sent as Unicode SMS with only 70 characters per part. German umlauts and ß belong to the default character set; many Spanish accented letters (e.g. á, ó, ú) do not and turn the message into Unicode.
+- Only run the relay in your own network; do not make it reachable from the internet.
+- Check whether your plan allows sending many SMS. Some private plans forbid bulk sending.

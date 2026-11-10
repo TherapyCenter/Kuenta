@@ -42,4 +42,4 @@ The license applies to this one installation with all companies.
 
 **Why is the Pro code visible in the repository?**
 So you can see what it does. It is not under the AGPL, however, but under the
-[Kuenta Pro license](server/pro/LICENSE.md) (German): it may only be run with a valid key.
+[Kuenta Pro license](server/pro/LICENSE.en.md) (English translation; the [German original](server/pro/LICENSE.md) is binding): it may only be run with a valid key.

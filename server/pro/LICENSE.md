@@ -1,5 +1,7 @@
 # Kuenta-Pro-Lizenz
 
+Englische Übersetzung zur Information: [LICENSE.en.md](LICENSE.en.md). Verbindlich ist diese deutsche Fassung.
+
 Copyright © 2026 DoctorD (heidepower@proton.me). Alle Rechte vorbehalten.
 
 Herausgeber und Lizenzgeber ist der Open-Source-Entwickler DoctorD. Lizenzschlüssel stellt
@@ -23,4 +25,4 @@ Hauptordner).
 6. **Gewährleistung.** Der Pro-Code wird ohne Gewähr bereitgestellt, soweit gesetzlich zulässig.
    Ansprüche aus einem Lizenzkauf richten sich nach dem jeweiligen Kaufvertrag.
 
-Fragen zur Lizenz: siehe `PRO.md`.
+Fragen zur Lizenz: siehe `PRO.de.md`.
