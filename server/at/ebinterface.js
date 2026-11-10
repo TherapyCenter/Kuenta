@@ -32,15 +32,18 @@ function create(rid) {
   const kundeName = [k.KUNNAME, k.KUNVORNAME].filter(Boolean).join(Number(k.KUNART) === 1 ? ' ' : ', ');
   const o = [];
   o.push('<?xml version="1.0" encoding="UTF-8"?>');
-  o.push(`<Invoice xmlns="${NS}" GeneratingSystem="Kuenta ${x(pkg.version)}" DocumentType="${credit ? 'CreditMemo' : 'Invoice'}" InvoiceCurrency="EUR" DocumentTitle="${x((credit ? 'Gutschrift ' : 'Rechnung ') + k.RECHNUNGNUMMER)}" Language="ger">`);
+  o.push(`<Invoice xmlns="${NS}" GeneratingSystem="Kuenta ${x(pkg.version)}" DocumentType="${credit ? 'CreditMemo' : 'Invoice'}" InvoiceCurrency="EUR" DocumentTitle="${x((credit ? 'Gutschrift ' : 'Rechnung ') + k.RECHNUNGNUMMER)}" Language="de">`);
   o.push(`<InvoiceNumber>${x(k.RECHNUNGNUMMER)}</InvoiceNumber><InvoiceDate>${x(String(k.DATUM).slice(0, 10))}</InvoiceDate>`);
+  // credit memo: the invoice it corrects
+  if (b.orig) o.push(`<RelatedDocument><InvoiceNumber>${x(b.orig.RECHNUNGNUMMER)}</InvoiceNumber><InvoiceDate>${x(String(b.orig.DATUM).slice(0, 10))}</InvoiceDate><DocumentType>Invoice</DocumentType></RelatedDocument>`);
   o.push(`<Delivery><Date>${x(String(k.LIEFDATUM || k.DATUM).slice(0, 10))}</Date></Delivery>`);
-  o.push(`<Biller><VATIdentificationNumber>${x(String(f.USTNR || '00000000').replace(/\s/g, ''))}</VATIdentificationNumber>${bund ? `<InvoiceRecipientsBillerID>${x(kunde.LEITWEGID)}</InvoiceRecipientsBillerID>` : ''}${adresse(f.FIRMENNAME, f.STRASSE, f.PLZ, f.ORT, f.LAND || 'AT', { tel: f.TELEFON, mail: f.EMAIL })}</Biller>`);
-  o.push(`<InvoiceRecipient><VATIdentificationNumber>${x(String(kunde.USTID || '00000000').replace(/\s/g, ''))}</VATIdentificationNumber>${k.KUNNUMMER ? `<BillersInvoiceRecipientID>${x(k.KUNNUMMER)}</BillersInvoiceRecipientID>` : ''}${k.BESTELLNR ? `<OrderReference><OrderID>${x(k.BESTELLNR)}</OrderID></OrderReference>` : ''}${adresse(kundeName, k.KUNSTRASSE, k.KUNPLZ, k.KUNORT, k.KUNLAND || 'AT', { mail: b.buyerMail })}</InvoiceRecipient>`);
+  // order of the party elements (schema): VAT number, order reference, address, then the IDs of the other party
+  o.push(`<Biller><VATIdentificationNumber>${x(String(f.USTNR || '00000000').replace(/\s/g, ''))}</VATIdentificationNumber>${adresse(f.FIRMENNAME, f.STRASSE, f.PLZ, f.ORT, f.LAND || 'AT', { tel: f.TELEFON, mail: f.EMAIL })}${bund ? `<InvoiceRecipientsBillerID>${x(kunde.LEITWEGID)}</InvoiceRecipientsBillerID>` : ''}</Biller>`);
+  o.push(`<InvoiceRecipient><VATIdentificationNumber>${x(String(kunde.USTID || '00000000').replace(/\s/g, ''))}</VATIdentificationNumber>${k.BESTELLNR ? `<OrderReference><OrderID>${x(k.BESTELLNR)}</OrderID></OrderReference>` : ''}${adresse(kundeName, k.KUNSTRASSE, k.KUNPLZ, k.KUNORT, k.KUNLAND || 'AT', { mail: b.buyerMail })}${k.KUNNUMMER ? `<BillersInvoiceRecipientID>${x(k.KUNNUMMER)}</BillersInvoiceRecipientID>` : ''}</InvoiceRecipient>`);
   o.push('<Details><ItemList>');
   for (const l of b.lines) {
     const tax = l.cat === 'S' ? Math.round(l.total * l.rate) / 100 : 0;
-    o.push(`<ListLineItem><PositionNumber>${l.id}</PositionNumber><Description>${x(l.name)}</Description>${l.artnr ? `<ArticleNumber ArticleNumberType="SellersArticleNumber">${x(l.artnr)}</ArticleNumber>` : ''}<Quantity Unit="${x(l.unit)}">${a4(sg * l.qty)}</Quantity><UnitPrice>${a4(l.price)}</UnitPrice><TaxItem><TaxableAmount>${a2(sg * l.total)}</TaxableAmount><TaxPercent TaxCategoryCode="${kategorie(l)}">${a2(l.rate)}</TaxPercent><TaxAmount>${a2(sg * tax)}</TaxAmount></TaxItem><LineItemAmount>${a2(sg * l.total)}</LineItemAmount></ListLineItem>`);
+    o.push(`<ListLineItem><PositionNumber>${l.id}</PositionNumber><Description>${x(l.name)}</Description>${l.artnr ? `<ArticleNumber ArticleNumberType="BillersArticleNumber">${x(l.artnr)}</ArticleNumber>` : ''}<Quantity Unit="${x(l.unit)}">${a4(sg * l.qty)}</Quantity><UnitPrice>${a4(l.price)}</UnitPrice><TaxItem><TaxableAmount>${a2(sg * l.total)}</TaxableAmount><TaxPercent TaxCategoryCode="${kategorie(l)}">${a2(l.rate)}</TaxPercent><TaxAmount>${a2(sg * tax)}</TaxAmount></TaxItem><LineItemAmount>${a2(sg * l.total)}</LineItemAmount></ListLineItem>`);
   }
   o.push('</ItemList></Details>');
   o.push('<Tax>');

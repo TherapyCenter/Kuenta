@@ -161,6 +161,9 @@ test('ebInterface 6.1', () => {
   assert.deepStrictEqual(r.problems, []);
   assert.match(r.xml, /<Invoice xmlns="http:\/\/www\.ebinterface\.at\/schema\/6p1\/"/);
   assert.match(r.xml, /<InvoiceRecipientsBillerID>123456<\/InvoiceRecipientsBillerID>/);
+  // order of the schema ebInterface 6.1: address first, then the ID of the other party; language with 2 letters
+  assert.match(r.xml, /<\/Address><InvoiceRecipientsBillerID>123456<\/InvoiceRecipientsBillerID><\/Biller>/);
+  assert.match(r.xml, /Language="de"/);
   assert.match(r.xml, /<OrderReference><OrderID>4500012345<\/OrderID><\/OrderReference>/);
   assert.match(r.xml, /<TaxPercent TaxCategoryCode="S">20.00<\/TaxPercent><TaxAmount>20.00<\/TaxAmount>/);
   assert.match(r.xml, /<TaxPercent TaxCategoryCode="S">13.00<\/TaxPercent><TaxAmount>6.50<\/TaxAmount>/);
