@@ -12,7 +12,7 @@ The licensor is the open source developer **Doc**. Buying an add-on funds furthe
 
 | Add-on | since | Price |
 |---|---|---|
-| **SMS:** SMS reminders of the HU (German MOT), service and other due dates, SMS gateway (provider, Android phone, USB modem via the Kuenta SMS relay) | 1.0.8 | 10 € |
+| **SMS:** SMS reminders of the HU (German MOT), service and other due dates, SMS gateway (provider, Android phone, USB modem via the Kuenta SMS relay) | 1.0.8 | $20 |
 
 The price is per add-on, one-off and unlimited, for one installation with all companies.
 Payment is made with Bitcoin or Tether at the euro rate on the day of payment.

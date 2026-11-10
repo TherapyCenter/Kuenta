@@ -13,7 +13,7 @@ finanzieren Sie die Weiterentwicklung.
 
 | Add-on | seit | Preis |
 |---|---|---|
-| **SMS:** SMS-Erinnerungen an HU, Inspektion und andere Termine, SMS-Gateway (Anbieter, Android-Handy, Surfstick über das Kuenta-SMS-Relais) | 1.0.8 | 10 € |
+| **SMS:** SMS-Erinnerungen an HU, Inspektion und andere Termine, SMS-Gateway (Anbieter, Android-Handy, Surfstick über das Kuenta-SMS-Relais) | 1.0.8 | 20 $ |
 
 Der Preis gilt je Add-on, einmalig und unbefristet, für eine Installation mit allen Mandanten.
 Bezahlt wird mit Bitcoin oder Tether zum Euro-Kurs am Zahltag.

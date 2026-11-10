@@ -24,7 +24,7 @@ cannot create licenses itself.
 
 1. In the store, create an app of type **Point of Sale**, display "Product list" or "Cart".
 2. Create one item per add-on. **The item ID must be the Kuenta feature name:**
-   `sms` (SMS add-on, 10 €), optionally `pro` (all add-ons). Map different IDs in
+   `sms` (SMS add-on, $20), optionally `pro` (all add-ons). Map different IDs in
    `shop.json` under `artikel`, e.g. `"sms-addon": "sms"`.
 3. Under *Forms*, create a form with the fields **`buyerName`** (label "Workshop name",
    required) and **`buyerEmail`** (email, required) and assign it to the app.

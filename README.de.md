@@ -102,7 +102,7 @@ Schrift: Liberation Sans (SIL Open Font License, `server/pdf/fonts/LICENSE`). QR
 
 ## Lizenz
 
-Copyright © 2026 Doc (heidepower@proton.me). Kuenta ist Open Source unter der **GNU Affero General Public License 3.0** (`LICENSE`). Ausgenommen ist der Ordner `server/pro/`: Er steht unter der [Kuenta-Pro-Lizenz](server/pro/LICENSE.md) und läuft nur mit einem Lizenzschlüssel. Was zu Kuenta Pro gehört und wie man es kauft (10 € je Add-on, Bitcoin oder Tether), steht in [PRO.de.md](PRO.de.md). Beiträge: [CONTRIBUTING.de.md](CONTRIBUTING.de.md).
+Copyright © 2026 Doc (heidepower@proton.me). Kuenta ist Open Source unter der **GNU Affero General Public License 3.0** (`LICENSE`). Ausgenommen ist der Ordner `server/pro/`: Er steht unter der [Kuenta-Pro-Lizenz](server/pro/LICENSE.md) und läuft nur mit einem Lizenzschlüssel. Was zu Kuenta Pro gehört und wie man es kauft (20 US-Dollar je Add-on, Bitcoin oder Tether), steht in [PRO.de.md](PRO.de.md). Beiträge: [CONTRIBUTING.de.md](CONTRIBUTING.de.md).
 
 ### Für den Herausgeber: Lizenzen ausstellen
 

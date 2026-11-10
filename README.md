@@ -107,7 +107,7 @@ Font: Liberation Sans (SIL Open Font License, `server/pdf/fonts/LICENSE`). QR co
 
 ## License
 
-Copyright © 2026 Doc (heidepower@proton.me). Kuenta is open source under the **GNU Affero General Public License 3.0** (`LICENSE`). The folder `server/pro/` is excluded: it is under the [Kuenta Pro license](server/pro/LICENSE.en.md) (the German original [LICENSE.md](server/pro/LICENSE.md) is binding) and only runs with a license key. What belongs to Kuenta Pro and how to buy it (10 € per add-on, Bitcoin or Tether) is described in [PRO.md](PRO.md). Contributions: [CONTRIBUTING.md](CONTRIBUTING.md).
+Copyright © 2026 Doc (heidepower@proton.me). Kuenta is open source under the **GNU Affero General Public License 3.0** (`LICENSE`). The folder `server/pro/` is excluded: it is under the [Kuenta Pro license](server/pro/LICENSE.en.md) (the German original [LICENSE.md](server/pro/LICENSE.md) is binding) and only runs with a license key. What belongs to Kuenta Pro and how to buy it ($20 per add-on, Bitcoin or Tether) is described in [PRO.md](PRO.md). Contributions: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ### For the publisher: issuing licenses
 

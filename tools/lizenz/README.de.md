@@ -24,7 +24,7 @@ nur einen API-Schlüssel mit Leserecht und kann selbst keine Lizenzen erzeugen.
 
 1. Im Store eine App vom Typ **Point of Sale** anlegen, Darstellung „Produktliste“ oder „Warenkorb“.
 2. Je Add-on einen Artikel anlegen. **Die Artikel-ID muss der Kuenta-Funktionsname sein:**
-   `sms` (SMS-Add-on, 10 €), optional `pro` (alle Add-ons). Abweichende IDs ordnen Sie in
+   `sms` (SMS-Add-on, 20 US-Dollar), optional `pro` (alle Add-ons). Abweichende IDs ordnen Sie in
    `shop.json` unter `artikel` zu, z. B. `"sms-addon": "sms"`.
 3. Unter *Formulare* ein Formular mit den Feldern **`buyerName`** (Beschriftung „Name der
    Werkstatt“, Pflicht) und **`buyerEmail`** (E-Mail, Pflicht) anlegen und der App zuweisen.

@@ -28,7 +28,7 @@ const ANGEBOT = {
   seite: 'https://github.com/TherapyCenter/Kuenta/blob/main/PRO.md',
   // Address of the BTCPay "Point of Sale" app (license shop). Empty = order by email only.
   shop: '',
-  text: 'Add-ons kosten je 10 € (einmalig) und werden mit Bitcoin (BTC, auch Lightning) oder Tether (USDT) bezahlt. Bestellung an heidepower@proton.me, nach Zahlungseingang erhalten Sie Ihren Lizenzschlüssel.',
+  text: 'Add-ons kosten je 20 US-Dollar (einmalig) und werden mit Bitcoin (BTC, auch Lightning) oder Tether (USDT) bezahlt. Bestellung an heidepower@proton.me, nach Zahlungseingang erhalten Sie Ihren Lizenzschlüssel.',
 };
 
 const PRAEFIX = 'KUENTA1';
