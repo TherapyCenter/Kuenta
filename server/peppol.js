@@ -1,31 +1,37 @@
 'use strict';
-// Peppol BIS Billing 3.0 (UBL 2.1) with the Dutch rules (NLCIUS in Peppol): invoices to the government and to
-// businesses on the Peppol network. Electronic addresses by the Peppol EAS list: 0106 KvK, 0190 OIN (government),
-// 9944 Dutch btw-id. The supplier is identified by its KvK number; customers in the Netherlands by KvK or OIN.
+// Peppol BIS Billing 3.0 (UBL 2.1) for the Dutch and the Belgian tax system: invoices to the government and to
+// businesses on the Peppol network (in Belgium mandatory between businesses since 2026).
+// Electronic addresses by the Peppol EAS list: 0106 KvK and 0190 OIN (Netherlands), 0208 enterprise number
+// (Belgium), otherwise the VAT number of the country. The supplier is identified by its KvK or enterprise number.
 // Uses the invoice data of the e-invoice builder (lines, tax groups, totals).
-const L = require('../lib');
-const NIF = require('../../public/js/nif.js');
-const NL = require('./index');
+const L = require('./lib');
+const NIF = require('../public/js/nif.js');
 
 const x = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const a2 = n => (Math.round((Number(n) || 0) * 100) / 100).toFixed(2);
 const a4 = n => (Math.round((Number(n) || 0) * 10000) / 10000).toString();
 const t = v => String(v || '').trim();
 
-// Dutch reason for each exempt category (the builder writes German texts)
-function reden(g) {
-  if (g.cat === 'AE') return { code: 'VATEX-EU-AE', text: 'Btw verlegd' };
-  if (g.cat === 'K') return { code: 'VATEX-EU-IC', text: 'Intracommunautaire levering' };
-  if (g.cat === 'G') return { code: 'VATEX-EU-G', text: 'Uitvoer buiten de EU' };
-  if (g.rcode === 'VATEX-EU-F') return { code: 'VATEX-EU-F', text: 'Margeregeling gebruikte goederen' };
-  if (/Kleinunternehmer/.test(g.reason || '')) return { code: null, text: 'Vrijgesteld (kleineondernemersregeling)' };
-  if (/Durchlaufender/.test(g.reason || '')) return { code: null, text: 'Doorlopende post (in naam en voor rekening van de klant)' };
-  return { code: null, text: 'Vrijgesteld van btw' };
+// reasons of the exempt categories in Dutch or French (the builder writes German texts)
+const REDEN = {
+  AE: ['Btw verlegd', 'Autoliquidation'], K: ['Intracommunautaire levering', 'Livraison intracommunautaire exemptée'], G: ['Uitvoer buiten de EU', 'Exportation hors UE'],
+  F: ['Margeregeling gebruikte goederen', 'Régime particulier des biens d\'occasion'], KOR: ['Vrijgesteld (kleine ondernemingen)', 'Franchise des petites entreprises'],
+  DP: ['Doorlopende post (in naam en voor rekening van de klant)', 'Débours (au nom et pour compte du client)'], E: ['Vrijgesteld van btw', 'Exonéré de TVA'],
+};
+function reden(g, fr) {
+  const tx = k => REDEN[k][fr ? 1 : 0];
+  if (g.cat === 'AE') return { code: 'VATEX-EU-AE', text: tx('AE') };
+  if (g.cat === 'K') return { code: 'VATEX-EU-IC', text: tx('K') };
+  if (g.cat === 'G') return { code: 'VATEX-EU-G', text: tx('G') };
+  if (g.rcode === 'VATEX-EU-F') return { code: 'VATEX-EU-F', text: tx('F') };
+  if (/Kleinunternehmer/.test(g.reason || '')) return { code: null, text: tx('KOR') };
+  if (/Durchlaufender/.test(g.reason || '')) return { code: null, text: tx('DP') };
+  return { code: null, text: tx('E') };
 }
 
 // Peppol EAS codes of VAT numbers per country
 const EAS_VAT = { NL: '9944', BE: '9925', DE: '9930', AT: '9914', FR: '9957', IT: '9906', ES: '9920', LU: '9938' };
-// electronic address of a party: OIN (government), KvK, otherwise the VAT number
+// electronic address of a party: OIN (government), KvK, Belgian enterprise number, otherwise the VAT number
 function endpoint({ oin, kvk, btw }) {
   const o = String(oin || '').replace(/\D/g, '');
   if (/^\d{20}$/.test(o)) return { scheme: '0190', id: o };
@@ -33,34 +39,57 @@ function endpoint({ oin, kvk, btw }) {
   if (k.ok) return { scheme: '0106', id: k.kvk };
   const b = NIF.nlBtw(btw);
   if (b.ok) return { scheme: '9944', id: b.btw };
+  if (/^BE/i.test(String(btw || '').trim())) { const be = NIF.beNr(btw); if (be.ok) return { scheme: '0208', id: be.nr }; }
   const v = String(btw || '').toUpperCase().replace(/[\s.\-]/g, '');
   const land = v.slice(0, 2);
   if (EAS_VAT[land] && /^[A-Z]{2}[0-9A-Z]{2,13}$/.test(v)) return { scheme: EAS_VAT[land], id: v };
   return null;
 }
+// legal registration of a party (BT-30 / BT-47): OIN, KvK or Belgian enterprise number
+function legal({ oin, kvk, btw }) {
+  const o = String(oin || '').replace(/\D/g, '');
+  if (/^\d{20}$/.test(o)) return { scheme: '0190', id: o };
+  const k = NIF.nlKvk(kvk); if (k.ok) return { scheme: '0106', id: k.kvk };
+  if (/^BE/i.test(String(btw || '').trim())) { const be = NIF.beNr(btw); if (be.ok) return { scheme: '0208', id: be.nr }; }
+  return null;
+}
+
+// the supplier's side per tax system
+function lieferant() {
+  if (L.land() === 'BE') {
+    const BE = require('./be'); const o = BE.ondernemingsnr();
+    // small businesses under the franchise keep their VAT number (BR-E-02)
+    return { mod: BE, fr: BE.fr(), btw: o ? o.btw : '', end: o ? { scheme: '0208', id: o.nr } : null, legal: o ? { scheme: '0208', id: o.nr } : null, land: 'BE',
+      fehlt: o ? null : 'Ondernemingsnummer der Firma fehlt (Peppol-Adresse 0208)' };
+  }
+  const NL = require('./nl'); const kvk = NL.kvk();
+  return { mod: NL, fr: false, btw: NL.btw(), end: endpoint({ kvk, btw: L.firma().USTNR }), legal: kvk ? { scheme: '0106', id: kvk } : null, land: 'NL',
+    fehlt: kvk ? null : 'KvK-Nummer der Firma fehlt (Pflicht für Peppol)' };
+}
 
 function create(rid) {
-  const ER = require('../api/erechnung');
+  const ER = require('./api/erechnung');
   const b = ER.build(rid); const { k, f, kunde } = b;
   const credit = b.credit;
   const root = credit ? 'CreditNote' : 'Invoice';
-  const problems = NL.pruefen(credit ? 'korrektur' : 'rechnung', k, kunde);
-  const seller = endpoint({ kvk: NL.kvk(), btw: f.USTNR });
-  const buyerNl = !k.KUNLAND || k.KUNLAND === 'NL';
+  const sup = lieferant(); const M = sup.mod;
+  const problems = M.pruefen(credit ? 'korrektur' : 'rechnung', k, kunde);
+  const seller = sup.end;
+  const kundeLand = k.KUNLAND || sup.land;
   const buyer = endpoint({ oin: kunde.NL_OIN, kvk: kunde.NL_KVK, btw: kunde.USTID });
-  const buyerLegal = /^\d{20}$/.test(String(kunde.NL_OIN || '').replace(/\D/g, '')) ? { scheme: '0190', id: String(kunde.NL_OIN).replace(/\D/g, '') } : NIF.nlKvk(kunde.NL_KVK).ok ? { scheme: '0106', id: NIF.nlKvk(kunde.NL_KVK).kvk } : null;
-  if (!NL.kvk()) problems.push('KvK-Nummer der Firma fehlt (Pflicht für Peppol)');
+  const buyerLegal = legal({ oin: kunde.NL_OIN, kvk: kunde.NL_KVK, btw: kunde.USTID });
+  if (sup.fehlt) problems.push(sup.fehlt);
   if (!f.STRASSE || !f.PLZ || !f.ORT) problems.push('Firmenanschrift unvollständig');
-  if (!buyer) problems.push('Peppol-Adresse des Kunden fehlt: OIN (Behörden), KvK-Nummer oder btw-id im Kunden eintragen');
-  if (buyerNl && !buyerLegal) problems.push('KvK-Nummer oder OIN des niederländischen Kunden fehlt (Peppol-Regel NL-R-005)');
-  if (buyerNl && (!k.KUNSTRASSE || !k.KUNPLZ || !k.KUNORT)) problems.push('Anschrift des Kunden unvollständig (Straße, Postleitzahl, Ort)');
+  if (!buyer) problems.push(sup.land === 'BE' ? 'Peppol-Adresse des Kunden fehlt: Unternehmensnummer bzw. USt-IdNr. (BE0…) im Kunden eintragen' : 'Peppol-Adresse des Kunden fehlt: OIN (Behörden), KvK-Nummer oder btw-id im Kunden eintragen');
+  if (sup.land === 'NL' && kundeLand === 'NL' && !buyerLegal) problems.push('KvK-Nummer oder OIN des niederländischen Kunden fehlt (Peppol-Regel NL-R-005)');
+  if (kundeLand === sup.land && (!k.KUNSTRASSE || !k.KUNPLZ || !k.KUNORT)) problems.push('Anschrift des Kunden unvollständig (Straße, Postleitzahl, Ort)');
   if (!k.BESTELLNR && !kunde.LEITWEGID) problems.push('Bestell-Nr. der Rechnung oder Referenz des Kunden fehlt (Peppol: BuyerReference oder OrderReference)');
-  if (credit && !b.orig) problems.push('Creditnota ohne Bezug auf die ursprüngliche Rechnung');
+  if (credit && !b.orig) problems.push('Gutschrift ohne Bezug auf die ursprüngliche Rechnung');
   if (!f.IBAN) problems.push('IBAN der Firma fehlt');
   if (!b.lines.length) problems.push('Keine Rechnungspositionen');
 
   const buyerName = [k.KUNNAME, k.KUNVORNAME].filter(Boolean).join(Number(k.KUNART) === 1 ? ' ' : ', ');
-  const addr = (street, plz, ort, land) => `<cac:PostalAddress>${t(street) ? `<cbc:StreetName>${x(t(street))}</cbc:StreetName>` : ''}${t(ort) ? `<cbc:CityName>${x(t(ort))}</cbc:CityName>` : ''}${t(plz) ? `<cbc:PostalZone>${x(t(plz))}</cbc:PostalZone>` : ''}<cac:Country><cbc:IdentificationCode>${x(land || 'NL')}</cbc:IdentificationCode></cac:Country></cac:PostalAddress>`;
+  const addr = (street, plz, ort, land) => `<cac:PostalAddress>${t(street) ? `<cbc:StreetName>${x(t(street))}</cbc:StreetName>` : ''}${t(ort) ? `<cbc:CityName>${x(t(ort))}</cbc:CityName>` : ''}${t(plz) ? `<cbc:PostalZone>${x(t(plz))}</cbc:PostalZone>` : ''}<cac:Country><cbc:IdentificationCode>${x(land || sup.land)}</cbc:IdentificationCode></cac:Country></cac:PostalAddress>`;
   const o = [];
   o.push('<?xml version="1.0" encoding="UTF-8"?>');
   o.push(`<${root} xmlns="urn:oasis:names:specification:ubl:schema:xsd:${root}-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">`);
@@ -68,29 +97,29 @@ function create(rid) {
   o.push(`<cbc:ID>${x(k.RECHNUNGNUMMER)}</cbc:ID><cbc:IssueDate>${x(String(k.DATUM).slice(0, 10))}</cbc:IssueDate>`);
   if (!credit && b.due > 0) o.push(`<cbc:DueDate>${x(b.faellig)}</cbc:DueDate>`);
   o.push(`<cbc:${root}TypeCode>${credit ? 381 : 380}</cbc:${root}TypeCode>`);
-  const notes = [...NL.mentions(credit ? 'korrektur' : 'rechnung', k, b.lines.map(() => ({ POSART: 'A' }))), ...[k.EINLEITUNGTXT, k.SCHLUSSTXT].filter(s => s && s.trim()).map(s => s.trim())];
+  const notes = [...M.mentions(credit ? 'korrektur' : 'rechnung', k, b.lines.map(() => ({ POSART: 'A' }))), ...[k.EINLEITUNGTXT, k.SCHLUSSTXT].filter(s => s && s.trim()).map(s => s.trim())];
   if (notes.length) o.push(`<cbc:Note>${x(notes.join('\n'))}</cbc:Note>`);
   o.push('<cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>');
   o.push(`<cbc:BuyerReference>${x(kunde.LEITWEGID || k.BESTELLNR || k.KUNNUMMER || k.RECHNUNGNUMMER)}</cbc:BuyerReference>`);
   if (k.BESTELLNR) o.push(`<cac:OrderReference><cbc:ID>${x(k.BESTELLNR)}</cbc:ID></cac:OrderReference>`);
   if (b.orig) o.push(`<cac:BillingReference><cac:InvoiceDocumentReference><cbc:ID>${x(b.orig.RECHNUNGNUMMER)}</cbc:ID><cbc:IssueDate>${x(String(b.orig.DATUM).slice(0, 10))}</cbc:IssueDate></cac:InvoiceDocumentReference></cac:BillingReference>`);
   // supplier
-  o.push(`<cac:AccountingSupplierParty><cac:Party>${seller ? `<cbc:EndpointID schemeID="${seller.scheme}">${x(seller.id)}</cbc:EndpointID>` : ''}<cac:PartyName><cbc:Name>${x(f.FIRMENNAME)}</cbc:Name></cac:PartyName>${addr(f.STRASSE, f.PLZ, f.ORT, f.LAND || 'NL')}`);
-  if (NL.btw()) o.push(`<cac:PartyTaxScheme><cbc:CompanyID>${x(NL.btw())}</cbc:CompanyID><cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme></cac:PartyTaxScheme>`);
-  o.push(`<cac:PartyLegalEntity><cbc:RegistrationName>${x(f.FIRMENNAME)}</cbc:RegistrationName>${NL.kvk() ? `<cbc:CompanyID schemeID="0106">${NL.kvk()}</cbc:CompanyID>` : ''}</cac:PartyLegalEntity>`);
+  o.push(`<cac:AccountingSupplierParty><cac:Party>${seller ? `<cbc:EndpointID schemeID="${seller.scheme}">${x(seller.id)}</cbc:EndpointID>` : ''}<cac:PartyName><cbc:Name>${x(f.FIRMENNAME)}</cbc:Name></cac:PartyName>${addr(f.STRASSE, f.PLZ, f.ORT, f.LAND || sup.land)}`);
+  if (sup.btw) o.push(`<cac:PartyTaxScheme><cbc:CompanyID>${x(sup.btw)}</cbc:CompanyID><cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme></cac:PartyTaxScheme>`);
+  o.push(`<cac:PartyLegalEntity><cbc:RegistrationName>${x(f.FIRMENNAME)}</cbc:RegistrationName>${sup.legal ? `<cbc:CompanyID schemeID="${sup.legal.scheme}">${sup.legal.id}</cbc:CompanyID>` : ''}</cac:PartyLegalEntity>`);
   // Peppol forbids empty elements: the contact only with telephone or e-mail
   o.push(`${f.TELEFON || f.EMAIL ? `<cac:Contact>${f.TELEFON ? `<cbc:Telephone>${x(f.TELEFON)}</cbc:Telephone>` : ''}${f.EMAIL ? `<cbc:ElectronicMail>${x(f.EMAIL)}</cbc:ElectronicMail>` : ''}</cac:Contact>` : ''}</cac:Party></cac:AccountingSupplierParty>`);
   // customer
-  o.push(`<cac:AccountingCustomerParty><cac:Party>${buyer ? `<cbc:EndpointID schemeID="${buyer.scheme}">${x(buyer.id)}</cbc:EndpointID>` : ''}${k.KUNNUMMER ? `<cac:PartyIdentification><cbc:ID>${x(k.KUNNUMMER)}</cbc:ID></cac:PartyIdentification>` : ''}<cac:PartyName><cbc:Name>${x(buyerName)}</cbc:Name></cac:PartyName>${addr(k.KUNSTRASSE, k.KUNPLZ, k.KUNORT, k.KUNLAND || 'NL')}`);
+  o.push(`<cac:AccountingCustomerParty><cac:Party>${buyer ? `<cbc:EndpointID schemeID="${buyer.scheme}">${x(buyer.id)}</cbc:EndpointID>` : ''}${k.KUNNUMMER ? `<cac:PartyIdentification><cbc:ID>${x(k.KUNNUMMER)}</cbc:ID></cac:PartyIdentification>` : ''}<cac:PartyName><cbc:Name>${x(buyerName)}</cbc:Name></cac:PartyName>${addr(k.KUNSTRASSE, k.KUNPLZ, k.KUNORT, kundeLand)}`);
   if (kunde.USTID) o.push(`<cac:PartyTaxScheme><cbc:CompanyID>${x(String(kunde.USTID).replace(/\s/g, '').toUpperCase())}</cbc:CompanyID><cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme></cac:PartyTaxScheme>`);
   o.push(`<cac:PartyLegalEntity><cbc:RegistrationName>${x(buyerName)}</cbc:RegistrationName>${buyerLegal ? `<cbc:CompanyID schemeID="${buyerLegal.scheme}">${buyerLegal.id}</cbc:CompanyID>` : ''}</cac:PartyLegalEntity></cac:Party></cac:AccountingCustomerParty>`);
-  o.push(`<cac:Delivery><cbc:ActualDeliveryDate>${x(String(k.LIEFDATUM || k.DATUM).slice(0, 10))}</cbc:ActualDeliveryDate>${b.taxes.some(g => g.cat === 'K' || g.cat === 'G') ? `<cac:DeliveryLocation><cac:Address><cac:Country><cbc:IdentificationCode>${x(k.KUNLAND || 'NL')}</cbc:IdentificationCode></cac:Country></cac:Address></cac:DeliveryLocation>` : ''}</cac:Delivery>`);
+  o.push(`<cac:Delivery><cbc:ActualDeliveryDate>${x(String(k.LIEFDATUM || k.DATUM).slice(0, 10))}</cbc:ActualDeliveryDate>${b.taxes.some(g => g.cat === 'K' || g.cat === 'G') ? `<cac:DeliveryLocation><cac:Address><cac:Country><cbc:IdentificationCode>${x(kundeLand)}</cbc:IdentificationCode></cac:Country></cac:Address></cac:DeliveryLocation>` : ''}</cac:Delivery>`);
   // credit transfer (30) with IBAN
   o.push(`<cac:PaymentMeans><cbc:PaymentMeansCode>30</cbc:PaymentMeansCode><cbc:PaymentID>${x(k.RECHNUNGNUMMER)}</cbc:PaymentID>${f.IBAN ? `<cac:PayeeFinancialAccount><cbc:ID>${x(String(f.IBAN).replace(/\s/g, ''))}</cbc:ID>${f.BANKINHABER ? `<cbc:Name>${x(f.BANKINHABER)}</cbc:Name>` : ''}${f.BIC ? `<cac:FinancialInstitutionBranch><cbc:ID>${x(String(f.BIC).replace(/\s/g, ''))}</cbc:ID></cac:FinancialInstitutionBranch>` : ''}</cac:PayeeFinancialAccount>` : ''}</cac:PaymentMeans>`);
-  if (!credit) o.push(`<cac:PaymentTerms><cbc:Note>${x(k.ZAHLBDTEXT || `Te betalen voor ${b.faellig}`)}</cbc:Note></cac:PaymentTerms>`);
+  if (!credit) o.push(`<cac:PaymentTerms><cbc:Note>${x(k.ZAHLBDTEXT || (sup.fr ? `À payer avant le ${b.faellig}` : `Te betalen voor ${b.faellig}`))}</cbc:Note></cac:PaymentTerms>`);
   o.push(`<cac:TaxTotal><cbc:TaxAmount currencyID="EUR">${a2(b.taxTotal)}</cbc:TaxAmount>`);
   for (const g of b.taxes) {
-    const r = g.cat === 'S' ? null : reden(g);
+    const r = g.cat === 'S' ? null : reden(g, sup.fr);
     o.push(`<cac:TaxSubtotal><cbc:TaxableAmount currencyID="EUR">${a2(g.basis)}</cbc:TaxableAmount><cbc:TaxAmount currencyID="EUR">${a2(g.tax)}</cbc:TaxAmount><cac:TaxCategory><cbc:ID>${g.cat}</cbc:ID><cbc:Percent>${a2(g.rate)}</cbc:Percent>${r && r.code ? `<cbc:TaxExemptionReasonCode>${r.code}</cbc:TaxExemptionReasonCode>` : ''}${r ? `<cbc:TaxExemptionReason>${x(r.text)}</cbc:TaxExemptionReason>` : ''}<cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme></cac:TaxCategory></cac:TaxSubtotal>`);
   }
   o.push('</cac:TaxTotal>');

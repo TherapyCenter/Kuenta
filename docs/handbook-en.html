@@ -577,6 +577,17 @@ docker compose up -d --build</code></pre></div>
       </ul>
     </section>
 
+    <section id="belgien">
+      <h2>Belgium: VAT, Peppol and Intervat</h2>
+      <p>Choose “België / Belgique” under <span class="path">Settings → Tax / dunning / register → Tax system</span>, save and reload. The settings are on the tab <span class="path">België / Belgique</span>. Choose the document language “Nederlands” or “Français”; the legal texts follow it.</p>
+      <ul>
+        <li><strong>Company data:</strong> enterprise number (BE0123456749) into VAT ID, RPR/RPM on the tab België / Belgique. Both appear in the footer.</li>
+        <li><strong>Rates:</strong> 21 % (full VAT), 6 % (reduced VAT), 12 % (code “AT-MwSt”), 0 % exempt. The small business exemption can be switched on.</li>
+        <li><strong>E-invoice (Peppol):</strong> mandatory between Belgian businesses since 2026. Enter the customer's enterprise number or VAT number; it is the customer's Peppol address. In the invoice window <em>E-Rechnung (Peppol) → download</em> and send it through your Peppol service provider or Hermes.</li>
+        <li><strong>VAT return:</strong> <span class="path">Finance → FIBU export</span> shows the grids (00–03, 44–49, 54, 59, 63, 64, 71/72, 82, 85) and creates the XML file for Intervat (monthly or quarterly). Small businesses under the exemption file no periodic return.</li>
+      </ul>
+    </section>
+
     <section id="datev">
       <h2>DATEV export for the tax adviser</h2>
       <p class="lead">Kuenta books invoices, payments, incoming invoices and register sales automatically and exports them as DATEV files. Your tax adviser reads them directly into DATEV, the accounting software common in Germany.</p>
@@ -875,7 +886,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>Check the TSE with a fiskaly test account before going live and register the register with the tax office.</li>
             <li>Check the card terminal and DSFinV-K before use or before an audit.</li>
-            <li>Kuenta is designed for Germany, Spain, the United Kingdom, the United States, France, Austria, Switzerland, Italy and the Netherlands (see <a href="#spanien">Spain</a>, <a href="#uk">United Kingdom</a>, <a href="#usa">United States</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Switzerland</a>, <a href="#italien">Italy</a> and <a href="#niederlande">the Netherlands</a>). Other countries are not supported.</li>
+            <li>Kuenta is designed for Germany, Spain, the United Kingdom, the United States, France, Austria, Switzerland, Italy, the Netherlands and Belgium (see <a href="#spanien">Spain</a>, <a href="#uk">United Kingdom</a>, <a href="#usa">United States</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Switzerland</a>, <a href="#italien">Italy</a>, <a href="#niederlande">the Netherlands</a> and <a href="#belgien">Belgium</a>). Other countries are not supported.</li>
             <li>Purchase contracts are templates and do not replace legal advice.</li>
           </ul></div>
       </div>

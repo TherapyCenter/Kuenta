@@ -573,6 +573,17 @@ docker compose up -d --build</code></pre></div>
       </ul>
     </section>
 
+    <section id="belgien">
+      <h2>Belgien: btw / TVA, Peppol und Intervat</h2>
+      <p>Unter <span class="path">Einstellungen → Steuer / Mahnung / Kasse → Steuersystem</span> „België / Belgique“ wählen, speichern und neu laden. Die Einstellungen stehen im Reiter <span class="path">België / Belgique</span>. Die Belegsprache „Nederlands“ oder „Français“ wählen; die Rechtstexte auf den Belegen folgen ihr.</p>
+      <ul>
+        <li><strong>Firmendaten:</strong> Unternehmensnummer (BE0123456749) unter USt-IdNr., RPR/RPM im Reiter België / Belgique. Beide stehen in der Fußzeile.</li>
+        <li><strong>Steuersätze:</strong> 21 % (volle MwSt), 6 % (ermäßigte MwSt), 12 % (Code „AT-MwSt“), 0 % befreit. Die Vrijstellingsregeling / Franchise für Kleinunternehmen ist wählbar.</li>
+        <li><strong>E-Rechnung (Peppol):</strong> seit 2026 Pflicht zwischen belgischen Unternehmen. Beim Kunden die Unternehmensnummer bzw. USt-IdNr. eintragen, sie ist seine Peppol-Adresse. Im Rechnungsfenster <em>E-Rechnung (Peppol) → herunterladen</em> und über Ihren Peppol-Dienstleister oder Hermes senden.</li>
+        <li><strong>MwSt-Erklärung:</strong> <span class="path">Finanzen → FIBU-Export</span> zeigt die Raster (00–03, 44–49, 54, 59, 63, 64, 71/72, 82, 85) und erzeugt die XML-Datei für Intervat (monatlich oder vierteljährlich). Kleinunternehmen mit Franchise reichen keine periodische Erklärung ein.</li>
+      </ul>
+    </section>
+
     <section id="datev">
       <h2>DATEV-Export für den Steuerberater</h2>
       <p class="lead">Kuenta bucht Rechnungen, Zahlungen, Eingangsrechnungen und Kassenumsätze automatisch und exportiert sie als DATEV-Dateien. Ihr Steuerberater liest sie direkt in DATEV ein.</p>
@@ -870,7 +881,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>TSE vor dem Echtbetrieb mit fiskaly-Testzugang prüfen und die Kasse beim Finanzamt melden.</li>
             <li>EC-Terminal und DSFinV-K vor dem Einsatz bzw. vor einer Prüfung kontrollieren.</li>
-            <li>Kuenta ist auf Deutschland, Spanien, Großbritannien, die USA, Frankreich, Österreich, die Schweiz, Italien und die Niederlande ausgelegt (siehe <a href="#spanien">Spanien</a>, <a href="#uk">Großbritannien</a>, <a href="#usa">USA</a>, <a href="#oesterreich">Österreich</a>, <a href="#schweiz">Schweiz</a>, <a href="#italien">Italien</a> und <a href="#niederlande">Niederlande</a>). Andere Länder werden nicht unterstützt.</li>
+            <li>Kuenta ist auf Deutschland, Spanien, Großbritannien, die USA, Frankreich, Österreich, die Schweiz, Italien, die Niederlande und Belgien ausgelegt (siehe <a href="#spanien">Spanien</a>, <a href="#uk">Großbritannien</a>, <a href="#usa">USA</a>, <a href="#oesterreich">Österreich</a>, <a href="#schweiz">Schweiz</a>, <a href="#italien">Italien</a>, <a href="#niederlande">Niederlande</a> und <a href="#belgien">Belgien</a>). Andere Länder werden nicht unterstützt.</li>
             <li>Kaufverträge sind Muster und ersetzen keine Rechtsberatung.</li>
           </ul></div>
       </div>

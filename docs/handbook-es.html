@@ -577,6 +577,17 @@ docker compose up -d --build</code></pre></div>
       </ul>
     </section>
 
+    <section id="belgien">
+      <h2>Bélgica: IVA, Peppol e Intervat</h2>
+      <p>Elija “België / Belgique” en <span class="path">Ajustes → Impuestos / reclamaciones / caja → Sistema fiscal</span>, guarde y recargue. La configuración está en la pestaña <span class="path">België / Belgique</span>. Elija el idioma de documentos “Nederlands” o “Français”; los textos legales lo siguen.</p>
+      <ul>
+        <li><strong>Datos de la empresa:</strong> número de empresa (BE0123456749) en NIF-IVA y RPR/RPM en la pestaña België / Belgique. Ambos aparecen en el pie.</li>
+        <li><strong>Tipos:</strong> 21 %, 6 % y 12 % (código “AT-MwSt”), 0 % exento. Se puede activar la franquicia de pequeñas empresas.</li>
+        <li><strong>Factura electrónica (Peppol):</strong> obligatoria entre empresas belgas desde 2026. Indique el número de empresa o NIF-IVA del cliente; es su dirección Peppol. En la ventana de la factura <em>E-Rechnung (Peppol) → descargar</em> y envíela mediante su proveedor Peppol o Hermes.</li>
+        <li><strong>Declaración de IVA:</strong> <span class="path">Finanzas → Exportación contable</span> muestra las casillas (00–03, 44–49, 54, 59, 63, 64, 71/72, 82, 85) y genera el XML para Intervat (mensual o trimestral). Las pequeñas empresas en franquicia no presentan declaración periódica.</li>
+      </ul>
+    </section>
+
     <section id="datev">
       <h2>Exportación DATEV para el asesor fiscal</h2>
       <p class="lead">Kuenta contabiliza automáticamente facturas, pagos, facturas de proveedor y ventas de caja y los exporta como archivos DATEV. Su asesor fiscal los importa directamente en DATEV, el programa contable habitual en Alemania.</p>
@@ -875,7 +886,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>Compruebe la TSE con una cuenta de prueba de fiskaly antes de usarla en real y comunique la caja a Hacienda (alemana).</li>
             <li>Compruebe el terminal de tarjetas y la DSFinV-K antes de usarlos o de una inspección.</li>
-            <li>Kuenta está pensado para Alemania, España, el Reino Unido, Estados Unidos, Francia, Austria, Suiza, Italia y los Países Bajos (vea <a href="#spanien">España</a>, <a href="#uk">Reino Unido</a>, <a href="#usa">Estados Unidos</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Suiza</a>, <a href="#italien">Italia</a> y <a href="#niederlande">Países Bajos</a>). TicketBAI, Navarra e IGIC no están soportados.</li>
+            <li>Kuenta está pensado para Alemania, España, el Reino Unido, Estados Unidos, Francia, Austria, Suiza, Italia, los Países Bajos y Bélgica (vea <a href="#spanien">España</a>, <a href="#uk">Reino Unido</a>, <a href="#usa">Estados Unidos</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Suiza</a>, <a href="#italien">Italia</a>, <a href="#niederlande">Países Bajos</a> y <a href="#belgien">Bélgica</a>). TicketBAI, Navarra e IGIC no están soportados.</li>
             <li>Los contratos de compraventa son modelos y no sustituyen el asesoramiento jurídico.</li>
           </ul></div>
       </div>

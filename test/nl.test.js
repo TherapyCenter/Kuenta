@@ -14,7 +14,7 @@ const dbm = require('../server/db');
 const VG = require('../server/api/vorgang');
 const G = require('../server/api/generic');
 const NIF = require('../public/js/nif.js');
-const PP = require('../server/nl/peppol');
+const PP = require('../server/peppol');
 const { I18N } = require('../server/i18n');
 
 test('btw-id and KvK number', () => {

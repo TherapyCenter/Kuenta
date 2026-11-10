@@ -2,7 +2,7 @@
 // Tax IDs: Spanish DNI (12345678Z), NIE (X1234567L), CIF of companies (B12345674) and special NIF (K/L/M);
 // UK VAT registration numbers (GB123456782); French SIREN (9 digits) and SIRET (14 digits);
 // Austrian UID (ATU12345678), Swiss UID (CHE-123.456.789), Italian partita IVA and codice fiscale,
-// Dutch btw-id (NL123456789B01) and KvK number. Shared by server and browser (UMD).
+// Dutch btw-id (NL123456789B01) and KvK number, Belgian enterprise number (BE0123456749). Shared by server and browser (UMD).
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
   else root.NIF = factory();
@@ -140,5 +140,14 @@
   // KvK number: 8 digits (Kamer van Koophandel, no check digit)
   function nlKvk(s) { const x = String(s || '').replace(/\D/g, ''); return { ok: /^\d{8}$/.test(x), kvk: x }; }
 
-  return { validar, limpiar, extranjero, gbVat, frSiren, atUid, chUid, itPiva, itCf, nlBtw, nlKvk };
+  // Belgian enterprise number (ondernemingsnummer / numéro d'entreprise, also the VAT number with BE):
+  // 10 digits starting with 0 or 1, the last two are 97 minus the first eight modulo 97
+  function beNr(s) {
+    let x = String(s || '').toUpperCase().replace(/[\s.\-]/g, '').replace(/^BE/, '');
+    if (/^\d{9}$/.test(x)) x = '0' + x; // old 9-digit numbers
+    if (!/^[01]\d{9}$/.test(x)) return { ok: false, nr: x };
+    return { ok: 97 - (Number(x.slice(0, 8)) % 97) === Number(x.slice(8)), nr: x, btw: 'BE' + x, anzeige: `${x.slice(0, 4)}.${x.slice(4, 7)}.${x.slice(7)}` };
+  }
+
+  return { validar, limpiar, extranjero, gbVat, frSiren, atUid, chUid, itPiva, itCf, nlBtw, nlKvk, beNr };
 });

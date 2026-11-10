@@ -15,9 +15,9 @@
   else root.I18N = factory();
 })(typeof self !== 'undefined' ? self : this, function () {
   // doc: only for customer documents (no translation of the user interface)
-  const LANGS = { de: { name: 'Deutsch', locale: 'de-DE' }, en: { name: 'English', locale: 'en-GB' }, es: { name: 'Español', locale: 'es-ES' }, it: { name: 'Italiano', locale: 'it-IT', doc: true }, nl: { name: 'Nederlands', locale: 'nl-NL', doc: true } };
+  const LANGS = { de: { name: 'Deutsch', locale: 'de-DE' }, en: { name: 'English', locale: 'en-GB' }, es: { name: 'Español', locale: 'es-ES' }, it: { name: 'Italiano', locale: 'it-IT', doc: true }, nl: { name: 'Nederlands', locale: 'nl-NL', doc: true }, fr: { name: 'Français', locale: 'fr-FR', doc: true } };
   const UI_LANGS = Object.fromEntries(Object.entries(LANGS).filter(([, l]) => !l.doc));
-  const DICT = { en: {}, es: {}, it: {}, nl: {} };
+  const DICT = { en: {}, es: {}, it: {}, nl: {}, fr: {} };
   const compiled = {};   // per language: { patterns, prefixes, suffixes, cache }
   let current = 'de';
 
