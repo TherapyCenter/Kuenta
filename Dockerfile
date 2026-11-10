@@ -1,7 +1,8 @@
 # Kuenta as a container image (Docker and Podman)
 #
-#   podman build -t kuenta:1.0.7 .        (or: docker build -t kuenta:1.0.7 .)
-#   podman run -d --name kuenta -p 3700:3700 -v kuenta-daten:/data kuenta:1.0.7
+#   podman build -t kuenta .        (or: docker build -t kuenta .)
+#   podman run -d --name kuenta -p 3700:3700 -v kuenta-daten:/data kuenta
+#   ready-made image: ghcr.io/therapycenter/kuenta (see .github/workflows/container.yml)
 #
 # Runs on x86_64 and ARM64 (e.g. Raspberry Pi, Mac with Apple silicon).
 # Data lives in the volume /data – never in the image. Details: INSTALL.md, section "Container".
@@ -40,6 +41,9 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
 
 CMD ["node", "server/index.js"]
 
+ARG VERSION=dev
 LABEL org.opencontainers.image.title="Kuenta" \
       org.opencontainers.image.description="Invoicing & POS for auto repair shops" \
-      org.opencontainers.image.version="1.0.7"
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.source="https://github.com/TherapyCenter/Kuenta" \
+      org.opencontainers.image.licenses="AGPL-3.0-only"
