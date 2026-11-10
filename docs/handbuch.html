@@ -515,6 +515,39 @@ docker compose up -d --build</code></pre></div>
       <p>Kuenta ermittelt den Satz nicht automatisch und reicht keine Steuererklärung ein; das erledigt Ihr Steuerberater oder QuickBooks.</p>
     </section>
 
+    <section id="oesterreich">
+      <h2>Österreich: USt, Registrierkasse (RKSV) und UVA</h2>
+      <p>Unter <span class="path">Einstellungen → Steuer / Mahnung / Kasse → Steuersystem</span> „Österreich“ wählen, speichern und neu laden. Die Einstellungen stehen im Reiter <span class="path">Österreich</span>.</p>
+      <ul>
+        <li><strong>Firmendaten:</strong> UID-Nummer (ATU…) unter USt-IdNr., die Steuernummer (Finanzamt + Steuernummer, 9 Ziffern) unter Steuernummer. Rechtsform, Sitz, Firmenbuchnummer und Firmenbuchgericht im Reiter Österreich (§ 14 UGB).</li>
+        <li><strong>Steuersätze:</strong> 20 % (volle MwSt), 10 % (ermäßigte MwSt) und 13 % (dritter Satz, Code „AT-MwSt“), steuerfrei 0 %. Kleinunternehmer und Ist-Besteuerung sind wählbar.</li>
+        <li><strong>Rechnungen:</strong> UID der Firma, Liefer-/Leistungsdatum und ab 10.000 € brutto die UID des Kunden. Kuenta weist im Menü <em>E-Rechnung → Pflichtangaben prüfen</em> auf Fehlendes hin.</li>
+        <li><strong>E-Rechnung an den Bund:</strong> <em>E-Rechnung (ebInterface) → ebInterface 6.1 herunterladen</em> und bei e-rechnung.gv.at hochladen. Im Kunden steht die Lieferantennummer im Feld Leitweg-ID, die Auftragsreferenz kommt in die Bestell-Nr. der Rechnung.</li>
+      </ul>
+      <h3>Registrierkasse (RKSV)</h3>
+      <ol>
+        <li>Im Reiter Österreich die Kassenidentifikationsnummer eintragen und die Signaturerstellungseinheit wählen: A-Trust a.sign RK (Benutzername und Passwort von A-Trust) oder der Testbetrieb mit lokalem Schlüssel. Der Testbetrieb ist nicht RKSV-konform.</li>
+        <li><em>Registrierkasse aktivieren</em>: Kuenta erzeugt den AES-Schlüssel und den Startbeleg. Kassen-ID und AES-Schlüssel in FinanzOnline registrieren, den Startbeleg mit der BMF-Belegcheck-App prüfen.</li>
+        <li>Jeder Verkauf und jedes Storno an der Kasse erhält einen signierten Beleg mit QR-Code. Beim Monatswechsel erstellt Kuenta den Monatsbeleg, im Dezember den Jahresbeleg. Den Jahresbeleg prüfen und aufbewahren.</li>
+        <li>Fällt die Signaturerstellungseinheit aus, steht auf den Belegen „Sicherheitseinrichtung ausgefallen“. Danach folgt automatisch ein Sammelbeleg. Ausfälle über 48 Stunden melden Sie über FinanzOnline.</li>
+      </ol>
+      <p>Unter <span class="path">Finanzen → FIBU-Export</span> (Ansicht „Steuer (Österreich)“) zeigt Kuenta alle RKSV-Belege, prüft Verkettung, Umsatzzähler und Signaturen und exportiert das Datenerfassungsprotokoll (DEP).</p>
+      <h3>Umsatzsteuervoranmeldung</h3>
+      <p>Dieselbe Ansicht berechnet die UVA mit den Kennzahlen 000, 011, 017, 016, 020, 022, 029, 006 und 060. Sie erzeugt außerdem die XML-Datei für den Upload in FinanzOnline (U30). Leistungen an EU-Unternehmer und innergemeinschaftliche Lieferungen melden Sie zusätzlich in der Zusammenfassenden Meldung.</p>
+    </section>
+
+    <section id="schweiz">
+      <h2>Schweiz: MWST, QR-Rechnung und CHF</h2>
+      <p>Unter <span class="path">Einstellungen → Steuer / Mahnung / Kasse → Steuersystem</span> „Schweiz“ wählen, speichern und neu laden. Der Mandant rechnet dann in Franken (CHF 1'234.50). Die Einstellungen stehen im Reiter <span class="path">Schweiz</span>.</p>
+      <ul>
+        <li><strong>Firmendaten:</strong> UID / MWST-Nummer (CHE-123.456.789) unter USt-IdNr., der Handelsregistereintrag unter Handelsregister. Auf den Belegen steht „MWST-Nr. CHE-… MWST“.</li>
+        <li><strong>Steuersätze:</strong> 8,1 % Normalsatz (volle MwSt), 2,6 % reduzierter Satz (ermäßigte MwSt), 3,8 % Beherbergung (Code „AT-MwSt“), 0 % ausgenommen. Betriebe unter CHF 100 000 Umsatz stellen „nicht MWST-pflichtig“ ein.</li>
+        <li><strong>QR-Rechnung:</strong> jede Rechnung erhält unten den Zahlteil mit Empfangsschein über den offenen Betrag. Bei langen Rechnungen steht er auf der letzten bzw. einer eigenen Seite. Mit einer QR-IBAN gibt es eine 27-stellige QR-Referenz, sonst eine Creditor Reference (RF…) aus der Rechnungsnummer.</li>
+        <li><strong>Kasse:</strong> Barzahlungen werden auf 5 Rappen gerundet. Die Differenz steht als eigene Zeile „Rundungsdifferenz“ auf Bon und Rechnung.</li>
+        <li><strong>MWST-Abrechnung:</strong> <span class="path">Finanzen → FIBU-Export</span> zeigt die Ziffern des ESTV-Formulars (200 bis 510) für die effektive Methode oder die Saldosteuersatzmethode. Die Werte tragen Sie im ePortal der ESTV ein; die CSV dient der Ablage.</li>
+      </ul>
+    </section>
+
     <section id="datev">
       <h2>DATEV-Export für den Steuerberater</h2>
       <p class="lead">Kuenta bucht Rechnungen, Zahlungen, Eingangsrechnungen und Kassenumsätze automatisch und exportiert sie als DATEV-Dateien. Ihr Steuerberater liest sie direkt in DATEV ein.</p>
@@ -812,7 +845,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>TSE vor dem Echtbetrieb mit fiskaly-Testzugang prüfen und die Kasse beim Finanzamt melden.</li>
             <li>EC-Terminal und DSFinV-K vor dem Einsatz bzw. vor einer Prüfung kontrollieren.</li>
-            <li>Kuenta ist auf Deutschland, Spanien, Großbritannien und die USA ausgelegt (siehe <a href="#spanien">Spanien</a>, <a href="#uk">Großbritannien</a> und <a href="#usa">USA</a>). Andere Länder werden nicht unterstützt.</li>
+            <li>Kuenta ist auf Deutschland, Spanien, Großbritannien, die USA, Frankreich, Österreich und die Schweiz ausgelegt (siehe <a href="#spanien">Spanien</a>, <a href="#uk">Großbritannien</a>, <a href="#usa">USA</a>, <a href="#oesterreich">Österreich</a> und <a href="#schweiz">Schweiz</a>). Andere Länder werden nicht unterstützt.</li>
             <li>Kaufverträge sind Muster und ersetzen keine Rechtsberatung.</li>
           </ul></div>
       </div>

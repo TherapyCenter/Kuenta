@@ -519,6 +519,39 @@ docker compose up -d --build</code></pre></div>
       <p>Kuenta no determina los tipos automáticamente ni presenta declaraciones; de eso se encarga su asesor o QuickBooks.</p>
     </section>
 
+    <section id="oesterreich">
+      <h2>Austria: IVA, caja registradora (RKSV) y UVA</h2>
+      <p>Elija “Österreich” en <span class="path">Ajustes → Impuestos / reclamaciones / caja → Sistema fiscal</span>, guarde y recargue. La configuración está en la pestaña <span class="path">Österreich</span>.</p>
+      <ul>
+        <li><strong>Datos de la empresa:</strong> el número UID (ATU…) en NIF-IVA, el número fiscal (oficina + número, 9 cifras) en Número fiscal. Forma jurídica, sede, número y tribunal del registro mercantil en la pestaña Österreich (§ 14 UGB).</li>
+        <li><strong>Tipos:</strong> 20 %, 10 % y 13 % (tercer tipo, código “AT-MwSt”), exento 0 %. Se puede activar el régimen de pequeña empresa y el criterio de caja.</li>
+        <li><strong>Facturas:</strong> UID de la empresa, fecha de la prestación y, a partir de 10.000 € brutos, el UID del cliente. <em>Factura electrónica → Comprobar datos obligatorios</em> indica lo que falta.</li>
+        <li><strong>Facturas electrónicas a la Administración federal:</strong> <em>Factura electrónica (ebInterface) → descargar ebInterface 6.1</em> y subirla en e-rechnung.gv.at. El número de proveedor va en el campo Leitweg-ID del cliente y la referencia del pedido en el número de pedido de la factura.</li>
+      </ul>
+      <h3>Caja registradora (RKSV)</h3>
+      <ol>
+        <li>En la pestaña Österreich introduzca el identificador de la caja y elija el dispositivo de firma: A-Trust a.sign RK (usuario y contraseña de A-Trust) o el modo de prueba con clave local. El modo de prueba no cumple la RKSV.</li>
+        <li><em>Activar caja registradora</em>: Kuenta crea la clave AES y el recibo inicial. Registre el identificador y la clave AES en FinanzOnline y compruebe el recibo inicial con la app BMF-Belegcheck.</li>
+        <li>Cada venta y anulación en la caja recibe un recibo firmado con código QR. Al cambiar de mes Kuenta crea el recibo mensual y en diciembre el anual; compruebe y conserve el recibo anual.</li>
+        <li>Si falla el dispositivo de firma, los recibos indican “Sicherheitseinrichtung ausgefallen” y después se crea un recibo colectivo. Comunique en FinanzOnline los fallos de más de 48 horas.</li>
+      </ol>
+      <p><span class="path">Finanzas → Exportación contable</span> (vista “Steuer (Österreich)”) muestra los recibos RKSV, comprueba encadenamiento, contador de ventas y firmas y exporta el protocolo de datos (DEP).</p>
+      <h3>Declaración de IVA (UVA)</h3>
+      <p>La misma vista calcula la UVA (Kennzahlen 000, 011, 017, 016, 020, 022, 029, 006, 060) y genera el XML para FinanzOnline (U30). Las prestaciones a empresarios de la UE y las entregas intracomunitarias se declaran además en la declaración recapitulativa.</p>
+    </section>
+
+    <section id="schweiz">
+      <h2>Suiza: IVA, factura QR y CHF</h2>
+      <p>Elija “Schweiz” en <span class="path">Ajustes → Impuestos / reclamaciones / caja → Sistema fiscal</span>, guarde y recargue. La empresa trabaja entonces en francos (CHF 1'234.50). La configuración está en la pestaña <span class="path">Schweiz</span>.</p>
+      <ul>
+        <li><strong>Datos de la empresa:</strong> UID / número de IVA (CHE-123.456.789) en NIF-IVA y el registro mercantil en Registro mercantil. Los documentos muestran “MWST-Nr. CHE-… MWST”.</li>
+        <li><strong>Tipos:</strong> 8,1 % normal, 2,6 % reducido, 3,8 % alojamiento (código “AT-MwSt”), 0 % excluido. Las empresas con menos de CHF 100 000 de volumen eligen “no sujeta a IVA”.</li>
+        <li><strong>Factura QR:</strong> cada factura lleva abajo la sección de pago con el resguardo por el importe pendiente; en facturas largas, en la última página o en una propia. Con un QR-IBAN se usa una referencia QR de 27 cifras, si no una Creditor Reference (RF…) con el número de factura.</li>
+        <li><strong>Caja:</strong> los pagos en efectivo se redondean a 5 céntimos; la diferencia aparece como línea “Rundungsdifferenz”.</li>
+        <li><strong>Declaración de IVA:</strong> <span class="path">Finanzas → Exportación contable</span> muestra las cifras del formulario de la AFC (200 a 510) por el método efectivo o el de tipo impositivo de saldo. Introdúzcalas en el ePortal de la AFC; el CSV sirve de archivo.</li>
+      </ul>
+    </section>
+
     <section id="datev">
       <h2>Exportación DATEV para el asesor fiscal</h2>
       <p class="lead">Kuenta contabiliza automáticamente facturas, pagos, facturas de proveedor y ventas de caja y los exporta como archivos DATEV. Su asesor fiscal los importa directamente en DATEV, el programa contable habitual en Alemania.</p>
@@ -817,7 +850,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>Compruebe la TSE con una cuenta de prueba de fiskaly antes de usarla en real y comunique la caja a Hacienda (alemana).</li>
             <li>Compruebe el terminal de tarjetas y la DSFinV-K antes de usarlos o de una inspección.</li>
-            <li>Kuenta está pensado para Alemania, España, el Reino Unido y Estados Unidos (vea <a href="#spanien">España</a>, <a href="#uk">Reino Unido</a> y <a href="#usa">Estados Unidos</a>). TicketBAI, Navarra e IGIC no están soportados.</li>
+            <li>Kuenta está pensado para Alemania, España, el Reino Unido, Estados Unidos, Francia, Austria y Suiza (vea <a href="#spanien">España</a>, <a href="#uk">Reino Unido</a>, <a href="#usa">Estados Unidos</a>, <a href="#oesterreich">Austria</a> y <a href="#schweiz">Suiza</a>). TicketBAI, Navarra e IGIC no están soportados.</li>
             <li>Los contratos de compraventa son modelos y no sustituyen el asesoramiento jurídico.</li>
           </ul></div>
       </div>

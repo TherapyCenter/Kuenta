@@ -103,7 +103,7 @@
         ] },
         { title: 'E-Rechnung', fields: [
           { f: 'ERECHNUNG', l: 'Rechnungsformat', t: 'select', opts: [[0, 'PDF / Papier'], [1, 'XRechnung (CII)'], [2, 'XRechnung (UBL)'], [3, 'ZUGFeRD / Factur-X (PDF + XML)']] },
-          { f: 'LEITWEGID', l: 'Leitweg-ID (öffentliche Auftraggeber)' },
+          { f: 'LEITWEGID', l: 'Leitweg-ID (öffentliche Auftraggeber; Österreich: Lieferantennummer beim Bund)' },
           { f: 'EMAILRECHNUNG', l: 'E-Mail für Rechnungen', t: 'email' },
         ] },
       ] },

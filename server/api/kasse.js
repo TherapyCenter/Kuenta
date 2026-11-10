@@ -10,6 +10,7 @@ const BTC = require('../btcpay');
 const ES = require('../es');
 const VF = require('../es/verifactu');
 const FRC = require('../fr/caisse');
+const RKSV = require('../at/rksv');
 const ZAHLART_ID = { BAR: 1, EC: 2, KARTE: 2, UEBERWEISUNG: 3, KRYPTO: -1 };
 const ZAHLART_TEXT = { BAR: 'Bar', EC: 'EC-Karte', KARTE: 'Kreditkarte', UEBERWEISUNG: 'Überweisung', KRYPTO: 'Krypto' };
 // payment type ID in the database; crypto is created when needed
@@ -42,6 +43,7 @@ function status() {
     autorechnung: L.sw('kasse.autorechnung', '1') === '1' || ES.activo(),
     land: L.land(),
     frCaisse: FRC.activo(),
+    atRksv: RKSV.aktiv(),
     tse: { aktiv: TSE.cfg().aktiv, serial: L.sw('tse.seriennummer', '') },
     ec: L.sw('ec.aktiv', '0') === '1',
     krypto: BTC.bereit(),
@@ -81,6 +83,10 @@ function speichereBon(b, lines) {
   FRC.ticket(id); // France: signed, chained receipt with grand totals (ISCA)
   return id;
 }
+// Austria: signed receipt of the RKSV (a failing signature device never blocks the sale, see rksv.js)
+async function rksv(id) {
+  try { await RKSV.beleg(id); } catch (e) { L.setSw('at.rksv.fehler', `${L.now()}: ${e.message}`); console.warn('RKSV:', e.message); }
+}
 
 // Sale / pay an order / pay an invoice
 const kryptoInArbeit = new Set(); // never book the same crypto payment twice at the same time
@@ -119,6 +125,11 @@ async function bonBuchen(p, user, krypto) {
     }
     lines = linien(pos);
     if (!lines.length) throw new L.HttpError(400, 'Der Kassenvorgang enthält keine Positionen.');
+    // Switzerland: cash amounts are rounded to 5 centimes, the difference is a line of its own
+    if (!rechnungid && zahlart === 'BAR' && L.land() === 'CH') {
+      const s0 = summen(lines); const diff = L.r2(require('../ch').rappen(s0.brutto) - s0.brutto);
+      if (diff) lines.push({ POS: lines.length + 1, POSART: 'A', ARTID: null, ARTNUMMER: '', BEZEICHNUNG: 'Rundungsdifferenz', MENGE: 1, EINZEL: diff, RABATT: 0, MWSTSATZ: 0, MWSTCODE: 63, BRUTTO: diff, NETTO: diff, GVTYP: 'Rundung', EK: 0, DURCHLAUFER: 0, EINHEITID: null });
+    }
     const s = summen(lines); bezahlBetrag = s.brutto;
     // Spain: every sale is an invoice (factura simplificada or completa) with a VERI*FACTU record
     if (!rechnungid && (L.sw('kasse.autorechnung', '1') === '1' || ES.activo())) {
@@ -147,6 +158,7 @@ async function bonBuchen(p, user, krypto) {
   const gegeben = zahlart === 'BAR' && p.gegeben ? num(p.gegeben) : bezahlBetrag;
   const id = speichereBon({ TYP: 'Beleg', BENID: bed.id, BEDIENER: bed.name, KUNID: kunid, KUNDE: kunde ? kunde.n : 'Barverkauf', RECHNUNGID: rechnungid, VERWENDUNG: krypto ? `Krypto (BTCPay)${krypto.METHODE ? ' · ' + krypto.METHODE : ''}` : undefined, BRUTTO: bezahlBetrag, NETTO: p.rechnungid ? bezahlBetrag : s.netto, ZAHLART: zahlart, GEGEBEN: gegeben, RUECKGELD: L.r2(Math.max(0, gegeben - bezahlBetrag)), ...(tse || {}) }, lines);
   if (krypto) BTC.kasseVerknuepfen(krypto.ID, id);
+  await rksv(id);
   return beleg(id);
 }
 
@@ -203,6 +215,7 @@ async function storno(bonid, { rechnungskorrektur = true, zahlart } = {}, user) 
   const tse = await TSE.signieren({ receiptType: 'CANCELLATION', ustSummen: ust, zahlarten: { [za]: -o.BRUTTO } });
   const id = speichereBon({ TYP: 'Beleg', BENID: o.BENID, BEDIENER: o.BEDIENER, KUNID: o.KUNID, KUNDE: o.KUNDE, RECHNUNGID: o.RECHNUNGID, BRUTTO: -o.BRUTTO, NETTO: -o.NETTO, ZAHLART: za, GEGEBEN: -o.BRUTTO, RUECKGELD: 0, STORNOID: o.ID, VERWENDUNG: `Storno zu Bon ${o.BONNR}`, ...(tse || {}) }, lines);
   d.prepare('UPDATE SW_KASSE_BON SET STORNIERT=1 WHERE ID=?').run(o.ID);
+  await rksv(id);
   return beleg(id);
 }
 
@@ -216,7 +229,7 @@ function beleg(id) {
   const r = b.RECHNUNGID ? d.prepare('SELECT * FROM RECHNUNGEN WHERE RECHNUNGID=?').get(b.RECHNUNGID) : null;
   // Spain: the receipt shows the invoice (series number, NIF, QR code of VERI*FACTU)
   const es = r && (ES.activo() || r.ESNUMSERIE) ? { ...VF.info(r), recargo: r.GRECARGO || 0 } : null;
-  return { es, fr: FRC.infoTicket(id), bon: b, pos, ust: Object.values(ust).map(u => ({ ...u, mwst: L.r2(u.brutto - u.netto) })), rechnungnr: r && r.RECHNUNGNUMMER, firma: L.firma(), kasse: L.sw('kasse.seriennummer', 'Kasse 1'), fusstext: L.sw('kasse.bonfusstext', 'Vielen Dank für Ihren Besuch!') };
+  return { es, fr: FRC.infoTicket(id), at: RKSV.infoBon(id), bon: b, pos, ust: Object.values(ust).map(u => ({ ...u, mwst: L.r2(u.brutto - u.netto) })), rechnungnr: r && r.RECHNUNGNUMMER, firma: L.firma(), kasse: L.sw('kasse.seriennummer', 'Kasse 1'), fusstext: L.sw('kasse.bonfusstext', 'Vielen Dank für Ihren Besuch!') };
 }
 function journal(q) {
   return L.db().prepare('SELECT * FROM SW_KASSE_BON WHERE substr(ZEIT,1,10) BETWEEN ? AND ? ORDER BY ID DESC LIMIT 5000').all(q.von || L.today(), q.bis || L.today());

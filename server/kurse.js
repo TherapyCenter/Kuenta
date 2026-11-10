@@ -1,13 +1,13 @@
 'use strict';
 // Exchange rates for display on the start page only. Invoices and bookings stay in the company's currency.
-// Sources: US dollar and pound sterling – reference rates of the European Central Bank; Bitcoin – daily BTC/EUR
+// Sources: US dollar, pound sterling and Swiss franc – reference rates of the European Central Bank; Bitcoin – daily BTC/EUR
 // rates from the Bitstamp exchange. All rates are stored as "euros per unit".
 // Rates are cached in SW_KURSE (this survives a KFZ-Faktura import too); without internet the last state applies.
 const L = require('./lib');
 const dbm = require('./db');
 
-const QUELLE = { USD: 'Europäische Zentralbank', GBP: 'Europäische Zentralbank', BTC: 'Bitstamp' };
-const AB = { USD: '1999-01-04', GBP: '1999-01-04', BTC: '2017-01-01' };   // rates exist from here on
+const QUELLE = { USD: 'Europäische Zentralbank', GBP: 'Europäische Zentralbank', CHF: 'Europäische Zentralbank', BTC: 'Bitstamp' };
+const AB = { USD: '1999-01-04', GBP: '1999-01-04', CHF: '1999-01-04', BTC: '2017-01-01' };   // rates exist from here on
 const ABRUF_ALLE_MS = 3 * 3600e3;                       // reload at most every 3 hours
 const laeuft = new Map();
 const ticker = new Map();                               // current BTC rate per process
@@ -27,7 +27,7 @@ function speichern(w, rows) {
   try { for (const [datum, eurPro] of rows) if (eurPro > 0) st.run(w, datum, eurPro); db().exec('COMMIT'); } catch (e) { db().exec('ROLLBACK'); throw e; }
 }
 
-// US dollar and pound: the ECB delivers "units per euro", we store "euros per unit"
+// US dollar, pound and franc: the ECB delivers "units per euro", we store "euros per unit"
 async function ladeEzb(w, von) {
   const csv = await holen(`https://data-api.ecb.europa.eu/service/data/EXR/D.${w}.EUR.SP00.A?startPeriod=${von}&format=csvdata`);
   const zeilen = csv.trim().split(/\r?\n/);
@@ -90,7 +90,7 @@ function kursHeute(w) {
 // Current rates for the currency switch
 async function aktuell() {
   const out = {};
-  for (const w of ['USD', 'GBP', 'BTC']) {
+  for (const w of ['USD', 'GBP', 'CHF', 'BTC']) {
     const fehler = await aktualisieren(w, L.addDays(L.today(), -14));
     const k = kursHeute(w);
     out[w] = k ? { ...k, quelle: QUELLE[w], fehler: fehler || null } : { fehler: fehler || 'Noch keine Kurse geladen (Internetverbindung?)', quelle: QUELLE[w] };

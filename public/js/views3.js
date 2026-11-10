@@ -94,7 +94,7 @@ Views.kasse = async (main) => {
     tbl.append(tb); tblWrap.innerHTML = ''; tblWrap.append(tbl);
     if (!lines.length) tblWrap.append(h('div', { class: 'grid-empty' }, 'Artikel scannen, Schnelltaste drücken oder über die Schaltflächen hinzufügen.'));
     summe.textContent = fmt.money(total());
-    bestand.textContent = T(`Kassenbestand: ${fmt.money(st.bestand)}${st.land === 'ES' ? ' · VERI*FACTU' : st.land === 'GB' ? '' : st.land === 'US' ? ` · ${T('inkl. Sales Tax')}` : st.tse.aktiv ? ' · TSE aktiv' : ' · ohne TSE'}`);
+    bestand.textContent = T(`Kassenbestand: ${fmt.money(st.bestand)}${st.land === 'ES' ? ' · VERI*FACTU' : st.land === 'GB' ? '' : st.land === 'US' ? ` · ${T('inkl. Sales Tax')}` : st.land === 'AT' ? (st.atRksv ? ' · RKSV aktiv' : ' · RKSV nicht aktiviert') : st.land === 'CH' ? '' : st.tse.aktiv ? ' · TSE aktiv' : ' · ohne TSE'}`);
   };
   const addArtikel = async (artid, menge = 1) => {
     const a = await api('/api/rec/artikel/' + artid);
@@ -130,8 +130,10 @@ Views.kasse = async (main) => {
   const pruefeBediener = () => { if (st.bediener.length && !bedSel.value) { toast('Bitte zuerst den Bediener wählen.', 'err'); bedSel.focus(); return false; } return true; };
   const bezahlen = async (zahlart, extra = {}) => {
     if (!pruefeBediener()) return;
-    const betrag = extra.betrag ?? total();
+    let betrag = extra.betrag ?? total();
     if (!extra.rechnungid && !extra.auftragid && !lines.length) { toast('Keine Positionen erfasst.', 'err'); return; }
+    // Switzerland: cash is rounded to 5 centimes (the server adds the rounding difference as a line)
+    if (zahlart === 'BAR' && LK.data && LK.data.land === 'CH' && !extra.rechnungid && !extra.auftragid) betrag = Math.round(Math.round(betrag * 100) / 5) * 5 / 100;
     let gegeben = betrag;
     if (zahlart === 'BAR') {
       const g = h('input', { type: 'text', class: 'num', value: fmt.num2(betrag), style: { fontSize: '24px', height: '40px', width: '100%' } });
@@ -140,7 +142,7 @@ Views.kasse = async (main) => {
       g.addEventListener('input', upd); upd();
       g.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); g.closest('.win').querySelector('.btn.primary').click(); } });
       setTimeout(() => g.select(), 50);
-      const ok = await dialog(`Barzahlung – ${fmt.money(betrag)}`, h('div', null, h('div', { class: 'hint' }, 'Gegeben'), g, rg, h('div', { style: { display: 'flex', gap: '6px', marginTop: '8px', flexWrap: 'wrap' } }, [5, 10, 20, 50, 100].map(x => h('button', { class: 'btn', onclick: () => { g.value = fmt.num2(x); upd(); } }, x + ' €')))), [{ label: 'Bezahlen', cls: 'primary', value: true }, { label: 'Abbrechen', value: false }], { width: 380 });
+      const ok = await dialog(`Barzahlung – ${fmt.money(betrag)}`, h('div', null, h('div', { class: 'hint' }, 'Gegeben'), g, rg, h('div', { style: { display: 'flex', gap: '6px', marginTop: '8px', flexWrap: 'wrap' } }, [5, 10, 20, 50, 100].map(x => h('button', { class: 'btn', onclick: () => { g.value = fmt.num2(x); upd(); } }, { CHF: 'CHF ' + x, GBP: '£' + x, USD: '$' + x }[LK.data && LK.data.waehrung] || x + ' €')))), [{ label: 'Bezahlen', cls: 'primary', value: true }, { label: 'Abbrechen', value: false }], { width: 380 });
       if (!ok) return;
       gegeben = parseNum(g.value);
       if (gegeben < betrag - 0.004) { toast('Der gegebene Betrag ist zu niedrig.', 'err'); return; }

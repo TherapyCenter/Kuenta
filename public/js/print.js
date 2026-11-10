@@ -64,6 +64,18 @@ table.list tfoot td { font-weight: bold; border-top: 0.8pt solid #333; }
 .titlerow { display: flex; justify-content: space-between; align-items: flex-start; gap: 6mm; }
 .vf { text-align: center; font-size: 7.5pt; line-height: 1.3; margin-top: 3mm; }
 .vf svg { display: block; margin: 0.8mm auto; }
+@page qrbill { size: A4; margin: 0; }
+.qrpage { page: qrbill; break-before: page; break-after: auto; position: relative; width: 210mm; height: 296mm; overflow: hidden; background: #fff; }
+.qrpage .zt { position: absolute; left: 0; bottom: 0; width: 210mm; height: 105mm; background: #fff; z-index: 10; border-top: 0.25mm dashed #000; font-family: Arial, Helvetica, "Liberation Sans", sans-serif; color: #000; }
+.qrpage .zt .abs { position: absolute; }
+.qrpage .zt .t { font-size: 11pt; font-weight: bold; }
+.qrpage .zt .rh { font-size: 6pt; font-weight: bold; line-height: 9pt; } .qrpage .zt .rv { font-size: 8pt; line-height: 9pt; margin-bottom: 9pt; }
+.qrpage .zt .ph { font-size: 8pt; font-weight: bold; line-height: 11pt; } .qrpage .zt .pv { font-size: 10pt; line-height: 11pt; margin-bottom: 11pt; }
+.qrpage .zt .cut { position: absolute; left: 62mm; top: 0; height: 105mm; border-left: 0.25mm dashed #000; }
+.qrpage .zt .note { position: absolute; top: -4mm; left: 0; width: 210mm; text-align: center; font-size: 7pt; color: #444; }
+.qrpage .zt .ecken { background: linear-gradient(#000,#000) top left / 3mm 0.25mm, linear-gradient(#000,#000) top left / 0.25mm 3mm, linear-gradient(#000,#000) top right / 3mm 0.25mm, linear-gradient(#000,#000) top right / 0.25mm 3mm, linear-gradient(#000,#000) bottom left / 3mm 0.25mm, linear-gradient(#000,#000) bottom left / 0.25mm 3mm, linear-gradient(#000,#000) bottom right / 3mm 0.25mm, linear-gradient(#000,#000) bottom right / 0.25mm 3mm; background-repeat: no-repeat; }
+.qrpage .kopf { position: absolute; left: 20mm; top: 15mm; font-size: 10pt; }
+@media screen { .qrpage { margin: 0 auto 10px; box-shadow: 0 2px 10px rgba(0,0,0,.4); } }
 @media screen { body { background: #8a96a6; padding: 10px 0; } .sheet { background: #fff; width: 210mm; min-height: 297mm; margin: 0 auto 10px; padding: 12mm 14mm 8mm 20mm; box-shadow: 0 2px 10px rgba(0,0,0,.4); position: relative; } .footer { position: absolute; left: 20mm; right: 14mm; bottom: 8mm; } }
 ${extra}`;
   },
@@ -77,7 +89,7 @@ ${extra}`;
       <div>${zeile(f.FIRMENNAME, f.FIRMENZUSATZ, f.STRASSE, Print.plzOrt(f.PLZ, f.ORT))}</div>
       <div>${zeile(f.TELEFON && 'Tel.: ' + f.TELEFON, f.FAX && 'Fax: ' + f.FAX, f.EMAIL, f.INTERNETSEITE)}</div>
       <div>${zeile(f.BANKNAME, f.IBAN && 'IBAN: ' + f.IBAN, f.BIC && 'BIC: ' + f.BIC, f.BANKINHABER && 'Inhaber: ' + f.BANKINHABER)}</div>
-      <div>${zeile(...(LK.data && LK.data.land === 'FR' && Print.frPied ? Print.frPied : es ? [(f.STEUERNR || f.USTNR) && 'NIF: ' + (f.STEUERNR || f.USTNR)] : us ? [App.setting('us.reg.nr', '') && `${App.setting('us.reg.label', 'Registration No.')}: ${App.setting('us.reg.nr', '')}`] : gb ? [f.USTNR && 'VAT-Reg.-Nr.: ' + f.USTNR] : [f.USTNR && 'USt-IdNr.: ' + f.USTNR, f.STEUERNR && 'Steuer-Nr.: ' + f.STEUERNR]), f.HANDELSREGISTER, f.GESCHAEFTSFUEHRER && 'Inhaber/GF: ' + f.GESCHAEFTSFUEHRER, f.FUSSZEILE)}</div>
+      <div>${zeile(...(LK.data && ['AT', 'CH'].includes(LK.data.land) && Print.lxPied ? Print.lxPied : LK.data && LK.data.land === 'FR' && Print.frPied ? Print.frPied : es ? [(f.STEUERNR || f.USTNR) && 'NIF: ' + (f.STEUERNR || f.USTNR)] : us ? [App.setting('us.reg.nr', '') && `${App.setting('us.reg.label', 'Registration No.')}: ${App.setting('us.reg.nr', '')}`] : gb ? [f.USTNR && 'VAT-Reg.-Nr.: ' + f.USTNR] : [f.USTNR && 'USt-IdNr.: ' + f.USTNR, f.STEUERNR && 'Steuer-Nr.: ' + f.STEUERNR]), f.HANDELSREGISTER, f.GESCHAEFTSFUEHRER && 'Inhaber/GF: ' + f.GESCHAEFTSFUEHRER, f.FUSSZEILE)}</div>
     </div>`;
   },
   headHtml(f) {
@@ -164,6 +176,8 @@ ${extra}`;
     const zustand = p => ({ GEBRAUCHT: '(gebraucht)', AUFBEREITET: '(aufbereitet)' }[p.TEILEZUSTAND] || '');
     const freigaben = (() => { try { return JSON.parse(k.USFREIGABE || '[]'); } catch { return []; } })();
     const fr = d.fr || null; Print.frPied = fr ? fr.pied : null; // France: legal mentions and footer from the server
+    const lx = d.lx || null; Print.lxPied = lx ? lx.pied : null; // Austria / Switzerland: texts, footer, QR-bill
+    const ustLabel = us ? 'Sales Tax' : lx ? lx.ustLabel : 'MwSt';
     const titleGb = (gb || fr) && isRe && ['rechnung', 'rechnung_ohne_kopf', 'rechnungskorrektur', 'storno-rechnung', 'gutschrift'].includes(formular) ? (typ === 'korrektur' ? 'Gutschrift' : gbReg ? 'Umsatzsteuerrechnung' : 'Rechnung') : null;
     const titleEs = vf ? { F1: 'Rechnung', F2: 'Vereinfachte Rechnung', R5: 'Vereinfachte Rechnungskorrektur' }[vf.tipo] || 'Rechnungskorrektur' : null;
     const nrLabel = { angebot: 'Angebots-Nr.', auftrag: 'Auftrags-Nr.', lieferschein: 'Lieferschein-Nr.', rechnung: 'Rechnungs-Nr.', korrektur: 'Beleg-Nr.' }[typ];
@@ -171,7 +185,7 @@ ${extra}`;
     if (isRe || typ === 'lieferschein') info.push([gb ? 'Steuerzeitpunkt' : 'Liefer-/Leistungsdatum', fmt.date(k.LIEFDATUM || k.DATUM)]);
     if (k.BENNAME) info.push(['Ansprechpartner', [k.BENVORNAME, k.BENNAME].filter(Boolean).join(' ')]);
     if (k.BESTELLNR) info.push(['Ihre Bestellung', k.BESTELLNR]);
-    if (d._ust) info.push([es ? 'NIF' : 'Ihre USt-IdNr.', d._ust]);
+    if (d._ust) info.push([es ? 'NIF' : lx ? lx.uidLabel : 'Ihre USt-IdNr.', d._ust]);
     if (fr && fr.sirenClient) info.push(['SIREN', fr.sirenClient]);
     const bezug = (d.verknuepft || []).find(l => l.typ === 'rechnung');
     if (typ === 'korrektur' && es && es.rectificada) info.push(['zu Rechnung', `${es.rectificada.numSerie} vom ${fmt.date(es.rectificada.fecha)}`]);
@@ -215,10 +229,10 @@ ${extra}`;
       const taxRows = Object.values(tax).filter(x => x.rate > 0);
       if (brutto && !klein) {
         t += `<tr><td>${us ? 'Zwischensumme' : 'Summe netto'}</td><td class="r">${fmt.money(k.GNETTO)}</td></tr>`;
-        for (const x of taxRows) t += `<tr><td>zzgl. ${fmt.num(x.rate)} % ${us ? 'Sales Tax' : 'MwSt'} auf ${fmt.money(x.netto)}</td><td class="r">${fmt.money(x.mwst)}</td></tr>`;
+        for (const x of taxRows) t += `<tr><td>zzgl. ${fmt.num(x.rate)} % ${ustLabel} auf ${fmt.money(x.netto)}</td><td class="r">${fmt.money(x.mwst)}</td></tr>`;
       } else if (!klein) {
         t += `<tr><td>${us ? 'Zwischensumme' : 'Summe netto'}</td><td class="r">${fmt.money(k.GNETTO)}</td></tr>`;
-        for (const x of taxRows) t += `<tr><td>zzgl. ${fmt.num(x.rate)} % ${us ? 'Sales Tax' : 'MwSt'} auf ${fmt.money(x.netto)}</td><td class="r">${fmt.money(x.mwst)}</td></tr>`;
+        for (const x of taxRows) t += `<tr><td>zzgl. ${fmt.num(x.rate)} % ${ustLabel} auf ${fmt.money(x.netto)}</td><td class="r">${fmt.money(x.mwst)}</td></tr>`;
         for (const x of taxRows.filter(x => x.recargo)) t += `<tr><td>zzgl. ${fmt.num(x.reRate)} % Recargo de equivalencia auf ${fmt.money(x.netto)}</td><td class="r">${fmt.money(x.recargo)}</td></tr>`;
         const frei = Object.values(tax).filter(x => !x.rate).reduce((s, x) => s + x.netto, 0);
         if (frei) t += `<tr><td class="muted">${us ? 'davon nicht steuerpflichtig' : 'davon steuerfrei / durchlaufend'}</td><td class="r muted">${fmt.money(frei)}</td></tr>`;
@@ -234,7 +248,7 @@ ${extra}`;
       if (klein) html += '<div class="txt muted">Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</div>';
       if (hatDP && us) html += '<div class="txt muted">(DP) = Durchlaufende Gebühr, nicht steuerpflichtig.</div>';
       else if (hatDP && gb) html += '<div class="txt muted">(DP) = Auslage im Namen des Kunden (disbursement), nicht umsatzsteuerbar.</div>';
-      else if (hatDP && !fr) html += es ? '<div class="txt muted">(DP) = Suplido: im Namen und für Rechnung des Kunden verauslagt, nicht Teil der Bemessungsgrundlage (Art. 78.Tres.3.º LIVA).</div>' : '<div class="txt muted">(DP) = Durchlaufender Posten gemäß § 10 Abs. 1 Satz 6 UStG, nicht umsatzsteuerpflichtig.</div>';
+      else if (hatDP && !fr && !lx) html += es ? '<div class="txt muted">(DP) = Suplido: im Namen und für Rechnung des Kunden verauslagt, nicht Teil der Bemessungsgrundlage (Art. 78.Tres.3.º LIVA).</div>' : '<div class="txt muted">(DP) = Durchlaufender Posten gemäß § 10 Abs. 1 Satz 6 UStG, nicht umsatzsteuerpflichtig.</div>';
       if (gb && hatMarge) html += '<div class="txt">Gebrauchtwagen: Margenbesteuerung (second-hand margin scheme, VAT Notice 718). Die Umsatzsteuer wird nicht gesondert ausgewiesen.</div>';
       if (gb && k.STEUERART) html += `<div class="txt muted">${esc({ REVERSE_CHARGE: 'Im Vereinigten Königreich nicht umsatzsteuerbar (Leistungsort im Ausland); der Kunde schuldet die Steuer (reverse charge).', IG_LIEFERUNG: 'Steuerfreie Ausfuhr (zero-rated export).', AUSFUHR: 'Steuerfreie Ausfuhr (zero-rated export).' }[k.STEUERART] || '')}</div>`;
       if (es && k.STEUERART) html += `<div class="txt muted">${esc({ REVERSE_CHARGE: 'Nicht steuerbar in Spanien, Steuerschuldnerschaft des Leistungsempfängers (Art. 69 und 84.Uno.2.º LIVA).', IG_LIEFERUNG: 'Steuerfreie innergemeinschaftliche Lieferung (Art. 25 LIVA).', AUSFUHR: 'Steuerfreie Ausfuhr (Art. 21 LIVA).' }[k.STEUERART] || '')}</div>`;
@@ -263,7 +277,30 @@ ${extra}`;
       for (const m of fr.mentions) html += `<div class="txt muted">${esc(m)}</div>`;
       if (typ === 'angebot' && formular === 'kostenvoranschlag') html += '<div class="txt">Schriftlicher Kostenvoranschlag. Ohne Ihre Freigabe werden keine Arbeiten ausgeführt und keine Beträge über diesem Kostenvoranschlag berechnet.</div><div class="sign"><div>Datum</div><div>Unterschrift Kunde (Freigabe)</div></div>';
     }
-    return Print.sheet(html, f, kopf);
+    if (lx) for (const m of lx.mentions) html += `<div class="txt muted">${esc(m)}</div>`;
+    // Switzerland: payment part of the QR-bill on a page of its own
+    const qr = lx && lx.qr && formular !== 'rechnung_ohne_kopf' ? Print.zahlteilHtml(lx.qr, k[v.nr]) : '';
+    return Print.sheet(html, f, kopf) + qr;
+  },
+  // Swiss QR-bill: receipt and payment part (210 x 105 mm) at the bottom of an A4 page without margins
+  zahlteilHtml(q, nr) {
+    const kreuz = '<svg viewBox="0 0 70 70" style="position:absolute;left:19.5mm;top:19.5mm;width:7mm;height:7mm"><rect width="70" height="70" fill="#fff"/><rect x="5" y="5" width="60" height="60" fill="#000"/><rect x="29.5" y="16" width="11" height="38" fill="#fff"/><rect x="16" y="29.5" width="38" height="11" fill="#fff"/></svg>';
+    const code = Print.qrSvg(unescape(encodeURIComponent(q.payload)), 46);
+    const blk = (c, kopf, zeilen) => `<div class="${c}h">${esc(kopf)}</div><div class="${c}v">${zeilen.map(esc).join('<br>')}</div>`;
+    const betrag = q.betrag ? q.betrag.replace(/\B(?=(\d{3})+\.)/g, ' ') : '';
+    const leer = (c, w, hh) => `<div class="${c}h">Zahlbar durch (Name/Adresse)</div><div class="ecken" style="width:${w}mm;height:${hh}mm"></div>`;
+    const r = [blk('r', 'Konto / Zahlbar an', [q.konto, ...q.glaeubiger]), q.referenz ? blk('r', 'Referenz', [q.referenz]) : '', q.schuldner ? blk('r', 'Zahlbar durch', q.schuldner) : leer('r', 52, 20)].join('');
+    const p = [blk('p', 'Konto / Zahlbar an', [q.konto, ...q.glaeubiger]), q.referenz ? blk('p', 'Referenz', [q.referenz]) : '', q.mitteilung ? blk('p', 'Zusätzliche Informationen', [q.mitteilung]) : '',
+      q.schuldner ? blk('p', 'Zahlbar durch', q.schuldner) : leer('p', 65, 25)].join('');
+    return `<div class="doc qrpage"><div class="kopf">${esc(Print.firma ? Print.firma.FIRMENNAME || '' : '')} · Rechnung Nr. ${esc(nr)}</div><div class="zt"><div class="note">Vor der Einzahlung abzutrennen</div><div class="cut"></div>
+      <div class="abs t" style="left:5mm;top:5mm">Empfangsschein</div><div class="abs" style="left:5mm;top:12mm;width:52mm">${r}</div>
+      <div class="abs" style="left:5mm;top:65mm"><div class="rh">Währung</div><div class="rv">${esc(q.waehrung)}</div></div>
+      <div class="abs" style="left:22mm;top:65mm"><div class="rh">Betrag</div>${betrag ? `<div class="rv">${esc(betrag)}</div>` : '<div class="ecken" style="width:30mm;height:10mm;margin-left:5mm"></div>'}</div>
+      <div class="abs rh" style="left:5mm;width:52mm;top:80mm;text-align:right">Annahmestelle</div>
+      <div class="abs t" style="left:67mm;top:5mm">Zahlteil</div><div class="abs" style="left:67mm;top:17mm;width:46mm;height:46mm">${code}${kreuz}</div>
+      <div class="abs" style="left:67mm;top:66mm"><div class="ph">Währung</div><div class="pv">${esc(q.waehrung)}</div></div>
+      <div class="abs" style="left:87mm;top:66mm"><div class="ph">Betrag</div>${betrag ? `<div class="pv">${esc(betrag)}</div>` : '<div class="ecken" style="width:40mm;height:15mm"></div>'}</div>
+      <div class="abs" style="left:118mm;top:5mm;width:87mm">${p}</div></div></div>`;
   },
   async vorgang(typ, d, opts = {}) {
     const f = await Print.ensureFirma();

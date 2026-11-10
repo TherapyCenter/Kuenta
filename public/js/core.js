@@ -45,10 +45,11 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 const LOCALE = I18N.locale();
 const DEC_POINT = LOCALE === 'en-GB';
 const nfMoney = new Intl.NumberFormat(LOCALE, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const nfChf = new Intl.NumberFormat('de-CH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); // Swiss francs: CHF 1'234.50
 const DATE_SEP = I18N.lang === 'de' ? '.' : '/';
 const fmt = {
   // currency of the tenant (lookups): euro after the number as before, pound sign in front
-  money: v => { if (v == null || v === '') return ''; const sym = { GBP: '£', USD: '$' }[LK.data && LK.data.waehrung]; return sym ? (Number(v) < 0 ? '-' : '') + sym + nfMoney.format(Math.abs(Number(v))) : nfMoney.format(Number(v)) + ' €'; },
+  money: v => { if (v == null || v === '') return ''; if (LK.data && LK.data.waehrung === 'CHF') return (Number(v) < 0 ? '-' : '') + 'CHF ' + nfChf.format(Math.abs(Number(v))).replace(/’/g, "'"); const sym = { GBP: '£', USD: '$' }[LK.data && LK.data.waehrung]; return sym ? (Number(v) < 0 ? '-' : '') + sym + nfMoney.format(Math.abs(Number(v))) : nfMoney.format(Number(v)) + ' €'; },
   money0: v => v == null || v === '' ? '' : nfMoney.format(Number(v)),
   num: (v, d = 2) => v == null || v === '' ? '' : new Intl.NumberFormat(LOCALE, { minimumFractionDigits: 0, maximumFractionDigits: d }).format(Number(v)),
   num2: v => v == null || v === '' ? '' : nfMoney.format(Number(v)),

@@ -81,6 +81,9 @@ function load(typ, id) {
     if (ES.activo() || kopf.ESNUMSERIE) res.es = require('../es/verifactu').info(kopf);
   }
   if (L.land() === 'FR') res.fr = require('../fr').info(typ, kopf, pos); // legal mentions and footer
+  // Austria / Switzerland: texts, footer, checks and (CH) the QR-bill of the open amount
+  if (L.land() === 'AT') res.lx = require('../at').info(typ, kopf, pos);
+  if (L.land() === 'CH') res.lx = require('../ch').info(typ, kopf, pos, res.offen);
   return res;
 }
 

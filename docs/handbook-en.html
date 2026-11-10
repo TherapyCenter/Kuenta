@@ -519,6 +519,39 @@ docker compose up -d --build</code></pre></div>
       <p>Kuenta does not look up rates automatically and does not file returns; your accountant or QuickBooks does that.</p>
     </section>
 
+    <section id="oesterreich">
+      <h2>Austria: VAT, cash register (RKSV) and UVA</h2>
+      <p>Choose “Österreich” under <span class="path">Settings → Tax / dunning / register → Tax system</span>, save and reload. The settings are on the tab <span class="path">Österreich</span>.</p>
+      <ul>
+        <li><strong>Company data:</strong> the UID number (ATU…) goes into VAT ID, the tax number (tax office + number, 9 digits) into Tax number. Legal form, seat, company register number and court on the tab Österreich (§ 14 UGB).</li>
+        <li><strong>Rates:</strong> 20 % (full VAT), 10 % (reduced VAT), 13 % (third rate, code “AT-MwSt”), exempt 0 %. Small business exemption and cash accounting can be switched on.</li>
+        <li><strong>Invoices:</strong> UID of the company, date of supply and, above € 10,000 gross, the UID of the customer. <em>E-invoice → Check mandatory fields</em> lists anything missing.</li>
+        <li><strong>E-invoices to the federal government:</strong> <em>E-invoice (ebInterface) → download ebInterface 6.1</em> and upload it at e-rechnung.gv.at. The supplier number goes into the customer's Leitweg-ID field, the order reference into the invoice's order number.</li>
+      </ul>
+      <h3>Cash register (RKSV)</h3>
+      <ol>
+        <li>On the tab Österreich enter the cash register ID and choose the signature device: A-Trust a.sign RK (user name and password from A-Trust) or the trial mode with a local key. The trial mode is not RKSV compliant.</li>
+        <li><em>Activate cash register</em>: Kuenta creates the AES key and the start receipt. Register the cash register ID and the AES key in FinanzOnline and check the start receipt with the BMF receipt check app.</li>
+        <li>Every sale and cancellation at the register gets a signed receipt with QR code. At the change of month Kuenta creates the monthly receipt, in December the yearly receipt. Check the yearly receipt and keep it.</li>
+        <li>If the signature device fails, receipts read “Sicherheitseinrichtung ausgefallen”, followed by a collective receipt once it works again. Report failures longer than 48 hours in FinanzOnline.</li>
+      </ol>
+      <p><span class="path">Finance → FIBU export</span> (view “Steuer (Österreich)”) lists all RKSV receipts, checks chain, turnover counter and signatures and exports the data collection protocol (DEP).</p>
+      <h3>VAT return (UVA)</h3>
+      <p>The same view calculates the UVA (Kennzahlen 000, 011, 017, 016, 020, 022, 029, 006, 060) and creates the XML file for the upload in FinanzOnline (U30). Report services to EU businesses and intra-community supplies in the recapitulative statement as well.</p>
+    </section>
+
+    <section id="schweiz">
+      <h2>Switzerland: VAT, QR-bill and CHF</h2>
+      <p>Choose “Schweiz” under <span class="path">Settings → Tax / dunning / register → Tax system</span>, save and reload. The company then works in francs (CHF 1'234.50). The settings are on the tab <span class="path">Schweiz</span>.</p>
+      <ul>
+        <li><strong>Company data:</strong> UID / VAT number (CHE-123.456.789) into VAT ID, the commercial register entry into Commercial register. Documents show “MWST-Nr. CHE-… MWST”.</li>
+        <li><strong>Rates:</strong> 8.1 % standard (full VAT), 2.6 % reduced (reduced VAT), 3.8 % accommodation (code “AT-MwSt”), 0 % excluded. Businesses below CHF 100,000 turnover choose “not registered for VAT”.</li>
+        <li><strong>QR-bill:</strong> every invoice gets the payment part with receipt for the open amount at the bottom, on the last or on a page of its own for long invoices. A QR-IBAN gives a 27-digit QR reference, otherwise a creditor reference (RF…) from the invoice number.</li>
+        <li><strong>Register:</strong> cash is rounded to 5 centimes; the difference is a line “Rundungsdifferenz” on receipt and invoice.</li>
+        <li><strong>VAT return:</strong> <span class="path">Finance → FIBU export</span> shows the Ziffern of the ESTV form (200 to 510) for the effective or the net tax rate method. Enter them in the ESTV ePortal; the CSV is for your records.</li>
+      </ul>
+    </section>
+
     <section id="datev">
       <h2>DATEV export for the tax adviser</h2>
       <p class="lead">Kuenta books invoices, payments, incoming invoices and register sales automatically and exports them as DATEV files. Your tax adviser reads them directly into DATEV, the accounting software common in Germany.</p>
@@ -817,7 +850,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>Check the TSE with a fiskaly test account before going live and register the register with the tax office.</li>
             <li>Check the card terminal and DSFinV-K before use or before an audit.</li>
-            <li>Kuenta is designed for Germany, Spain, the United Kingdom and the United States (see <a href="#spanien">Spain</a>, <a href="#uk">United Kingdom</a> and <a href="#usa">United States</a>). Other countries are not supported.</li>
+            <li>Kuenta is designed for Germany, Spain, the United Kingdom, the United States, France, Austria and Switzerland (see <a href="#spanien">Spain</a>, <a href="#uk">United Kingdom</a>, <a href="#usa">United States</a>, <a href="#oesterreich">Austria</a> and <a href="#schweiz">Switzerland</a>). Other countries are not supported.</li>
             <li>Purchase contracts are templates and do not replace legal advice.</li>
           </ul></div>
       </div>

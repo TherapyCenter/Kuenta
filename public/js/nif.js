@@ -1,6 +1,7 @@
 'use strict';
 // Tax IDs: Spanish DNI (12345678Z), NIE (X1234567L), CIF of companies (B12345674) and special NIF (K/L/M);
-// UK VAT registration numbers (GB123456782); French SIREN (9 digits) and SIRET (14 digits). Shared by server and browser (UMD).
+// UK VAT registration numbers (GB123456782); French SIREN (9 digits) and SIRET (14 digits);
+// Austrian UID (ATU12345678) and Swiss UID (CHE-123.456.789). Shared by server and browser (UMD).
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
   else root.NIF = factory();
@@ -78,5 +79,28 @@
     return { ok: sum % 10 === 0, num: x };
   }
 
-  return { validar, limpiar, extranjero, gbVat, frSiren };
+  // Austrian UID: ATU + 8 digits, the last one is a check digit (BMF algorithm)
+  function atUid(s) {
+    const x = String(s || '').toUpperCase().replace(/[\s.\-]/g, '');
+    const m = /^ATU(\d{8})$/.exec(x);
+    if (!m) return { ok: false, uid: x };
+    const c = m[1].split('').map(Number);
+    const sx = d => Math.floor(d / 5) + (d * 2) % 10;
+    const r = sx(c[1]) + sx(c[3]) + sx(c[5]) + c[0] + c[2] + c[4] + c[6];
+    return { ok: (10 - (r + 4) % 10) % 10 === c[7], uid: x };
+  }
+
+  // Swiss UID: CHE + 9 digits, check digit modulo 11 (weights 5 4 3 2 7 6 5 4); shown as CHE-123.456.789
+  function chUid(s) {
+    const x = String(s || '').toUpperCase().replace(/(MWST|TVA|IVA|HR)$/g, '').replace(/[\s.\-]/g, '');
+    const m = /^CHE(\d{9})$/.exec(x);
+    if (!m) return { ok: false, uid: x };
+    const d = m[1].split('').map(Number);
+    const sum = [5, 4, 3, 2, 7, 6, 5, 4].reduce((a, w, i) => a + w * d[i], 0);
+    const p = 11 - (sum % 11);
+    const ok = p !== 10 && (p === 11 ? 0 : p) === d[8];
+    return { ok, uid: `CHE-${m[1].slice(0, 3)}.${m[1].slice(3, 6)}.${m[1].slice(6)}` };
+  }
+
+  return { validar, limpiar, extranjero, gbVat, frSiren, atUid, chUid };
 });

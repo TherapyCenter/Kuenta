@@ -83,6 +83,7 @@ const Vorgang = {
           { label: 'Facturae 3.2.2 herunterladen', onClick: () => Vorgang.facturae(id) },
           { label: 'Pflichtangaben prüfen', onClick: () => Vorgang.facturae(id, true) }] });
       else if (Vorgang.land() === 'FR') items.push({ label: 'Factur-X / Chorus Pro', icon: '🧾', items: Vorgang.frMenu(id) });
+      else if (Vorgang.land() === 'AT') items.push({ label: 'E-Rechnung (ebInterface)', icon: '🧾', items: Vorgang.atMenu(id) });
       else if (Vorgang.land() === 'DE') items.push({ label: 'E-Rechnung (XRechnung)', icon: '🧾', items: [
         { label: 'XRechnung CII herunterladen', onClick: () => Vorgang.erechnung(id, 'cii') },
         { label: 'XRechnung UBL herunterladen', onClick: () => Vorgang.erechnung(id, 'ubl') },
@@ -120,6 +121,24 @@ const Vorgang = {
   // ---------- Spain (VERI*FACTU) ----------
   es() { return !!(LK.data && LK.data.land === 'ES'); },
   land() { return (LK.data && LK.data.land) || 'DE'; },
+  // Austria: ebInterface 6.1 (e-rechnung.gv.at) and the checks of § 11 UStG
+  atMenu(id, wrap = fn => fn()) {
+    const pruefen = async (download) => {
+      try {
+        const [chk, d] = await Promise.all([api(`/api/at/ebinterface/${id}?pruefen=1`), api(`/api/vorgang/rechnung/${id}`)]);
+        const probleme = [...((d.lx && d.lx.warnungen) || []), ...chk.problems.filter(p => !((d.lx && d.lx.warnungen) || []).includes(p))];
+        if (download) {
+          if (probleme.length && !(await confirmDlg('Es fehlen Angaben:\n\n• ' + probleme.join('\n• ') + '\n\nTrotzdem erstellen?', { ok: 'Trotzdem erstellen' }))) return;
+          await downloadUrl(`/api/at/ebinterface/${id}`, 'ebInterface.xml');
+        } else if (probleme.length) alertDlg('Fehlende Angaben:\n\n• ' + probleme.join('\n• '), 'Pflichtangaben');
+        else toast('Alle Pflichtangaben vorhanden.', 'ok');
+      } catch (e) { showError(e); }
+    };
+    return [
+      { label: 'ebInterface 6.1 herunterladen', onClick: () => wrap(() => pruefen(true)) },
+      { label: 'Pflichtangaben prüfen', onClick: () => wrap(() => pruefen(false)) },
+    ];
+  },
   // France: Factur-X (EN 16931) and Chorus Pro for invoices to public bodies
   frMenu(id, wrap = fn => fn()) {
     return [
@@ -858,9 +877,9 @@ class VorgangWindow {
       h('button', { class: 'btn', onclick: () => this.print() }, h('span', { class: 'ico' }, '🖨'), 'Drucken'),
       h('label', { class: 'inline' }, 'Formular:', this.formSel),
     ];
-    if (isRe && ['DE', 'ES', 'FR'].includes(Vorgang.land())) items.push(h('button', { class: 'btn', onclick: async ev => {
+    if (isRe && ['DE', 'ES', 'FR', 'AT'].includes(Vorgang.land())) items.push(h('button', { class: 'btn', onclick: async ev => {
       const r = ev.currentTarget.getBoundingClientRect();
-      const m = contextMenu(r.left, r.top, Vorgang.land() === 'FR' ? Vorgang.frMenu(this.id, fn => this.withSaved(fn)) : Vorgang.es() ? [
+      const m = contextMenu(r.left, r.top, Vorgang.land() === 'AT' ? Vorgang.atMenu(this.id, fn => this.withSaved(fn)) : Vorgang.land() === 'FR' ? Vorgang.frMenu(this.id, fn => this.withSaved(fn)) : Vorgang.es() ? [
         { label: 'Facturae 3.2.2 herunterladen', onClick: () => this.withSaved(() => Vorgang.facturae(this.id)) },
         { label: 'Pflichtangaben prüfen', onClick: () => this.withSaved(() => Vorgang.facturae(this.id, true)) },
         { label: 'VERI*FACTU-Status', onClick: () => this.withSaved(() => Vorgang.esStatus(this.typ, this.id).then(() => this.reloadEs())) }] : [

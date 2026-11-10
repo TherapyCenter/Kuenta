@@ -66,16 +66,17 @@ function commitNumber(key, value) {
 }
 
 // ---- MwSt: codes 61..64 refer to OPTIONSWERTE ----
-// Tax system of the current tenant: DE (default), ES or GB
-function land() { const v = sw('steuer.land', 'DE'); return ['ES', 'GB', 'US', 'FR'].includes(v) ? v : 'DE'; }
+// Tax system of the current tenant: DE (default), ES, GB, US, FR, AT or CH
+function land() { const v = sw('steuer.land', 'DE'); return ['ES', 'GB', 'US', 'FR', 'AT', 'CH'].includes(v) ? v : 'DE'; }
 // Currency of the tenant's documents
-const waehrung = () => ({ GB: 'GBP', US: 'USD' }[land()] || 'EUR');
-const SYMBOL = { EUR: '€', GBP: '£', USD: '$' };
-// amount with currency: 1.234,50 € (euro after the number, as before) or £1,234.50
+const waehrung = () => ({ GB: 'GBP', US: 'USD', CH: 'CHF' }[land()] || 'EUR');
+const SYMBOL = { EUR: '€', GBP: '£', USD: '$', CHF: 'CHF ' };
+// amount with currency: 1.234,50 € (euro after the number, as before), £1,234.50 or CHF 1'234.50
 function geld(v, locale) {
   const n = new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const w = waehrung();
   if (w === 'EUR') return n.format(Number(v)) + ' €';
+  if (w === 'CHF') return (Number(v) < 0 ? '-' : '') + 'CHF ' + new Intl.NumberFormat('de-CH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Math.abs(Number(v))).replace(/’/g, "'");
   return (Number(v) < 0 ? '-' : '') + SYMBOL[w] + n.format(Math.abs(Number(v)));
 }
 
@@ -85,6 +86,8 @@ function mwstRates() {
   if (land() === 'GB') return require('./gb').mwstRates();
   if (land() === 'US') return require('./us').mwstRates();
   if (land() === 'FR') return require('./fr').mwstRates();
+  if (land() === 'AT') return require('./at').mwstRates();
+  if (land() === 'CH') return require('./ch').mwstRates();
   const klein = optNum('Kleinunternehmer', 0) === 1;
   return {
     61: klein ? 0 : optNum('volle MwSt', 19),
@@ -99,6 +102,8 @@ function mwstList() {
   if (land() === 'GB') return require('./gb').mwstList();
   if (land() === 'US') return require('./us').mwstList();
   if (land() === 'FR') return require('./fr').mwstList();
+  if (land() === 'AT') return require('./at').mwstList();
+  if (land() === 'CH') return require('./ch').mwstList();
   return [
     { id: 61, name: `volle MwSt (${optNum('volle MwSt', 19)} %)`, rate: optNum('volle MwSt', 19) },
     { id: 62, name: `ermäßigte MwSt (${optNum('verm. MwSt', 7)} %)`, rate: optNum('verm. MwSt', 7) },

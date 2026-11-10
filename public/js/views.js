@@ -1,5 +1,5 @@
 'use strict';
-/* global h, $, $$, fmt, api, qs, parseNum, LK, ENT, Win, toast, showError, confirmDlg, promptDlg, dialog, alertDlg, Overview, miniGrid, editRecord, pickKunde, pickRecord, Vorgang, Zahlung, Print, App, today, addDays, addMonths, downloadUrl, pickFile, saveBlob, kname, r2, Pref, EsUI, GbUI, UsUI, FrUI */
+/* global h, $, $$, fmt, api, qs, parseNum, LK, ENT, Win, toast, showError, confirmDlg, promptDlg, dialog, alertDlg, Overview, miniGrid, editRecord, pickKunde, pickRecord, Vorgang, Zahlung, Print, App, today, addDays, addMonths, downloadUrl, pickFile, saveBlob, kname, r2, Pref, EsUI, GbUI, UsUI, FrUI, AtUI, ChUI */
 
 const Views = {};
 const title = (t, sub) => h('div', { class: 'view-title' }, t, sub ? h('span', { class: 'sub' }, sub) : null);
@@ -27,8 +27,8 @@ const dateRange = (von, bis, onChange) => {
 // ---------------- Display currency and hiding amounts (display only – invoices and bookings stay in the company's currency) ----------------
 const Anzeige = {
   kurse: null,
-  NAMEN: { EUR: 'Euro', USD: 'US-Dollar', GBP: 'Britisches Pfund', BTC: 'Bitcoin', SATS: 'Satoshis' },
-  // currency of the company's amounts (EUR, GBP for UK, USD for US companies)
+  NAMEN: { EUR: 'Euro', USD: 'US-Dollar', GBP: 'Britisches Pfund', CHF: 'Schweizer Franken', BTC: 'Bitcoin', SATS: 'Satoshis' },
+  // currency of the company's amounts (EUR, GBP for UK, USD for US, CHF for Swiss companies)
   basis: () => (LK.data && LK.data.waehrung) || 'EUR',
   w: () => Pref.get('anzeigeWaehrung', null) || Anzeige.basis(),
   verborgen: () => Pref.get('betraegeVerbergen', false) === true,
@@ -38,11 +38,11 @@ const Anzeige = {
     return this.kurse;
   },
   kurs(w) { if (w === 'EUR') return { eurPro: 1 }; const k = this.kurse && this.kurse[w === 'SATS' ? 'BTC' : w]; return k && k.eurPro ? k : null; },
-  // Format an amount in units of the currency (for EUR/USD/GBP/BTC/SATS)
+  // Format an amount in units of the currency (for EUR/USD/GBP/CHF/BTC/SATS)
   einheiten(v, w) {
     if (this.verborgen()) return '*****';
     if (w === 'EUR') return new Intl.NumberFormat(LOCALE, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v) + ' €';
-    if (w === 'USD' || w === 'GBP') return new Intl.NumberFormat(LOCALE, { style: 'currency', currency: w }).format(v);
+    if (w === 'USD' || w === 'GBP' || w === 'CHF') return new Intl.NumberFormat(LOCALE, { style: 'currency', currency: w }).format(v);
     if (w === 'BTC') return new Intl.NumberFormat(LOCALE, { minimumFractionDigits: 8, maximumFractionDigits: 8 }).format(v) + ' ₿';
     if (w === 'SATS') return new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0 }).format(v * 1e8) + ' sats';
     return fmt.money(v);
@@ -64,7 +64,7 @@ const Anzeige = {
     const auge = h('button', { class: 'btn sm icon', title: this.verborgen() ? 'Beträge anzeigen' : 'Beträge ausblenden', 'aria-label': this.verborgen() ? 'Beträge anzeigen' : 'Beträge ausblenden',
       onclick: () => { Pref.set('betraegeVerbergen', !this.verborgen()); onChange(); } }, this.verborgen() ? '🙈' : '👁');
     const setze = k => { Pref.set('anzeigeWaehrung', k); if (k === 'BTC' || k === 'SATS') Pref.set('btcEinheit', k); onChange(); };
-    const knoepfe = [['EUR', '€'], ['USD', '$'], ['GBP', '£']].map(([k, l]) => h('button', {
+    const knoepfe = [['EUR', '€'], ['USD', '$'], ['GBP', '£'], ['CHF', 'CHF']].map(([k, l]) => h('button', {
       class: 'btn sm' + (k === w ? ' primary' : ''), title: `Anzeige in ${this.NAMEN[k]}`, onclick: () => setze(k) }, l));
     // One button for Bitcoin: the first click shows the last used unit, every further click toggles between ₿ and sats
     const btcAktiv = w === 'BTC' || w === 'SATS';
@@ -348,6 +348,8 @@ Views.fibu = async (main) => {
   if (GbUI.activo()) return Views.ukVat(main); // UK: Xero/QuickBooks/Sage exports and MTD VAT return
   if (UsUI.activo()) return Views.usExport(main); // US: QuickBooks Online
   if (FrUI.activo()) return Views.frCompta(main); // France: FEC, cash register journal, Chorus Pro
+  if (AtUI.activo()) return Views.atSteuer(main); // Austria: UVA (FinanzOnline) and RKSV
+  if (ChUI.activo()) return Views.chMwst(main); // Switzerland: MWST return
   let von = addMonths(today().slice(0, 7) + '-01', -1), bis = addDays(today().slice(0, 7) + '-01', -1);
   const alle = h('input', { type: 'checkbox' });
   const wrap = h('div', { class: 'overview' }); let g, rows = [];
@@ -608,10 +610,10 @@ Views.einstellungen = async (main) => {
   });
   addTab('Steuer / Mahnung / Kasse', p => p.append(h('div', { class: 'groups' },
     grp('Steuersystem / Tax system', (() => {
-      const x = h('select', null, [['DE', 'Deutschland (UStG, TSE, DATEV, XRechnung)'], ['ES', 'España (IVA, VERI*FACTU, Facturae)'], ['GB', 'United Kingdom (VAT, Making Tax Digital, £)'], ['US', 'United States (sales tax, $)'], ['FR', 'France (TVA, Factur-X, NF525, FEC)']].map(([v, l]) => h('option', { value: v, selected: (s.sw['steuer.land'] || 'DE') === v }, l)));
+      const x = h('select', null, [['DE', 'Deutschland (UStG, TSE, DATEV, XRechnung)'], ['ES', 'España (IVA, VERI*FACTU, Facturae)'], ['GB', 'United Kingdom (VAT, Making Tax Digital, £)'], ['US', 'United States (sales tax, $)'], ['FR', 'France (TVA, Factur-X, NF525, FEC)'], ['AT', 'Österreich (USt, RKSV, UVA, ebInterface)'], ['CH', 'Schweiz (MWST, QR-Rechnung, CHF)']].map(([v, l]) => h('option', { value: v, selected: (s.sw['steuer.land'] || 'DE') === v }, l)));
       x.addEventListener('change', () => { changes.sw['steuer.land'] = x.value; });
       return fld('Steuersystem dieses Mandanten', x);
-    })(), h('div', { class: 'fld hint' }, 'Gilt nur für den aktuellen Mandanten. Vorhandene Rechnungen, Sicherungen und der Import aus KFZ-Faktura bleiben unverändert. Großbritannien rechnet in Pfund (£). Die Belegsprache stellen Sie unter Vorgabewerte → Sprache ein. Nach dem Umstellen speichern und das Programm neu laden.')),
+    })(), h('div', { class: 'fld hint' }, 'Gilt nur für den aktuellen Mandanten. Vorhandene Rechnungen, Sicherungen und der Import aus KFZ-Faktura bleiben unverändert. Großbritannien rechnet in Pfund (£), die Schweiz in Franken (CHF). Die Belegsprache stellen Sie unter Vorgabewerte → Sprache ein. Nach dem Umstellen speichern und das Programm neu laden.')),
     grp('Mehrwertsteuer', oi('volle MwSt', 'voller Satz %', true, 'num'), oi('verm. MwSt', 'ermäßigter Satz %', true, 'num'), oi('AT.-MwSt', 'AT-MwSt %', true, 'num'), ob('Kleinunternehmer', 'Kleinunternehmer nach § 19 UStG (keine MwSt)')),
     grp('Mahnwesen', ...[1, 2, 3, 4].flatMap(i => [oi(`Mahntage${i}`, `Stufe ${i}: Tage nach Fälligkeit`, true, 'num'), oi(`Mahntage${i}Gebuehren`, `Stufe ${i}: Gebühr €`, true, 'num')])),
     grp('Kasse', oi('Kassenanfang', 'Kassen-Anfangsbestand €', true, 'num')))));
@@ -619,6 +621,8 @@ Views.einstellungen = async (main) => {
   addTab('United Kingdom / MTD', p => GbUI.settingsTab(p, { s, changes, si, grp, fld, ob }));
   addTab('United States / Sales tax', p => UsUI.settingsTab(p, { s, changes, si, sb, grp, fld }));
   addTab('France', p => FrUI.settingsTab(p, { s, changes, si, sb, grp, fld, ob }));
+  addTab('Österreich', p => AtUI.settingsTab(p, { s, changes, si, sb, grp, fld, ob }));
+  addTab('Schweiz', p => ChUI.settingsTab(p, { s, changes, si, sb, grp, fld, ob }));
   addTab('Nummernkreise', p => p.append(h('div', { class: 'note info', style: { marginBottom: '8px' } }, 'Eingetragen ist jeweils die zuletzt vergebene Nummer. Die nächste Nummer ist um 1 höher.'),
     h('div', { class: 'groups' }, grp('Stammdaten', oi('Nummernkreis Kunden', 'Kunden', true), oi('Nummerkreis Fahrzeuge', 'Fahrzeuge', true), oi('Nummerkreis Artikel', 'Artikel', true), oi('Nummernkreis Arbeitswert', 'Arbeitswerte', true), oi('Nummernkreis Liefranten', 'Lieferanten', true), oi('Reifeneinlagerung', 'Reifeneinlagerung', true)),
       grp('Vorgänge', oi('Nummernkreis Angebot', 'Angebote', true), oi('Nummernkreis Auftrag', 'Aufträge', true), oi('Nummerkreis Lieferschein', 'Lieferscheine', true), oi('Nummernkreis Rechnung', 'Rechnungen', true), oi('Nummerkreis Gutschrift', 'Rechnungskorrekturen', true)))));

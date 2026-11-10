@@ -21,7 +21,8 @@ test('Aktuelle Kurse aus dem Zwischenspeicher, kein Abruf nötig', async () => {
   K.speichern('BTC', [['2026-01-02', 20000], [L.today(), 40000]]);
   K.speichern('USD', [['2026-01-02', 0.9], [L.today(), 0.8]]);
   K.speichern('GBP', [[L.today(), 1.17]]);
-  for (const w of ['BTC', 'USD', 'GBP']) { L.setSw('kurse.geladenab.' + w, '2017-01-01'); L.setSw('kurse.abruf.' + w, new Date().toISOString()); }
+  K.speichern('CHF', [[L.today(), 1.06]]);
+  for (const w of ['BTC', 'USD', 'GBP', 'CHF']) { L.setSw('kurse.geladenab.' + w, '2017-01-01'); L.setSw('kurse.abruf.' + w, new Date().toISOString()); }
   const a = await K.aktuell();
   assert.strictEqual(a.BTC.eurPro, 40000);
   assert.strictEqual(a.BTC.quelle, 'Bitstamp');
@@ -30,6 +31,7 @@ test('Aktuelle Kurse aus dem Zwischenspeicher, kein Abruf nötig', async () => {
   assert.strictEqual(a.USD.quelle, 'Europäische Zentralbank');
   assert.strictEqual(a.GBP.eurPro, 1.17);
   assert.strictEqual(a.GBP.quelle, 'Europäische Zentralbank');
+  assert.strictEqual(a.CHF.eurPro, 1.06);
 });
 
 test('Ungültige oder leere Kurse werden nicht gespeichert', () => {

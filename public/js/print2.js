@@ -28,9 +28,13 @@ Object.assign(Print, {
       let dup = null; if (kopie) { try { dup = await api(`/api/fr/caisse/duplicata/${b.ID}`, { method: 'POST' }); } catch { /* offline */ } }
       frBlock = `${dup && dup.numero ? `<div class="c b">*** DUPLICATA n° ${dup.numero} ***</div>` : ''}${d.fr ? `<div class="small">Ticket n° ${esc(d.fr.nr)} · Signature ${esc(d.fr.court)}</div>` : ''}`;
     }
-    const tse = frBlock ? '<hr>' + frBlock : es ? vf : (gb || us || (LK.data && LK.data.land === 'FR')) ? '' : b.TSE_SIGNATUR ? `<hr><div class="small">TSE-Seriennr.: ${esc(b.TSE_SERIAL)}<br>Transaktion: ${esc(b.TSE_TXNR)} · Signaturzähler: ${esc(b.TSE_ZAEHLER)}<br>Start: ${esc(b.TSE_START)}<br>Ende: ${esc(b.TSE_ENDE)}<br>Signatur: ${esc(b.TSE_SIGNATUR)}</div><div class="c">${Print.qrSvg(b.TSE_QR)}</div>`
-      : b.TSE_FEHLER ? `<hr><div class="small b">${esc(b.TSE_FEHLER)}</div>` : '<hr><div class="small">Keine TSE aktiv</div>';
-    const html = `<div class="c b" style="font-size:11pt">${esc(f.FIRMENNAME || '')}</div><div class="c">${esc(f.STRASSE || '')}<br>${esc(Print.plzOrt(f.PLZ, f.ORT))}<br>${esc(f.TELEFON || '')}${es ? (es.nifEmisor ? '<br>NIF ' + esc(es.nifEmisor) : '') : gb ? (f.USTNR ? '<br>VAT-Reg.-Nr. ' + esc(f.USTNR) : '') : f.USTNR ? '<br>USt-IdNr. ' + esc(f.USTNR) : f.STEUERNR ? '<br>St.-Nr. ' + esc(f.STEUERNR) : ''}</div><hr>
+    // Austria: machine-readable code of the RKSV with cash register id and receipt number
+    const at = LK.data && LK.data.land === 'AT'; const ch = LK.data && LK.data.land === 'CH';
+    const atBlock = d.at ? `<hr><div class="c">${Print.qrSvg(d.at.qr, 34)}</div><div class="small c">Kassen-ID ${esc(d.at.kassenid)} · Beleg-Nr. ${esc(d.at.nr)}${d.at.ausfall ? '<br><b>Sicherheitseinrichtung ausgefallen</b>' : ''}</div>` : '';
+    const lbl = at ? 'USt' : ch ? 'MWST' : 'MwSt';
+    const tse = atBlock || (frBlock ? '<hr>' + frBlock : es ? vf : (gb || us || at || ch || (LK.data && LK.data.land === 'FR')) ? '' : b.TSE_SIGNATUR ? `<hr><div class="small">TSE-Seriennr.: ${esc(b.TSE_SERIAL)}<br>Transaktion: ${esc(b.TSE_TXNR)} · Signaturzähler: ${esc(b.TSE_ZAEHLER)}<br>Start: ${esc(b.TSE_START)}<br>Ende: ${esc(b.TSE_ENDE)}<br>Signatur: ${esc(b.TSE_SIGNATUR)}</div><div class="c">${Print.qrSvg(b.TSE_QR)}</div>`
+      : b.TSE_FEHLER ? `<hr><div class="small b">${esc(b.TSE_FEHLER)}</div>` : '<hr><div class="small">Keine TSE aktiv</div>');
+    const html = `<div class="c b" style="font-size:11pt">${esc(f.FIRMENNAME || '')}</div><div class="c">${esc(f.STRASSE || '')}<br>${esc(Print.plzOrt(f.PLZ, f.ORT))}<br>${esc(f.TELEFON || '')}${es ? (es.nifEmisor ? '<br>NIF ' + esc(es.nifEmisor) : '') : at ? (f.USTNR ? '<br>UID ' + esc(f.USTNR) : '') : ch ? (f.USTNR ? '<br>MWST-Nr. ' + esc(f.USTNR) : '') : gb ? (f.USTNR ? '<br>VAT-Reg.-Nr. ' + esc(f.USTNR) : '') : f.USTNR ? '<br>USt-IdNr. ' + esc(f.USTNR) : f.STEUERNR ? '<br>St.-Nr. ' + esc(f.STEUERNR) : ''}</div><hr>
       ${kopie && !(LK.data && LK.data.land === 'FR') ? '<div class="c b">*** KOPIE ***</div>' : ''}${b.STORNOID ? '<div class="c b">*** STORNO ***</div>' : ''}
       ${es && es.emitida ? `<div class="b">${esc({ F1: 'Rechnung', F2: 'Vereinfachte Rechnung', R5: 'Vereinfachte Rechnungskorrektur' }[es.tipo] || 'Rechnungskorrektur')} Nr. ${esc(es.numSerie)}</div>` : ''}
       <div>${esc(b.TYP === 'Beleg' ? 'Kassenbeleg' : b.TYP)} Nr. ${b.BONNR}<br>${fmt.datetime(b.ZEIT)}${b.BEDIENER ? '<br>Bediener: ' + esc(b.BEDIENER) : ''}<br>Kasse: ${esc(d.kasse)}${b.KUNDE && b.KUNDE !== 'Barverkauf' ? '<br>Kunde: ' + esc(b.KUNDE) : ''}${d.rechnungnr && !es ? '<br>Rechnung Nr. ' + esc(d.rechnungnr) : ''}</div><hr>
@@ -38,7 +42,7 @@ Object.assign(Print, {
       <table><tr><td class="big">SUMME</td><td class="r big">${fmt.money(b.BRUTTO)}</td></tr>
       <tr><td>${esc({ BAR: 'Bar', EC: 'EC-Karte', KARTE: 'Kreditkarte', UEBERWEISUNG: 'Überweisung', KRYPTO: 'Krypto' }[b.ZAHLART] || b.ZAHLART)}${b.ZAHLART === 'KRYPTO' && b.VERWENDUNG ? '<br><small>' + esc(b.VERWENDUNG.replace(/^Krypto \(BTCPay\)( · )?/, 'BTCPay ')) + '</small>' : ''}</td><td class="r">${fmt.money(b.GEGEBEN)}</td></tr>
       ${Number(b.RUECKGELD) ? `<tr><td>Rückgeld</td><td class="r">${fmt.money(b.RUECKGELD)}</td></tr>` : ''}</table><hr>
-      <table><tr><td>MwSt</td><td class="r">Netto</td><td class="r">MwSt</td><td class="r">Brutto</td></tr>${d.ust.map(u => `<tr><td>${buchstabe(u.satz)} ${fmt.num(u.satz)}%</td><td class="r">${fmt.money0(u.netto)}</td><td class="r">${fmt.money0(u.mwst)}</td><td class="r">${fmt.money0(u.brutto)}</td></tr>`).join('')}</table>
+      <table><tr><td>${lbl}</td><td class="r">Netto</td><td class="r">${lbl}</td><td class="r">Brutto</td></tr>${d.ust.map(u => `<tr><td>${buchstabe(u.satz)} ${fmt.num(u.satz)}%</td><td class="r">${fmt.money0(u.netto)}</td><td class="r">${fmt.money0(u.mwst)}</td><td class="r">${fmt.money0(u.brutto)}</td></tr>`).join('')}</table>
       ${tse}<hr><div class="c">${esc(d.fusstext || '')}</div>`;
     await Print.preview(`<!doctype html><html><head><meta charset="utf-8"><style>${Print.bonCss}</style></head><body>${html}</body></html>`, `Kassenbon ${b.BONNR}`);
   },
