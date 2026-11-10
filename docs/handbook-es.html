@@ -393,11 +393,11 @@ docker compose up -d --build</code></pre></div>
         <thead><tr><th>Interruptor</th><th>Efecto</th></tr></thead>
         <tbody>
           <tr><td>👁 Ojo</td><td>oculta con asteriscos todos los importes del resumen, p. ej. cuando los clientes pueden ver la pantalla. Otro clic los vuelve a mostrar.</td></tr>
-          <tr><td>€ · $ · ₿</td><td>muestra los importes en euros, dólares estadounidenses o bitcoin al tipo actual. Otro clic en ₿ cambia a satoshis (1 bitcoin = 100.000.000 sats) y vuelve. El botón recuerda la última unidad elegida. El tipo y la fuente aparecen bajo los recuadros.</td></tr>
+          <tr><td>€ · $ · £ · ₿</td><td>muestra los importes en euros, dólares estadounidenses, libras esterlinas o bitcoin al tipo actual. Otro clic en ₿ cambia a satoshis (1 bitcoin = 100.000.000 sats) y vuelve. El botón recuerda la última unidad elegida. El tipo y la fuente aparecen bajo los recuadros.</td></tr>
         </tbody>
       </table></div>
       <div class="note"><strong>Solo visualización</strong><span>Facturas, pagos, asientos, DATEV y todas las impresiones siguen siempre en euros. El interruptor solo cambia cómo se muestran las cifras en el resumen.</span></div>
-      <p>Los tipos de cambio proceden del Banco Central Europeo (dólar, tipo de referencia del último día hábil) y de la plataforma Bitstamp (bitcoin, tipo actual).</p>
+      <p>Los tipos de cambio proceden del Banco Central Europeo (dólar y libra esterlina, tipo de referencia del último día hábil) y de la plataforma Bitstamp (bitcoin, tipo actual).</p>
       <div class="note"><strong>Internet</strong><span>Para los tipos de cambio, el ordenador de Kuenta consulta al BCE y a Bitstamp como máximo cada tres horas. No se envía ningún dato de Kuenta. Kuenta guarda los tipos en caché. Sin internet se usan los últimos cargados. Si nunca se han cargado, la visualización sigue en euros.</span></div>
 
       <h3>Colores</h3>
@@ -782,7 +782,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>En modo red y en el contenedor, active de inmediato el inicio de sesión y cree usuarios.</li>
             <li>Para varios puestos use el modo red. No hay base de datos externa.</li>
-            <li>Para los tipos del dólar y del bitcoin en el resumen, el ordenador de Kuenta necesita internet (BCE, Bitstamp). Son solo visualización; las facturas siguen en euros.</li>
+            <li>Para los tipos del dólar, la libra y el bitcoin en el resumen, el ordenador de Kuenta necesita internet (BCE, Bitstamp). Son solo visualización; las facturas siguen en euros.</li>
             <li>En el contenedor no hay programa de correo. Envíe allí por SMTP.</li>
             <li>La imagen de contenedor aún no se ha construido en un entorno Docker o Podman real. Compruébelo en el primer uso.</li>
           </ul></div>

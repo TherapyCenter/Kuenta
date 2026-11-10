@@ -24,32 +24,38 @@ const dateRange = (von, bis, onChange) => {
   return [h('label', { class: 'inline' }, 'von', v), h('label', { class: 'inline' }, 'bis', b), presets];
 };
 
-// ---------------- Display currency and hiding amounts (display only – invoices and bookings stay in euros) ----------------
+// ---------------- Display currency and hiding amounts (display only – invoices and bookings stay in the company's currency) ----------------
 const Anzeige = {
   kurse: null,
-  NAMEN: { EUR: 'Euro', USD: 'US-Dollar', BTC: 'Bitcoin', SATS: 'Satoshis' },
-  w: () => Pref.get('anzeigeWaehrung', 'EUR'),
+  NAMEN: { EUR: 'Euro', USD: 'US-Dollar', GBP: 'Britisches Pfund', BTC: 'Bitcoin', SATS: 'Satoshis' },
+  // currency of the company's amounts (EUR, GBP for UK, USD for US companies)
+  basis: () => (LK.data && LK.data.waehrung) || 'EUR',
+  w: () => Pref.get('anzeigeWaehrung', null) || Anzeige.basis(),
   verborgen: () => Pref.get('betraegeVerbergen', false) === true,
   async laden(neu) {
     if (this.kurse && !neu) return this.kurse;
     try { this.kurse = await api('/api/kurse/aktuell'); } catch (e) { this.kurse = { fehler: e.message }; }
     return this.kurse;
   },
-  kurs(w) { const k = this.kurse && this.kurse[w === 'SATS' ? 'BTC' : w]; return k && k.eurPro ? k : null; },
-  // Format an amount in units of the currency (for USD/BTC/SATS)
+  kurs(w) { if (w === 'EUR') return { eurPro: 1 }; const k = this.kurse && this.kurse[w === 'SATS' ? 'BTC' : w]; return k && k.eurPro ? k : null; },
+  // Format an amount in units of the currency (for EUR/USD/GBP/BTC/SATS)
   einheiten(v, w) {
     if (this.verborgen()) return '*****';
-    if (w === 'USD') return new Intl.NumberFormat(LOCALE, { style: 'currency', currency: 'USD' }).format(v);
+    if (w === 'EUR') return new Intl.NumberFormat(LOCALE, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v) + ' €';
+    if (w === 'USD' || w === 'GBP') return new Intl.NumberFormat(LOCALE, { style: 'currency', currency: w }).format(v);
     if (w === 'BTC') return new Intl.NumberFormat(LOCALE, { minimumFractionDigits: 8, maximumFractionDigits: 8 }).format(v) + ' ₿';
     if (w === 'SATS') return new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0 }).format(v * 1e8) + ' sats';
     return fmt.money(v);
   },
-  // Euro amount in the chosen display currency; without a rate it stays in euros
-  betrag(eur, w = this.w()) {
+  // Amount in the company's currency shown in the chosen display currency (converted via the euro);
+  // without a rate it stays in the company's currency
+  betrag(v, w = this.w()) {
     if (this.verborgen()) return '*****';
-    if (eur == null || eur === '') return '';
-    const k = w === 'EUR' ? null : this.kurs(w);
-    return k ? this.einheiten(Number(eur) / k.eurPro, w) : fmt.money(eur);
+    if (v == null || v === '') return '';
+    const b = this.basis();
+    if (w === b) return fmt.money(v);
+    const kb = this.kurs(b), kz = this.kurs(w);
+    return kb && kz ? this.einheiten(Number(v) * kb.eurPro / kz.eurPro, w) : fmt.money(v);
   },
   euro(eur) { return this.verborgen() ? '*****' : fmt.money(eur); },
   // Eye icon and currency switch
@@ -58,7 +64,7 @@ const Anzeige = {
     const auge = h('button', { class: 'btn sm icon', title: this.verborgen() ? 'Beträge anzeigen' : 'Beträge ausblenden', 'aria-label': this.verborgen() ? 'Beträge anzeigen' : 'Beträge ausblenden',
       onclick: () => { Pref.set('betraegeVerbergen', !this.verborgen()); onChange(); } }, this.verborgen() ? '🙈' : '👁');
     const setze = k => { Pref.set('anzeigeWaehrung', k); if (k === 'BTC' || k === 'SATS') Pref.set('btcEinheit', k); onChange(); };
-    const knoepfe = [['EUR', '€'], ['USD', '$']].map(([k, l]) => h('button', {
+    const knoepfe = [['EUR', '€'], ['USD', '$'], ['GBP', '£']].map(([k, l]) => h('button', {
       class: 'btn sm' + (k === w ? ' primary' : ''), title: `Anzeige in ${this.NAMEN[k]}`, onclick: () => setze(k) }, l));
     // One button for Bitcoin: the first click shows the last used unit, every further click toggles between ₿ and sats
     const btcAktiv = w === 'BTC' || w === 'SATS';
@@ -73,16 +79,19 @@ const Anzeige = {
 
 // ---------------- Start page ----------------
 Views.start = async (main) => {
-  const [d] = await Promise.all([api('/api/dashboard'), Anzeige.w() !== 'EUR' ? Anzeige.laden() : null]);
-  const A = Anzeige; const w = A.w();
+  const [d] = await Promise.all([api('/api/dashboard'), Anzeige.w() !== Anzeige.basis() ? Anzeige.laden() : null]);
+  const A = Anzeige; const w = A.w(); const b = A.basis();
   const neu = () => App.go('start', false);
   const card = (kk, v, s, go) => h('div', { class: 'card' + (go ? ' click' : ''), onclick: go }, h('div', { class: 'k' }, kk), h('div', { class: 'v' }, v), h('div', { class: 's' }, s || ''));
   let kursHinweis = null;
-  if (w !== 'EUR') {
-    const kb = A.kurs(w);
-    kursHinweis = h('div', { class: 'hint', style: { margin: '6px 0 0' } }, kb
-      ? `Anzeige in ${A.NAMEN[w]} zum Kurs von ${fmt.money(kb.eurPro)} je ${w === 'USD' ? 'Dollar' : 'Bitcoin'} (${kb.quelle}, Stand ${fmt.date(kb.datum)}${kb.live ? ' aktuell' : ''}). Nur Anzeige – Rechnungen und Buchungen bleiben in Euro.`
-      : `Kein ${A.NAMEN[w]}-Kurs verfügbar${A.kurse && A.kurse[w === 'SATS' ? 'BTC' : w] && A.kurse[w === 'SATS' ? 'BTC' : w].fehler ? ` (${A.kurse[w === 'SATS' ? 'BTC' : w].fehler})` : ''} – die Beträge werden in Euro angezeigt.`);
+  if (w !== b) {
+    // conversion via the euro: display units per unit of the company's currency
+    const kz = A.kurs(w), kb = A.kurs(b);
+    const q = [kz, kb].find(k => k && k.quelle);
+    const fehlt = [w, b].map(x => x === 'SATS' ? 'BTC' : x).map(x => A.kurse && A.kurse[x] && A.kurse[x].fehler).find(Boolean);
+    kursHinweis = h('div', { class: 'hint', style: { margin: '6px 0 0' } }, kz && kb && q
+      ? `Anzeige in ${A.NAMEN[w]}: 1 ${b} = ${A.einheiten(kb.eurPro / kz.eurPro, w)} (${q.quelle}, Stand ${fmt.date(q.datum)}${q.live ? ' aktuell' : ''}). Nur Anzeige – Rechnungen und Buchungen bleiben in ${A.NAMEN[b]}.`
+      : `Kein ${A.NAMEN[w]}-Kurs verfügbar${fehlt ? ` (${fehlt})` : ''} – die Beträge werden in ${A.NAMEN[b]} angezeigt.`);
   }
   const t = title('Übersicht', `${App.session.firma || ''} · ${fmt.date(d.heute)}`);
   t.append(A.leiste(neu));

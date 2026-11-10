@@ -2618,4 +2618,7 @@
   "zzgl. {0} % Sales Tax auf {1}": "plus {0} % sales tax on {1}",
   "davon nicht steuerpflichtig": "of which non-taxable",
   "inkl. Sales Tax": "incl. sales tax",
+  "Britisches Pfund": "Pound sterling",
+  "Anzeige in {0}: 1 {1} = {2} ({3}, Stand {4}{5}). Nur Anzeige – Rechnungen und Buchungen bleiben in {6}.": "Shown in {0}: 1 {1} = {2} ({3}, as of {4}{5}). Display only – invoices and bookings stay in {6}.",
+  "Kein {0}-Kurs verfügbar{1} – die Beträge werden in {2} angezeigt.": "No {0} rate available{1} – amounts are shown in {2}.",
 });

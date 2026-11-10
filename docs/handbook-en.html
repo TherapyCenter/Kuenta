@@ -393,11 +393,11 @@ docker compose up -d --build</code></pre></div>
         <thead><tr><th>Switch</th><th>Effect</th></tr></thead>
         <tbody>
           <tr><td>👁 Eye</td><td>hides all amounts on the overview with asterisks, e.g. when customers can see the screen. Click again to show them.</td></tr>
-          <tr><td>€ · $ · ₿</td><td>shows the amounts in euros, US dollars or bitcoin at the current rate. Another click on ₿ switches to satoshis (1 bitcoin = 100,000,000 sats) and back. The button remembers the unit used last. Rate and source are shown below the tiles.</td></tr>
+          <tr><td>€ · $ · £ · ₿</td><td>shows the amounts in euros, US dollars, pounds sterling or bitcoin at the current rate. Another click on ₿ switches to satoshis (1 bitcoin = 100,000,000 sats) and back. The button remembers the unit used last. Rate and source are shown below the tiles.</td></tr>
         </tbody>
       </table></div>
       <div class="note"><strong>Display only</strong><span>Invoices, payments, bookings, DATEV and all printouts always stay in euros. The switch only changes how the figures are shown on the overview.</span></div>
-      <p>The rates come from the European Central Bank (US dollar, reference rate of the last banking day) and from the Bitstamp exchange (bitcoin, current rate).</p>
+      <p>The rates come from the European Central Bank (US dollar and pound sterling, reference rate of the last banking day) and from the Bitstamp exchange (bitcoin, current rate).</p>
       <div class="note"><strong>Internet</strong><span>For the rates the Kuenta computer asks the ECB and Bitstamp, at most every three hours. No data from Kuenta is sent. Kuenta caches the rates. Without internet the last loaded rates apply. If no rates were ever loaded, the display stays in euros.</span></div>
 
       <h3>Colours</h3>
@@ -782,7 +782,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>In network mode and in the container, switch on login immediately and create users.</li>
             <li>Use network mode for several workstations. There is no external database.</li>
-            <li>For dollar and bitcoin rates on the overview the Kuenta computer needs internet (ECB, Bitstamp). The rates are display only; invoices stay in euros.</li>
+            <li>For dollar, pound and bitcoin rates on the overview the Kuenta computer needs internet (ECB, Bitstamp). The rates are display only; invoices stay in the company's currency.</li>
             <li>There is no mail program in the container. Send via SMTP there.</li>
             <li>The container image has not yet been built in a real Docker or Podman environment. Please check on first use.</li>
           </ul></div>

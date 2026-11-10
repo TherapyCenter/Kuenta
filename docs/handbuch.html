@@ -389,11 +389,11 @@ docker compose up -d --build</code></pre></div>
         <thead><tr><th>Schalter</th><th>Wirkung</th></tr></thead>
         <tbody>
           <tr><td>👁 Auge</td><td>blendet alle Beträge auf der Übersicht mit Sternchen aus, z. B. wenn Kunden auf den Bildschirm sehen. Noch einmal klicken zeigt sie wieder.</td></tr>
-          <tr><td>€ · $ · ₿</td><td>zeigt die Beträge in Euro, US-Dollar oder Bitcoin zum aktuellen Kurs. Ein weiterer Klick auf ₿ wechselt zu Satoshis (1 Bitcoin = 100.000.000 sats) und zurück. Der Knopf merkt sich die zuletzt gewählte Einheit. Kurs und Quelle stehen unter den Kacheln.</td></tr>
+          <tr><td>€ · $ · £ · ₿</td><td>zeigt die Beträge in Euro, US-Dollar, britischen Pfund oder Bitcoin zum aktuellen Kurs. Ein weiterer Klick auf ₿ wechselt zu Satoshis (1 Bitcoin = 100.000.000 sats) und zurück. Der Knopf merkt sich die zuletzt gewählte Einheit. Kurs und Quelle stehen unter den Kacheln.</td></tr>
         </tbody>
       </table></div>
       <div class="note"><strong>Nur Anzeige</strong><span>Rechnungen, Zahlungen, Buchungen, DATEV und alle Ausdrucke bleiben immer in Euro. Der Umschalter ändert nur, wie die Zahlen auf der Übersicht angezeigt werden.</span></div>
-      <p>Die Kurse kommen von der Europäischen Zentralbank (US-Dollar, Referenzkurs des letzten Bankarbeitstags) und von der Börse Bitstamp (Bitcoin, aktueller Kurs).</p>
+      <p>Die Kurse kommen von der Europäischen Zentralbank (US-Dollar und Pfund, Referenzkurs des letzten Bankarbeitstags) und von der Börse Bitstamp (Bitcoin, aktueller Kurs).</p>
       <div class="note"><strong>Internet</strong><span>Für die Kurse fragt der Kuenta-Rechner die EZB und Bitstamp ab, höchstens alle drei Stunden. Dabei werden keine Daten aus Kuenta übertragen. Die Kurse speichert Kuenta zwischen. Ohne Internet gilt der zuletzt geladene Stand. Wurden noch nie Kurse geladen, bleibt die Anzeige in Euro.</span></div>
 
       <h3>Farben</h3>
@@ -777,7 +777,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>Im Netzwerkbetrieb und im Container sofort die Anmeldung einschalten und Benutzer anlegen.</li>
             <li>Für mehrere Arbeitsplätze den Netzwerkbetrieb nutzen. Eine externe Datenbank gibt es nicht.</li>
-            <li>Für Dollar- und Bitcoin-Kurse auf der Übersicht braucht der Kuenta-Rechner Internet (EZB, Bitstamp). Die Kurse sind nur Anzeige, Rechnungen bleiben in Euro.</li>
+            <li>Für Dollar-, Pfund- und Bitcoin-Kurse auf der Übersicht braucht der Kuenta-Rechner Internet (EZB, Bitstamp). Die Kurse sind nur Anzeige, Rechnungen bleiben in Euro.</li>
             <li>Im Container gibt es kein Mailprogramm. Dort per SMTP versenden.</li>
             <li>Das Container-Image wurde bisher nicht in einer echten Docker- oder Podman-Umgebung gebaut. Beim ersten Einsatz bitte prüfen.</li>
           </ul></div>

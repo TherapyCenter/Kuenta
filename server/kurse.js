@@ -1,12 +1,13 @@
 'use strict';
-// Exchange rates for display on the start page only. Invoices and bookings always stay in euros.
-// Sources: US dollar – reference rates of the European Central Bank; Bitcoin – daily BTC/EUR rates from the Bitstamp exchange.
+// Exchange rates for display on the start page only. Invoices and bookings stay in the company's currency.
+// Sources: US dollar and pound sterling – reference rates of the European Central Bank; Bitcoin – daily BTC/EUR
+// rates from the Bitstamp exchange. All rates are stored as "euros per unit".
 // Rates are cached in SW_KURSE (this survives a KFZ-Faktura import too); without internet the last state applies.
 const L = require('./lib');
 const dbm = require('./db');
 
-const QUELLE = { USD: 'Europäische Zentralbank', BTC: 'Bitstamp' };
-const AB = { USD: '1999-01-04', BTC: '2017-01-01' };   // rates exist from here on
+const QUELLE = { USD: 'Europäische Zentralbank', GBP: 'Europäische Zentralbank', BTC: 'Bitstamp' };
+const AB = { USD: '1999-01-04', GBP: '1999-01-04', BTC: '2017-01-01' };   // rates exist from here on
 const ABRUF_ALLE_MS = 3 * 3600e3;                       // reload at most every 3 hours
 const laeuft = new Map();
 const ticker = new Map();                               // current BTC rate per process
@@ -26,14 +27,14 @@ function speichern(w, rows) {
   try { for (const [datum, eurPro] of rows) if (eurPro > 0) st.run(w, datum, eurPro); db().exec('COMMIT'); } catch (e) { db().exec('ROLLBACK'); throw e; }
 }
 
-// US dollar: the ECB delivers "dollars per euro", we store "euros per dollar"
-async function ladeUsd(von) {
-  const csv = await holen(`https://data-api.ecb.europa.eu/service/data/EXR/D.USD.EUR.SP00.A?startPeriod=${von}&format=csvdata`);
+// US dollar and pound: the ECB delivers "units per euro", we store "euros per unit"
+async function ladeEzb(w, von) {
+  const csv = await holen(`https://data-api.ecb.europa.eu/service/data/EXR/D.${w}.EUR.SP00.A?startPeriod=${von}&format=csvdata`);
   const zeilen = csv.trim().split(/\r?\n/);
   const kopf = zeilen.shift().split(',');
   const iT = kopf.indexOf('TIME_PERIOD'), iV = kopf.indexOf('OBS_VALUE');
   if (iT < 0 || iV < 0) throw new Error('unerwartetes Format der EZB-Daten');
-  speichern('USD', zeilen.map(z => z.split(',')).map(f => [f[iT], 1 / Number(f[iV])]).filter(([d, v]) => /^\d{4}-\d{2}-\d{2}$/.test(d) && isFinite(v)));
+  speichern(w, zeilen.map(z => z.split(',')).map(f => [f[iT], 1 / Number(f[iV])]).filter(([d, v]) => /^\d{4}-\d{2}-\d{2}$/.test(d) && isFinite(v)));
 }
 // Bitcoin: daily closing rates BTC/EUR (euros per bitcoin), paged by 1000 days
 async function ladeBtc(von) {
@@ -65,7 +66,7 @@ async function aktualisieren(w, von) {
     else if (Date.now() - zuletzt > ABRUF_ALLE_MS) ab = L.addDays(r.max, -3);   // fetch new rates
     if (!ab) return null;
     try {
-      await (w === 'USD' ? ladeUsd(ab) : ladeBtc(ab));
+      await (w === 'BTC' ? ladeBtc(ab) : ladeEzb(w, ab));
       if (ab === von && (!geladenAb || von < geladenAb)) L.setSw('kurse.geladenab.' + w, von);
       L.setSw('kurse.abruf.' + w, new Date().toISOString());
       L.setSw('kurse.fehler.' + w, '');
@@ -89,7 +90,7 @@ function kursHeute(w) {
 // Current rates for the currency switch
 async function aktuell() {
   const out = {};
-  for (const w of ['USD', 'BTC']) {
+  for (const w of ['USD', 'GBP', 'BTC']) {
     const fehler = await aktualisieren(w, L.addDays(L.today(), -14));
     const k = kursHeute(w);
     out[w] = k ? { ...k, quelle: QUELLE[w], fehler: fehler || null } : { fehler: fehler || 'Noch keine Kurse geladen (Internetverbindung?)', quelle: QUELLE[w] };
