@@ -1,0 +1,37 @@
+# Smoke test of the published container image: starts it as user 1000 with a data folder (as umbrelOS does),
+# waits for the server and checks that it answers and writes its database to /data.
+# Runs after every image build and on demand.
+name: Container test
+
+on:
+  workflow_run:
+    workflows: ['Container image']
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      image:
+        description: 'Image (default: ghcr.io/therapycenter/kuenta:<version of package.json>)'
+        required: false
+
+jobs:
+  test:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Image
+        id: img
+        run: echo "image=${{ inputs.image || format('ghcr.io/therapycenter/kuenta:{0}', '') }}$( [ -n "${{ inputs.image }}" ] || node -p "require('./package.json').version" )" >> "$GITHUB_OUTPUT"
+      - name: Start as user 1000 with a data folder
+        run: |
+          mkdir -p data && sudo chown 1000:1000 data
+          docker run -d --name kuenta --user 1000:1000 -p 3700:3700 -v "$PWD/data:/data" "${{ steps.img.outputs.image }}"
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:3700/api/session && break; sleep 2; done
+          echo; docker logs kuenta | head -20
+      - name: Checks
+        run: |
+          curl -fsS http://127.0.0.1:3700/api/session | grep -q '"version"'
+          curl -fsS http://127.0.0.1:3700/ | grep -qi '<title>'
+          test -f data/kuenta.db
+          docker inspect --format '{{.State.Health.Status}}' kuenta || true
+          echo "Container OK: $(curl -fsS http://127.0.0.1:3700/api/session)"
