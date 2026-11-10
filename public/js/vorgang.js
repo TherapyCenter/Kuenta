@@ -61,6 +61,7 @@ const Vorgang = {
       { label: 'Drucken', icon: '🖨', onClick: () => Vorgang.printById(typ, id).then(reload) },
       { label: 'PDF herunterladen', icon: '📄', onClick: () => Vorgang.pdf(typ, id).then(reload) },
       ...(v.table === 'RECHNUNGEN' && Vorgang.land() === 'DE' ? [{ label: 'ZUGFeRD-PDF herunterladen', icon: '🧾', onClick: () => Vorgang.zugferd(id) }] : []),
+      ...(v.table === 'RECHNUNGEN' && Vorgang.land() === 'FR' ? [{ label: 'Factur-X-PDF herunterladen', icon: '🧾', onClick: () => Vorgang.zugferd(id) }] : []),
       { label: 'Per E-Mail senden', icon: '✉️', onClick: () => Mail.dialog('vorgang', typ, id).then(reload) },
       '-',
     ];
@@ -81,6 +82,7 @@ const Vorgang = {
         { label: 'Facturae (E-Rechnung für Behörden)', icon: '🧾', items: [
           { label: 'Facturae 3.2.2 herunterladen', onClick: () => Vorgang.facturae(id) },
           { label: 'Pflichtangaben prüfen', onClick: () => Vorgang.facturae(id, true) }] });
+      else if (Vorgang.land() === 'FR') items.push({ label: 'Factur-X / Chorus Pro', icon: '🧾', items: Vorgang.frMenu(id) });
       else if (Vorgang.land() === 'DE') items.push({ label: 'E-Rechnung (XRechnung)', icon: '🧾', items: [
         { label: 'XRechnung CII herunterladen', onClick: () => Vorgang.erechnung(id, 'cii') },
         { label: 'XRechnung UBL herunterladen', onClick: () => Vorgang.erechnung(id, 'ubl') },
@@ -118,6 +120,18 @@ const Vorgang = {
   // ---------- Spain (VERI*FACTU) ----------
   es() { return !!(LK.data && LK.data.land === 'ES'); },
   land() { return (LK.data && LK.data.land) || 'DE'; },
+  // France: Factur-X (EN 16931) and Chorus Pro for invoices to public bodies
+  frMenu(id, wrap = fn => fn()) {
+    return [
+      { label: 'Factur-X-PDF herunterladen', onClick: () => wrap(() => Vorgang.zugferd(id)) },
+      { label: 'Pflichtangaben prüfen', onClick: () => wrap(() => Vorgang.erechnungPruefen(id)) },
+      { label: 'An Chorus Pro senden (öffentliche Auftraggeber)', onClick: () => wrap(async () => {
+        if (!(await confirmDlg('Die Rechnung als Factur-X an Chorus Pro senden?', { ok: 'Senden' }))) return;
+        try { const r = await api(`/api/fr/chorus/deposer/${id}`, { method: 'POST' }); toast(T('An Chorus Pro übergeben, Fluss-Nr. ') + (r.flux || ''), 'ok'); } catch (e) { showError(e); }
+      }) },
+      { label: 'Chorus-Pro-Status abrufen', onClick: () => wrap(async () => { try { const r = await api(`/api/fr/chorus/cr/${id}`); alertDlg(`${T('Fluss')} ${r.flux}: ${r.statut}`, 'Chorus Pro'); } catch (e) { showError(e); } }) },
+    ];
+  },
   // Before an invoice leaves Kuenta (print, PDF) it is issued: VERI*FACTU record, then locked
   async esEmitir(typ, id, d) {
     if (!Vorgang.es() || ENT.V[typ].table !== 'RECHNUNGEN' || (d && d.es && d.es.emitida)) return d || true;
@@ -844,9 +858,9 @@ class VorgangWindow {
       h('button', { class: 'btn', onclick: () => this.print() }, h('span', { class: 'ico' }, '🖨'), 'Drucken'),
       h('label', { class: 'inline' }, 'Formular:', this.formSel),
     ];
-    if (isRe && ['DE', 'ES'].includes(Vorgang.land())) items.push(h('button', { class: 'btn', onclick: async ev => {
+    if (isRe && ['DE', 'ES', 'FR'].includes(Vorgang.land())) items.push(h('button', { class: 'btn', onclick: async ev => {
       const r = ev.currentTarget.getBoundingClientRect();
-      const m = contextMenu(r.left, r.top, Vorgang.es() ? [
+      const m = contextMenu(r.left, r.top, Vorgang.land() === 'FR' ? Vorgang.frMenu(this.id, fn => this.withSaved(fn)) : Vorgang.es() ? [
         { label: 'Facturae 3.2.2 herunterladen', onClick: () => this.withSaved(() => Vorgang.facturae(this.id)) },
         { label: 'Pflichtangaben prüfen', onClick: () => this.withSaved(() => Vorgang.facturae(this.id, true)) },
         { label: 'VERI*FACTU-Status', onClick: () => this.withSaved(() => Vorgang.esStatus(this.typ, this.id).then(() => this.reloadEs())) }] : [
@@ -866,6 +880,7 @@ class VorgangWindow {
       const r = ev.currentTarget.getBoundingClientRect();
       const m = contextMenu(r.left, r.top, [
         { label: 'PDF herunterladen', icon: '📄', onClick: () => this.withSaved(async () => { await Vorgang.pdf(this.typ, this.id); this.reloadEs(); }) },
+        ...(isRe && Vorgang.land() === 'FR' ? [{ label: 'Factur-X-PDF', icon: '🧾', onClick: () => this.withSaved(() => Vorgang.zugferd(this.id)) }] : []),
         ...(isRe && Vorgang.land() === 'DE' ? [{ label: 'ZUGFeRD-PDF (mit XRechnung)', icon: '🧾', onClick: () => this.withSaved(() => Vorgang.zugferd(this.id)) }] : []),
         { label: 'Per E-Mail senden…', icon: '✉️', onClick: () => this.withSaved(async () => { await Mail.dialog('vorgang', this.typ, this.id); }) }]);
       m.style.transform = 'translateY(-100%)';

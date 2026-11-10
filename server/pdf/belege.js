@@ -83,7 +83,7 @@ class Layout {
           [f.FIRMENNAME, f.FIRMENZUSATZ, f.STRASSE, plzOrt(f.PLZ, f.ORT)],
           [f.TELEFON && 'Tel.: ' + f.TELEFON, f.FAX && 'Fax: ' + f.FAX, f.EMAIL, f.INTERNETSEITE],
           [f.BANKNAME, f.IBAN && 'IBAN: ' + f.IBAN, f.BIC && 'BIC: ' + f.BIC, f.BANKINHABER && 'Inhaber: ' + f.BANKINHABER],
-          [...(require('../es').activo() ? [(f.STEUERNR || f.USTNR) && 'NIF: ' + (f.STEUERNR || f.USTNR)] : L.land() === 'US' ? [L.sw('us.reg.nr', '') && `${L.sw('us.reg.label', 'Registration No.')}: ${L.sw('us.reg.nr', '')}`] : L.land() === 'GB' ? [f.USTNR && 'VAT-Reg.-Nr.: ' + f.USTNR] : [f.USTNR && 'USt-IdNr.: ' + f.USTNR, f.STEUERNR && 'Steuer-Nr.: ' + f.STEUERNR]), f.HANDELSREGISTER, f.GESCHAEFTSFUEHRER && 'Inhaber/GF: ' + f.GESCHAEFTSFUEHRER],
+          [...(L.land() === 'FR' ? require('../fr').pied() : require('../es').activo() ? [(f.STEUERNR || f.USTNR) && 'NIF: ' + (f.STEUERNR || f.USTNR)] : L.land() === 'US' ? [L.sw('us.reg.nr', '') && `${L.sw('us.reg.label', 'Registration No.')}: ${L.sw('us.reg.nr', '')}`] : L.land() === 'GB' ? [f.USTNR && 'VAT-Reg.-Nr.: ' + f.USTNR] : [f.USTNR && 'USt-IdNr.: ' + f.USTNR, f.STEUERNR && 'Steuer-Nr.: ' + f.STEUERNR]), f.HANDELSREGISTER, f.GESCHAEFTSFUEHRER && 'Inhaber/GF: ' + f.GESCHAEFTSFUEHRER],
         ];
         cols.forEach((c, ci) => { let y = 278; for (const l of c.filter(Boolean)) { d.text(this.L + ci * 44.5, y, l.slice(0, 48), { size: 6.8, color: GREY }); y += 3.1; } });
       }
@@ -145,7 +145,8 @@ function vorgangPdf(typ, d, opts = {}) {
   const usTax = p => Number(p.DURCHLAUFER) === 1 || k.STEUERART || (usLaborFree && p.POSART === 'L') ? '' : (rates[Number(p.MWST) || 61] ?? 0) > 0 ? 'T' : '';
   const zustand = p => ({ GEBRAUCHT: '(gebraucht)', AUFBEREITET: '(aufbereitet)' }[p.TEILEZUSTAND] || '');
   const freigaben = (() => { try { return JSON.parse(k.USFREIGABE || '[]'); } catch { return []; } })();
-  const titleGb = gb && isRe && ['rechnung', 'rechnung_ohne_kopf', 'rechnungskorrektur', 'storno-rechnung', 'gutschrift'].includes(formular) ? (typ === 'korrektur' ? 'Gutschrift' : gbReg ? 'Umsatzsteuerrechnung' : 'Rechnung') : null;
+  const fr = d.fr || null; // France: legal mentions from the server module
+  const titleGb = (gb || fr) && isRe && ['rechnung', 'rechnung_ohne_kopf', 'rechnungskorrektur', 'storno-rechnung', 'gutschrift'].includes(formular) ? (typ === 'korrektur' ? 'Gutschrift' : gbReg ? 'Umsatzsteuerrechnung' : 'Rechnung') : null;
   const ein = Object.fromEntries(L.db().prepare('SELECT EINHEITID, BEZEICHNUNG FROM EINHEITEN').all().map(e => [e.EINHEITID, e.BEZEICHNUNG]));
   const titel = vf ? ({ F1: 'Rechnung', F2: 'Vereinfachte Rechnung', R5: 'Vereinfachte Rechnungskorrektur' }[vf.tipo] || 'Rechnungskorrektur') : titleGb || title;
   const lay = new Layout(`${titel} ${nrText}`, { kopf: formular !== 'rechnung_ohne_kopf', facturx: opts.facturx });
@@ -158,6 +159,7 @@ function vorgangPdf(typ, d, opts = {}) {
   if (k.BESTELLNR) info.push(['Ihre Bestellung', k.BESTELLNR]);
   const kd = k.KUNID ? L.db().prepare('SELECT USTID FROM KUNDEN WHERE KUNID=?').get(k.KUNID) : null;
   if (kd && kd.USTID) info.push([es ? 'NIF' : 'Ihre USt-IdNr.', kd.USTID]);
+  if (fr && fr.sirenClient) info.push(['SIREN', fr.sirenClient]);
   const bezug = (d.verknuepft || []).find(l => l.typ === 'rechnung');
   if (typ === 'korrektur' && es && es.rectificada) info.push(['zu Rechnung', `${es.rectificada.numSerie} vom ${date(es.rectificada.fecha)}`]);
   else if (typ === 'korrektur' && bezug) info.push(['zu Rechnung', `${bezug.nr} vom ${date(bezug.datum)}`]);
@@ -259,7 +261,7 @@ function vorgangPdf(typ, d, opts = {}) {
     if (klein && L.land() === 'DE') lay.para('Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.', { color: GREY });
     if (hatDP && us) lay.para('(DP) = Durchlaufende Gebühr, nicht steuerpflichtig.', { color: GREY, size: 8.5 });
     else if (hatDP && gb) lay.para('(DP) = Auslage im Namen des Kunden (disbursement), nicht umsatzsteuerbar.', { color: GREY, size: 8.5 });
-    else if (hatDP) lay.para(es ? '(DP) = Suplido: im Namen und für Rechnung des Kunden verauslagt, nicht Teil der Bemessungsgrundlage (Art. 78.Tres.3.º LIVA).' : '(DP) = Durchlaufender Posten gemäß § 10 Abs. 1 Satz 6 UStG, nicht umsatzsteuerpflichtig.', { color: GREY, size: 8.5 });
+    else if (hatDP && !fr) lay.para(es ? '(DP) = Suplido: im Namen und für Rechnung des Kunden verauslagt, nicht Teil der Bemessungsgrundlage (Art. 78.Tres.3.º LIVA).' : '(DP) = Durchlaufender Posten gemäß § 10 Abs. 1 Satz 6 UStG, nicht umsatzsteuerpflichtig.', { color: GREY, size: 8.5 });
     if (es && k.STEUERART) lay.para({ REVERSE_CHARGE: 'Nicht steuerbar in Spanien, Steuerschuldnerschaft des Leistungsempfängers (Art. 69 und 84.Uno.2.º LIVA).', IG_LIEFERUNG: 'Steuerfreie innergemeinschaftliche Lieferung (Art. 25 LIVA).', AUSFUHR: 'Steuerfreie Ausfuhr (Art. 21 LIVA).' }[k.STEUERART] || '', { size: 9 });
     if (vf && vf.tipo && vf.tipo[0] === 'R') lay.para(`Grund der Korrektur: ${vf.tipo} – ${vf.motivo}`, { size: 9, color: GREY });
     if (gb && k.STEUERART) lay.para({ REVERSE_CHARGE: 'Im Vereinigten Königreich nicht umsatzsteuerbar (Leistungsort im Ausland); der Kunde schuldet die Steuer (reverse charge).', IG_LIEFERUNG: 'Steuerfreie Ausfuhr (zero-rated export).', AUSFUHR: 'Steuerfreie Ausfuhr (zero-rated export).' }[k.STEUERART] || '', { size: 9 });
@@ -299,8 +301,9 @@ function vorgangPdf(typ, d, opts = {}) {
   }
   lay.para(k.SCHLUSSTXT);
   const sign = (a, b) => { lay.ensure(24); lay.y += 16; doc.line(lay.L, lay.y, lay.L + 75, lay.y, { w: 0.4 }); doc.line(115, lay.y, lay.R, lay.y, { w: 0.4 }); doc.text(lay.L, lay.y + 3.5, a, { size: 8, color: GREY }); doc.text(115, lay.y + 3.5, b, { size: 8, color: GREY }); lay.y += 6; };
-  if (us && typ === 'angebot' && formular === 'kostenvoranschlag') { lay.para('Schriftlicher Kostenvoranschlag. Ohne Ihre Freigabe werden keine Arbeiten ausgeführt und keine Beträge über diesem Kostenvoranschlag berechnet.'); sign('Datum', 'Unterschrift Kunde (Freigabe)'); }
-  if (us && formular === 'auftrag_mit_unterschrift') { lay.para('Ich beauftrage die oben genannten Arbeiten bis zum angegebenen Betrag. Zusätzliche Arbeiten oder Mehrkosten nur nach meiner weiteren Freigabe.'); sign('Ort, Datum', 'Unterschrift Auftraggeber'); } else if (formular === 'auftrag_mit_unterschrift') { lay.para('Hiermit erteile ich den Auftrag zur Durchführung der oben genannten Arbeiten. Erforderliche Probefahrten dürfen durchgeführt werden. Es gelten die Allgemeinen Geschäftsbedingungen für die Ausführung von Arbeiten an Kraftfahrzeugen.'); sign('Ort, Datum', 'Unterschrift Auftraggeber'); }
+  if (fr) for (const m of fr.mentions) lay.para(m, { size: 8.5, color: GREY });
+  if ((us || fr) && typ === 'angebot' && formular === 'kostenvoranschlag') { lay.para('Schriftlicher Kostenvoranschlag. Ohne Ihre Freigabe werden keine Arbeiten ausgeführt und keine Beträge über diesem Kostenvoranschlag berechnet.'); sign('Datum', 'Unterschrift Kunde (Freigabe)'); }
+  if ((us || fr) && formular === 'auftrag_mit_unterschrift') { lay.para('Ich beauftrage die oben genannten Arbeiten bis zum angegebenen Betrag. Zusätzliche Arbeiten oder Mehrkosten nur nach meiner weiteren Freigabe.'); sign('Ort, Datum', 'Unterschrift Auftraggeber'); } else if (formular === 'auftrag_mit_unterschrift') { lay.para('Hiermit erteile ich den Auftrag zur Durchführung der oben genannten Arbeiten. Erforderliche Probefahrten dürfen durchgeführt werden. Es gelten die Allgemeinen Geschäftsbedingungen für die Ausführung von Arbeiten an Kraftfahrzeugen.'); sign('Ort, Datum', 'Unterschrift Auftraggeber'); }
   if (formular === 'arbeitskarte') { lay.ensure(50); doc.rect(lay.L, lay.y + 2, lay.R - lay.L, 40, { stroke: [150, 150, 150] }); doc.text(lay.L + 2, lay.y + 6, 'Notizen / ausgeführte Arbeiten:', { f: 'B', size: 9 }); lay.y += 45; lay.para('Monteur: ______________________     Arbeitszeit: von ________ bis ________'); }
   if (typ === 'lieferschein') sign('Ware vollständig erhalten – Datum', 'Unterschrift Empfänger');
   if (opts.attach) doc.attach(opts.attach.name, opts.attach.data, { mime: 'text/xml', relationship: 'Alternative', description: opts.attach.description });
@@ -341,7 +344,10 @@ function zugferd(rid) {
   const typ = typRow.TYP === 2 ? 'korrektur' : 'rechnung';
   const d = VG.load(typ, rid);
   const x = ER.create(rid, 'cii');
-  const pdf = vorgangPdf(typ, d, { facturx: { filename: 'xrechnung.xml', level: 'XRECHNUNG' }, attach: { name: 'xrechnung.xml', data: Buffer.from(x.xml, 'utf8'), description: 'Rechnungsdaten im XRechnung-Format (CII)' } });
+  // France: Factur-X profile EN 16931 with the standard file name factur-x.xml
+  const fr = L.land() === 'FR';
+  const datei = fr ? 'factur-x.xml' : 'xrechnung.xml';
+  const pdf = vorgangPdf(typ, d, { facturx: { filename: datei, level: fr ? 'EN 16931' : 'XRECHNUNG' }, attach: { name: datei, data: Buffer.from(x.xml, 'utf8'), description: fr ? 'Factur-X (EN 16931)' : 'Rechnungsdaten im XRechnung-Format (CII)' } });
   return { pdf, problems: x.problems, nr: d.kopf.RECHNUNGNUMMER };
 }
 module.exports = { vorgangPdf, mahnungPdf, zugferd, Layout, money, date };

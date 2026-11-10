@@ -67,7 +67,7 @@ function commitNumber(key, value) {
 
 // ---- MwSt: codes 61..64 refer to OPTIONSWERTE ----
 // Tax system of the current tenant: DE (default), ES or GB
-function land() { const v = sw('steuer.land', 'DE'); return ['ES', 'GB', 'US'].includes(v) ? v : 'DE'; }
+function land() { const v = sw('steuer.land', 'DE'); return ['ES', 'GB', 'US', 'FR'].includes(v) ? v : 'DE'; }
 // Currency of the tenant's documents
 const waehrung = () => ({ GB: 'GBP', US: 'USD' }[land()] || 'EUR');
 const SYMBOL = { EUR: '€', GBP: '£', USD: '$' };
@@ -84,6 +84,7 @@ function mwstRates() {
   if (ES.activo()) return ES.mwstRates();
   if (land() === 'GB') return require('./gb').mwstRates();
   if (land() === 'US') return require('./us').mwstRates();
+  if (land() === 'FR') return require('./fr').mwstRates();
   const klein = optNum('Kleinunternehmer', 0) === 1;
   return {
     61: klein ? 0 : optNum('volle MwSt', 19),
@@ -97,6 +98,7 @@ function mwstList() {
   if (ES.activo()) return ES.mwstList();
   if (land() === 'GB') return require('./gb').mwstList();
   if (land() === 'US') return require('./us').mwstList();
+  if (land() === 'FR') return require('./fr').mwstList();
   return [
     { id: 61, name: `volle MwSt (${optNum('volle MwSt', 19)} %)`, rate: optNum('volle MwSt', 19) },
     { id: 62, name: `ermäßigte MwSt (${optNum('verm. MwSt', 7)} %)`, rate: optNum('verm. MwSt', 7) },

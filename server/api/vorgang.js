@@ -80,6 +80,7 @@ function load(typ, id) {
     const ES = require('../es');
     if (ES.activo() || kopf.ESNUMSERIE) res.es = require('../es/verifactu').info(kopf);
   }
+  if (L.land() === 'FR') res.fr = require('../fr').info(typ, kopf, pos); // legal mentions and footer
   return res;
 }
 
@@ -187,7 +188,7 @@ function save(typ, payload, user) {
   if (v.typ) kopfIn.TYP = v.typ;
   if (id && v.table === 'RECHNUNGEN') {
     const old = d.prepare('SELECT GEDRUCKT FROM RECHNUNGEN WHERE RECHNUNGID=?').get(id);
-    if (old && old.GEDRUCKT && L.sw('gobd.sperre', '0') === '1') throw new L.HttpError(409, 'Gedruckte Rechnungen sind gesperrt (GoBD). Bitte erstellen Sie eine Rechnungskorrektur.');
+    if (old && old.GEDRUCKT && (L.sw('gobd.sperre', '0') === '1' || L.land() === 'FR')) throw new L.HttpError(409, 'Gedruckte Rechnungen sind gesperrt (GoBD). Bitte erstellen Sie eine Rechnungskorrektur.');
   }
   const tax = calc(kopfIn, pos);
   const cols = L.tableColumns(v.table); const pcols = L.tableColumns(v.pos);

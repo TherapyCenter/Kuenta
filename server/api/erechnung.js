@@ -47,7 +47,7 @@ function build(rid) {
       id: lines.length + 1,
       name: (p.BEZEICHNUNG || p.BESCHREIBUNG || p.ARTNUMMER || 'Position').slice(0, 200),
       desc: [p.BEZEICHNUNG ? p.BESCHREIBUNG : null, p.ARBEITSTEXT, p.MEMOTEXT].filter(Boolean).join('\n').slice(0, 1000),
-      artnr: p.ARTNUMMER, qty, unit: p.UNECE || 'C62', price: net, total: lineTotal, cat, rate: cat === 'S' ? rate : 0, reason, rcode,
+      artnr: p.ARTNUMMER, qty, unit: p.UNECE || 'C62', price: net, total: lineTotal, service: p.POSART === 'L', cat, rate: cat === 'S' ? rate : 0, reason, rcode,
     });
   }
   // tax breakdown
@@ -77,19 +77,22 @@ function build(rid) {
   if (!String(k.KUNORT || '').trim() || !String(k.KUNPLZ || '').trim()) problems.push('Kundenanschrift unvollständig (PLZ und Ort sind Pflicht)');
   if (!kunde.EMAILRECHNUNG && !kunde.EMAIL) problems.push('E-Mail-Adresse des Kunden fehlt (elektronische Adresse BT-49)');
   if (!lines.length) problems.push('Keine Rechnungspositionen');
+  const fr = L.land() === 'FR';
+  if (fr && !require('../fr').siren()) problems.push('SIRET der Firma fehlt oder ist ungültig (Einstellungen → Firmendaten → Steuernummer)');
+  if (fr && (Number(k.KUNART) === 1 || kunde.USTID) && !require('../../public/js/nif.js').frSiren(kunde.SIREN).ok) problems.push('SIREN/SIRET des Kunden fehlt (Pflicht für Geschäftskunden ab der E-Rechnungsreform)');
   if ((k.STEUERART === 'REVERSE_CHARGE' || k.STEUERART === 'IG_LIEFERUNG') && !kunde.USTID) problems.push('USt-IdNr. des Kunden fehlt (Pflicht bei Reverse Charge / innergemeinschaftlicher Lieferung)');
 
   const orig = k.REIDGUTSCHRIFT > 0 ? d.prepare('SELECT RECHNUNGNUMMER, DATUM FROM RECHNUNGEN WHERE RECHNUNGID=?').get(k.REIDGUTSCHRIFT) : null;
   const faellig = L.addDays(k.DATUM, k.FAELLING || 0);
   const notes = [k.EINLEITUNGTXT, k.SCHLUSSTXT].filter(s => s && s.trim()).map(s => s.trim());
-  if (klein) notes.push('Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.');
+  if (klein && L.land() === 'DE') notes.push('Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.');
   return {
     k, f, kunde, zb, lines, taxes, lineTotal, taxTotal, grand, rounding, prepaid, due, credit, orig, faellig, notes, problems,
     buyerRef: kunde.LEITWEGID || String(k.KUNNUMMER || k.RECHNUNGNUMMER),
     payCode: (zb && zb.ERECHCODE) || '58',
     buyerMail: kunde.EMAILRECHNUNG || kunde.EMAIL || '',
     sellerTaxId: f.USTNR ? String(f.USTNR).replace(/\s/g, '') : null,
-    sellerTaxNo: f.STEUERNR || null,
+    sellerTaxNo: L.land() === 'FR' ? null : (f.STEUERNR || null),
   };
 }
 
@@ -101,12 +104,25 @@ function addrCii(name, street, plz, ort, land) {
 function cii(rid) {
   const b = build(rid); const { k, f } = b;
   const buyerName = [k.KUNNAME, k.KUNVORNAME].filter(Boolean).join(', ');
+  // France: Factur-X profile EN 16931, BT-23 = kind of operations (B1 goods, S1 services, M1 mixed), SIREN/SIRET
+  const fr = L.land() === 'FR';
+  const FR = fr ? require('../fr') : null; const NIFJ = require('../../public/js/nif.js');
+  const nature = fr ? (b.lines.some(l => l.service) && b.lines.some(l => !l.service) ? 'M1' : b.lines.some(l => l.service) ? 'S1' : 'B1') : null;
+  const sirenAch = fr ? NIFJ.frSiren(b.kunde.SIREN) : { ok: false };
   const o = [];
   o.push('<?xml version="1.0" encoding="UTF-8"?>');
   o.push('<rsm:CrossIndustryInvoice xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100" xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100" xmlns:qdt="urn:un:unece:uncefact:data:standard:QualifiedDataType:100" xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100">');
-  o.push('<rsm:ExchangedDocumentContext><ram:BusinessProcessSpecifiedDocumentContextParameter><ram:ID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</ram:ID></ram:BusinessProcessSpecifiedDocumentContextParameter><ram:GuidelineSpecifiedDocumentContextParameter><ram:ID>urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0</ram:ID></ram:GuidelineSpecifiedDocumentContextParameter></rsm:ExchangedDocumentContext>');
+  if (fr) o.push(`<rsm:ExchangedDocumentContext><ram:BusinessProcessSpecifiedDocumentContextParameter><ram:ID>${nature}</ram:ID></ram:BusinessProcessSpecifiedDocumentContextParameter><ram:GuidelineSpecifiedDocumentContextParameter><ram:ID>urn:cen.eu:en16931:2017</ram:ID></ram:GuidelineSpecifiedDocumentContextParameter></rsm:ExchangedDocumentContext>`);
+  else o.push('<rsm:ExchangedDocumentContext><ram:BusinessProcessSpecifiedDocumentContextParameter><ram:ID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</ram:ID></ram:BusinessProcessSpecifiedDocumentContextParameter><ram:GuidelineSpecifiedDocumentContextParameter><ram:ID>urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0</ram:ID></ram:GuidelineSpecifiedDocumentContextParameter></rsm:ExchangedDocumentContext>');
   o.push(`<rsm:ExchangedDocument><ram:ID>${x(k.RECHNUNGNUMMER)}</ram:ID><ram:TypeCode>${b.credit ? 381 : 380}</ram:TypeCode><ram:IssueDateTime><udt:DateTimeString format="102">${d8(k.DATUM)}</udt:DateTimeString></ram:IssueDateTime>`);
   for (const n of b.notes) o.push(`<ram:IncludedNote><ram:Content>${x(n)}</ram:Content></ram:IncludedNote>`);
+  if (fr) {
+    // mandatory notes: penalties (PMD), recovery indemnity (PMT), discount (AAB)
+    const pro = Number(k.KUNART) === 1 || sirenAch.ok || !!b.kunde.USTID;
+    const notas = [['AAB', L.sw('fr.escompte', FR.ESCOMPTE)], ['PMD', L.sw('fr.penalites', FR.PENALITES)], ['PMT', pro ? 'Indemnité forfaitaire pour frais de recouvrement : 40 € (art. L441-10 du Code de commerce).' : 'Indemnité forfaitaire pour frais de recouvrement : non applicable (client particulier).']];
+    for (const [c, t] of notas) o.push(`<ram:IncludedNote><ram:Content>${x(t)}</ram:Content><ram:SubjectCode>${c}</ram:SubjectCode></ram:IncludedNote>`);
+    for (const m of FR.mentions(b.credit ? 'korrektur' : 'rechnung', k, b.lines.map(l => ({ POSART: l.service ? 'L' : 'A' })), b.kunde).filter(m => !/escompte|pénalités|Indemnité/.test(m))) o.push(`<ram:IncludedNote><ram:Content>${x(m)}</ram:Content><ram:SubjectCode>TXD</ram:SubjectCode></ram:IncludedNote>`);
+  }
   o.push('</rsm:ExchangedDocument><rsm:SupplyChainTradeTransaction>');
   for (const l of b.lines) {
     o.push(`<ram:IncludedSupplyChainTradeLineItem><ram:AssociatedDocumentLineDocument><ram:LineID>${l.id}</ram:LineID></ram:AssociatedDocumentLineDocument>`);
@@ -120,6 +136,7 @@ function cii(rid) {
   o.push(`<ram:ApplicableHeaderTradeAgreement><ram:BuyerReference>${x(b.buyerRef)}</ram:BuyerReference>`);
   o.push(`<ram:SellerTradeParty><ram:Name>${x(f.FIRMENNAME)}</ram:Name>`);
   if (f.HANDELSREGISTER) o.push(`<ram:Description>${x(f.HANDELSREGISTER)}</ram:Description>`);
+  if (fr && FR.siren()) o.push(`<ram:SpecifiedLegalOrganization><ram:ID schemeID="0002">${FR.siren()}</ram:ID>${L.sw('fr.forme', '') ? `<ram:TradingBusinessName>${x(f.FIRMENNAME)}</ram:TradingBusinessName>` : ''}</ram:SpecifiedLegalOrganization>`);
   o.push(`<ram:DefinedTradeContact><ram:PersonName>${x(f.BANKINHABER || f.GESCHAEFTSFUEHRER || f.FIRMENNAME)}</ram:PersonName><ram:TelephoneUniversalCommunication><ram:CompleteNumber>${x(f.TELEFON)}</ram:CompleteNumber></ram:TelephoneUniversalCommunication><ram:EmailURIUniversalCommunication><ram:URIID>${x(f.EMAIL)}</ram:URIID></ram:EmailURIUniversalCommunication></ram:DefinedTradeContact>`);
   o.push(addrCii(f.FIRMENNAME, f.STRASSE, f.PLZ, f.ORT, f.LAND));
   o.push(`<ram:URIUniversalCommunication><ram:URIID schemeID="EM">${x(f.EMAIL)}</ram:URIID></ram:URIUniversalCommunication>`);
@@ -127,6 +144,7 @@ function cii(rid) {
   if (b.sellerTaxNo) o.push(`<ram:SpecifiedTaxRegistration><ram:ID schemeID="FC">${x(b.sellerTaxNo)}</ram:ID></ram:SpecifiedTaxRegistration>`);
   o.push('</ram:SellerTradeParty>');
   o.push(`<ram:BuyerTradeParty>${k.KUNNUMMER ? `<ram:ID>${x(k.KUNNUMMER)}</ram:ID>` : ''}<ram:Name>${x(buyerName)}</ram:Name>`);
+  if (sirenAch.ok) o.push(`<ram:SpecifiedLegalOrganization><ram:ID schemeID="${sirenAch.num.length === 14 ? '0009' : '0002'}">${sirenAch.num}</ram:ID></ram:SpecifiedLegalOrganization>`);
   o.push(addrCii(buyerName, k.KUNSTRASSE, k.KUNPLZ, k.KUNORT, k.KUNLAND));
   if (b.buyerMail) o.push(`<ram:URIUniversalCommunication><ram:URIID schemeID="EM">${x(b.buyerMail)}</ram:URIID></ram:URIUniversalCommunication>`);
   if (b.kunde.USTID) o.push(`<ram:SpecifiedTaxRegistration><ram:ID schemeID="VA">${x(String(b.kunde.USTID).replace(/\s/g, ''))}</ram:ID></ram:SpecifiedTaxRegistration>`);
@@ -144,7 +162,7 @@ function cii(rid) {
   for (const t of b.taxes) {
     o.push(`<ram:ApplicableTradeTax><ram:CalculatedAmount>${a2(t.tax)}</ram:CalculatedAmount><ram:TypeCode>VAT</ram:TypeCode>${t.reason ? `<ram:ExemptionReason>${x(t.reason)}</ram:ExemptionReason>` : ''}<ram:BasisAmount>${a2(t.basis)}</ram:BasisAmount><ram:CategoryCode>${t.cat}</ram:CategoryCode>${t.rcode ? `<ram:ExemptionReasonCode>${t.rcode}</ram:ExemptionReasonCode>` : ''}<ram:RateApplicablePercent>${a2(t.rate)}</ram:RateApplicablePercent></ram:ApplicableTradeTax>`);
   }
-  o.push(`<ram:SpecifiedTradePaymentTerms><ram:Description>${x(k.ZAHLBDTEXT || 'Zahlbar ohne Abzug')}</ram:Description>${b.due > 0 ? `<ram:DueDateDateTime><udt:DateTimeString format="102">${d8(b.faellig)}</udt:DateTimeString></ram:DueDateDateTime>` : ''}</ram:SpecifiedTradePaymentTerms>`);
+  o.push(`<ram:SpecifiedTradePaymentTerms><ram:Description>${x(k.ZAHLBDTEXT || (fr ? 'Paiement à réception de facture' : 'Zahlbar ohne Abzug'))}</ram:Description>${b.due > 0 ? `<ram:DueDateDateTime><udt:DateTimeString format="102">${d8(b.faellig)}</udt:DateTimeString></ram:DueDateDateTime>` : ''}</ram:SpecifiedTradePaymentTerms>`);
   o.push(`<ram:SpecifiedTradeSettlementHeaderMonetarySummation><ram:LineTotalAmount>${a2(b.lineTotal)}</ram:LineTotalAmount><ram:TaxBasisTotalAmount>${a2(b.lineTotal)}</ram:TaxBasisTotalAmount><ram:TaxTotalAmount currencyID="EUR">${a2(b.taxTotal)}</ram:TaxTotalAmount>${b.rounding ? `<ram:RoundingAmount>${a2(b.rounding)}</ram:RoundingAmount>` : ''}<ram:GrandTotalAmount>${a2(b.grand)}</ram:GrandTotalAmount><ram:TotalPrepaidAmount>${a2(b.prepaid)}</ram:TotalPrepaidAmount><ram:DuePayableAmount>${a2(b.due)}</ram:DuePayableAmount></ram:SpecifiedTradeSettlementHeaderMonetarySummation>`);
   if (b.orig) o.push(`<ram:InvoiceReferencedDocument><ram:IssuerAssignedID>${x(b.orig.RECHNUNGNUMMER)}</ram:IssuerAssignedID><ram:FormattedIssueDateTime><qdt:DateTimeString format="102">${d8(b.orig.DATUM)}</qdt:DateTimeString></ram:FormattedIssueDateTime></ram:InvoiceReferencedDocument>`);
   o.push('</ram:ApplicableHeaderTradeSettlement></rsm:SupplyChainTradeTransaction></rsm:CrossIndustryInvoice>');

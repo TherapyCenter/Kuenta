@@ -323,12 +323,14 @@ route('POST', '/api/import/kfz', async (ctx) => {
   const buf = await readBody(ctx.req);
   const pw = ctx.req.headers['x-passwort'] ? decodeURIComponent(ctx.req.headers['x-passwort']) : null;
   const res = KFZ.importBuffer(buf, { password: pw, database: ctx.q.db || null, files: ctx.q.dateien !== '0', behalten: ctx.q.behalten !== '0' });
+  try { require('./fr/caisse').jet('IMPORT', { source: 'KFZ-Faktura' }); } catch { /* not France */ }
   return res;
 });
 route('POST', '/api/import/ordner', async (ctx) => {
   ctx.need('Einstellungen', 'anzeigen');
   const b = await json(ctx.req);
   const res = KFZ.importFolder(b.pfad, { database: b.db || 'DB1.FDB', files: b.dateien !== false, behalten: b.behalten !== false });
+  try { require('./fr/caisse').jet('IMPORT', { source: 'KFZ-Faktura' }); } catch { /* not France */ }
   return res;
 });
 route('GET', '/api/import/ordnervorschlag', () => {
@@ -340,6 +342,7 @@ route('GET', '/api/import/ordnervorschlag', () => {
 require('./routes2')(route, { json, readBody });
 require('./es/routes')(route, { json, readBody });
 require('./gb/routes')(route, { json, readBody });
+require('./fr/routes')(route, { json, readBody });
 route('GET', '/api/us/export/quickbooks', (ctx) => { ctx.need('FIBU', 'anzeigen'); const r = require('./us/export').quickbooks(ctx.q); return { _download: r.buffer, filename: r.filename, type: 'text/csv; charset=utf-8' }; });
 
 // ---------- Server ----------
@@ -434,6 +437,8 @@ if (require.main === module) {
   const btcPruefen = () => { for (const m of dbm.listMandanten()) dbm.runAs(m.id, () => require('./btcpay').pruefen().catch(e => console.warn('BTCPay:', e.message))); };
   setTimeout(btcPruefen, 20000);
   setInterval(btcPruefen, 2 * 60 * 1000);
+  // France: start of the software is a technical event of the cash register
+  for (const m of dbm.listMandanten()) dbm.runAs(m.id, () => { try { require('./fr/caisse').jet('DEMARRAGE', { mode: process.env.HOST === '0.0.0.0' ? 'reseau' : 'local' }); } catch (e) { console.warn('NF525:', e.message); } });
   // Spain: send pending VERI*FACTU records (the module itself respects the waiting time of the AEAT)
   const vfEnviar = () => { for (const m of dbm.listMandanten()) dbm.runAs(m.id, () => require('./es/verifactu').enviar().catch(e => console.warn('VERI*FACTU:', e.message))); };
   setTimeout(vfEnviar, 25000);

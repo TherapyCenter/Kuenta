@@ -1,6 +1,6 @@
 'use strict';
 // Tax IDs: Spanish DNI (12345678Z), NIE (X1234567L), CIF of companies (B12345674) and special NIF (K/L/M);
-// UK VAT registration numbers (GB123456782). Shared by server and browser (UMD).
+// UK VAT registration numbers (GB123456782); French SIREN (9 digits) and SIRET (14 digits). Shared by server and browser (UMD).
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
   else root.NIF = factory();
@@ -68,5 +68,15 @@
     return { ok: sum % 97 === 0 || (sum + 55) % 97 === 0, vrn: m[1] + (m[2] || '') };
   }
 
-  return { validar, limpiar, extranjero, gbVat };
+  // French SIREN / SIRET: Luhn check (La Poste establishments: sum of digits divisible by 5)
+  function frSiren(s) {
+    const x = String(s || '').replace(/[\s.\-]/g, '');
+    if (!/^(\d{9}|\d{14})$/.test(x)) return { ok: false, num: x };
+    if (x.length === 14 && x.startsWith('356000000')) return { ok: x.split('').reduce((a, c) => a + Number(c), 0) % 5 === 0, num: x };
+    let sum = 0;
+    for (let i = 0; i < x.length; i++) { let d = Number(x[x.length - 1 - i]); if (i % 2 === 1) { d *= 2; if (d > 9) d -= 9; } sum += d; }
+    return { ok: sum % 10 === 0, num: x };
+  }
+
+  return { validar, limpiar, extranjero, gbVat, frSiren };
 });

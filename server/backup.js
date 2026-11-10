@@ -74,7 +74,13 @@ function inspectBackup(buf) {
   return { error: 'Unbekanntes Dateiformat' };
 }
 
-function restoreBackup(buf, { password } = {}) {
+function restoreBackup(buf, opts = {}) {
+  const res = restoreBackupIntern(buf, opts);
+  // France: the restore is a technical event of the cash register (journal stays complete, see fr/caisse.js)
+  try { require('./fr/caisse').jet('RESTAURATION', { fichier: res && res.datei }); } catch { /* not France */ }
+  return res;
+}
+function restoreBackupIntern(buf, { password } = {}) {
   if (buf.subarray(0, 8).equals(MAGIC)) buf = decrypt(buf, password);
   if (!isZip(buf)) throw new Error('Keine gültige Kuenta-Sicherung (*.kuenta).');
   const z = readZip(buf);

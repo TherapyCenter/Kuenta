@@ -95,6 +95,7 @@
           { f: 'NETTORECHNUNG', l: 'Ausländischer Kunde: bekommt eine Netto-Rechnung (ohne MwSt)', t: 'bool' },
           { f: 'EXPORTART', l: 'Steuerlicher Grund', t: 'select', opts: [['REVERSE_CHARGE', 'Reverse Charge (Leistung an EU-Unternehmer)'], ['IG_LIEFERUNG', 'Innergemeinschaftliche Lieferung'], ['AUSFUHR', 'Ausfuhr / Drittland']] },
           { f: 'RECARGO', l: 'Spanien: Kunde im Recargo de equivalencia (Einzelhändler)', t: 'bool' },
+          { f: 'SIREN', l: 'Frankreich: SIREN / SIRET' },
           { f: 'TAXEXEMPT', l: 'USA: steuerbefreit (Exemption certificate)', t: 'bool' },
           { f: 'EXEMPTCERT', l: 'USA: Nummer des Exemption Certificate' },
           { f: 'EXEMPTREASON', l: 'USA: Grund (z. B. Resale, Government, Non-profit)' },

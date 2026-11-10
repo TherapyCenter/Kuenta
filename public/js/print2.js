@@ -22,10 +22,16 @@ Object.assign(Print, {
     const zeilen = d.pos.map(p => `<tr><td colspan="2">${esc(p.BEZEICHNUNG)}</td></tr><tr><td>${fmt.num(p.MENGE, 3)} x ${fmt.money0(p.EINZEL)}${Number(p.RABATT) ? ` -${fmt.num(p.RABATT)}%` : ''}</td><td class="r">${fmt.money0(p.BRUTTO)} ${buchstabe(p.MWSTSATZ)}</td></tr>`).join('');
     const vf = es && es.emitida && es.qr ? `<hr><div class="c">QR tributario:<br>${Print.qrSvg(es.qr, 32)}<br><b>VERI*FACTU</b>${es.entorno === 'pruebas' ? '<br><span class="small">Testumgebung – nicht bei der AEAT registriert</span>' : ''}</div>` : '';
     const us = LK.data && LK.data.land === 'US';
-    const tse = es ? vf : (gb || us) ? '' : b.TSE_SIGNATUR ? `<hr><div class="small">TSE-Seriennr.: ${esc(b.TSE_SERIAL)}<br>Transaktion: ${esc(b.TSE_TXNR)} · Signaturzähler: ${esc(b.TSE_ZAEHLER)}<br>Start: ${esc(b.TSE_START)}<br>Ende: ${esc(b.TSE_ENDE)}<br>Signatur: ${esc(b.TSE_SIGNATUR)}</div><div class="c">${Print.qrSvg(b.TSE_QR)}</div>`
+    // France: signature of the receipt (journal ISCA) and numbered duplicate on reprints
+    let frBlock = '';
+    if (LK.data && LK.data.land === 'FR') {
+      let dup = null; if (kopie) { try { dup = await api(`/api/fr/caisse/duplicata/${b.ID}`, { method: 'POST' }); } catch { /* offline */ } }
+      frBlock = `${dup && dup.numero ? `<div class="c b">*** DUPLICATA n° ${dup.numero} ***</div>` : ''}${d.fr ? `<div class="small">Ticket n° ${esc(d.fr.nr)} · Signature ${esc(d.fr.court)}</div>` : ''}`;
+    }
+    const tse = frBlock ? '<hr>' + frBlock : es ? vf : (gb || us || (LK.data && LK.data.land === 'FR')) ? '' : b.TSE_SIGNATUR ? `<hr><div class="small">TSE-Seriennr.: ${esc(b.TSE_SERIAL)}<br>Transaktion: ${esc(b.TSE_TXNR)} · Signaturzähler: ${esc(b.TSE_ZAEHLER)}<br>Start: ${esc(b.TSE_START)}<br>Ende: ${esc(b.TSE_ENDE)}<br>Signatur: ${esc(b.TSE_SIGNATUR)}</div><div class="c">${Print.qrSvg(b.TSE_QR)}</div>`
       : b.TSE_FEHLER ? `<hr><div class="small b">${esc(b.TSE_FEHLER)}</div>` : '<hr><div class="small">Keine TSE aktiv</div>';
     const html = `<div class="c b" style="font-size:11pt">${esc(f.FIRMENNAME || '')}</div><div class="c">${esc(f.STRASSE || '')}<br>${esc(Print.plzOrt(f.PLZ, f.ORT))}<br>${esc(f.TELEFON || '')}${es ? (es.nifEmisor ? '<br>NIF ' + esc(es.nifEmisor) : '') : gb ? (f.USTNR ? '<br>VAT-Reg.-Nr. ' + esc(f.USTNR) : '') : f.USTNR ? '<br>USt-IdNr. ' + esc(f.USTNR) : f.STEUERNR ? '<br>St.-Nr. ' + esc(f.STEUERNR) : ''}</div><hr>
-      ${kopie ? '<div class="c b">*** KOPIE ***</div>' : ''}${b.STORNOID ? '<div class="c b">*** STORNO ***</div>' : ''}
+      ${kopie && !(LK.data && LK.data.land === 'FR') ? '<div class="c b">*** KOPIE ***</div>' : ''}${b.STORNOID ? '<div class="c b">*** STORNO ***</div>' : ''}
       ${es && es.emitida ? `<div class="b">${esc({ F1: 'Rechnung', F2: 'Vereinfachte Rechnung', R5: 'Vereinfachte Rechnungskorrektur' }[es.tipo] || 'Rechnungskorrektur')} Nr. ${esc(es.numSerie)}</div>` : ''}
       <div>${esc(b.TYP === 'Beleg' ? 'Kassenbeleg' : b.TYP)} Nr. ${b.BONNR}<br>${fmt.datetime(b.ZEIT)}${b.BEDIENER ? '<br>Bediener: ' + esc(b.BEDIENER) : ''}<br>Kasse: ${esc(d.kasse)}${b.KUNDE && b.KUNDE !== 'Barverkauf' ? '<br>Kunde: ' + esc(b.KUNDE) : ''}${d.rechnungnr && !es ? '<br>Rechnung Nr. ' + esc(d.rechnungnr) : ''}</div><hr>
       <table>${zeilen}</table><hr>

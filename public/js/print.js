@@ -77,7 +77,7 @@ ${extra}`;
       <div>${zeile(f.FIRMENNAME, f.FIRMENZUSATZ, f.STRASSE, Print.plzOrt(f.PLZ, f.ORT))}</div>
       <div>${zeile(f.TELEFON && 'Tel.: ' + f.TELEFON, f.FAX && 'Fax: ' + f.FAX, f.EMAIL, f.INTERNETSEITE)}</div>
       <div>${zeile(f.BANKNAME, f.IBAN && 'IBAN: ' + f.IBAN, f.BIC && 'BIC: ' + f.BIC, f.BANKINHABER && 'Inhaber: ' + f.BANKINHABER)}</div>
-      <div>${zeile(...(es ? [(f.STEUERNR || f.USTNR) && 'NIF: ' + (f.STEUERNR || f.USTNR)] : us ? [App.setting('us.reg.nr', '') && `${App.setting('us.reg.label', 'Registration No.')}: ${App.setting('us.reg.nr', '')}`] : gb ? [f.USTNR && 'VAT-Reg.-Nr.: ' + f.USTNR] : [f.USTNR && 'USt-IdNr.: ' + f.USTNR, f.STEUERNR && 'Steuer-Nr.: ' + f.STEUERNR]), f.HANDELSREGISTER, f.GESCHAEFTSFUEHRER && 'Inhaber/GF: ' + f.GESCHAEFTSFUEHRER, f.FUSSZEILE)}</div>
+      <div>${zeile(...(LK.data && LK.data.land === 'FR' && Print.frPied ? Print.frPied : es ? [(f.STEUERNR || f.USTNR) && 'NIF: ' + (f.STEUERNR || f.USTNR)] : us ? [App.setting('us.reg.nr', '') && `${App.setting('us.reg.label', 'Registration No.')}: ${App.setting('us.reg.nr', '')}`] : gb ? [f.USTNR && 'VAT-Reg.-Nr.: ' + f.USTNR] : [f.USTNR && 'USt-IdNr.: ' + f.USTNR, f.STEUERNR && 'Steuer-Nr.: ' + f.STEUERNR]), f.HANDELSREGISTER, f.GESCHAEFTSFUEHRER && 'Inhaber/GF: ' + f.GESCHAEFTSFUEHRER, f.FUSSZEILE)}</div>
     </div>`;
   },
   headHtml(f) {
@@ -163,7 +163,8 @@ ${extra}`;
     const usTax = p => Number(p.DURCHLAUFER) === 1 || k.STEUERART || (LK.data.usLaborFree && p.POSART === 'L') ? '' : LK.rate(Number(p.MWST) || 61) > 0 ? 'T' : '';
     const zustand = p => ({ GEBRAUCHT: '(gebraucht)', AUFBEREITET: '(aufbereitet)' }[p.TEILEZUSTAND] || '');
     const freigaben = (() => { try { return JSON.parse(k.USFREIGABE || '[]'); } catch { return []; } })();
-    const titleGb = gb && isRe && ['rechnung', 'rechnung_ohne_kopf', 'rechnungskorrektur', 'storno-rechnung', 'gutschrift'].includes(formular) ? (typ === 'korrektur' ? 'Gutschrift' : gbReg ? 'Umsatzsteuerrechnung' : 'Rechnung') : null;
+    const fr = d.fr || null; Print.frPied = fr ? fr.pied : null; // France: legal mentions and footer from the server
+    const titleGb = (gb || fr) && isRe && ['rechnung', 'rechnung_ohne_kopf', 'rechnungskorrektur', 'storno-rechnung', 'gutschrift'].includes(formular) ? (typ === 'korrektur' ? 'Gutschrift' : gbReg ? 'Umsatzsteuerrechnung' : 'Rechnung') : null;
     const titleEs = vf ? { F1: 'Rechnung', F2: 'Vereinfachte Rechnung', R5: 'Vereinfachte Rechnungskorrektur' }[vf.tipo] || 'Rechnungskorrektur' : null;
     const nrLabel = { angebot: 'Angebots-Nr.', auftrag: 'Auftrags-Nr.', lieferschein: 'Lieferschein-Nr.', rechnung: 'Rechnungs-Nr.', korrektur: 'Beleg-Nr.' }[typ];
     const info = [[nrLabel, es ? es.numSerie : k[v.nr]], ['Datum', fmt.date(k.DATUM)], ['Kunden-Nr.', k.KUNNUMMER]];
@@ -171,6 +172,7 @@ ${extra}`;
     if (k.BENNAME) info.push(['Ansprechpartner', [k.BENVORNAME, k.BENNAME].filter(Boolean).join(' ')]);
     if (k.BESTELLNR) info.push(['Ihre Bestellung', k.BESTELLNR]);
     if (d._ust) info.push([es ? 'NIF' : 'Ihre USt-IdNr.', d._ust]);
+    if (fr && fr.sirenClient) info.push(['SIREN', fr.sirenClient]);
     const bezug = (d.verknuepft || []).find(l => l.typ === 'rechnung');
     if (typ === 'korrektur' && es && es.rectificada) info.push(['zu Rechnung', `${es.rectificada.numSerie} vom ${fmt.date(es.rectificada.fecha)}`]);
     else if (typ === 'korrektur' && bezug) info.push(['zu Rechnung', `${bezug.nr} vom ${fmt.date(bezug.datum)}`]);
@@ -232,7 +234,7 @@ ${extra}`;
       if (klein) html += '<div class="txt muted">Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</div>';
       if (hatDP && us) html += '<div class="txt muted">(DP) = Durchlaufende Gebühr, nicht steuerpflichtig.</div>';
       else if (hatDP && gb) html += '<div class="txt muted">(DP) = Auslage im Namen des Kunden (disbursement), nicht umsatzsteuerbar.</div>';
-      else if (hatDP) html += es ? '<div class="txt muted">(DP) = Suplido: im Namen und für Rechnung des Kunden verauslagt, nicht Teil der Bemessungsgrundlage (Art. 78.Tres.3.º LIVA).</div>' : '<div class="txt muted">(DP) = Durchlaufender Posten gemäß § 10 Abs. 1 Satz 6 UStG, nicht umsatzsteuerpflichtig.</div>';
+      else if (hatDP && !fr) html += es ? '<div class="txt muted">(DP) = Suplido: im Namen und für Rechnung des Kunden verauslagt, nicht Teil der Bemessungsgrundlage (Art. 78.Tres.3.º LIVA).</div>' : '<div class="txt muted">(DP) = Durchlaufender Posten gemäß § 10 Abs. 1 Satz 6 UStG, nicht umsatzsteuerpflichtig.</div>';
       if (gb && hatMarge) html += '<div class="txt">Gebrauchtwagen: Margenbesteuerung (second-hand margin scheme, VAT Notice 718). Die Umsatzsteuer wird nicht gesondert ausgewiesen.</div>';
       if (gb && k.STEUERART) html += `<div class="txt muted">${esc({ REVERSE_CHARGE: 'Im Vereinigten Königreich nicht umsatzsteuerbar (Leistungsort im Ausland); der Kunde schuldet die Steuer (reverse charge).', IG_LIEFERUNG: 'Steuerfreie Ausfuhr (zero-rated export).', AUSFUHR: 'Steuerfreie Ausfuhr (zero-rated export).' }[k.STEUERART] || '')}</div>`;
       if (es && k.STEUERART) html += `<div class="txt muted">${esc({ REVERSE_CHARGE: 'Nicht steuerbar in Spanien, Steuerschuldnerschaft des Leistungsempfängers (Art. 69 und 84.Uno.2.º LIVA).', IG_LIEFERUNG: 'Steuerfreie innergemeinschaftliche Lieferung (Art. 25 LIVA).', AUSFUHR: 'Steuerfreie Ausfuhr (Art. 21 LIVA).' }[k.STEUERART] || '')}</div>`;
@@ -243,9 +245,9 @@ ${extra}`;
       if (isRe && typ === 'rechnung' && Number(k.FAELLING) > 0) zt += (zt ? '\n' : '') + `Zahlbar bis ${fmt.date(addDaysIso(k.DATUM, k.FAELLING))}${Number(k.SKONTO) > 0 ? `, bei Zahlung bis ${fmt.date(addDaysIso(k.DATUM, k.TAGESKONTO))} abzüglich ${fmt.num(k.SKONTO)} % Skonto` : ''}.`;
       if (zt && typ !== 'korrektur') html += `<div class="txt">${esc(zt)}</div>`;
     }
-    if (isRe && !es && !gb && !us && !(isRe && k.LIEFDATUM)) html += '<div class="txt muted">Leistungsdatum entspricht dem Rechnungsdatum.</div>';
+    if (isRe && !es && !gb && !us && !fr && !(isRe && k.LIEFDATUM)) html += '<div class="txt muted">Leistungsdatum entspricht dem Rechnungsdatum.</div>';
     if (k.SCHLUSSTXT) html += `<div class="txt">${esc(k.SCHLUSSTXT)}</div>`;
-    if (formular === 'auftrag_mit_unterschrift' && us) html += '<div class="txt" style="margin-top:6mm">Ich beauftrage die oben genannten Arbeiten bis zum angegebenen Betrag. Zusätzliche Arbeiten oder Mehrkosten nur nach meiner weiteren Freigabe.</div><div class="sign"><div>Ort, Datum</div><div>Unterschrift Auftraggeber</div></div>';
+    if (formular === 'auftrag_mit_unterschrift' && (us || fr)) html += '<div class="txt" style="margin-top:6mm">Ich beauftrage die oben genannten Arbeiten bis zum angegebenen Betrag. Zusätzliche Arbeiten oder Mehrkosten nur nach meiner weiteren Freigabe.</div><div class="sign"><div>Ort, Datum</div><div>Unterschrift Auftraggeber</div></div>';
     else if (formular === 'auftrag_mit_unterschrift') html += `<div class="txt" style="margin-top:6mm">Hiermit erteile ich den Auftrag zur Durchführung der oben genannten Arbeiten. Erforderliche Probefahrten dürfen durchgeführt werden. Es gelten die Allgemeinen Geschäftsbedingungen für die Ausführung von Arbeiten an Kraftfahrzeugen.</div><div class="sign"><div>Ort, Datum</div><div>Unterschrift Auftraggeber</div></div>`;
     if (formular === 'arbeitskarte') html += `<div class="box" style="min-height:45mm"><b>Notizen / ausgeführte Arbeiten:</b></div><div class="grid2"><div class="box">Monteur: ____________________</div><div class="box">Arbeitszeit: von _______ bis _______</div></div>`;
     if (typ === 'lieferschein') html += '<div class="sign"><div>Ware vollständig erhalten – Datum</div><div>Unterschrift Empfänger</div></div>';
@@ -257,6 +259,10 @@ ${extra}`;
       for (const a of freigaben) html += `<div class="txt muted">${esc(I18N.tr(`Freigegeben: ${fmt.money(a.betrag)} am ${fmt.date(a.datum)} (${I18N.tr(a.art || 'persönlich', Print.docLang())}) durch ${a.person || ''}`, Print.docLang()))}</div>`;
       if (typ === 'angebot' && formular === 'kostenvoranschlag') html += '<div class="txt">Schriftlicher Kostenvoranschlag. Ohne Ihre Freigabe werden keine Arbeiten ausgeführt und keine Beträge über diesem Kostenvoranschlag berechnet.</div><div class="sign"><div>Datum</div><div>Unterschrift Kunde (Freigabe)</div></div>';
     } else if (typ === 'angebot' && formular === 'kostenvoranschlag') html += '<div class="txt muted">Dieser Kostenvoranschlag ist unverbindlich. Abweichungen bis 15 % bleiben vorbehalten.</div>';
+    if (fr) {
+      for (const m of fr.mentions) html += `<div class="txt muted">${esc(m)}</div>`;
+      if (typ === 'angebot' && formular === 'kostenvoranschlag') html += '<div class="txt">Schriftlicher Kostenvoranschlag. Ohne Ihre Freigabe werden keine Arbeiten ausgeführt und keine Beträge über diesem Kostenvoranschlag berechnet.</div><div class="sign"><div>Datum</div><div>Unterschrift Kunde (Freigabe)</div></div>';
+    }
     return Print.sheet(html, f, kopf);
   },
   async vorgang(typ, d, opts = {}) {

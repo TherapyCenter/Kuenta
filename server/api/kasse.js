@@ -9,6 +9,7 @@ const num = x => { const n = Number(String(x ?? '').replace(',', '.')); return N
 const BTC = require('../btcpay');
 const ES = require('../es');
 const VF = require('../es/verifactu');
+const FRC = require('../fr/caisse');
 const ZAHLART_ID = { BAR: 1, EC: 2, KARTE: 2, UEBERWEISUNG: 3, KRYPTO: -1 };
 const ZAHLART_TEXT = { BAR: 'Bar', EC: 'EC-Karte', KARTE: 'Kreditkarte', UEBERWEISUNG: 'Überweisung', KRYPTO: 'Krypto' };
 // payment type ID in the database; crypto is created when needed
@@ -40,6 +41,7 @@ function status() {
     schnelltasten: JSON.parse(L.sw('kasse.schnelltasten', '[]') || '[]'),
     autorechnung: L.sw('kasse.autorechnung', '1') === '1' || ES.activo(),
     land: L.land(),
+    frCaisse: FRC.activo(),
     tse: { aktiv: TSE.cfg().aktiv, serial: L.sw('tse.seriennummer', '') },
     ec: L.sw('ec.aktiv', '0') === '1',
     krypto: BTC.bereit(),
@@ -76,6 +78,7 @@ function speichereBon(b, lines) {
   const id = Number(d.prepare(`INSERT INTO SW_KASSE_BON (${cols.join(',')}) VALUES (${cols.map(() => '?').join(',')})`).run(...cols.map(c => b[c])).lastInsertRowid);
   const pc = ['POS', 'POSART', 'ARTID', 'ARTNUMMER', 'BEZEICHNUNG', 'MENGE', 'EINZEL', 'RABATT', 'MWSTSATZ', 'MWSTCODE', 'BRUTTO', 'NETTO', 'GVTYP'];
   for (const l of lines) d.prepare(`INSERT INTO SW_KASSE_POS (BONID, ${pc.join(',')}) VALUES (?,${pc.map(() => '?').join(',')})`).run(id, ...pc.map(c => l[c] ?? null));
+  FRC.ticket(id); // France: signed, chained receipt with grand totals (ISCA)
   return id;
 }
 
@@ -213,7 +216,7 @@ function beleg(id) {
   const r = b.RECHNUNGID ? d.prepare('SELECT * FROM RECHNUNGEN WHERE RECHNUNGID=?').get(b.RECHNUNGID) : null;
   // Spain: the receipt shows the invoice (series number, NIF, QR code of VERI*FACTU)
   const es = r && (ES.activo() || r.ESNUMSERIE) ? { ...VF.info(r), recargo: r.GRECARGO || 0 } : null;
-  return { es, bon: b, pos, ust: Object.values(ust).map(u => ({ ...u, mwst: L.r2(u.brutto - u.netto) })), rechnungnr: r && r.RECHNUNGNUMMER, firma: L.firma(), kasse: L.sw('kasse.seriennummer', 'Kasse 1'), fusstext: L.sw('kasse.bonfusstext', 'Vielen Dank für Ihren Besuch!') };
+  return { es, fr: FRC.infoTicket(id), bon: b, pos, ust: Object.values(ust).map(u => ({ ...u, mwst: L.r2(u.brutto - u.netto) })), rechnungnr: r && r.RECHNUNGNUMMER, firma: L.firma(), kasse: L.sw('kasse.seriennummer', 'Kasse 1'), fusstext: L.sw('kasse.bonfusstext', 'Vielen Dank für Ihren Besuch!') };
 }
 function journal(q) {
   return L.db().prepare('SELECT * FROM SW_KASSE_BON WHERE substr(ZEIT,1,10) BETWEEN ? AND ? ORDER BY ID DESC LIMIT 5000').all(q.von || L.today(), q.bis || L.today());
@@ -254,6 +257,7 @@ async function abschluss({ ist, zaehlprotokoll, benid }) {
   const r = d.prepare('INSERT INTO SW_KASSE_ABSCHLUSS (ZNR, ZEIT, VON_BONID, BIS_BONID, ANFANG, BAR_EIN, BAR_AUS, SOLL, IST, DIFFERENZ, UMSATZ_BRUTTO, UMSATZ_NETTO, UST, ZAHLARTEN, ZAEHLPROTOKOLL, BENID, BEDIENER) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
     .run(v.znr, L.now(), bons[0] ? bons[0].ID : null, bons.length ? bons[bons.length - 1].ID : null, v.anfang, v.bar_ein, v.bar_aus, v.soll, istB, diff, v.umsatz_brutto, v.umsatz_netto, JSON.stringify(v.ust), JSON.stringify(v.zahlarten), JSON.stringify(zaehlprotokoll || null), bed.id, bed.name);
   d.prepare('UPDATE SW_KASSE_BON SET ABSCHLUSSID=? WHERE ABSCHLUSSID IS NULL').run(r.lastInsertRowid);
+  FRC.clotureJour(v.znr); // France: signed daily closure (and monthly/yearly at the turn)
   return abschlussDetail(Number(r.lastInsertRowid));
 }
 function abschluesse() { return L.db().prepare('SELECT * FROM SW_KASSE_ABSCHLUSS ORDER BY ZNR DESC LIMIT 1000').all(); }
