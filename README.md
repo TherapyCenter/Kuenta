@@ -15,7 +15,8 @@ Handbook: **[English](docs/handbook-en.html)** · **[Español](docs/handbook-es.
 |---|---|---|
 | Windows | `Kuenta-Setup-<version>.exe` (Node.js included) | Start menu → *Kuenta* or *Kuenta (network)* |
 | Linux / macOS | Node.js 22.13 or later, then `./installer/unix/install.sh` | `kuenta` (network: `kuenta --netzwerk`) |
-| Container (Docker/Podman) | `podman build -t kuenta:1.8.1 .` or `docker compose up -d --build` | `http://<computer>:3700` (data in the volume `/data`) |
+| Container (Docker/Podman) | ready-made image `ghcr.io/therapycenter/kuenta:1.8.1` or `podman build -t kuenta:1.8.1 .` or `docker compose up -d --build` | `http://<computer>:3700` (data in the volume `/data`) |
+| Umbrel | App Store → ⋯ → *Community App Stores* → `https://github.com/TherapyCenter/umbrel-app-store` → install Kuenta | `http://umbrel.local:3700` |
 | Without installation | Node.js 22.13 or later | `Kuenta starten.bat`, `./kuenta.sh` or `node server/index.js --open` |
 
 The browser then opens `http://127.0.0.1:3700`. In network mode the start window shows the address for the other devices. **Important:** in network mode, enable login under *Settings → Defaults* and create users.

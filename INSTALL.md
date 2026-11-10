@@ -246,6 +246,21 @@ Then `systemctl --user daemon-reload` and `systemctl --user start kuenta`. To ke
 
 ---
 
+## Umbrel
+
+Kuenta is available as an app for [umbrelOS](https://umbrel.com) (Umbrel Home, Raspberry Pi, PC) in the community app store
+`https://github.com/TherapyCenter/umbrel-app-store`.
+
+1. In umbrelOS open the **App Store**, top right **⋯** → **Community App Stores**.
+2. Paste `https://github.com/TherapyCenter/umbrel-app-store` and click **Add**.
+3. Open the **TherapyCenter** store and install **Kuenta**.
+
+Kuenta then runs at `http://umbrel.local:3700` and can be reached from every device in the network, e.g. the tablet in the
+workshop. Access is protected by the Umbrel login; with several staff members also create users in Kuenta under
+*Settings → Defaults*. The data lives on the Umbrel in the app's data folder and is kept during updates. Also make a backup
+in Kuenta under *Kuenta → Back up data* and keep it elsewhere. umbrelOS offers updates as soon as a new Kuenta version is in
+the store.
+
 ## Taking over data
 
 After the first start Kuenta is empty. The overview offers buttons for the setup:
