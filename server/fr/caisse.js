@@ -135,11 +135,13 @@ function clotureJour(znr) {
   return e;
 }
 
-// reprint of a receipt: numbered duplicate, recorded in the event log
+// reprint of a receipt: numbered duplicate, recorded in the event log. Only duplicates since the latest ticket
+// of the bon count: after restoring an older backup a bon id can be used again.
 function duplicata(bonid) {
   if (!activo()) return null;
   const d = asegurar();
-  const n = d.prepare("SELECT COUNT(*) n FROM SW_FR_JOURNAL WHERE TYP='jet' AND REF='DUPLICATA' AND DATEN LIKE ?").get(`%"bon":${Number(bonid)},%`).n + 1;
+  const t = d.prepare("SELECT ZEIT FROM SW_FR_JOURNAL WHERE TYP='ticket' AND REF=? ORDER BY NR DESC LIMIT 1").get(String(bonid));
+  const n = d.prepare("SELECT COUNT(*) n FROM SW_FR_JOURNAL WHERE TYP='jet' AND REF='DUPLICATA' AND DATEN LIKE ? AND ZEIT>=?").get(`%"bon":${Number(bonid)},%`, t ? t.ZEIT : '').n + 1;
   jet('DUPLICATA', { bon: Number(bonid), numero: n });
   return { numero: n };
 }
@@ -186,9 +188,10 @@ function archive({ von, bis } = {}) {
 function liste({ typ, limit = 500 } = {}) {
   return asegurar().prepare(`SELECT ID, TYP, NR, REF, ZEIT, KASSE, TOTAL, GT, GTABS, DATEN, substr(SIGNATUR,1,16) SIG FROM SW_FR_JOURNAL ${typ ? 'WHERE TYP=?' : ''} ORDER BY ID DESC LIMIT ${Math.min(Number(limit) || 500, 10000)}`).all(...(typ ? [typ] : []));
 }
+// the latest ticket of a bon (after restoring an older backup a bon id can be used again)
 function infoTicket(bonid) {
   if (!activo()) return null;
-  const e = asegurar().prepare("SELECT NR, SIGNATUR, GT FROM SW_FR_JOURNAL WHERE TYP='ticket' AND REF=?").get(String(bonid));
+  const e = asegurar().prepare("SELECT NR, SIGNATUR, GT FROM SW_FR_JOURNAL WHERE TYP='ticket' AND REF=? ORDER BY NR DESC LIMIT 1").get(String(bonid));
   return e ? { nr: e.NR, signature: e.SIGNATUR, court: e.SIGNATUR.slice(-4).toUpperCase() } : null;
 }
 

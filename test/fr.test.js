@@ -110,6 +110,17 @@ test('cash register: signed chain, grand totals, closures, duplicate, archive, r
   assert.strictEqual(FRC.liste({ typ: 'ticket' }).length, 4, 'ticket made after the backup is kept');
   assert.ok(FRC.liste({ typ: 'jet' }).some(e => e.REF === 'RESTAURATION'));
   assert.ok(FRC.verifier().ok);
+  // a bon id used again after the restore: the new ticket and its own duplicate numbering
+  const vor = BK.createBackup({});
+  const alt = await KS.bon({ zahlart: 'BAR', gegeben: 5, positionen: [{ POSART: 'A', BEZEICHNUNG: 'Ampoule', MENGE: 1, EINZEL: 3, MWST: 61 }] });
+  FRC.duplicata(alt.bon.ID); FRC.duplicata(alt.bon.ID);
+  BK.restoreBackup(vor.buffer);
+  const neu = await KS.bon({ zahlart: 'BAR', gegeben: 5, positionen: [{ POSART: 'A', BEZEICHNUNG: 'Balai', MENGE: 1, EINZEL: 4, MWST: 61 }] });
+  assert.strictEqual(neu.bon.ID, alt.bon.ID, 'the restore makes the bon id free again');
+  assert.ok(neu.fr.nr > alt.fr.nr, 'the receipt shows the new ticket');
+  assert.strictEqual(neu.fr.signature.slice(0, 16), FRC.liste({ typ: 'ticket', limit: 1 })[0].SIG, 'signature of the latest ticket');
+  assert.deepStrictEqual(FRC.duplicata(neu.bon.ID), { numero: 1 });
+  assert.ok(FRC.verifier().ok);
 });
 
 test('FEC: 18 columns, balanced entries', () => {
