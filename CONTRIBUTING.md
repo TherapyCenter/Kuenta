@@ -1,24 +1,28 @@
-# Mitmachen
+# Contributing
 
-Fehlerberichte und Verbesserungen sind willkommen, gern als Issue oder Pull Request.
+**English** · [Deutsch](CONTRIBUTING.de.md)
 
-## Lizenz der Beiträge
+Bug reports and improvements are welcome, as an issue or a pull request.
 
-Kuenta steht unter der GNU AGPL 3.0. Der Ordner `server/pro/` steht unter der
-[Kuenta-Pro-Lizenz](server/pro/LICENSE.md).
+## License of contributions
 
-Mit einem Pull Request bestätigen Sie, dass Sie den Beitrag selbst geschrieben haben bzw.
-weitergeben dürfen, und dass der Herausgeber DoctorD ihn
+Kuenta is licensed under the GNU AGPL 3.0. The folder `server/pro/` is under the
+[Kuenta Pro license](server/pro/LICENSE.md).
 
-- unter der AGPL 3.0 veröffentlicht und
-- zusätzlich unter anderen Lizenzbedingungen verwenden darf, auch zusammen mit Kuenta Pro.
+By opening a pull request you confirm that you wrote the contribution yourself or are allowed
+to pass it on, and that the publisher DoctorD may
 
-Das ist nötig, weil Kuenta zusammen mit den Pro-Funktionen ausgeliefert wird.
+- publish it under the AGPL 3.0 and
+- also use it under other license terms, including together with Kuenta Pro.
 
-## Regeln
+This is necessary because Kuenta is shipped together with the Pro features.
 
-- Keine Kunden-, Firmen- oder Kassendaten ins Repository, auch nicht in Tests. Testdaten sind erfunden.
-- Keine npm-Abhängigkeiten ohne vorherige Absprache. Kuenta braucht nur Node.js.
-- Vor dem Pull Request `npm test` ausführen.
-- Kommentare im Code auf Englisch schreiben.
-- Neue Texte der Oberfläche auf Deutsch schreiben und in `public/js/lang/en.js` und `es.js` übersetzen. `node tools/i18n/missing.js` zeigt, was noch fehlt. Werte im Text werden zu `{0}`, `{1}` …, die Übersetzung braucht dieselben Platzhalter.
+If this English text and the German version differ, the German version applies.
+
+## Rules
+
+- No customer, company or register data in the repository, not even in tests. Test data is made up.
+- No npm dependencies without prior agreement. Kuenta only needs Node.js.
+- Run `npm test` before opening a pull request.
+- Write code comments and commit messages in English.
+- Write new user interface texts in German and translate them in `public/js/lang/en.js` and `es.js`. `node tools/i18n/missing.js` shows what is still missing. Values inside a text become `{0}`, `{1}` …, and the translation needs the same placeholders.

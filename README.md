@@ -8,7 +8,7 @@ The user interface is available in **German, English and Spanish**. Tax rules, e
 
 ## Installation and start
 
-Detailed instructions for Windows, Linux and macOS: **[INSTALL.md](INSTALL.md)** (German).
+Detailed instructions for Windows, Linux and macOS: **[INSTALL.md](INSTALL.md)**.
 Handbook: **[English](docs/handbook-en.html)** · **[Español](docs/handbook-es.html)** · **[Deutsch](docs/handbuch.html)**.
 
 | System | Installation | Start |

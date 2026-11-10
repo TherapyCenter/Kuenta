@@ -1,45 +1,45 @@
 # Kuenta Pro
 
-Kuenta ist Open Source (GNU AGPL 3.0) und in vollem Umfang kostenlos nutzbar: Rechnungen,
-E-Rechnung, Kasse, DATEV, KFZ-Faktura-Import, Erinnerungen per Brief und E-Mail und alles andere.
+**English** · [Deutsch](PRO.de.md)
 
-Einige Zusatzfunktionen gibt es als **Add-ons**. Sie werden mit einem Lizenzschlüssel
-freigeschaltet. Lizenzgeber ist der Open-Source-Entwickler **DoctorD**. Mit dem Kauf
-finanzieren Sie die Weiterentwicklung.
+Kuenta is open source (GNU AGPL 3.0) and fully usable free of charge: invoices, e-invoices,
+cash register, DATEV, KFZ-Faktura import, reminders by letter and email, and everything else.
+
+Some extra features are available as **add-ons**. They are unlocked with a license key.
+The licensor is the open source developer **DoctorD**. Buying an add-on funds further development.
 
 ## Add-ons
 
-| Add-on | seit | Preis |
+| Add-on | since | Price |
 |---|---|---|
-| **SMS:** SMS-Erinnerungen an HU, Inspektion und andere Termine, SMS-Gateway (Anbieter, Android-Handy, Surfstick über das Kuenta-SMS-Relais) | 1.0.8 | 10 € |
+| **SMS:** SMS reminders of the HU (German MOT), service and other due dates, SMS gateway (provider, Android phone, USB modem via the Kuenta SMS relay) | 1.0.8 | 10 € |
 
-Der Preis gilt je Add-on, einmalig und unbefristet, für eine Installation mit allen Mandanten.
-Bezahlt wird mit Bitcoin oder Tether zum Euro-Kurs am Zahltag.
+The price is per add-on, one-off and unlimited, for one installation with all companies.
+Payment is made with Bitcoin or Tether at the euro rate on the day of payment.
 
-## Bezahlen
+## Payment
 
-- **Bitcoin (BTC):** on-chain oder über Lightning
-- **Tether (USDT):** Netz wird mit der Rechnung genannt
+- **Bitcoin (BTC):** on-chain or via Lightning
+- **Tether (USDT):** the network is stated on the invoice
 
-So läuft eine Bestellung ab:
+How an order works:
 
-1. Schreiben Sie an **heidepower@proton.me** und nennen Sie den Namen Ihrer Werkstatt,
-   die Rechnungsanschrift und die gewünschten Add-ons.
-2. Sie erhalten eine Rechnung mit Betrag und Zahlungsadresse.
-3. Nach Zahlungseingang bekommen Sie den Lizenzschlüssel per E-Mail.
-4. In Kuenta unter *Einstellungen → Lizenz* den Schlüssel einfügen und „Lizenz einspielen“
-   klicken. Fertig. Kuenta muss dafür nicht ins Internet.
+1. Write to **heidepower@proton.me** and state the name of your workshop,
+   the billing address and the add-ons you want.
+2. You receive an invoice with the amount and the payment address.
+3. Once the payment has arrived, you get the license key by email.
+4. In Kuenta, paste the key under *Settings → License* and click "Install license".
+   Done. Kuenta does not need internet access for this.
 
-## Häufige Fragen
+## Frequent questions
 
-**Ich kaufe später ein weiteres Add-on. Was passiert mit meinem Schlüssel?**
-Sie bekommen einen neuen Schlüssel, der alle Ihre Add-ons enthält. Den spielen Sie wie gewohnt
-ein, er ersetzt den alten.
+**I buy another add-on later. What happens to my key?**
+You get a new key that contains all your add-ons. Install it as usual; it replaces the old one.
 
-**Gilt die Lizenz für mehrere Arbeitsplätze?**
-Ja. Kuenta läuft auf einem Rechner und die anderen Arbeitsplätze greifen über das Netzwerk zu.
-Die Lizenz gilt für diese eine Installation mit allen Mandanten.
+**Does the license cover several workstations?**
+Yes. Kuenta runs on one computer and the other workstations connect through the network.
+The license applies to this one installation with all companies.
 
-**Warum ist der Pro-Code im Repository sichtbar?**
-Damit Sie nachvollziehen können, was er tut. Er steht aber nicht unter der AGPL, sondern unter
-der [Kuenta-Pro-Lizenz](server/pro/LICENSE.md): ausführen nur mit gültigem Schlüssel.
+**Why is the Pro code visible in the repository?**
+So you can see what it does. It is not under the AGPL, however, but under the
+[Kuenta Pro license](server/pro/LICENSE.md) (German): it may only be run with a valid key.

@@ -6,7 +6,7 @@ Kuenta ist eine plattformunabhängige Faktura für Kfz-Werkstätten. Es läuft i
 
 ## Installation und Start
 
-Ausführliche Anleitung für Windows, Linux und macOS: **[INSTALL.md](INSTALL.md)**.
+Ausführliche Anleitung für Windows, Linux und macOS: **[INSTALL.de.md](INSTALL.de.md)**.
 Handbuch: **[Deutsch](docs/handbuch.html)** · **[English](docs/handbook-en.html)** · **[Español](docs/handbook-es.html)**.
 
 | System | Installation | Start |
@@ -22,7 +22,7 @@ Nach der Installation ist der Datenbestand leer. Firmendaten unter *Einstellunge
 
 Die Daten liegen im Benutzerprofil, nicht im Programmordner: Windows `%APPDATA%\Kuenta`, macOS `~/Library/Application Support/Kuenta`, Linux `~/.local/share/kuenta`.
 
-Umgebungsvariablen: `PORT` (Standard 3700), `HOST` (Standard 127.0.0.1), `KUENTA_DATA` (anderes Datenverzeichnis, nur auf einem lokalen Laufwerk – nicht auf einem Netzlaufwerk/NAS, siehe INSTALL.md).
+Umgebungsvariablen: `PORT` (Standard 3700), `HOST` (Standard 127.0.0.1), `KUENTA_DATA` (anderes Datenverzeichnis, nur auf einem lokalen Laufwerk – nicht auf einem Netzlaufwerk/NAS, siehe INSTALL.de.md).
 
 ## Daten aus KFZ-Faktura übernehmen
 
@@ -71,7 +71,7 @@ Technik: Kuenta liest das Firebird-Sicherungsformat (gbak, Version 5–10) selbs
 ```
 npm test                    # automatische Tests
 npm run server              # Server ohne Browser starten
-npm run installer:windows   # Windows-Installer bauen (Inno Setup 6 nötig, siehe INSTALL.md)
+npm run installer:windows   # Windows-Installer bauen (Inno Setup 6 nötig, siehe INSTALL.de.md)
 ```
 
 Der Quellcode wird mit Git verwaltet. Es gehören **keine Kunden- oder Firmendaten** ins Repository: Daten liegen im Benutzerprofil (bzw. in `KUENTA_DATA`); `.gitignore` schließt zusätzlich Datenbanken, Sicherungen (`*.kuenta`, `*.kft`, `*.swb`, `*.kfz`) und den Ordner `build/` aus. Tests arbeiten nur mit erfundenen Testdaten in temporären Ordnern.
@@ -84,7 +84,7 @@ Schrift: Liberation Sans (SIL Open Font License, `server/pdf/fonts/LICENSE`). QR
 
 ## Lizenz
 
-Copyright © 2026 DoctorD (heidepower@proton.me). Kuenta ist Open Source unter der **GNU Affero General Public License 3.0** (`LICENSE`). Ausgenommen ist der Ordner `server/pro/`: Er steht unter der [Kuenta-Pro-Lizenz](server/pro/LICENSE.md) und läuft nur mit einem Lizenzschlüssel. Was zu Kuenta Pro gehört und wie man es kauft (10 € je Add-on, Bitcoin oder Tether), steht in [PRO.md](PRO.md). Beiträge: [CONTRIBUTING.md](CONTRIBUTING.md).
+Copyright © 2026 DoctorD (heidepower@proton.me). Kuenta ist Open Source unter der **GNU Affero General Public License 3.0** (`LICENSE`). Ausgenommen ist der Ordner `server/pro/`: Er steht unter der [Kuenta-Pro-Lizenz](server/pro/LICENSE.md) und läuft nur mit einem Lizenzschlüssel. Was zu Kuenta Pro gehört und wie man es kauft (10 € je Add-on, Bitcoin oder Tether), steht in [PRO.de.md](PRO.de.md). Beiträge: [CONTRIBUTING.de.md](CONTRIBUTING.de.md).
 
 ### Für den Herausgeber: Lizenzen ausstellen
 

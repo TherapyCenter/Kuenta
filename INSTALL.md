@@ -1,104 +1,108 @@
-# Kuenta installieren
+# Installing Kuenta
 
-Kuenta ist eine Webanwendung: Ein kleiner Server läuft auf dem Werkstatt-PC, bedient wird im Browser (auch von Tablets und weiteren Arbeitsplätzen im Netzwerk). Nach der Installation ist der Datenbestand **leer** – eigene Firmendaten tragen Sie unter *Einstellungen* ein, vorhandene Daten holen Sie per Import herein (siehe [Daten übernehmen](#daten-übernehmen)).
+**English** · [Deutsch](INSTALL.de.md)
 
-**Wo liegen die Daten?** Nie im Programmordner, sondern im Benutzerprofil. Updates und Deinstallation lassen sie unangetastet.
+Kuenta is a web application: a small server runs on the workshop PC, and you use it in the browser (also from tablets and other workstations in the network). After installation the database is **empty** – enter your own company details under *Settings* and bring in existing data by import (see [Taking over data](#taking-over-data)).
 
-| System | Datenordner |
+To switch the user interface to English or Spanish, use the menu *Kuenta → Sprache / Language* or the language box on the login page.
+
+**Where is the data?** Never in the program folder, always in the user profile. Updates and uninstalling leave it untouched.
+
+| System | Data folder |
 |---|---|
-| Windows | `%APPDATA%\Kuenta` (z. B. `C:\Users\<Name>\AppData\Roaming\Kuenta`) |
+| Windows | `%APPDATA%\Kuenta` (e.g. `C:\Users\<name>\AppData\Roaming\Kuenta`) |
 | macOS | `~/Library/Application Support/Kuenta` |
-| Linux | `~/.local/share/kuenta` (bzw. `$XDG_DATA_HOME/kuenta`) |
+| Linux | `~/.local/share/kuenta` (or `$XDG_DATA_HOME/kuenta`) |
 
-Mit der Umgebungsvariablen `KUENTA_DATA` lässt sich ein anderer Ordner festlegen, z. B. eine zweite Festplatte im selben Rechner.
+The environment variable `KUENTA_DATA` sets a different folder, e.g. a second hard disk in the same computer.
 
-> **Datenordner nie auf ein Netzlaufwerk oder NAS legen.** Kuenta arbeitet ständig in seiner Datenbank. Über eine Netzwerkfreigabe (SMB/NFS) kann sie dabei beschädigt werden, z. B. bei einer kurzen Netzwerkstörung. Kuenta zeigt beim Start eine Warnung, wenn der Datenordner auf einem Netzlaufwerk liegt. Für mehrere Arbeitsplätze ist der Netzwerkbetrieb gedacht (ein Rechner hält die Daten, die anderen arbeiten im Browser). **Sicherungen** dürfen und sollten dagegen auf ein NAS oder einen anderen Datenträger: *Kuenta → Daten sichern* → Sicherungsordner.
+> **Never put the data folder on a network drive or NAS.** Kuenta works in its database all the time. Over a network share (SMB/NFS) the database can get damaged, e.g. during a short network outage. Kuenta shows a warning at start if the data folder is on a network drive. Network mode is meant for several workstations (one computer holds the data, the others work in the browser). **Backups**, on the other hand, may and should go to a NAS or another drive: *Kuenta → Back up data* → backup folder.
 
 ---
 
 ## Windows
 
-1. `Kuenta-Setup-<Version>.exe` ausführen.
-   - *Für alle Benutzer installieren* (Standard, braucht Administratorrechte) → `C:\Programme\Kuenta`
-   - *Nur für mich installieren* → ohne Administratorrechte, im Benutzerprofil
-2. Optional im Assistenten: Desktop-Verknüpfung, Firewall-Freigabe für den Netzwerkbetrieb.
-3. Start über das Startmenü: **Kuenta**. Es öffnet sich ein Konsolenfenster (bitte geöffnet lassen – Schließen beendet Kuenta) und der Browser mit `http://127.0.0.1:3700`.
+1. Run `Kuenta-Setup-<version>.exe`.
+   - *Install for all users* (default, needs administrator rights) → `C:\Program Files\Kuenta`
+   - *Install only for me* → no administrator rights, in the user profile
+2. Optional in the wizard: desktop shortcut, firewall rule for network mode.
+3. Start from the start menu: **Kuenta**. A console window opens (keep it open – closing it stops Kuenta), and the browser opens `http://127.0.0.1:3700`.
 
-Node.js ist im Installer enthalten; es muss nichts weiter installiert werden. Unterstützt wird Windows 10/11 (64 Bit).
+Node.js is included in the installer; nothing else needs to be installed. Windows 10/11 (64 bit) is supported.
 
-**Netzwerkbetrieb:** Startmenü → *Kuenta im Netzwerk*. Das Konsolenfenster zeigt die Adresse für die anderen Geräte (`http://<IP>:3700`). Windows fragt beim ersten Start ggf. nach einer Firewall-Freigabe – für „Private Netzwerke“ zulassen. Danach unter *Einstellungen → Vorgabewerte* die Anmeldung aktivieren und Benutzer anlegen.
+**Network mode:** start menu → *Kuenta im Netzwerk*. The console window shows the address for the other devices (`http://<IP>:3700`). On the first start Windows may ask for a firewall permission – allow it for "Private networks". Then enable login under *Settings → Defaults* and create users.
 
-**Update:** Einfach den neuen Installer ausführen. Ein laufendes Kuenta wird vorher automatisch beendet (Datenbank wird sauber geschlossen) und nach dem Update wieder gestartet – im selben Modus wie vorher (lokal bzw. im Netzwerk). Die Daten bleiben unverändert.
+**Update:** simply run the new installer. A running Kuenta is stopped automatically first (the database is closed cleanly) and started again after the update – in the same mode as before (local or network). The data stays unchanged.
 
-**Ausrollen ohne Rückfragen** (z. B. per Skript oder Softwareverteilung):
+**Rolling out without questions** (e.g. by script or software distribution):
 
 ```
-Kuenta-Setup-<Version>.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
+Kuenta-Setup-<version>.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
 ```
 
-- `/CURRENTUSER` bzw. `/ALLUSERS` legt fest, ob nur für den Benutzer oder für alle installiert wird (Standard: wie bei der ersten Installation).
-- `/NOSTART` – Kuenta nach dem Update nicht wieder starten.
-- `/LOG="C:\Temp\kuenta-setup.log"` – Protokoll schreiben.
-- Läuft die Installation unter dem Systemkonto (Softwareverteilung), wird Kuenta zwar beendet, aber nicht wieder gestartet (es liefe sonst im falschen Benutzerprofil). Die Benutzer starten es dann wie gewohnt über das Startmenü.
+- `/CURRENTUSER` or `/ALLUSERS` sets whether to install for the user only or for everyone (default: as in the first installation).
+- `/NOSTART` – do not start Kuenta again after the update.
+- `/LOG="C:\Temp\kuenta-setup.log"` – write a log.
+- If the installation runs under the system account (software distribution), Kuenta is stopped but not started again (it would otherwise run in the wrong user profile). Users then start it from the start menu as usual.
 
-**Deinstallation:** *Einstellungen → Apps* → Kuenta. Ein laufendes Kuenta wird vorher beendet. Der Datenordner bleibt erhalten und kann bei Bedarf von Hand gelöscht werden.
+**Uninstall:** *Settings → Apps* → Kuenta. A running Kuenta is stopped first. The data folder is kept and can be deleted by hand if needed.
 
-### Installer selbst bauen
+### Building the installer yourself
 
-Voraussetzungen: Windows, [Inno Setup 6](https://jrsoftware.org/isdl.php), Internetzugang (Node.js wird von nodejs.org geladen und per SHA-256 geprüft).
+Requirements: Windows, [Inno Setup 6](https://jrsoftware.org/isdl.php), internet access (Node.js is downloaded from nodejs.org and verified with SHA-256).
 
 ```powershell
 npm run installer:windows
-# oder: powershell -ExecutionPolicy Bypass -File installer\windows\build.ps1 [-NodeVersion 24.21.0]
+# or: powershell -ExecutionPolicy Bypass -File installer\windows\build.ps1 [-NodeVersion 24.21.0]
 ```
 
-Ergebnis: `build\Kuenta-Setup-<Version>.exe` (Version aus `package.json`).
+Result: `build\Kuenta-Setup-<version>.exe` (version from `package.json`).
 
 ---
 
 ## Linux
 
-### 1. Node.js installieren (ab Version 22.13)
+### 1. Install Node.js (version 22.13 or later)
 
-Prüfen: `node -v` – zeigt es `v22.13` oder neuer, weiter mit Schritt 2.
+Check: `node -v` – if it shows `v22.13` or newer, continue with step 2.
 
-| Distribution | Befehl |
+| Distribution | Command |
 |---|---|
-| Debian / Ubuntu / Mint | Paketquellen sind meist zu alt. Über NodeSource: `curl -fsSL https://deb.nodesource.com/setup_24.x \| sudo -E bash -` und danach `sudo apt install -y nodejs` |
-| Fedora (ab 41) | `sudo dnf install nodejs` (sonst NodeSource: `https://rpm.nodesource.com/setup_24.x`) |
+| Debian / Ubuntu / Mint | The package sources are usually too old. Via NodeSource: `curl -fsSL https://deb.nodesource.com/setup_24.x \| sudo -E bash -` and then `sudo apt install -y nodejs` |
+| Fedora (41 or later) | `sudo dnf install nodejs` (otherwise NodeSource: `https://rpm.nodesource.com/setup_24.x`) |
 | openSUSE | `sudo zypper install nodejs24` |
 | Arch / Manjaro | `sudo pacman -S nodejs` |
-| alle (ohne root) | [nvm](https://github.com/nvm-sh/nvm): `nvm install 24` |
+| all (without root) | [nvm](https://github.com/nvm-sh/nvm): `nvm install 24` |
 
-### 2. Kuenta herunterladen und installieren
+### 2. Download and install Kuenta
 
 ```sh
-git clone <Repository-URL> kuenta     # oder Archiv herunterladen und entpacken
+git clone <repository URL> kuenta     # or download and unpack the archive
 cd kuenta
 ./installer/unix/install.sh
 ```
 
-Das Skript installiert ohne root für den aktuellen Benutzer:
+The script installs for the current user without root:
 
-- Programm nach `~/.local/lib/kuenta` (anderer Ort: `PREFIX=/opt/kuenta ./installer/unix/install.sh`)
-- Startbefehl `~/.local/bin/kuenta`
-- Eintrag im Anwendungsmenü („Kuenta“)
+- program to `~/.local/lib/kuenta` (different location: `PREFIX=/opt/kuenta ./installer/unix/install.sh`)
+- start command `~/.local/bin/kuenta`
+- entry in the application menu ("Kuenta")
 
-### 3. Starten
+### 3. Start
 
-Über das Anwendungsmenü oder im Terminal:
+From the application menu or in the terminal:
 
 ```sh
-kuenta              # nur dieser Rechner
-kuenta --netzwerk   # für Tablets / weitere Arbeitsplätze freigeben
+kuenta              # this computer only
+kuenta --netzwerk   # share with tablets / other workstations
 ```
 
-Beenden mit `Strg+C` bzw. durch Schließen des Terminalfensters. Ohne Installation geht es auch direkt aus dem entpackten Ordner: `./kuenta.sh`.
+Stop with `Ctrl+C` or by closing the terminal window. Without installation it also runs directly from the unpacked folder: `./kuenta.sh`.
 
-**Update:** neue Version herunterladen (`git pull`) und `./installer/unix/install.sh` erneut ausführen.
-**Deinstallation:** `./installer/unix/install.sh --uninstall` (Daten bleiben erhalten).
+**Update:** download the new version (`git pull`) and run `./installer/unix/install.sh` again.
+**Uninstall:** `./installer/unix/install.sh --uninstall` (data is kept).
 
-### Optional: als Dienst im Hintergrund (Server ohne Bildschirm)
+### Optional: as a background service (server without a screen)
 
 ```sh
 mkdir -p ~/.config/systemd/user
@@ -116,52 +120,52 @@ WantedBy=default.target
 EOF
 systemctl --user daemon-reload
 systemctl --user enable --now kuenta
-loginctl enable-linger "$USER"   # Dienst auch ohne angemeldeten Benutzer laufen lassen
+loginctl enable-linger "$USER"   # keep the service running without a logged-in user
 ```
 
-Bei aktiver Firewall Port 3700/TCP freigeben (z. B. `sudo ufw allow 3700/tcp`). Im Netzwerkbetrieb unbedingt die Anmeldung aktivieren.
+If a firewall is active, open port 3700/TCP (e.g. `sudo ufw allow 3700/tcp`). In network mode, always enable login.
 
 ---
 
 ## macOS
 
-### 1. Node.js installieren (ab Version 22.13)
+### 1. Install Node.js (version 22.13 or later)
 
-- Installationspaket von [nodejs.org](https://nodejs.org/de) (LTS) herunterladen und installieren, **oder**
-- mit Homebrew: `brew install node@24` (Hinweise von Homebrew zum `PATH` beachten)
+- download and install the package from [nodejs.org](https://nodejs.org/en) (LTS), **or**
+- with Homebrew: `brew install node@24` (follow Homebrew's notes about `PATH`)
 
-Prüfen im Terminal: `node -v`
+Check in the terminal: `node -v`
 
-### 2. Kuenta installieren
+### 2. Install Kuenta
 
-Im Terminal (Programme → Dienstprogramme → Terminal):
+In the terminal (Applications → Utilities → Terminal):
 
 ```sh
-git clone <Repository-URL> kuenta     # oder Archiv herunterladen und im Finder entpacken
+git clone <repository URL> kuenta     # or download the archive and unpack it in the Finder
 cd kuenta
 ./installer/unix/install.sh
 ```
 
-Das Skript legt das Programm unter `~/.local/lib/kuenta` ab, den Startbefehl `kuenta` und die App **Kuenta** im Ordner *Programme* des Benutzers (`~/Applications`).
+The script puts the program into `~/.local/lib/kuenta`, the start command `kuenta`, and the app **Kuenta** into the user's *Applications* folder (`~/Applications`).
 
-### 3. Starten
+### 3. Start
 
-Doppelklick auf *Kuenta* in `~/Applications` (öffnet ein Terminalfenster und den Browser) oder im Terminal `kuenta`. Netzwerkbetrieb: `kuenta --netzwerk`; macOS fragt beim ersten Mal, ob „node“ eingehende Verbindungen annehmen darf – zulassen.
+Double-click *Kuenta* in `~/Applications` (opens a terminal window and the browser) or run `kuenta` in the terminal. Network mode: `kuenta --netzwerk`; the first time macOS asks whether "node" may accept incoming connections – allow it.
 
-Beim ersten Öffnen der App kann macOS eine Sicherheitswarnung zeigen (nicht signierte App). Dann im Finder Rechtsklick → *Öffnen* oder unter *Systemeinstellungen → Datenschutz & Sicherheit* „Trotzdem öffnen“ wählen.
+When opening the app for the first time, macOS may show a security warning (unsigned app). Then right-click it in the Finder → *Open*, or choose "Open anyway" under *System Settings → Privacy & Security*.
 
-**Update:** neue Version herunterladen und `./installer/unix/install.sh` erneut ausführen.
-**Deinstallation:** `./installer/unix/install.sh --uninstall` (Daten bleiben erhalten).
+**Update:** download the new version and run `./installer/unix/install.sh` again.
+**Uninstall:** `./installer/unix/install.sh --uninstall` (data is kept).
 
 ---
 
 ## Container (Docker / Podman)
 
-Für Linux-Server, NAS-Systeme mit Container-Unterstützung, Raspberry Pi oder Macs: Kuenta läuft auch als Container. Das Image enthält Node.js, es muss sonst nichts installiert werden. Es läuft auf x86_64 und ARM64 (z. B. Mac mit Apple-Chip, Raspberry Pi 4/5).
+For Linux servers, NAS systems with container support, Raspberry Pi or Macs: Kuenta also runs as a container. The image contains Node.js; nothing else needs to be installed. It runs on x86_64 and ARM64 (e.g. Mac with Apple silicon, Raspberry Pi 4/5).
 
-### Bauen und starten
+### Build and start
 
-Im Kuenta-Ordner (dort liegt das `Dockerfile`):
+In the Kuenta folder (where the `Dockerfile` is):
 
 ```sh
 # Podman
@@ -173,39 +177,39 @@ docker build -t kuenta:1.1.0 .
 docker run -d --name kuenta --restart unless-stopped -p 3700:3700 -v kuenta-daten:/data kuenta:1.1.0
 ```
 
-Oder mit Compose (Datei `compose.yaml` liegt bei):
+Or with Compose (the file `compose.yaml` is included):
 
 ```sh
-docker compose up -d --build      # bzw. podman compose up -d --build
+docker compose up -d --build      # or podman compose up -d --build
 ```
 
-Danach im Browser `http://<Rechner>:3700` öffnen.
+Then open `http://<computer>:3700` in the browser.
 
-> **Sofort die Anmeldung einschalten.** Im Container ist Kuenta im ganzen Netzwerk erreichbar. Unter *Einstellungen → Vorgabewerte* die Anmeldung aktivieren und Benutzer anlegen. Soll Kuenta nur auf diesem Rechner erreichbar sein: `-p 127.0.0.1:3700:3700`.
+> **Switch on login immediately.** In a container Kuenta can be reached from the whole network. Enable login under *Settings → Defaults* and create users. If Kuenta should only be reachable on this computer: `-p 127.0.0.1:3700:3700`.
 
-### Daten
+### Data
 
-- Alle Daten liegen im Volume `kuenta-daten` (im Container `/data`). Beim Löschen oder Neubauen des Containers bleiben sie erhalten.
-- Ein eigener Ordner statt Volume geht auch: `-v /srv/kuenta:/data`. Der Ordner muss dem Benutzer mit der UID 1000 gehören (`sudo chown 1000:1000 /srv/kuenta`). Bei Podman ohne root stattdessen `-v /srv/kuenta:/data:Z,U`.
-- Auf Fedora, RHEL und anderen Systemen mit SELinux braucht ein eigener Ordner den Zusatz `:Z`.
-- **Sicherungen** gehören auf ein anderes Laufwerk oder NAS: z. B. `-v /mnt/nas/kuenta-sicherungen:/sicherungen` und in Kuenta unter *Daten sichern* den Sicherungsordner `/sicherungen` eintragen. Den Datenordner selbst nicht auf ein Netzlaufwerk legen.
+- All data lives in the volume `kuenta-daten` (`/data` in the container). It is kept when the container is deleted or rebuilt.
+- A folder of your own instead of a volume works too: `-v /srv/kuenta:/data`. The folder must belong to the user with UID 1000 (`sudo chown 1000:1000 /srv/kuenta`). With rootless Podman use `-v /srv/kuenta:/data:Z,U` instead.
+- On Fedora, RHEL and other systems with SELinux, a folder of your own needs the suffix `:Z`.
+- **Backups** belong on another drive or NAS: e.g. `-v /mnt/nas/kuenta-sicherungen:/sicherungen` and enter the backup folder `/sicherungen` in Kuenta under *Back up data*. Do not put the data folder itself on a network drive.
 
-### Einstellungen
+### Settings
 
-| Variable | Standard | Bedeutung |
+| Variable | Default | Meaning |
 |---|---|---|
-| `TZ` | `Europe/Berlin` | Zeitzone für Rechnungsdatum und Uhrzeit, z. B. `-e TZ=Europe/Vienna` |
-| `PORT` | `3700` | Port im Container (Zuordnung nach außen über `-p`) |
+| `TZ` | `Europe/Berlin` | time zone for invoice date and time, e.g. `-e TZ=Europe/Madrid` |
+| `PORT` | `3700` | port inside the container (mapped to the outside with `-p`) |
 
-### Bedienung
+### Operation
 
 ```sh
-podman logs -f kuenta        # Ausgabe ansehen (docker logs -f kuenta)
-podman stop kuenta           # beenden – die Datenbank wird sauber geschlossen
-podman start kuenta          # wieder starten
+podman logs -f kuenta        # show the output (docker logs -f kuenta)
+podman stop kuenta           # stop – the database is closed cleanly
+podman start kuenta          # start again
 ```
 
-**Update:** neue Version holen, Image neu bauen und den Container neu anlegen. Die Daten im Volume bleiben erhalten:
+**Update:** get the new version, rebuild the image and create the container again. The data in the volume is kept:
 
 ```sh
 podman build -t kuenta:1.1.0 .
@@ -213,9 +217,9 @@ podman rm -f kuenta
 podman run -d --name kuenta --restart unless-stopped -p 3700:3700 -v kuenta-daten:/data kuenta:1.1.0
 ```
 
-Mit Compose: `docker compose up -d --build`.
+With Compose: `docker compose up -d --build`.
 
-**Automatisch starten mit Podman (systemd, ab Podman 4.4):** Datei `~/.config/containers/systemd/kuenta.container` anlegen:
+**Automatic start with Podman (systemd, Podman 4.4 or later):** create the file `~/.config/containers/systemd/kuenta.container`:
 
 ```ini
 [Container]
@@ -232,25 +236,25 @@ TimeoutStopSec=30
 WantedBy=default.target
 ```
 
-Dann `systemctl --user daemon-reload` und `systemctl --user start kuenta`. Damit Kuenta auch ohne angemeldeten Benutzer läuft: `loginctl enable-linger "$USER"`. Bei Docker reicht `--restart unless-stopped`.
+Then `systemctl --user daemon-reload` and `systemctl --user start kuenta`. To keep Kuenta running without a logged-in user: `loginctl enable-linger "$USER"`. With Docker, `--restart unless-stopped` is enough.
 
-### Unterschiede zur normalen Installation
+### Differences from the normal installation
 
-- **E-Mail:** Im Container gibt es kein Mailprogramm. Bitte unter *Einstellungen → E-Mail* den direkten Versand (SMTP) wählen. Die Übergabe an Thunderbird geht nur bei einer normalen Installation.
-- **Import aus KFZ-Faktura:** Den direkten Import aus dem Programmordner gibt es nur unter Windows. Im Container die Datensicherung (`*.kfz`) oder `DB1.bak` hochladen.
-- Es öffnet sich kein Browserfenster. Die Adresse rufen Sie selbst auf.
+- **Email:** there is no mail program in the container. Choose direct sending (SMTP) under *Settings → Email*. Handing over to Thunderbird only works with a normal installation.
+- **Import from KFZ-Faktura:** the direct import from the program folder only exists on Windows. In the container, upload the backup (`*.kfz`) or `DB1.bak`.
+- No browser window opens. Open the address yourself.
 
 ---
 
-## Daten übernehmen
+## Taking over data
 
-Nach dem ersten Start ist Kuenta leer. Auf der Übersicht stehen Schaltflächen für die Einrichtung bereit:
+After the first start Kuenta is empty. The overview offers buttons for the setup:
 
-| Quelle | Weg in Kuenta |
+| Source | Where in Kuenta |
 |---|---|
-| eigene Firmendaten von Hand | *Einstellungen* → Firmendaten (Name, Anschrift, Bank, Steuernummer, Logo) |
-| KFZ-Faktura (`*.kfz`, `DB1.bak`, Programmordner) | *Kuenta → Daten aus KFZ-Faktura importieren* |
-| Kuenta-Sicherung (`*.kuenta`) oder ältere KFZ-Faktotum-/Schraubwerk-Sicherung (`*.kft`, `*.swb`) | *Kuenta → Daten wiederherstellen* |
-| Kunden, Fahrzeuge, Artikel … aus anderen Programmen (CSV, DATANORM) | *Kuenta → Datenimport* |
+| your own company details by hand | *Settings* → Company details (name, address, bank, tax number, logo) |
+| KFZ-Faktura (`*.kfz`, `DB1.bak`, program folder) | *Kuenta → Import data from KFZ-Faktura* |
+| Kuenta backup (`*.kuenta`) or older KFZ-Faktotum/Schraubwerk backup (`*.kft`, `*.swb`) | *Kuenta → Restore data* |
+| customers, vehicles, articles … from other programs (CSV, DATANORM) | *Kuenta → Data import* |
 
-Umzug auf einen anderen Rechner: auf dem alten Rechner *Daten sichern* (`*.kuenta`), auf dem neuen *Daten wiederherstellen*.
+Moving to another computer: on the old computer *Back up data* (`*.kuenta`), on the new one *Restore data*.

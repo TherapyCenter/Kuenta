@@ -45,7 +45,7 @@ New-Item -ItemType Directory -Force $stage | Out-Null
 foreach ($d in 'server', 'public') { Copy-Item -Recurse (Join-Path $root $d) (Join-Path $stage $d) }
 # SMS relay for the computer with the USB modem (started separately there)
 Copy-Item -Recurse (Join-Path (Join-Path $root 'installer') 'sms-relais') (Join-Path $stage 'sms-relais')
-foreach ($f in 'package.json', 'README.md', 'README.de.md', 'INSTALL.md', 'LICENSE', 'PRO.md', 'Kuenta starten.bat', 'Kuenta im Netzwerk starten.bat') {
+foreach ($f in 'package.json', 'README.md', 'README.de.md', 'INSTALL.md', 'INSTALL.de.md', 'LICENSE', 'PRO.md', 'PRO.de.md', 'Kuenta starten.bat', 'Kuenta im Netzwerk starten.bat') {
   $p = Join-Path $root $f
   if (Test-Path $p) { Copy-Item $p $stage }
 }

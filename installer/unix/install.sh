@@ -37,7 +37,7 @@ echo "Installiere Kuenta nach $PREFIX ..."
 rm -rf "$PREFIX/server" "$PREFIX/public"
 mkdir -p "$PREFIX" "$BIN"
 cp -R "$SRC/server" "$SRC/public" "$PREFIX/"
-for f in package.json README.md INSTALL.md LICENSE kuenta.sh; do
+for f in package.json README.md README.de.md INSTALL.md INSTALL.de.md LICENSE kuenta.sh; do
   if [ -f "$SRC/$f" ]; then cp "$SRC/$f" "$PREFIX/"; fi
 done
 chmod +x "$PREFIX/kuenta.sh"
