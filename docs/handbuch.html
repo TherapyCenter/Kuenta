@@ -389,11 +389,11 @@ docker compose up -d --build</code></pre></div>
         <thead><tr><th>Schalter</th><th>Wirkung</th></tr></thead>
         <tbody>
           <tr><td>👁 Auge</td><td>blendet alle Beträge auf der Übersicht mit Sternchen aus, z. B. wenn Kunden auf den Bildschirm sehen. Noch einmal klicken zeigt sie wieder.</td></tr>
-          <tr><td>€ · $ · £ · ₿</td><td>zeigt die Beträge in Euro, US-Dollar, britischen Pfund oder Bitcoin zum aktuellen Kurs. Ein weiterer Klick auf ₿ wechselt zu Satoshis (1 Bitcoin = 100.000.000 sats) und zurück. Der Knopf merkt sich die zuletzt gewählte Einheit. Kurs und Quelle stehen unter den Kacheln.</td></tr>
+          <tr><td>€ · $ · £ · CHF · ₿</td><td>zeigt die Beträge in Euro, US-Dollar, britischen Pfund, Schweizer Franken oder Bitcoin zum aktuellen Kurs. Ein weiterer Klick auf ₿ wechselt zu Satoshis (1 Bitcoin = 100.000.000 sats) und zurück. Der Knopf merkt sich die zuletzt gewählte Einheit. Kurs und Quelle stehen unter den Kacheln.</td></tr>
         </tbody>
       </table></div>
-      <div class="note"><strong>Nur Anzeige</strong><span>Rechnungen, Zahlungen, Buchungen, DATEV und alle Ausdrucke bleiben immer in Euro. Der Umschalter ändert nur, wie die Zahlen auf der Übersicht angezeigt werden.</span></div>
-      <p>Die Kurse kommen von der Europäischen Zentralbank (US-Dollar und Pfund, Referenzkurs des letzten Bankarbeitstags) und von der Börse Bitstamp (Bitcoin, aktueller Kurs).</p>
+      <div class="note"><strong>Nur Anzeige</strong><span>Rechnungen, Zahlungen, Buchungen, DATEV und alle Ausdrucke bleiben immer in der Währung des Mandanten (Euro, in Großbritannien Pfund, in den USA Dollar, in der Schweiz Franken). Der Umschalter ändert nur, wie die Zahlen auf der Übersicht angezeigt werden.</span></div>
+      <p>Die Kurse kommen von der Europäischen Zentralbank (US-Dollar, Pfund und Franken, Referenzkurs des letzten Bankarbeitstags) und von der Börse Bitstamp (Bitcoin, aktueller Kurs).</p>
       <div class="note"><strong>Internet</strong><span>Für die Kurse fragt der Kuenta-Rechner die EZB und Bitstamp ab, höchstens alle drei Stunden. Dabei werden keine Daten aus Kuenta übertragen. Die Kurse speichert Kuenta zwischen. Ohne Internet gilt der zuletzt geladene Stand. Wurden noch nie Kurse geladen, bleibt die Anzeige in Euro.</span></div>
 
       <h3>Farben</h3>
@@ -405,12 +405,12 @@ docker compose up -d --build</code></pre></div>
       <p>Beides gilt nur für den jeweiligen Arbeitsplatz bzw. Browser. So lassen sich z. B. die Kasse, das Tablet in der Werkstatt oder ein Demo-Mandant auf einen Blick unterscheiden.</p>
 
       <h3>Sprache</h3>
-      <p>Kuenta gibt es auf Deutsch, Englisch und Spanisch. Es gibt zwei Einstellungen:</p>
+      <p>Die Oberfläche gibt es auf Deutsch, Englisch und Spanisch, die Belege zusätzlich auf Italienisch, Niederländisch und Französisch. Es gibt zwei Einstellungen:</p>
       <ul>
         <li><strong>Sprache der Oberfläche:</strong> im Menü <span class="path">Kuenta → Sprache / Language</span>, auf der Anmeldeseite oder unter <span class="path">Einstellungen → Vorgabewerte</span>. Sie gilt nur für den jeweiligen Arbeitsplatz. Zahlen erscheinen auf Englisch als 1,234.50.</li>
-        <li><strong>Sprache der Belege:</strong> unter <span class="path">Einstellungen → Vorgabewerte</span>. Sie gilt für den ganzen Mandanten und betrifft PDF-Belege, den Druck, Mahnungen und die Vorlagen für E-Mails und Erinnerungen.</li>
+        <li><strong>Sprache der Belege:</strong> unter <span class="path">Einstellungen → Vorgabewerte</span>. Sie gilt für den ganzen Mandanten und betrifft PDF-Belege, den Druck, Mahnungen und die Vorlagen für E-Mails und Erinnerungen. Zur Wahl stehen Deutsch, Englisch, Spanisch, Italienisch, Niederländisch und Französisch.</li>
       </ul>
-      <p>Was Sie selbst eingeben, bleibt, wie es ist: Artikeltexte, Kundennamen und eigene Textvorlagen werden nicht übersetzt. Gesetzliche Hinweise wie § 19 UStG erscheinen übersetzt, es gilt aber weiter das deutsche Recht. Die E-Rechnung (XRechnung) bleibt deutsch.</p>
+      <p>Was Sie selbst eingeben, bleibt, wie es ist: Artikeltexte, Kundennamen und eigene Textvorlagen werden nicht übersetzt. Gesetzliche Hinweise wie § 19 UStG erscheinen übersetzt, es gilt aber weiter das Recht des gewählten Steuersystems; die Rechtstexte der anderen Länder (Frankreich, Italien, Niederlande, Belgien) druckt Kuenta in der Landessprache. Die E-Rechnung (XRechnung) bleibt deutsch.</p>
     </section>
 
     <section id="module">
@@ -450,9 +450,14 @@ docker compose up -d --build</code></pre></div>
           <tr><td>XRechnung 3.0 (CII)</td><td>reine XML-Datei, z. B. für Behörden</td></tr>
           <tr><td>XRechnung 3.0 (UBL)</td><td>reine XML-Datei in UBL-Syntax</td></tr>
           <tr><td>ZUGFeRD 2.3 / Factur-X</td><td>PDF/A-3 mit eingebetteter XRechnung, lesbar für Mensch und Software</td></tr>
+          <tr><td>Factur-X EN 16931</td><td>Frankreich: PDF mit eingebetteter CII, auch für Chorus Pro</td></tr>
+          <tr><td>FatturaPA 1.2.2</td><td>Italien: XML für das SdI (Privat, Unternehmen, Behörden)</td></tr>
+          <tr><td>ebInterface 6.1</td><td>Österreich: XML für e-rechnung.gv.at</td></tr>
+          <tr><td>Peppol BIS Billing 3.0</td><td>Niederlande und Belgien: UBL über das Peppol-Netz</td></tr>
+          <tr><td>QR-Rechnung</td><td>Schweiz: Zahlteil mit Swiss QR Code auf der Rechnung</td></tr>
         </tbody>
       </table></div>
-      <p>Welches Format ein Kunde bekommt, steht in seinen E-Rechnungs-Einstellungen. Es wird beim E-Mail-Versand automatisch vorgeschlagen. Unterstützte Steuerfälle: Reverse Charge, innergemeinschaftliche Lieferung, Ausfuhr, Kleinunternehmer, Differenzbesteuerung. Geprüft mit dem Mustang-Validator.</p>
+      <p>Welches Format ein Kunde bekommt, steht in seinen E-Rechnungs-Einstellungen. Es wird beim E-Mail-Versand automatisch vorgeschlagen. Unterstützte Steuerfälle: Reverse Charge, innergemeinschaftliche Lieferung, Ausfuhr, Kleinunternehmer, Differenzbesteuerung. Geprüft mit dem Mustang-Validator, gegen die EN-16931-Regeln und die XRechnung-Regeln der KoSIT (3.0.2); FatturaPA, ebInterface, Peppol und die belgische MwSt-Erklärung gegen die offiziellen Schemas und Regeln.</p>
       <p>Eingehende E-Rechnungen lesen Sie unter <span class="path">Einkauf → Eingangsrechnung</span> ein. Zum Anschauen einer XRechnung dient <span class="path">Einkauf → E-Rechnung visualisieren</span>.</p>
     </section>
 
@@ -513,6 +518,19 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Buchhaltung:</strong> <span class="path">Finanzen → FIBU-Export</span> erzeugt eine CSV für den Rechnungsimport in QuickBooks Online (Steuercode TAX/NON).</li>
       </ul>
       <p>Kuenta ermittelt den Satz nicht automatisch und reicht keine Steuererklärung ein; das erledigt Ihr Steuerberater oder QuickBooks.</p>
+    </section>
+
+    <section id="frankreich">
+      <h2>Frankreich: TVA, Factur-X und Kasse (NF525)</h2>
+      <p>Unter <span class="path">Einstellungen → Steuer / Mahnung / Kasse → Steuersystem</span> „France“ wählen, speichern und neu laden. Die Einstellungen stehen im Reiter <span class="path">France</span>. Für französische Belege die Belegsprache „Français“ wählen.</p>
+      <ul>
+        <li><strong>Firmendaten:</strong> SIRET (14 Ziffern) unter Steuernummer, TVA-Nummer (FR…) unter USt-IdNr. Rechtsform, Kapital, RCS und Code APE im Reiter France; sie stehen in der Fußzeile.</li>
+        <li><strong>Steuersätze:</strong> 20 % (volle MwSt), 10 % (ermäßigte MwSt), 5,5 % (Code „AT-MwSt“), 0 % exonéré. Die Franchise en base (art. 293 B CGI) ist wählbar.</li>
+        <li><strong>Pflichtangaben:</strong> Art der Leistungen, Escompte, Strafzinsen und die Pauschale von 40 € für Geschäftskunden druckt Kuenta automatisch; die SIREN/SIRET von Geschäftskunden steht im Kunden. Gedruckte Rechnungen sind gesperrt, Korrekturen gehen als Avoir.</li>
+        <li><strong>Factur-X:</strong> im Rechnungsfenster <em>Factur-X / Chorus Pro → Factur-X-PDF herunterladen</em> (Profil EN 16931). Rechnungen an Behörden sendet Kuenta direkt an Chorus Pro (Zugangsdaten PISTE im Reiter France).</li>
+        <li><strong>Kasse:</strong> jeder Bon wird signiert und mit dem vorherigen verkettet, mit Grand Total, Tages-, Monats- und Jahresabschluss, nummerierten Duplikaten und Ereignisprotokoll. Das Journal liegt zusätzlich außerhalb der Sicherung und bleibt auch beim Zurückspielen einer älteren Sicherung vollständig. Die Zertifizierung NF525 erfolgt durch eine akkreditierte Stelle.</li>
+        <li><strong>Buchhaltung:</strong> <span class="path">Finanzen → FIBU-Export</span> erzeugt den FEC, das signierte Kassenarchiv und zeigt die Übermittlungen an Chorus Pro.</li>
+      </ul>
     </section>
 
     <section id="oesterreich">
@@ -740,7 +758,7 @@ docker compose up -d --build</code></pre></div>
         <thead><tr><th>Add-on</th><th>seit</th><th>Preis</th></tr></thead>
         <tbody><tr><td>SMS-Erinnerungen und SMS-Gateway</td><td>1.0.8</td><td>10 €</td></tr></tbody>
       </table></div>
-      <p>Lizenzgeber ist der Open-Source-Entwickler DoctorD. Bestellung per E-Mail an <a href="mailto:heidepower@proton.me">heidepower@proton.me</a> mit Name der Werkstatt, Rechnungsanschrift und den gewünschten Add-ons. Nach Zahlungseingang kommt der Lizenzschlüssel per E-Mail. Wer später ein weiteres Add-on kauft, bekommt einen neuen Schlüssel mit allen seinen Add-ons, der den alten ersetzt.</p>
+      <p>Lizenzgeber ist der Open-Source-Entwickler Doc. Bestellung per E-Mail an <a href="mailto:heidepower@proton.me">heidepower@proton.me</a> mit Name der Werkstatt, Rechnungsanschrift und den gewünschten Add-ons. Nach Zahlungseingang kommt der Lizenzschlüssel per E-Mail. Wer später ein weiteres Add-on kauft, bekommt einen neuen Schlüssel mit allen seinen Add-ons, der den alten ersetzt.</p>
       <p>Add-ons ohne Lizenz erkennen Sie am Schloss 🔒. Ein Klick darauf erklärt, wie Sie die Lizenz bekommen.</p>
       <h3>Lizenz einspielen</h3>
       <ol class="steps">
@@ -846,7 +864,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>Im Netzwerkbetrieb und im Container sofort die Anmeldung einschalten und Benutzer anlegen.</li>
             <li>Für mehrere Arbeitsplätze den Netzwerkbetrieb nutzen. Eine externe Datenbank gibt es nicht.</li>
-            <li>Für Dollar-, Pfund- und Bitcoin-Kurse auf der Übersicht braucht der Kuenta-Rechner Internet (EZB, Bitstamp). Die Kurse sind nur Anzeige, Rechnungen bleiben in Euro.</li>
+            <li>Für Dollar-, Pfund-, Franken- und Bitcoin-Kurse auf der Übersicht braucht der Kuenta-Rechner Internet (EZB, Bitstamp). Die Kurse sind nur Anzeige, Rechnungen bleiben in der Währung des Mandanten.</li>
             <li>Im Container gibt es kein Mailprogramm. Dort per SMTP versenden.</li>
             <li>Das Container-Image wurde bisher nicht in einer echten Docker- oder Podman-Umgebung gebaut. Beim ersten Einsatz bitte prüfen.</li>
           </ul></div>
@@ -881,7 +899,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>TSE vor dem Echtbetrieb mit fiskaly-Testzugang prüfen und die Kasse beim Finanzamt melden.</li>
             <li>EC-Terminal und DSFinV-K vor dem Einsatz bzw. vor einer Prüfung kontrollieren.</li>
-            <li>Kuenta ist auf Deutschland, Spanien, Großbritannien, die USA, Frankreich, Österreich, die Schweiz, Italien, die Niederlande und Belgien ausgelegt (siehe <a href="#spanien">Spanien</a>, <a href="#uk">Großbritannien</a>, <a href="#usa">USA</a>, <a href="#oesterreich">Österreich</a>, <a href="#schweiz">Schweiz</a>, <a href="#italien">Italien</a>, <a href="#niederlande">Niederlande</a> und <a href="#belgien">Belgien</a>). Andere Länder werden nicht unterstützt.</li>
+            <li>Kuenta ist auf Deutschland, Spanien, Großbritannien, die USA, Frankreich, Österreich, die Schweiz, Italien, die Niederlande und Belgien ausgelegt (siehe <a href="#spanien">Spanien</a>, <a href="#uk">Großbritannien</a>, <a href="#usa">USA</a>, <a href="#frankreich">Frankreich</a>, <a href="#oesterreich">Österreich</a>, <a href="#schweiz">Schweiz</a>, <a href="#italien">Italien</a>, <a href="#niederlande">Niederlande</a> und <a href="#belgien">Belgien</a>). Andere Länder werden nicht unterstützt.</li>
             <li>Kaufverträge sind Muster und ersetzen keine Rechtsberatung.</li>
           </ul></div>
       </div>
@@ -956,7 +974,7 @@ npm run installer:windows   # Windows-Installer bauen</code></pre></div>
     </section>
   </main>
 
-  <footer>Kuenta 1.7.0 · © 2026 DoctorD · Open Source unter der GNU AGPL 3.0, Pro-Funktionen mit Lizenz · Schrift in den Belegen: Liberation Sans (SIL Open Font License) · QR-Code: qrcode-generator (MIT)</footer>
+  <footer>Kuenta 1.7.0 · © 2026 Doc · Open Source unter der GNU AGPL 3.0, Pro-Funktionen mit Lizenz · Schrift in den Belegen: Liberation Sans (SIL Open Font License) · QR-Code: qrcode-generator (MIT)</footer>
 </div>
 
 <script>

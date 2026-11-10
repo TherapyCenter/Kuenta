@@ -393,11 +393,11 @@ docker compose up -d --build</code></pre></div>
         <thead><tr><th>Switch</th><th>Effect</th></tr></thead>
         <tbody>
           <tr><td>👁 Eye</td><td>hides all amounts on the overview with asterisks, e.g. when customers can see the screen. Click again to show them.</td></tr>
-          <tr><td>€ · $ · £ · ₿</td><td>shows the amounts in euros, US dollars, pounds sterling or bitcoin at the current rate. Another click on ₿ switches to satoshis (1 bitcoin = 100,000,000 sats) and back. The button remembers the unit used last. Rate and source are shown below the tiles.</td></tr>
+          <tr><td>€ · $ · £ · CHF · ₿</td><td>shows the amounts in euros, US dollars, pounds sterling, Swiss francs or bitcoin at the current rate. Another click on ₿ switches to satoshis (1 bitcoin = 100,000,000 sats) and back. The button remembers the unit used last. Rate and source are shown below the tiles.</td></tr>
         </tbody>
       </table></div>
-      <div class="note"><strong>Display only</strong><span>Invoices, payments, bookings, DATEV and all printouts always stay in euros. The switch only changes how the figures are shown on the overview.</span></div>
-      <p>The rates come from the European Central Bank (US dollar and pound sterling, reference rate of the last banking day) and from the Bitstamp exchange (bitcoin, current rate).</p>
+      <div class="note"><strong>Display only</strong><span>Invoices, payments, bookings, DATEV and all printouts always stay in the company's currency (euros, pounds in the UK, dollars in the US, francs in Switzerland). The switch only changes how the figures are shown on the overview.</span></div>
+      <p>The rates come from the European Central Bank (US dollar, pound sterling and Swiss franc, reference rate of the last banking day) and from the Bitstamp exchange (bitcoin, current rate).</p>
       <div class="note"><strong>Internet</strong><span>For the rates the Kuenta computer asks the ECB and Bitstamp, at most every three hours. No data from Kuenta is sent. Kuenta caches the rates. Without internet the last loaded rates apply. If no rates were ever loaded, the display stays in euros.</span></div>
 
       <h3>Colours</h3>
@@ -409,12 +409,12 @@ docker compose up -d --build</code></pre></div>
       <p>Both apply only to the current workstation or browser. This way the register, the tablet in the workshop or a demo company can be told apart at a glance.</p>
 
       <h3>Language</h3>
-      <p>Kuenta is available in German, English and Spanish. There are two settings:</p>
+      <p>The user interface is available in German, English and Spanish, documents also in Italian, Dutch and French. There are two settings:</p>
       <ul>
         <li><strong>Language of the user interface:</strong> in the menu <span class="path">Kuenta → Sprache / Language</span>, on the login page or under <span class="path">Settings → Defaults</span>. It applies only to the current workstation. In English, numbers appear as 1,234.50 and dates as 31/12/2026.</li>
-        <li><strong>Language of documents:</strong> under <span class="path">Settings → Defaults</span>. It applies to the whole company and affects PDF documents, printing, dunning letters and the templates for emails and reminders.</li>
+        <li><strong>Language of documents:</strong> under <span class="path">Settings → Defaults</span>. It applies to the whole company and affects PDF documents, printing, dunning letters and the templates for emails and reminders. You can choose German, English, Spanish, Italian, Dutch and French.</li>
       </ul>
-      <p>What you enter yourself stays as it is: article texts, customer names and your own text templates are not translated. Legal notes such as § 19 UStG appear translated, but German law still applies. The e-invoice (XRechnung) stays in German.</p>
+      <p>What you enter yourself stays as it is: article texts, customer names and your own text templates are not translated. Legal notes such as § 19 UStG appear translated, but the law of the chosen tax system still applies; the legal texts of the other countries (France, Italy, Netherlands, Belgium) are printed in the national language. The e-invoice (XRechnung) stays in German.</p>
     </section>
 
     <section id="module">
@@ -454,9 +454,14 @@ docker compose up -d --build</code></pre></div>
           <tr><td>XRechnung 3.0 (CII)</td><td>pure XML file, e.g. for public authorities</td></tr>
           <tr><td>XRechnung 3.0 (UBL)</td><td>pure XML file in UBL syntax</td></tr>
           <tr><td>ZUGFeRD 2.3 / Factur-X</td><td>PDF/A-3 with embedded XRechnung, readable by people and software</td></tr>
+          <tr><td>Factur-X EN 16931</td><td>France: PDF with embedded CII, also for Chorus Pro</td></tr>
+          <tr><td>FatturaPA 1.2.2</td><td>Italy: XML for the SdI (consumers, businesses, public bodies)</td></tr>
+          <tr><td>ebInterface 6.1</td><td>Austria: XML for e-rechnung.gv.at</td></tr>
+          <tr><td>Peppol BIS Billing 3.0</td><td>Netherlands and Belgium: UBL through the Peppol network</td></tr>
+          <tr><td>QR-bill</td><td>Switzerland: payment part with Swiss QR Code on the invoice</td></tr>
         </tbody>
       </table></div>
-      <p>Which format a customer gets is set in their e-invoice settings. It is suggested automatically when sending by email. Supported tax cases: reverse charge, intra-community supply, export, small business, margin scheme. Checked with the Mustang validator.</p>
+      <p>Which format a customer gets is set in their e-invoice settings. It is suggested automatically when sending by email. Supported tax cases: reverse charge, intra-community supply, export, small business, margin scheme. Checked with the Mustang validator, against the EN 16931 rules and the KoSIT XRechnung rules (3.0.2); FatturaPA, ebInterface, Peppol and the Belgian VAT return against the official schemas and rules.</p>
       <p>Read incoming e-invoices under <span class="path">Purchasing → Incoming invoice</span>. To view an XRechnung use <span class="path">Purchasing → Visualise e-invoice</span>.</p>
     </section>
 
@@ -517,6 +522,19 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Accounting:</strong> <span class="path">Finance → FIBU export</span> creates a CSV for the invoice import into QuickBooks Online (tax code TAX/NON).</li>
       </ul>
       <p>Kuenta does not look up rates automatically and does not file returns; your accountant or QuickBooks does that.</p>
+    </section>
+
+    <section id="frankreich">
+      <h2>France: VAT, Factur-X and cash register (NF525)</h2>
+      <p>Choose “France” under <span class="path">Settings → Tax / dunning / register → Tax system</span>, save and reload. The settings are on the tab <span class="path">France</span>. For French documents choose the document language “Français”.</p>
+      <ul>
+        <li><strong>Company data:</strong> SIRET (14 digits) into Tax number, VAT number (FR…) into VAT ID. Legal form, capital, RCS and APE code on the tab France; they appear in the footer.</li>
+        <li><strong>Rates:</strong> 20 % (full VAT), 10 % (reduced VAT), 5.5 % (code “AT-MwSt”), 0 % exempt. The franchise en base (art. 293 B CGI) can be switched on.</li>
+        <li><strong>Mandatory notes:</strong> nature of the operations, discount, late payment penalties and the € 40 recovery fee for business customers are printed automatically; the SIREN/SIRET of business customers goes into the customer. Printed invoices are locked; corrections are credit notes (avoir).</li>
+        <li><strong>Factur-X:</strong> in the invoice window <em>Factur-X / Chorus Pro → download Factur-X PDF</em> (profile EN 16931). Invoices to public bodies go directly to Chorus Pro (PISTE credentials on the tab France).</li>
+        <li><strong>Cash register:</strong> every receipt is signed and chained to the previous one, with grand totals, daily, monthly and yearly closures, numbered duplicates and an event log. The journal is also kept outside the backup and stays complete when an older backup is restored. The NF525 certification is done by an accredited body.</li>
+        <li><strong>Accounting:</strong> <span class="path">Finance → FIBU export</span> creates the FEC and the signed cash register archive and lists the Chorus Pro deposits.</li>
+      </ul>
     </section>
 
     <section id="oesterreich">
@@ -745,7 +763,7 @@ docker compose up -d --build</code></pre></div>
         <thead><tr><th>Add-on</th><th>since</th><th>Price</th></tr></thead>
         <tbody><tr><td>SMS reminders and SMS gateway</td><td>1.0.8</td><td>10 €</td></tr></tbody>
       </table></div>
-      <p>The licensor is the open source developer DoctorD. Order by email to <a href="mailto:heidepower@proton.me">heidepower@proton.me</a> with the workshop name, billing address and the add-ons you want. After payment the license key arrives by email. If you buy another add-on later, you get a new key with all your add-ons that replaces the old one.</p>
+      <p>The licensor is the open source developer Doc. Order by email to <a href="mailto:heidepower@proton.me">heidepower@proton.me</a> with the workshop name, billing address and the add-ons you want. After payment the license key arrives by email. If you buy another add-on later, you get a new key with all your add-ons that replaces the old one.</p>
       <p>Add-ons without a license show a lock 🔒. Clicking it explains how to get the license.</p>
       <h3>Installing the license</h3>
       <ol class="steps">
@@ -851,7 +869,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>In network mode and in the container, switch on login immediately and create users.</li>
             <li>Use network mode for several workstations. There is no external database.</li>
-            <li>For dollar, pound and bitcoin rates on the overview the Kuenta computer needs internet (ECB, Bitstamp). The rates are display only; invoices stay in the company's currency.</li>
+            <li>For dollar, pound, franc and bitcoin rates on the overview the Kuenta computer needs internet (ECB, Bitstamp). The rates are display only; invoices stay in the company's currency.</li>
             <li>There is no mail program in the container. Send via SMTP there.</li>
             <li>The container image has not yet been built in a real Docker or Podman environment. Please check on first use.</li>
           </ul></div>
@@ -886,7 +904,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>Check the TSE with a fiskaly test account before going live and register the register with the tax office.</li>
             <li>Check the card terminal and DSFinV-K before use or before an audit.</li>
-            <li>Kuenta is designed for Germany, Spain, the United Kingdom, the United States, France, Austria, Switzerland, Italy, the Netherlands and Belgium (see <a href="#spanien">Spain</a>, <a href="#uk">United Kingdom</a>, <a href="#usa">United States</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Switzerland</a>, <a href="#italien">Italy</a>, <a href="#niederlande">the Netherlands</a> and <a href="#belgien">Belgium</a>). Other countries are not supported.</li>
+            <li>Kuenta is designed for Germany, Spain, the United Kingdom, the United States, France, Austria, Switzerland, Italy, the Netherlands and Belgium (see <a href="#spanien">Spain</a>, <a href="#uk">United Kingdom</a>, <a href="#usa">United States</a>, <a href="#frankreich">France</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Switzerland</a>, <a href="#italien">Italy</a>, <a href="#niederlande">the Netherlands</a> and <a href="#belgien">Belgium</a>). Other countries are not supported.</li>
             <li>Purchase contracts are templates and do not replace legal advice.</li>
           </ul></div>
       </div>
@@ -962,7 +980,7 @@ npm run installer:windows   # build the Windows installer</code></pre></div>
     </section>
   </main>
 
-  <footer>Kuenta 1.7.0 · © 2026 DoctorD · Open source under the GNU AGPL 3.0, Pro features with a license · Font in documents: Liberation Sans (SIL Open Font License) · QR code: qrcode-generator (MIT)</footer>
+  <footer>Kuenta 1.7.0 · © 2026 Doc · Open source under the GNU AGPL 3.0, Pro features with a license · Font in documents: Liberation Sans (SIL Open Font License) · QR code: qrcode-generator (MIT)</footer>
 </div>
 
 <script>

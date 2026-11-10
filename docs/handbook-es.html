@@ -393,11 +393,11 @@ docker compose up -d --build</code></pre></div>
         <thead><tr><th>Interruptor</th><th>Efecto</th></tr></thead>
         <tbody>
           <tr><td>👁 Ojo</td><td>oculta con asteriscos todos los importes del resumen, p. ej. cuando los clientes pueden ver la pantalla. Otro clic los vuelve a mostrar.</td></tr>
-          <tr><td>€ · $ · £ · ₿</td><td>muestra los importes en euros, dólares estadounidenses, libras esterlinas o bitcoin al tipo actual. Otro clic en ₿ cambia a satoshis (1 bitcoin = 100.000.000 sats) y vuelve. El botón recuerda la última unidad elegida. El tipo y la fuente aparecen bajo los recuadros.</td></tr>
+          <tr><td>€ · $ · £ · CHF · ₿</td><td>muestra los importes en euros, dólares estadounidenses, libras esterlinas, francos suizos o bitcoin al tipo actual. Otro clic en ₿ cambia a satoshis (1 bitcoin = 100.000.000 sats) y vuelve. El botón recuerda la última unidad elegida. El tipo y la fuente aparecen bajo los recuadros.</td></tr>
         </tbody>
       </table></div>
-      <div class="note"><strong>Solo visualización</strong><span>Facturas, pagos, asientos, DATEV y todas las impresiones siguen siempre en euros. El interruptor solo cambia cómo se muestran las cifras en el resumen.</span></div>
-      <p>Los tipos de cambio proceden del Banco Central Europeo (dólar y libra esterlina, tipo de referencia del último día hábil) y de la plataforma Bitstamp (bitcoin, tipo actual).</p>
+      <div class="note"><strong>Solo visualización</strong><span>Facturas, pagos, asientos, DATEV y todas las impresiones siguen siempre en la moneda de la empresa (euros, libras en el Reino Unido, dólares en EE. UU., francos en Suiza). El interruptor solo cambia cómo se muestran las cifras en el resumen.</span></div>
+      <p>Los tipos de cambio proceden del Banco Central Europeo (dólar, libra esterlina y franco suizo, tipo de referencia del último día hábil) y de la plataforma Bitstamp (bitcoin, tipo actual).</p>
       <div class="note"><strong>Internet</strong><span>Para los tipos de cambio, el ordenador de Kuenta consulta al BCE y a Bitstamp como máximo cada tres horas. No se envía ningún dato de Kuenta. Kuenta guarda los tipos en caché. Sin internet se usan los últimos cargados. Si nunca se han cargado, la visualización sigue en euros.</span></div>
 
       <h3>Colores</h3>
@@ -409,12 +409,12 @@ docker compose up -d --build</code></pre></div>
       <p>Ambos solo se aplican al puesto o navegador actual. Así se distinguen de un vistazo, p. ej., la caja, la tableta del taller o una empresa de prueba.</p>
 
       <h3>Idioma</h3>
-      <p>Kuenta está disponible en alemán, inglés y español. Hay dos ajustes:</p>
+      <p>La interfaz está disponible en alemán, inglés y español, los documentos también en italiano, neerlandés y francés. Hay dos ajustes:</p>
       <ul>
         <li><strong>Idioma de la interfaz:</strong> en el menú <span class="path">Kuenta → Sprache / Language</span>, en la página de inicio de sesión o en <span class="path">Ajustes → Valores predeterminados</span>. Solo se aplica al puesto actual. En español, los números aparecen como 1.234,50 y las fechas como 31/12/2026.</li>
-        <li><strong>Idioma de los documentos:</strong> en <span class="path">Ajustes → Valores predeterminados</span>. Se aplica a toda la empresa y afecta a los documentos PDF, la impresión, las reclamaciones y las plantillas de correos y recordatorios.</li>
+        <li><strong>Idioma de los documentos:</strong> en <span class="path">Ajustes → Valores predeterminados</span>. Se aplica a toda la empresa y afecta a los documentos PDF, la impresión, las reclamaciones y las plantillas de correos y recordatorios. Puede elegir alemán, inglés, español, italiano, neerlandés y francés.</li>
       </ul>
-      <p>Lo que usted introduce se queda tal cual: los textos de artículos, los nombres de clientes y sus propias plantillas no se traducen. Las indicaciones legales como el § 19 UStG aparecen traducidas, pero sigue aplicándose la legislación alemana. La factura electrónica (XRechnung) sigue en alemán.</p>
+      <p>Lo que usted introduce se queda tal cual: los textos de artículos, los nombres de clientes y sus propias plantillas no se traducen. Las indicaciones legales como el § 19 UStG aparecen traducidas, pero sigue aplicándose la legislación del sistema fiscal elegido; los textos legales de los demás países (Francia, Italia, Países Bajos, Bélgica) se imprimen en el idioma del país. La factura electrónica (XRechnung) sigue en alemán.</p>
     </section>
 
     <section id="module">
@@ -454,9 +454,14 @@ docker compose up -d --build</code></pre></div>
           <tr><td>XRechnung 3.0 (CII)</td><td>archivo XML puro, p. ej. para administraciones públicas</td></tr>
           <tr><td>XRechnung 3.0 (UBL)</td><td>archivo XML puro en sintaxis UBL</td></tr>
           <tr><td>ZUGFeRD 2.3 / Factur-X</td><td>PDF/A-3 con XRechnung incrustada, legible por personas y programas</td></tr>
+          <tr><td>Factur-X EN 16931</td><td>Francia: PDF con CII incrustado, también para Chorus Pro</td></tr>
+          <tr><td>FatturaPA 1.2.2</td><td>Italia: XML para el SdI (particulares, empresas, administraciones)</td></tr>
+          <tr><td>ebInterface 6.1</td><td>Austria: XML para e-rechnung.gv.at</td></tr>
+          <tr><td>Peppol BIS Billing 3.0</td><td>Países Bajos y Bélgica: UBL por la red Peppol</td></tr>
+          <tr><td>Factura QR</td><td>Suiza: sección de pago con Swiss QR Code en la factura</td></tr>
         </tbody>
       </table></div>
-      <p>El formato que recibe cada cliente se indica en sus ajustes de factura electrónica y se propone automáticamente al enviar por correo. Casos fiscales admitidos: inversión del sujeto pasivo, entrega intracomunitaria, exportación, pequeña empresa, régimen del margen. Comprobado con el validador Mustang.</p>
+      <p>El formato que recibe cada cliente se indica en sus ajustes de factura electrónica y se propone automáticamente al enviar por correo. Casos fiscales admitidos: inversión del sujeto pasivo, entrega intracomunitaria, exportación, pequeña empresa, régimen del margen. Comprobado con el validador Mustang, con las reglas EN 16931 y las reglas XRechnung de KoSIT (3.0.2); FatturaPA, ebInterface, Peppol y la declaración de IVA belga con los esquemas y reglas oficiales.</p>
       <p>Las facturas electrónicas recibidas se leen en <span class="path">Compras → Factura de proveedor</span>. Para ver una XRechnung use <span class="path">Compras → Visualizar factura electrónica</span>.</p>
     </section>
 
@@ -517,6 +522,19 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Contabilidad:</strong> <span class="path">Finanzas → Exportación contable</span> genera un CSV para importar facturas en QuickBooks Online (código TAX/NON).</li>
       </ul>
       <p>Kuenta no determina los tipos automáticamente ni presenta declaraciones; de eso se encarga su asesor o QuickBooks.</p>
+    </section>
+
+    <section id="frankreich">
+      <h2>Francia: TVA, Factur-X y caja (NF525)</h2>
+      <p>Elija “France” en <span class="path">Ajustes → Impuestos / reclamaciones / caja → Sistema fiscal</span>, guarde y recargue. La configuración está en la pestaña <span class="path">France</span>. Para documentos en francés elija el idioma de documentos “Français”.</p>
+      <ul>
+        <li><strong>Datos de la empresa:</strong> SIRET (14 cifras) en Número fiscal, número de IVA (FR…) en NIF-IVA. Forma jurídica, capital, RCS y código APE en la pestaña France; aparecen en el pie.</li>
+        <li><strong>Tipos:</strong> 20 %, 10 % y 5,5 % (código “AT-MwSt”), 0 % exento. Se puede activar la franchise en base (art. 293 B CGI).</li>
+        <li><strong>Menciones obligatorias:</strong> naturaleza de las operaciones, descuento, penalizaciones por demora y la indemnización de 40 € para clientes empresariales se imprimen automáticamente; el SIREN/SIRET de los clientes empresariales va en el cliente. Las facturas impresas quedan bloqueadas; las correcciones son abonos (avoir).</li>
+        <li><strong>Factur-X:</strong> en la ventana de la factura <em>Factur-X / Chorus Pro → descargar PDF Factur-X</em> (perfil EN 16931). Las facturas a administraciones van directamente a Chorus Pro (credenciales PISTE en la pestaña France).</li>
+        <li><strong>Caja:</strong> cada ticket se firma y se encadena con el anterior, con gran total, cierres diarios, mensuales y anuales, duplicados numerados y registro de eventos. El diario se guarda también fuera de la copia de seguridad y sigue completo al restaurar una copia antigua. La certificación NF525 la realiza un organismo acreditado.</li>
+        <li><strong>Contabilidad:</strong> <span class="path">Finanzas → Exportación contable</span> genera el FEC y el archivo firmado de caja y muestra los envíos a Chorus Pro.</li>
+      </ul>
     </section>
 
     <section id="oesterreich">
@@ -745,7 +763,7 @@ docker compose up -d --build</code></pre></div>
         <thead><tr><th>Complemento</th><th>desde</th><th>Precio</th></tr></thead>
         <tbody><tr><td>Recordatorios por SMS y pasarela SMS</td><td>1.0.8</td><td>10 €</td></tr></tbody>
       </table></div>
-      <p>El licenciante es el desarrollador de código abierto DoctorD. Pedidos por correo a <a href="mailto:heidepower@proton.me">heidepower@proton.me</a> con el nombre del taller, la dirección de facturación y los complementos deseados. Tras el pago, la clave de licencia llega por correo. Quien compre más tarde otro complemento recibe una clave nueva con todos sus complementos, que sustituye a la anterior.</p>
+      <p>El licenciante es el desarrollador de código abierto Doc. Pedidos por correo a <a href="mailto:heidepower@proton.me">heidepower@proton.me</a> con el nombre del taller, la dirección de facturación y los complementos deseados. Tras el pago, la clave de licencia llega por correo. Quien compre más tarde otro complemento recibe una clave nueva con todos sus complementos, que sustituye a la anterior.</p>
       <p>Los complementos sin licencia muestran un candado 🔒. Al hacer clic se explica cómo obtener la licencia.</p>
       <h3>Instalar la licencia</h3>
       <ol class="steps">
@@ -851,7 +869,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>En modo red y en el contenedor, active de inmediato el inicio de sesión y cree usuarios.</li>
             <li>Para varios puestos use el modo red. No hay base de datos externa.</li>
-            <li>Para los tipos del dólar, la libra y el bitcoin en el resumen, el ordenador de Kuenta necesita internet (BCE, Bitstamp). Son solo visualización; las facturas siguen en euros.</li>
+            <li>Para los tipos del dólar, la libra, el franco y el bitcoin en el resumen, el ordenador de Kuenta necesita internet (BCE, Bitstamp). Son solo visualización; las facturas siguen en la moneda de la empresa.</li>
             <li>En el contenedor no hay programa de correo. Envíe allí por SMTP.</li>
             <li>La imagen de contenedor aún no se ha construido en un entorno Docker o Podman real. Compruébelo en el primer uso.</li>
           </ul></div>
@@ -886,7 +904,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>Compruebe la TSE con una cuenta de prueba de fiskaly antes de usarla en real y comunique la caja a Hacienda (alemana).</li>
             <li>Compruebe el terminal de tarjetas y la DSFinV-K antes de usarlos o de una inspección.</li>
-            <li>Kuenta está pensado para Alemania, España, el Reino Unido, Estados Unidos, Francia, Austria, Suiza, Italia, los Países Bajos y Bélgica (vea <a href="#spanien">España</a>, <a href="#uk">Reino Unido</a>, <a href="#usa">Estados Unidos</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Suiza</a>, <a href="#italien">Italia</a>, <a href="#niederlande">Países Bajos</a> y <a href="#belgien">Bélgica</a>). TicketBAI, Navarra e IGIC no están soportados.</li>
+            <li>Kuenta está pensado para Alemania, España, el Reino Unido, Estados Unidos, Francia, Austria, Suiza, Italia, los Países Bajos y Bélgica (vea <a href="#spanien">España</a>, <a href="#uk">Reino Unido</a>, <a href="#usa">Estados Unidos</a>, <a href="#frankreich">Francia</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Suiza</a>, <a href="#italien">Italia</a>, <a href="#niederlande">Países Bajos</a> y <a href="#belgien">Bélgica</a>). TicketBAI, Navarra e IGIC no están soportados.</li>
             <li>Los contratos de compraventa son modelos y no sustituyen el asesoramiento jurídico.</li>
           </ul></div>
       </div>
@@ -962,7 +980,7 @@ npm run installer:windows   # crear el instalador de Windows</code></pre></div>
     </section>
   </main>
 
-  <footer>Kuenta 1.7.0 · © 2026 DoctorD · Código abierto bajo la GNU AGPL 3.0, funciones Pro con licencia · Fuente de los documentos: Liberation Sans (SIL Open Font License) · Código QR: qrcode-generator (MIT)</footer>
+  <footer>Kuenta 1.7.0 · © 2026 Doc · Código abierto bajo la GNU AGPL 3.0, funciones Pro con licencia · Fuente de los documentos: Liberation Sans (SIL Open Font License) · Código QR: qrcode-generator (MIT)</footer>
 </div>
 
 <script>
