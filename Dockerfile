@@ -22,7 +22,7 @@ ENV NODE_ENV=production \
 
 WORKDIR /app
 # Kuenta needs no npm packages – only its own files
-COPY package.json README.md INSTALL.md LICENSE PRO.md ./
+COPY package.json README.md README.de.md INSTALL.md LICENSE PRO.md ./
 COPY server ./server
 COPY public ./public
 

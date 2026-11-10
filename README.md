@@ -1,99 +1,106 @@
 # Kuenta – Invoicing & POS for auto repair shops
 
-Kuenta ist eine plattformunabhängige Faktura für Kfz-Werkstätten. Es läuft im Browser auf Windows, macOS, Linux und Tablets und übernimmt den kompletten Datenbestand aus **KFZ-Faktura** (Datensicherung `*.kfz`, `DB1.bak` oder direkt aus dem Programmordner). Bedienung und Masken sind an KFZ-Faktura angelehnt: Menüleiste, Navigationsmenü, Schnellmenü, Übersichtstabellen mit Suchleiste und Buchstabenleiste, „Weitere Funktionen“ und Rechtsklick-Menüs, Eingabemasken mit Reitern.
+**English** · [Deutsch](README.de.md)
 
-## Installation und Start
+Kuenta is cross-platform invoicing and point-of-sale software for car workshops. It runs in the browser on Windows, macOS, Linux and tablets and takes over the complete data of **KFZ-Faktura**, a widely used German workshop program (backup `*.kfz`, `DB1.bak` or directly from the program folder). Screens and workflow follow KFZ-Faktura: menu bar, navigation, quick bar, overview tables with search bar and letter bar, "More functions" and right-click menus, input forms with tabs.
 
-Ausführliche Anleitung für Windows, Linux und macOS: **[INSTALL.md](INSTALL.md)**.
-Handbuch: **[Deutsch](docs/handbuch.html)** · **[English](docs/handbook-en.html)** · **[Español](docs/handbook-es.html)**.
+The user interface is available in **German, English and Spanish**. Tax rules, e-invoicing, the cash register (TSE) and the DATEV export are designed for Germany.
+
+## Installation and start
+
+Detailed instructions for Windows, Linux and macOS: **[INSTALL.md](INSTALL.md)** (German).
+Handbook: **[English](docs/handbook-en.html)** · **[Español](docs/handbook-es.html)** · **[Deutsch](docs/handbuch.html)**.
 
 | System | Installation | Start |
 |---|---|---|
-| Windows | `Kuenta-Setup-<Version>.exe` (Node.js ist enthalten) | Startmenü → *Kuenta* bzw. *Kuenta im Netzwerk* |
-| Linux / macOS | Node.js ab 22.13, dann `./installer/unix/install.sh` | `kuenta` (Netzwerk: `kuenta --netzwerk`) |
-| Container (Docker/Podman) | `podman build -t kuenta:1.0.11 .` bzw. `docker compose up -d --build` | `http://<Rechner>:3700` (Daten im Volume `/data`) |
-| ohne Installation | Node.js ab 22.13 | `Kuenta starten.bat` bzw. `./kuenta.sh` oder `node server/index.js --open` |
+| Windows | `Kuenta-Setup-<version>.exe` (Node.js included) | Start menu → *Kuenta* or *Kuenta im Netzwerk* (network) |
+| Linux / macOS | Node.js 22.13 or later, then `./installer/unix/install.sh` | `kuenta` (network: `kuenta --netzwerk`) |
+| Container (Docker/Podman) | `podman build -t kuenta:1.1.0 .` or `docker compose up -d --build` | `http://<computer>:3700` (data in the volume `/data`) |
+| Without installation | Node.js 22.13 or later | `Kuenta starten.bat`, `./kuenta.sh` or `node server/index.js --open` |
 
-Danach öffnet sich der Browser mit `http://127.0.0.1:3700`. Im Netzwerkbetrieb zeigt das Startfenster die Adresse für die anderen Geräte an. **Wichtig:** Im Netzwerkbetrieb unter *Einstellungen → Vorgabewerte* die Anmeldung aktivieren und Benutzer anlegen.
+The browser then opens `http://127.0.0.1:3700`. In network mode the start window shows the address for the other devices. **Important:** in network mode, enable login under *Settings → Defaults* and create users.
 
-Nach der Installation ist der Datenbestand leer. Firmendaten unter *Einstellungen* eintragen; vorhandene Daten per Import übernehmen (KFZ-Faktura, frühere Sicherungen, CSV/DATANORM).
+After installation the database is empty. Enter your company details under *Settings*, or import existing data (KFZ-Faktura, earlier backups, CSV/DATANORM). Switch the language in the menu *Kuenta → Sprache / Language* or on the login page.
 
-Die Daten liegen im Benutzerprofil, nicht im Programmordner: Windows `%APPDATA%\Kuenta`, macOS `~/Library/Application Support/Kuenta`, Linux `~/.local/share/kuenta`.
+The data lives in the user profile, not in the program folder: Windows `%APPDATA%\Kuenta`, macOS `~/Library/Application Support/Kuenta`, Linux `~/.local/share/kuenta`.
 
-Umgebungsvariablen: `PORT` (Standard 3700), `HOST` (Standard 127.0.0.1), `KUENTA_DATA` (anderes Datenverzeichnis, nur auf einem lokalen Laufwerk – nicht auf einem Netzlaufwerk/NAS, siehe INSTALL.md).
+Environment variables: `PORT` (default 3700), `HOST` (default 127.0.0.1), `KUENTA_DATA` (different data folder, on a local drive only – not on a network drive/NAS, see INSTALL.md).
 
-## Daten aus KFZ-Faktura übernehmen
+## Taking over data from KFZ-Faktura
 
-*Kuenta → Daten aus KFZ-Faktura importieren* (oder Navigationsmenü *System → KFZ-Faktura-Import*):
+*Kuenta → Import data from KFZ-Faktura* (or navigation *System → KFZ-Faktura import*):
 
-1. **Datensicherung (`*.kfz`)** – in KFZ-Faktura *„KFZ-Faktura → Daten sichern“*, die Datei per Ziehen-und-Ablegen hochladen. Passwortgeschützte Sicherungen werden unterstützt.
-2. **Datenbanksicherung** `DB1.bak` / `*.fbk` direkt hochladen.
-3. **Programmordner** (nur Windows), z. B. `C:\KFZ-Faktura` – liest `db\DB1.FDB` über das mitgelieferte Firebird. KFZ-Faktura vorher schließen. Die Originaldatenbank wird nur kopiert, nie verändert.
+1. **Backup (`*.kfz`)** – in KFZ-Faktura use *"KFZ-Faktura → Daten sichern"*, then drag and drop the file. Password-protected backups are supported.
+2. **Database backup** `DB1.bak` / `*.fbk` – upload directly.
+3. **Program folder** (Windows only), e.g. `C:\KFZ-Faktura` – reads `db\DB1.FDB` via the bundled Firebird. Close KFZ-Faktura first. The original database is only copied, never changed.
 
-Übernommen werden alle Tabellen (Kunden, Fahrzeuge, Artikel, Arbeitswerte, Lieferanten, Reifeneinlagerung, Angebote, Aufträge, Lieferscheine, Rechnungen, Rechnungskorrekturen, Zahlungen, OP, Mahnungen, Kassenbuch, FIBU-Buchungen, Textbausteine, Einstellungen, Nummernkreise, KBA-Schlüsselnummern, PLZ-Verzeichnis) sowie Dokumente, Bilder und das Firmenlogo. Vor jedem Import legt Kuenta eine Sicherheitskopie der bisherigen Daten an (Unterordner `sicherheitskopien` im Datenordner).
+All tables are taken over (customers, vehicles, articles, labour items, suppliers, tyre storage, quotes, orders, delivery notes, invoices, invoice corrections, payments, open items, dunning letters, cash book, accounting entries, text modules, settings, number ranges, KBA vehicle codes, postcode directory) as well as documents, images and the company logo. Before every import Kuenta saves a safety copy of the previous data (subfolder `sicherheitskopien` in the data folder).
 
-Bei einem erneuten Import bleiben Daten, die es nur in Kuenta gibt, erhalten: Einstellungen (E-Mail, Kasse, Sicherung), Kassenbons und -abschlüsse, Zeiterfassung, Termine, Aufgaben, Briefe, Eingangsrechnungen, Fahrzeughandel, eigene Dokumente, Protokolle sowie Kuenta-eigene Felder in den Stammdaten (z. B. E-Rechnungsformat und Leitweg-ID beim Kunden). Ersetzt werden die Tabellen aus KFZ-Faktura; Kuenta zeigt vorher an, wie viele davon seit dem letzten Import in Kuenta geändert wurden. Technisch: Tabellen mit Präfix `SW_` und die Zusatzspalten aus `EXT_COLUMNS` (`server/db/index.js`) werden aus der bisherigen Datenbank übernommen (`keepKuentaData` in `server/import/kfz.js`). Neue Kuenta-eigene Felder deshalb immer dort anlegen.
+When importing again, data that only exists in Kuenta is kept: settings (email, register, backup), register receipts and closings, time tracking, appointments, tasks, letters, incoming invoices, vehicle trading, own documents, logs, and Kuenta's own fields in the master data (e.g. e-invoice format and Leitweg ID of a customer). The tables from KFZ-Faktura are replaced; beforehand Kuenta shows how many of them were changed in Kuenta since the last import. Technically: tables with the prefix `SW_` and the extra columns in `EXT_COLUMNS` (`server/db/index.js`) are copied from the previous database (`keepKuentaData` in `server/import/kfz.js`). Always add new Kuenta-only fields there.
 
-Technik: Kuenta liest das Firebird-Sicherungsformat (gbak, Version 5–10) selbst ein; Firebird muss dafür nicht installiert sein. Neuere KFZ-Faktura-Versionen, die ihre Sicherung im 7-Zip-Format packen: die `.kfz`-Datei mit 7-Zip entpacken und `db\DB1.bak` hochladen.
+Technology: Kuenta reads the Firebird backup format (gbak, versions 5–10) itself; Firebird does not need to be installed. Newer KFZ-Faktura versions pack their backup in 7-Zip format: unpack the `.kfz` file with 7-Zip and upload `db\DB1.bak`.
 
-## Funktionsumfang
+## Features
 
-- **Stammdaten:** Kunden (Fahrzeuge, Vorgangshistorie, Dokumente, Konditionen, E-Rechnungs-Einstellungen, Leitweg-ID, Auslandskunden mit Netto-Rechnung), Fahrzeuge (KBA-Suche über HSN/TSN, Termine, Halter, Reifeneinlagerung, Historie, Fotos/Dokumente), Artikel (Preisgruppen, Lager, Lagerbewegungen), Arbeitswerte mit Stundenverrechnungssätzen, Lieferanten, Reifeneinlagerung mit Einlagerungsbeleg.
-- **Büro:** Terminplaner, Aufgaben, Briefe, **Zeiterfassung** (Summen/Zeitkonto, Zeitstempelung, Aufträge, Abwesenheit, Korrekturen, Monatsabschluss, Stundenzettel, Feiertage je Bundesland) und **Stempeluhr** (Kommen/Gehen, Pause, Auftrag – mit Personalnummer, Anwesenheitsliste).
-- **Einkauf:** Eingangsrechnungen (Positionen mit Lagerbuchung und EK-Aktualisierung, Zahlungen bar/Bank, FIBU-Buchung, Dokumente), **Einlesen eingehender E-Rechnungen** (XRechnung CII/UBL und ZUGFeRD-PDF, Lieferant wird automatisch angelegt), Lagerbestände (Mindestbestand, reserviert, verfügbar), Lagerbewegung (Schnellerfassung mit Scanner), Inventur (Zählliste, Ist-Erfassung, Buchung), E-Rechnung visualisieren.
-- **Verkauf:** Angebot/Kostenvoranschlag, Auftrag/Arbeitskarte, Lieferschein, Rechnung, Rechnungskorrektur/Gutschrift/Storno – Positionen mit Artikeln, Arbeitswerten, Texten, Zwischensummen, KET, MTZ, Rabatt, durchlaufenden Posten, Fahrzeugverkauf/-ankauf, **Import aus Teilekatalogen (Warenkorb-CSV/DATANORM)**. Weiterführen, Kopieren, Archiv, **Anzahlungs-/Abschlags- und Schlussrechnung**, **Sammelrechnung**, Stapeldruck, PDF, **E-Mail-Versand** (direkt per SMTP oder Übergabe an Thunderbird/das Standard-Mailprogramm, damit die Mail im Ordner „Gesendet“ liegt).
-- **Kasse:** Kassenoberfläche mit Scanner-Eingabe und Schnelltasten, Bar (mit Rückgeld)/EC/Kreditkarte, Auftrag oder Rechnung über die Kasse bezahlen, automatische Rechnung zu jedem Barumsatz, Ein-/Auszahlungen, Bon-Storno, Kassenabschluss (Z-Bon) mit Zählprotokoll und Differenzbuchung, Kassenjournal, **Cloud-TSE fiskaly SIGN DE** (KassenSichV) mit QR-Code auf dem Bon, **DSFinV-K-Export**, **EC-Terminal über ZVT**.
-- **Fahrzeughandel:** Fahrzeuglager (NW/GW, Ausstattung, Handelsdaten, Pkw-EnVKV-Angaben), Kalkulation mit Kosten/Aufwand und Differenzbesteuerung § 25a, Preisschild, Verkauf per Rechnung mit Umbuchung zum Kunden, Inzahlungnahme ins Lager, **Kaufverträge** (NW/GW, Gewährleistung, vorvertragliche Informationen) mit Rechnungserstellung, Verkaufsstatistik.
-- **E-Rechnung:** XRechnung 3.0 (EN 16931) in CII und UBL, **ZUGFeRD 2.3 / Factur-X als PDF/A-3** mit eingebetteter XRechnung, Steuerfälle Reverse Charge, innergemeinschaftliche Lieferung, Ausfuhr, Kleinunternehmer, Differenzbesteuerung. Geprüft mit dem Mustang-Validator (PDF/A und EN-16931-/XRechnung-Schematron).
-- **Finanzen:** Zahlungen, Offene Posten, Rechnungsliste, Mahnwesen (4 Stufen, PDF, E-Mail), Kassenbuch, **DATEV-Export** (Buchungsstapel und Debitoren/Kreditoren im DATEV-Format, Windows-1252, Prüfung von Wirtschaftsjahr und Kontenbereichen, abweichendes Wirtschaftsjahr, Sammeldebitor/-kreditor), GoBD-Datenexport.
-- **Auswertung:** Fahrzeugtermine mit Erinnerung per Brief, **E-Mail und SMS** (Protokoll gegen Doppelversand, Abmeldung je Kunde; SMS ist eine Pro-Funktion, siehe unten; SMS über frei einstellbares HTTP-Gateway: Anbieter, Android-Handy oder Kuenta-SMS-Relais mit Surfstick in `installer/sms-relais`), Umsatz/Roherlöse, Serienbriefe, Leistungsgrad je Auftrag und Mitarbeiter.
-- **Schnittstellen / Datenimport:** Import-Assistent für Kunden, Fahrzeuge, Artikel, Arbeitswerte und Lieferanten aus CSV mit Feldzuordnung und Vorlagen, DATANORM 4/5.
-- **System:** Mandantenverwaltung (mehrere Betriebe/Demodaten, je Arbeitsplatz wählbar), Benutzer und Rechte, Änderungsprotokoll, E-Mail-Versandprotokoll, Datensicherung (*.kuenta, optional AES-256), tägliche automatische Sicherung, Übersicht mit Augensymbol (Beträge ausblenden) und Anzeige in €, $, ₿ oder sats (nur Anzeige, Kurse von EZB und Bitstamp; Rechnungen bleiben in Euro), Hell-/Dunkelmodus und vier Farbschemata (Blau, Grün, Graphit, Bordeaux) je Arbeitsplatz.
-- **Sprachen:** Oberfläche auf Deutsch, Englisch oder Spanisch (je Arbeitsplatz, Menü *Kuenta → Sprache / Language*). Belege (PDF, Druck, E-Mail-Vorlagen) in einer eigenen Belegsprache je Mandant (*Einstellungen → Vorgabewerte*). Rechtslage und Steuerlogik bleiben deutsch.
+- **Master data:** customers (vehicles, document history, files, terms, e-invoice settings, Leitweg ID, foreign customers with net invoices), vehicles (KBA lookup via HSN/TSN, due dates, owner, tyre storage, history, photos/files), articles (price groups, stock, stock movements), labour items with hourly rates, suppliers, tyre storage with storage receipt.
+- **Office:** appointment planner, tasks, letters, **time tracking** (totals/time account, clocking, orders, absence, corrections, month-end closing, time sheet, public holidays per German federal state) and **time clock** (clock in/out, break, order – with staff number, attendance list).
+- **Purchasing:** incoming invoices (line items with stock booking and purchase price update, cash/bank payments, accounting entry, files), **reading incoming e-invoices** (XRechnung CII/UBL and ZUGFeRD PDF, the supplier is created automatically), stock levels (minimum stock, reserved, available), stock movement (quick entry with scanner), stocktaking (counting list, actual quantities, booking), visualising e-invoices.
+- **Sales:** quote/cost estimate, order/job card, delivery note, invoice, invoice correction/credit note/cancellation – line items with articles, labour items, texts, subtotals, small parts and paint material surcharges, discount, pass-through items, vehicle sale/purchase, **import from parts catalogues (cart CSV/DATANORM)**. Continue, copy, archive, **down payment, partial and final invoices**, **collective invoice**, batch print, PDF, **sending by email** (directly via SMTP or handed over to Thunderbird/the default mail program, so the mail ends up in the "Sent" folder).
+- **Cash register:** register screen with scanner input and quick keys, cash (with change)/debit card/credit card/**crypto**, pay orders or invoices at the register, automatic invoice for every cash sale, cash in/out, voiding receipts, closing (Z report) with cash count and difference booking, register journal, **cloud TSE fiskaly SIGN DE** (German KassenSichV) with QR code on the receipt, **DSFinV-K export**, **card terminal via ZVT**.
+- **Crypto payment:** Bitcoin, Lightning and USDT through your own **BTCPay Server** – payment link and QR code on the PDF invoice and in the email, automatic booking of paid invoices, QR payment at the register. Free in the core, can be switched off.
+- **Vehicle trading:** vehicle stock (new/used, equipment, trading data, Pkw-EnVKV details), costing with costs/expenses and margin scheme § 25a, price tag, sale by invoice with transfer to the customer, trade-ins into stock, **purchase contracts** (new/used, warranty, pre-contractual information) with invoice creation, sales statistics.
+- **E-invoice:** XRechnung 3.0 (EN 16931) in CII and UBL, **ZUGFeRD 2.3 / Factur-X as PDF/A-3** with embedded XRechnung, tax cases reverse charge, intra-community supply, export, small business, margin scheme. Checked with the Mustang validator (PDF/A and EN 16931/XRechnung Schematron).
+- **Finance:** payments, open items, invoice list, dunning (4 levels, PDF, email), cash book, **DATEV export** (booking batch and debtors/creditors in DATEV format, Windows-1252, checks of fiscal year and account ranges, different fiscal year, collective debtor/creditor), GoBD data export.
+- **Reports:** vehicle due dates with reminders by letter, **email and SMS** (log against double sending, opt-out per customer; SMS is a Pro feature, see below; SMS via a freely configurable HTTP gateway: provider, Android phone or the Kuenta SMS relay with a USB modem in `installer/sms-relais`), revenue/gross profit, mail merge, performance rate per order and employee.
+- **Interfaces / data import:** import assistant for customers, vehicles, articles, labour items and suppliers from CSV with field mapping and templates, DATANORM 4/5.
+- **System:** multiple companies (several businesses/demo data, selectable per workstation), users and permissions, change log, email sending log, backup (`*.kuenta`, optionally AES-256), daily automatic backup, overview with eye icon (hide amounts) and display in €, $, ₿ or sats (display only, rates from the ECB and Bitstamp; invoices stay in euros), light/dark mode and four colour schemes (blue, green, graphite, bordeaux) per workstation.
+- **Languages:** user interface in German, English or Spanish (per workstation, menu *Kuenta → Sprache / Language*). Documents (PDF, printing, email templates) in a separate document language per company (*Settings → Defaults*). Legal and tax logic stays German.
 
-### Hinweise und Grenzen
+### Notes and limits
 
-- **TSE:** Unterstützt wird die Cloud-TSE von fiskaly (SIGN DE). Die Anbindung ist nach der API-Dokumentation umgesetzt und gegen eine Simulation getestet, aber noch nicht gegen ein echtes fiskaly-Konto. Vor dem Echtbetrieb bitte mit fiskaly-Testzugangsdaten prüfen und die Kasse beim Finanzamt melden. USB-TSE (Swissbit) und die österreichische RKSV werden nicht unterstützt.
-- **EC-Terminal:** ZVT über TCP/IP (Anmeldung und Zahlung) ist gegen ein simuliertes Terminal getestet, nicht gegen ein echtes Gerät.
-- **DSFinV-K:** Der Export folgt der Dateistruktur der DSFinV-K 2.3. Vor einer Prüfung bitte mit dem DSFinV-K-Prüfwerkzeug kontrollieren.
-- **Teilekataloge:** Live-Schnittstellen zu TecDoc, DAT, Elekat & Co. setzen Herstellerlizenzen voraus und sind nicht enthalten. Übernommen werden Warenkörbe, die die Kataloge als CSV/DATANORM exportieren.
-- **Kaufvertrag:** Die Vertragstexte sind ein Muster und ersetzen keine Rechtsberatung.
-- Logos im CMYK-Format wandelt die Oberfläche automatisch in ein PDF/A-taugliches PNG um.
+- **TSE:** the cloud TSE from fiskaly (SIGN DE) is supported. The connection follows the API documentation and has been tested against a simulation, not yet against a real fiskaly account. Before going live, check with fiskaly test credentials and register the register with the tax office. USB TSEs (Swissbit) and the Austrian RKSV are not supported.
+- **Card terminal:** ZVT over TCP/IP (registration and payment) has been tested against a simulated terminal, not against a real device.
+- **DSFinV-K:** the export follows the file structure of DSFinV-K 2.3. Before an audit, check it with the DSFinV-K test tool.
+- **Crypto payment:** tested against a simulated BTCPay Server, not yet against a real one. USDT only via the Liquid network.
+- **Parts catalogues:** live connections to TecDoc, DAT, Elekat & co. require manufacturer licenses and are not included. Carts exported by the catalogues as CSV/DATANORM are taken over.
+- **Purchase contract:** the contract texts are a template and do not replace legal advice.
+- **Countries:** Kuenta is built for Germany. Country-specific obligations elsewhere (e.g. VeriFactu in Spain) are not supported.
+- The user interface converts CMYK logos automatically into a PNG suitable for PDF/A.
 
-## Datensicherung
+## Backup
 
-*Kuenta → Daten sichern* erzeugt eine `*.kuenta`-Datei (ZIP mit Datenbank und Dokumenten; mit Passwort AES-256-GCM-verschlüsselt). Zusätzlich sichert Kuenta täglich automatisch in den Unterordner `sicherungen` des Datenordners (Anzahl und Ordner einstellbar). Alternativ den ganzen Datenordner sichern, während Kuenta beendet ist. Sicherungen der Vorgängerversionen „KFZ-Faktotum“ (`*.kft`) und „Schraubwerk“ (`*.swb`) lassen sich weiterhin wiederherstellen.
+*Kuenta → Back up data* creates a `*.kuenta` file (ZIP with database and documents; with a password, AES-256-GCM encrypted). In addition Kuenta backs up automatically every day into the subfolder `sicherungen` of the data folder (number and folder adjustable). Alternatively back up the whole data folder while Kuenta is stopped. Backups of the predecessor versions "KFZ-Faktotum" (`*.kft`) and "Schraubwerk" (`*.swb`) can still be restored.
 
-## Entwicklung
-
-```
-npm test                    # automatische Tests
-npm run server              # Server ohne Browser starten
-npm run installer:windows   # Windows-Installer bauen (Inno Setup 6 nötig, siehe INSTALL.md)
-```
-
-Der Quellcode wird mit Git verwaltet. Es gehören **keine Kunden- oder Firmendaten** ins Repository: Daten liegen im Benutzerprofil (bzw. in `KUENTA_DATA`); `.gitignore` schließt zusätzlich Datenbanken, Sicherungen (`*.kuenta`, `*.kft`, `*.swb`, `*.kfz`) und den Ordner `build/` aus. Tests arbeiten nur mit erfundenen Testdaten in temporären Ordnern.
-
-Aufbau: `server/` (HTTP-Server, Geschäftslogik, Import, E-Rechnung, PDF/A-Erzeugung, SMTP, Kasse/TSE/ZVT, Sicherung), `public/` (Oberfläche, ohne Build-Schritt), `installer/` (Windows-Installer, Linux/macOS-Installationsskript), `public/js/entities.js` (gemeinsame Definition aller Module für Server und Oberfläche). Die Datenbank ist SQLite (in Node.js eingebaut) mit den Tabellen- und Spaltennamen von KFZ-Faktura.
-
-Übersetzungen: Der deutsche Text im Code ist der Schlüssel, die Übersetzungen stehen in `public/js/lang/en.js` und `es.js` (Erklärung in `public/js/i18n.js`). `node tools/i18n/missing.js` listet Texte ohne Übersetzung. Kommentare im Code sind englisch.
-
-Schrift: Liberation Sans (SIL Open Font License, `server/pdf/fonts/LICENSE`). QR-Code: qrcode-generator (MIT, `public/vendor/qrcode.js`).
-
-## Lizenz
-
-Copyright © 2026 DoctorD (heidepower@proton.me). Kuenta ist Open Source unter der **GNU Affero General Public License 3.0** (`LICENSE`). Ausgenommen ist der Ordner `server/pro/`: Er steht unter der [Kuenta-Pro-Lizenz](server/pro/LICENSE.md) und läuft nur mit einem Lizenzschlüssel. Was zu Kuenta Pro gehört und wie man es kauft (10 € je Add-on, Bitcoin oder Tether), steht in [PRO.md](PRO.md). Beiträge: [CONTRIBUTING.md](CONTRIBUTING.md).
-
-### Für den Herausgeber: Lizenzen ausstellen
+## Development
 
 ```
-node tools/lizenz/lizenz-werkzeug.js schluessel     # einmalig: Schlüsselpaar erzeugen
+npm test                    # automated tests
+npm run server              # start the server without a browser
+npm run installer:windows   # build the Windows installer (needs Inno Setup 6, see INSTALL.md)
+```
+
+**No customer or company data** belongs in the repository: data lives in the user profile (or in `KUENTA_DATA`); `.gitignore` also excludes databases, backups (`*.kuenta`, `*.kft`, `*.swb`, `*.kfz`) and the folder `build/`. Tests only use made-up test data in temporary folders.
+
+Structure: `server/` (HTTP server, business logic, import, e-invoice, PDF/A generation, SMTP, register/TSE/ZVT, backup), `public/` (user interface, no build step), `installer/` (Windows installer, Linux/macOS install script), `public/js/entities.js` (shared definition of all modules for server and user interface). The database is SQLite (built into Node.js) with the table and column names of KFZ-Faktura. Identifiers in the code are mostly German, comments are in English.
+
+Translations: the German text in the code is the key; the translations are in `public/js/lang/en.js` and `es.js` (explained in `public/js/i18n.js`). `node tools/i18n/missing.js` lists texts without a translation.
+
+Font: Liberation Sans (SIL Open Font License, `server/pdf/fonts/LICENSE`). QR code: qrcode-generator (MIT, `public/vendor/qrcode.js`).
+
+## License
+
+Copyright © 2026 DoctorD (heidepower@proton.me). Kuenta is open source under the **GNU Affero General Public License 3.0** (`LICENSE`). The folder `server/pro/` is excluded: it is under the [Kuenta Pro license](server/pro/LICENSE.md) and only runs with a license key. What belongs to Kuenta Pro and how to buy it (10 € per add-on, Bitcoin or Tether) is described in [PRO.md](PRO.md). Contributions: [CONTRIBUTING.md](CONTRIBUTING.md).
+
+### For the publisher: issuing licenses
+
+```
+node tools/lizenz/lizenz-werkzeug.js schluessel     # once: create the key pair
 node tools/lizenz/lizenz-werkzeug.js ausstellen --kunde "Werkstatt Muster" --funktionen sms --zahlung "BTC …, txid …"
 node tools/lizenz/lizenz-werkzeug.js pruefen KUENTA1.…
 ```
 
-Der private Schlüssel liegt in `~/.kuenta-lizenz/privat.pem` und gehört **nie** ins Repository. Der öffentliche Schlüssel steht in `server/lizenz.js`. Jede ausgestellte Lizenz wird in `~/.kuenta-lizenz/ausgestellt.csv` vermerkt. `--funktionen` nennt die gekauften Add-ons (mehrere mit Komma, `pro` = alle, auch künftige). Kauft jemand ein weiteres Add-on, bekommt er einen neuen Schlüssel mit allen seinen Add-ons. Ohne `--bis` ist die Lizenz unbefristet.
+The private key is stored in `~/.kuenta-lizenz/privat.pem` and **never** belongs in the repository. The public key is in `server/lizenz.js`. Every issued license is recorded in `~/.kuenta-lizenz/ausgestellt.csv`. `--funktionen` names the purchased add-ons (several separated by commas, `pro` = all, including future ones). If someone buys another add-on, they get a new key with all their add-ons. Without `--bis` the license is unlimited.
 
-Automatischer Verkauf über einen BTCPay-Shop (Bitcoin, Lightning, USDT): `node tools/lizenz/lizenz-werkzeug.js shop`, Einrichtung in [tools/lizenz/README.md](tools/lizenz/README.md).
+Automatic sales through a BTCPay shop (Bitcoin, Lightning, USDT): `node tools/lizenz/lizenz-werkzeug.js shop`, setup in [tools/lizenz/README.md](tools/lizenz/README.md).
 
-Neue Pro-Funktion: Code nach `server/pro/`, in `server/lizenz.js` bei `FUNKTIONEN` eintragen und in der Route bzw. im Modul `LIZENZ.brauche('<name>')` aufrufen.
+New Pro feature: put the code into `server/pro/`, add it to `FUNKTIONEN` in `server/lizenz.js` and call `LIZENZ.brauche('<name>')` in the route or module.
