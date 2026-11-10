@@ -338,6 +338,8 @@ route('GET', '/api/import/ordnervorschlag', () => {
 });
 
 require('./routes2')(route, { json, readBody });
+require('./es/routes')(route, { json, readBody });
+require('./gb/routes')(route, { json, readBody });
 
 // ---------- Server ----------
 const server = http.createServer((req, res) => {
@@ -361,6 +363,7 @@ async function handle(req, res) {
         };
         const out = await r.handler(ctx);
         if (out && out._download) return download(res, out._download, out.filename, out.type);
+        if (out && out._html) { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }); return res.end(out._html); }
         return send(res, 200, out);
       }
       throw new L.HttpError(404, 'Unbekannte Funktion');
@@ -430,6 +433,10 @@ if (require.main === module) {
   const btcPruefen = () => { for (const m of dbm.listMandanten()) dbm.runAs(m.id, () => require('./btcpay').pruefen().catch(e => console.warn('BTCPay:', e.message))); };
   setTimeout(btcPruefen, 20000);
   setInterval(btcPruefen, 2 * 60 * 1000);
+  // Spain: send pending VERI*FACTU records (the module itself respects the waiting time of the AEAT)
+  const vfEnviar = () => { for (const m of dbm.listMandanten()) dbm.runAs(m.id, () => require('./es/verifactu').enviar().catch(e => console.warn('VERI*FACTU:', e.message))); };
+  setTimeout(vfEnviar, 25000);
+  setInterval(vfEnviar, 30 * 1000);
   // clean up old sessions
   setInterval(() => { const t = Date.now() - 12 * 3600 * 1000; for (const [k, s] of sessions) if (s.seen < t) sessions.delete(k); }, 600000);
 }

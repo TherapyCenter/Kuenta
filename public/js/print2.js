@@ -1,5 +1,5 @@
 'use strict';
-/* global Print, fmt, esc, api, today, qrcode, I18N */
+/* global Print, fmt, esc, api, today, qrcode, I18N, LK */
 // Additional print templates: receipt, Z report, purchase contract, price tag, time sheet, stocktaking, expenses
 
 Object.assign(Print, {
@@ -15,17 +15,23 @@ Object.assign(Print, {
 
   async kassenbon(d, { kopie = false } = {}) {
     const b = d.bon, f = d.firma;
-    const zeilen = d.pos.map(p => `<tr><td colspan="2">${esc(p.BEZEICHNUNG)}</td></tr><tr><td>${fmt.num(p.MENGE, 3)} x ${fmt.money0(p.EINZEL)}${Number(p.RABATT) ? ` -${fmt.num(p.RABATT)}%` : ''}</td><td class="r">${fmt.money0(p.BRUTTO)} ${p.MWSTSATZ === 19 ? 'A' : p.MWSTSATZ === 7 ? 'B' : 'C'}</td></tr>`).join('');
-    const tse = b.TSE_SIGNATUR ? `<hr><div class="small">TSE-Seriennr.: ${esc(b.TSE_SERIAL)}<br>Transaktion: ${esc(b.TSE_TXNR)} · Signaturzähler: ${esc(b.TSE_ZAEHLER)}<br>Start: ${esc(b.TSE_START)}<br>Ende: ${esc(b.TSE_ENDE)}<br>Signatur: ${esc(b.TSE_SIGNATUR)}</div><div class="c">${Print.qrSvg(b.TSE_QR)}</div>`
+    const es = d.es; // Spain: the receipt is the invoice (factura simplificada) with the VERI*FACTU QR code
+    const gb = LK.data && LK.data.land === 'GB'; // UK: no fiscal signature on receipts, VAT registration number instead
+    const satzA = LK.rate(61), satzB = LK.rate(62);
+    const buchstabe = s => s === satzA ? 'A' : s === satzB ? 'B' : s === 4 && es ? 'D' : 'C';
+    const zeilen = d.pos.map(p => `<tr><td colspan="2">${esc(p.BEZEICHNUNG)}</td></tr><tr><td>${fmt.num(p.MENGE, 3)} x ${fmt.money0(p.EINZEL)}${Number(p.RABATT) ? ` -${fmt.num(p.RABATT)}%` : ''}</td><td class="r">${fmt.money0(p.BRUTTO)} ${buchstabe(p.MWSTSATZ)}</td></tr>`).join('');
+    const vf = es && es.emitida && es.qr ? `<hr><div class="c">QR tributario:<br>${Print.qrSvg(es.qr, 32)}<br><b>VERI*FACTU</b>${es.entorno === 'pruebas' ? '<br><span class="small">Testumgebung – nicht bei der AEAT registriert</span>' : ''}</div>` : '';
+    const tse = es ? vf : gb ? '' : b.TSE_SIGNATUR ? `<hr><div class="small">TSE-Seriennr.: ${esc(b.TSE_SERIAL)}<br>Transaktion: ${esc(b.TSE_TXNR)} · Signaturzähler: ${esc(b.TSE_ZAEHLER)}<br>Start: ${esc(b.TSE_START)}<br>Ende: ${esc(b.TSE_ENDE)}<br>Signatur: ${esc(b.TSE_SIGNATUR)}</div><div class="c">${Print.qrSvg(b.TSE_QR)}</div>`
       : b.TSE_FEHLER ? `<hr><div class="small b">${esc(b.TSE_FEHLER)}</div>` : '<hr><div class="small">Keine TSE aktiv</div>';
-    const html = `<div class="c b" style="font-size:11pt">${esc(f.FIRMENNAME || '')}</div><div class="c">${esc(f.STRASSE || '')}<br>${esc([f.PLZ, f.ORT].filter(Boolean).join(' '))}<br>${esc(f.TELEFON || '')}${f.USTNR ? '<br>USt-IdNr. ' + esc(f.USTNR) : f.STEUERNR ? '<br>St.-Nr. ' + esc(f.STEUERNR) : ''}</div><hr>
+    const html = `<div class="c b" style="font-size:11pt">${esc(f.FIRMENNAME || '')}</div><div class="c">${esc(f.STRASSE || '')}<br>${esc(Print.plzOrt(f.PLZ, f.ORT))}<br>${esc(f.TELEFON || '')}${es ? (es.nifEmisor ? '<br>NIF ' + esc(es.nifEmisor) : '') : gb ? (f.USTNR ? '<br>VAT-Reg.-Nr. ' + esc(f.USTNR) : '') : f.USTNR ? '<br>USt-IdNr. ' + esc(f.USTNR) : f.STEUERNR ? '<br>St.-Nr. ' + esc(f.STEUERNR) : ''}</div><hr>
       ${kopie ? '<div class="c b">*** KOPIE ***</div>' : ''}${b.STORNOID ? '<div class="c b">*** STORNO ***</div>' : ''}
-      <div>${esc(b.TYP === 'Beleg' ? 'Kassenbeleg' : b.TYP)} Nr. ${b.BONNR}<br>${fmt.datetime(b.ZEIT)}${b.BEDIENER ? '<br>Bediener: ' + esc(b.BEDIENER) : ''}<br>Kasse: ${esc(d.kasse)}${b.KUNDE && b.KUNDE !== 'Barverkauf' ? '<br>Kunde: ' + esc(b.KUNDE) : ''}${d.rechnungnr ? '<br>Rechnung Nr. ' + esc(d.rechnungnr) : ''}</div><hr>
+      ${es && es.emitida ? `<div class="b">${esc({ F1: 'Rechnung', F2: 'Vereinfachte Rechnung', R5: 'Vereinfachte Rechnungskorrektur' }[es.tipo] || 'Rechnungskorrektur')} Nr. ${esc(es.numSerie)}</div>` : ''}
+      <div>${esc(b.TYP === 'Beleg' ? 'Kassenbeleg' : b.TYP)} Nr. ${b.BONNR}<br>${fmt.datetime(b.ZEIT)}${b.BEDIENER ? '<br>Bediener: ' + esc(b.BEDIENER) : ''}<br>Kasse: ${esc(d.kasse)}${b.KUNDE && b.KUNDE !== 'Barverkauf' ? '<br>Kunde: ' + esc(b.KUNDE) : ''}${d.rechnungnr && !es ? '<br>Rechnung Nr. ' + esc(d.rechnungnr) : ''}</div><hr>
       <table>${zeilen}</table><hr>
       <table><tr><td class="big">SUMME</td><td class="r big">${fmt.money(b.BRUTTO)}</td></tr>
       <tr><td>${esc({ BAR: 'Bar', EC: 'EC-Karte', KARTE: 'Kreditkarte', UEBERWEISUNG: 'Überweisung', KRYPTO: 'Krypto' }[b.ZAHLART] || b.ZAHLART)}${b.ZAHLART === 'KRYPTO' && b.VERWENDUNG ? '<br><small>' + esc(b.VERWENDUNG.replace(/^Krypto \(BTCPay\)( · )?/, 'BTCPay ')) + '</small>' : ''}</td><td class="r">${fmt.money(b.GEGEBEN)}</td></tr>
       ${Number(b.RUECKGELD) ? `<tr><td>Rückgeld</td><td class="r">${fmt.money(b.RUECKGELD)}</td></tr>` : ''}</table><hr>
-      <table><tr><td>MwSt</td><td class="r">Netto</td><td class="r">MwSt</td><td class="r">Brutto</td></tr>${d.ust.map(u => `<tr><td>${u.satz === 19 ? 'A' : u.satz === 7 ? 'B' : 'C'} ${fmt.num(u.satz)}%</td><td class="r">${fmt.money0(u.netto)}</td><td class="r">${fmt.money0(u.mwst)}</td><td class="r">${fmt.money0(u.brutto)}</td></tr>`).join('')}</table>
+      <table><tr><td>MwSt</td><td class="r">Netto</td><td class="r">MwSt</td><td class="r">Brutto</td></tr>${d.ust.map(u => `<tr><td>${buchstabe(u.satz)} ${fmt.num(u.satz)}%</td><td class="r">${fmt.money0(u.netto)}</td><td class="r">${fmt.money0(u.mwst)}</td><td class="r">${fmt.money0(u.brutto)}</td></tr>`).join('')}</table>
       ${tse}<hr><div class="c">${esc(d.fusstext || '')}</div>`;
     await Print.preview(`<!doctype html><html><head><meta charset="utf-8"><style>${Print.bonCss}</style></head><body>${html}</body></html>`, `Kassenbon ${b.BONNR}`);
   },
@@ -33,7 +39,7 @@ Object.assign(Print, {
   async zbon(a) {
     const f = a.firma;
     const zp = a.ZAEHLPROTOKOLL ? Object.entries(a.ZAEHLPROTOKOLL).filter(([, n]) => Number(n)).sort((x, y) => Number(y[0]) - Number(x[0])).map(([w, n]) => `<tr><td>${n} x ${fmt.money(Number(w))}</td><td class="r">${fmt.money(Number(w) * Number(n))}</td></tr>`).join('') : '';
-    const html = `<div class="c b" style="font-size:11pt">${esc(f.FIRMENNAME || '')}</div><div class="c">${esc([f.STRASSE, [f.PLZ, f.ORT].filter(Boolean).join(' ')].filter(Boolean).join(', '))}</div><hr>
+    const html = `<div class="c b" style="font-size:11pt">${esc(f.FIRMENNAME || '')}</div><div class="c">${esc([f.STRASSE, Print.plzOrt(f.PLZ, f.ORT)].filter(Boolean).join(', '))}</div><hr>
       <div class="c big">Kassenabschluss (Z-Bon)</div><div>Z-Nr.: ${a.ZNR}<br>Datum: ${fmt.datetime(a.ZEIT)}<br>Kasse: ${esc(a.kasse)}${a.BEDIENER ? '<br>Bediener: ' + esc(a.BEDIENER) : ''}<br>Bons: ${a.VON_BONID || '-'} bis ${a.BIS_BONID || '-'}</div><hr>
       <table><tr><td>Anfangsbestand</td><td class="r">${fmt.money(a.ANFANG)}</td></tr><tr><td>Bareinnahmen</td><td class="r">${fmt.money(a.BAR_EIN)}</td></tr><tr><td>Barausgaben</td><td class="r">${fmt.money(a.BAR_AUS)}</td></tr>
       <tr><td class="b">Soll-Bestand</td><td class="r b">${fmt.money(a.SOLL)}</td></tr><tr><td class="b">Ist-Bestand (gezählt)</td><td class="r b">${fmt.money(a.IST)}</td></tr><tr><td>Differenz</td><td class="r">${fmt.money(a.DIFFERENZ)}</td></tr></table><hr>
@@ -50,7 +56,7 @@ Object.assign(Print, {
     const kv = (a, b) => `<span>${esc(a)}</span><div>${esc(b ?? '') || '&nbsp;'}</div>`;
     let html = Print.headHtml(f);
     html += `<h1 style="margin-top:0">Kaufvertrag über ein ${v.ART === 'NW' ? 'neues' : 'gebrauchtes'} Kraftfahrzeug</h1><div class="muted">Vertrags-Nr. ${esc(v.NUMMER)} vom ${fmt.date(v.DATUM)}</div>
-      <div class="grid2"><div class="box"><b>Verkäufer</b><br>${esc(f.FIRMENNAME || '')}<br>${esc(f.STRASSE || '')}<br>${esc([f.PLZ, f.ORT].filter(Boolean).join(' '))}<br>${esc(f.TELEFON || '')}</div>
+      <div class="grid2"><div class="box"><b>Verkäufer</b><br>${esc(f.FIRMENNAME || '')}<br>${esc(f.STRASSE || '')}<br>${esc(Print.plzOrt(f.PLZ, f.ORT))}<br>${esc(f.TELEFON || '')}</div>
       <div class="box"><b>Käufer</b>${Number(v.UNTERNEHMER) ? ' (Unternehmer)' : ' (Verbraucher)'}<br>${esc([k.anrede && !/firma/i.test(k.anrede) ? k.anrede : '', k.vorname, k.name].filter(Boolean).join(' '))}<br>${esc(k.zusatz || '')}${k.zusatz ? '<br>' : ''}${esc(k.strasse || '')}<br>${esc([k.plz, k.ort].filter(Boolean).join(' '))}<br>${esc(k.telefon || '')}${k.gebdatum ? '<br>geb. ' + fmt.date(k.gebdatum) : ''}</div></div>
       <div class="box"><b>Fahrzeug</b><div class="kv" style="margin-top:1mm">${kv('Hersteller / Typ', [z.marke, z.modell].filter(Boolean).join(' '))}${kv('Fahrzeug-Ident.-Nr.', z.fin)}${kv('Amtl. Kennzeichen', z.kennzeichen)}${kv('Erstzulassung', fmt.date(z.ez))}${kv('km-Stand (abgelesen)', v.KMSTAND)}${kv('Nächste HU', fmt.month(v.HU))}${kv('ZB II-Nr.', z.briefnr)}${kv('Leistung', z.kw ? `${z.kw} kW (${z.ps || Math.round(z.kw * 1.36)} PS)` : '')}${kv('Anzahl Vorbesitzer', z.vorbesitzer)}${kv('Farbe', z.farbe)}</div></div>
       <div class="box"><b>Kaufpreis und Zahlung</b><div class="kv" style="margin-top:1mm">${kv('Kaufpreis', fmt.money(v.KAUFPREIS) + (Number(v.DIFFBESTEUERT) ? ' (Differenzbesteuerung gem. § 25a UStG, keine MwSt ausweisbar)' : ' inkl. gesetzlicher MwSt'))}${Number(v.ANZAHLUNG) ? kv('Anzahlung', fmt.money(v.ANZAHLUNG)) : ''}${Number(v.INZAHLUNGNAHMEBETRAG) ? kv('Inzahlungnahme', `${v.INZAHLUNGNAHME || ''} – angerechnet mit ${fmt.money(v.INZAHLUNGNAHMEBETRAG)}`) : ''}${kv('Restbetrag', fmt.money((v.KAUFPREIS || 0) - (v.ANZAHLUNG || 0) - (v.INZAHLUNGNAHMEBETRAG || 0)))}${kv('Zahlungsweise', v.ZAHLUNGSWEISE)}${kv('Übergabe / Liefertermin', fmt.date(v.LIEFERTERMIN))}</div></div>

@@ -185,7 +185,11 @@ function lookups() {
     textbausteine: all('SELECT TXTID id, TXTBEZEICHNUNG name, TXTTEXT text FROM TEXTBLOCK ORDER BY TXTBEZEICHNUNG'),
     drucktexte: all('SELECT IDTXT id, TXTART art, TXTARTSTANDARD std, TXTBEZEICHNUNG name, TXTBETREFF betreff, EINLEITUNG einleitung, SCHLUSSTEXT schluss, TXTARTVARIABLE var FROM DRUCKTEXTBAUSTEINE ORDER BY TXTART, TXTBEZEICHNUNG'),
     mwst: L.mwstList(),
-    klein: L.optNum('Kleinunternehmer', 0) === 1,
+    klein: L.optNum('Kleinunternehmer', 0) === 1 && L.land() === 'DE',
+    land: L.land(),
+    waehrung: L.waehrung(),
+    gbRegistrado: L.land() === 'GB' && require('../gb').registrado(),
+    recargo: require('../es').activo() ? require('../es').RECARGO : null,
     opt30: opts(30), opt40: opts(40), opt50: opts(50), opt60: opts(60), opt100: opts(100),
     ind,
   };

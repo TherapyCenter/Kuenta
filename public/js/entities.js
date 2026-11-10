@@ -90,10 +90,11 @@
           { f: 'AUSNETTO', l: 'Vorgänge in Netto-Ansicht erstellen', t: 'bool' },
         ] },
         { title: 'Steuer & Buchhaltung', fields: [
-          { f: 'USTID', l: 'USt-IdNr.' },
+          { f: 'USTID', l: 'USt-IdNr. / NIF' },
           { f: 'DEBITORNR', l: 'Debitoren-Nr.', t: 'int' },
           { f: 'NETTORECHNUNG', l: 'Ausländischer Kunde: bekommt eine Netto-Rechnung (ohne MwSt)', t: 'bool' },
           { f: 'EXPORTART', l: 'Steuerlicher Grund', t: 'select', opts: [['REVERSE_CHARGE', 'Reverse Charge (Leistung an EU-Unternehmer)'], ['IG_LIEFERUNG', 'Innergemeinschaftliche Lieferung'], ['AUSFUHR', 'Ausfuhr / Drittland']] },
+          { f: 'RECARGO', l: 'Spanien: Kunde im Recargo de equivalencia (Einzelhändler)', t: 'bool' },
           { f: 'FIBUEXPORT', l: 'an FIBU exportiert', t: 'bool', ro: true },
         ] },
         { title: 'E-Rechnung', fields: [

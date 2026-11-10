@@ -7,6 +7,8 @@ const { writeZip } = require('../import/zip');
 
 const num = x => { const n = Number(String(x ?? '').replace(',', '.')); return Number.isFinite(n) ? n : 0; };
 const BTC = require('../btcpay');
+const ES = require('../es');
+const VF = require('../es/verifactu');
 const ZAHLART_ID = { BAR: 1, EC: 2, KARTE: 2, UEBERWEISUNG: 3, KRYPTO: -1 };
 const ZAHLART_TEXT = { BAR: 'Bar', EC: 'EC-Karte', KARTE: 'Kreditkarte', UEBERWEISUNG: 'Überweisung', KRYPTO: 'Krypto' };
 // payment type ID in the database; crypto is created when needed
@@ -36,7 +38,8 @@ function status() {
     bediener: d.prepare("SELECT BENUTZERID id, TRIM(COALESCE(VORNAME,'')||' '||COALESCE(NAME,'')) name FROM BENUTZER WHERE COALESCE(KASSENBEDIENER,0)=1 ORDER BY NAME").all(),
     barkunde: Number(L.sw('kasse.barkunde', '0')) || null,
     schnelltasten: JSON.parse(L.sw('kasse.schnelltasten', '[]') || '[]'),
-    autorechnung: L.sw('kasse.autorechnung', '1') === '1',
+    autorechnung: L.sw('kasse.autorechnung', '1') === '1' || ES.activo(),
+    land: L.land(),
     tse: { aktiv: TSE.cfg().aktiv, serial: L.sw('tse.seriennummer', '') },
     ec: L.sw('ec.aktiv', '0') === '1',
     krypto: BTC.bereit(),
@@ -110,14 +113,20 @@ async function bonBuchen(p, user, krypto) {
     lines = linien(pos);
     if (!lines.length) throw new L.HttpError(400, 'Der Kassenvorgang enthält keine Positionen.');
     const s = summen(lines); bezahlBetrag = s.brutto;
-    if (!rechnungid && L.sw('kasse.autorechnung', '1') === '1') {
+    // Spain: every sale is an invoice (factura simplificada or completa) with a VERI*FACTU record
+    if (!rechnungid && (L.sw('kasse.autorechnung', '1') === '1' || ES.activo())) {
       const t = VG.template('rechnung', kunid ? { kunid } : {}); delete t.kopf._kunde;
       t.kopf.ANSICHTBRUTTO = 1; t.kopf.ZAHLBDTEXT = zahlart === 'KRYPTO' ? 'Betrag per Krypto-Zahlung (BTCPay) erhalten.' : `Betrag ${ZAHLART_TEXT[zahlart].toLowerCase()} erhalten.`; t.kopf.FAELLING = 0;
       if (!kunid) { t.kopf.KUNNAME = 'Barverkauf'; }
       const r = VG.save('rechnung', { kopf: t.kopf, pos: lines.map(l => ({ POSART: l.POSART === 'L' ? 'L' : 'A', ARTID: l.ARTID, ARTNUMMER: l.ARTNUMMER, BEZEICHNUNG: l.BEZEICHNUNG, MENGE: l.MENGE, VKBRUTTO: l.EINZEL, RABATT: l.RABATT, MWST: l.MWSTCODE, EK: l.EK, DURCHLAUFER: l.DURCHLAUFER, EINHEITID: l.EINHEITID })) }, user);
       rechnungid = r.kopf.RECHNUNGID;
+      if (ES.activo()) {
+        try { VF.emitir(rechnungid); } catch (e) { VG.remove('rechnung', rechnungid, user); throw e; }
+        bezahlBetrag = r.kopf.GBRUTTO; // incl. recargo de equivalencia
+      }
     }
   }
+  if (rechnungid && ES.activo()) VF.emitir(rechnungid); // invoice paid at the register is issued now at the latest
   if (krypto && Math.abs(krypto.BETRAG - bezahlBetrag) > 0.005) throw new L.HttpError(409, 'Der Betrag hat sich geändert. Die Krypto-Zahlung passt nicht mehr zum Bon.');
   const s = summen(lines);
   if (rechnungid) { await VG.addPayment({ RECHNUNGID: rechnungid, BETRAG: bezahlBetrag, ZAHLUNGSARTID: zahlartDb(zahlart), BANKNAME: 'Kasse' }, user); }
@@ -165,6 +174,7 @@ async function storno(bonid, { rechnungskorrektur = true, zahlart } = {}, user) 
   if (o.ABSCHLUSSID) throw new L.HttpError(409, 'Der Bon ist bereits in einem Kassenabschluss enthalten.');
   const lines = d.prepare('SELECT * FROM SW_KASSE_POS WHERE BONID=? ORDER BY POS').all(bonid).map(l => ({ ...l, MENGE: -l.MENGE, BRUTTO: -l.BRUTTO, NETTO: -l.NETTO }));
   const za = ZAHLART_ID[zahlart] ? zahlart : o.ZAHLART;
+  if (ES.activo()) rechnungskorrektur = true; // Spain: a cancelled sale needs a corrective invoice
   if (o.RECHNUNGID) {
     const isZahlung = lines.length === 1 && lines[0].GVTYP === 'Forderungsaufloesung';
     if (isZahlung) {
@@ -172,6 +182,7 @@ async function storno(bonid, { rechnungskorrektur = true, zahlart } = {}, user) 
       if (z) VG.deletePayment(z.ID, user);
     } else if (rechnungskorrektur) {
       const st = VG.storno(o.RECHNUNGID, user);
+      if (ES.activo()) VF.emitir(st.id);
       const k = VG.load('korrektur', st.id);
       if (Math.abs(k.offen) > 0.004) await VG.addPayment({ RECHNUNGID: st.id, BETRAG: k.offen, ZAHLUNGSARTID: zahlartDb(za), BANKNAME: 'Kasse (Storno)' }, user);
     } else {
@@ -195,8 +206,10 @@ function beleg(id) {
   const pos = d.prepare('SELECT * FROM SW_KASSE_POS WHERE BONID=? ORDER BY POS').all(id);
   const ust = {};
   for (const p of pos) { const u = ust[p.MWSTSATZ] || (ust[p.MWSTSATZ] = { satz: p.MWSTSATZ, brutto: 0, netto: 0 }); u.brutto = L.r2(u.brutto + p.BRUTTO); u.netto = L.r2(u.netto + p.NETTO); }
-  const r = b.RECHNUNGID ? d.prepare('SELECT RECHNUNGNUMMER FROM RECHNUNGEN WHERE RECHNUNGID=?').get(b.RECHNUNGID) : null;
-  return { bon: b, pos, ust: Object.values(ust).map(u => ({ ...u, mwst: L.r2(u.brutto - u.netto) })), rechnungnr: r && r.RECHNUNGNUMMER, firma: L.firma(), kasse: L.sw('kasse.seriennummer', 'Kasse 1'), fusstext: L.sw('kasse.bonfusstext', 'Vielen Dank für Ihren Besuch!') };
+  const r = b.RECHNUNGID ? d.prepare('SELECT * FROM RECHNUNGEN WHERE RECHNUNGID=?').get(b.RECHNUNGID) : null;
+  // Spain: the receipt shows the invoice (series number, NIF, QR code of VERI*FACTU)
+  const es = r && (ES.activo() || r.ESNUMSERIE) ? { ...VF.info(r), recargo: r.GRECARGO || 0 } : null;
+  return { es, bon: b, pos, ust: Object.values(ust).map(u => ({ ...u, mwst: L.r2(u.brutto - u.netto) })), rechnungnr: r && r.RECHNUNGNUMMER, firma: L.firma(), kasse: L.sw('kasse.seriennummer', 'Kasse 1'), fusstext: L.sw('kasse.bonfusstext', 'Vielen Dank für Ihren Besuch!') };
 }
 function journal(q) {
   return L.db().prepare('SELECT * FROM SW_KASSE_BON WHERE substr(ZEIT,1,10) BETWEEN ? AND ? ORDER BY ID DESC LIMIT 5000').all(q.von || L.today(), q.bis || L.today());

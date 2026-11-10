@@ -21,20 +21,22 @@ module.exports = function register(route, { json, readBody }) {
   const fname = s => String(s).replace(/[^\wäöüÄÖÜß.\- ]/g, '_');
 
   // ---------- PDF / ZUGFeRD ----------
-  function vorgangPdf(typ, id, { zugferd } = {}) {
+  function vorgangPdf(typ, id, { zugferd, vorschau } = {}) {
     const v = V[typ]; if (!v) throw new L.HttpError(404, 'Unbekannter Vorgang');
+    // Spain: an invoice that leaves Kuenta as PDF is issued (VERI*FACTU record with QR code)
+    if (v.table === 'RECHNUNGEN' && !vorschau && require('./es').activo()) require('./es/verifactu').emitir(Number(id));
     if (zugferd && v.table === 'RECHNUNGEN') { const z = PDF.zugferd(id); return { buf: z.pdf, name: `${v.title}_${z.nr}.pdf`, problems: z.problems }; }
     const d = VG.load(typ, id);
     return { buf: PDF.vorgangPdf(typ, d), name: `${v.title}_${d.kopf[v.nr]}.pdf` };
   }
-  route('GET', '/api/pdf/vorgang/:typ/:id', (ctx) => { const p = vorgangPdf(ctx.p.typ, ctx.p.id, { zugferd: ctx.q.zugferd === '1' }); return { _download: p.buf, filename: fname(p.name), type: 'application/pdf' }; });
+  route('GET', '/api/pdf/vorgang/:typ/:id', (ctx) => { const p = vorgangPdf(ctx.p.typ, ctx.p.id, { zugferd: ctx.q.zugferd === '1', vorschau: ctx.q.vorschau === '1' }); return { _download: p.buf, filename: fname(p.name), type: 'application/pdf' }; });
   route('GET', '/api/pdf/mahnung/:id', (ctx) => { const m = FI.mahnung(ctx.p.id); return { _download: PDF.mahnungPdf(m), filename: `Mahnung_${m.rechnung.RECHNUNGNUMMER}.pdf`, type: 'application/pdf' }; });
 
   // ---------- Email ----------
   const platz = (t, k) => String(t || '').replace(/\{(\w+)\}/g, (m, n) => ({ Nummer: k.nr, Vorgang: k.titel, Name: k.name, Anrede: k.anrede, Briefanrede: k.briefanrede, Firma: L.firma().FIRMENNAME || '', Betrag: k.betrag, Datum: k.datum, Zahlungslink: k.zahlungslink || '' }[n] ?? m));
   const { D, Dt, docLang, I18N } = require('./i18n');
   function briefanrede(a, name) { a = String(a || '').trim(); return D(/^herr/i.test(a) ? `Sehr geehrter ${a} ${name},` : /^frau/i.test(a) ? `Sehr geehrte ${a} ${name},` : 'Sehr geehrte Damen und Herren,'); }
-  const eur = v => new Intl.NumberFormat(I18N.locale(docLang()), { style: 'currency', currency: 'EUR' }).format(v);
+  const eur = v => new Intl.NumberFormat(I18N.locale(docLang()), { style: 'currency', currency: L.waehrung() }).format(v);
   route('GET', '/api/mail/vorlage/:art/:typ/:id', (ctx) => {
     const { art, typ, id } = ctx.p;
     let to = '', k;

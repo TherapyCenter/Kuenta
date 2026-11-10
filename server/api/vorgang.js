@@ -37,15 +37,22 @@ function calc(kopf, pos) {
     g.netto += p.SUMME; g.brutto += p.SUMMEBRUTTO;
   });
   let pnr = 0; for (const p of pos) if (p.POSART !== 'T' && p.POSART !== 'Z') p.POS = ++pnr;
-  const tax = {}; let gn = 0, gb = 0;
+  const tax = {}; let gn = 0, gb = 0, gre = 0;
+  // Spain: recargo de equivalencia on top of the IVA for customers in that regime
+  const ES = require('../es');
+  const conRecargo = Number(kopf.ESRECARGO) === 1 && ES.activo();
   for (const [code, g] of Object.entries(groups)) {
     let n, m, b;
     if (brutto) { b = L.r2(g.brutto); n = L.r2(b / (1 + g.rate / 100)); m = L.r2(b - n); }
     else { n = L.r2(g.netto); m = L.r2(n * g.rate / 100); b = L.r2(n + m); }
+    const reRate = conRecargo && g.rate > 0 && Number(code) !== 63 ? ES.recargo(g.rate) : 0;
+    const re = reRate ? L.r2(n * reRate / 100) : 0;
+    b = L.r2(b + re);
     tax[code] = { rate: g.rate, netto: n, mwst: m, brutto: b };
-    gn += n; gb += b;
+    if (reRate) Object.assign(tax[code], { reRate, recargo: re });
+    gn += n; gb += b; gre += re;
   }
-  kopf.GNETTO = L.r2(gn); kopf.GBRUTTO = L.r2(gb);
+  kopf.GNETTO = L.r2(gn); kopf.GBRUTTO = L.r2(gb); kopf.GRECARGO = L.r2(gre);
   kopf.GMWST1 = tax[61] ? tax[61].mwst : 0;
   kopf.GMWST2 = tax[62] ? tax[62].mwst : 0;
   kopf.GMWSTAT = tax[64] ? tax[64].mwst : 0;
@@ -66,6 +73,10 @@ function load(typ, id) {
     res.mahnungen = d.prepare('SELECT * FROM MAHNUNG WHERE RECHNUNGID=? ORDER BY MAHNDATUM').all(id);
   }
   res.verknuepft = related(v, kopf);
+  if (v.table === 'RECHNUNGEN') {
+    const ES = require('../es');
+    if (ES.activo() || kopf.ESNUMSERIE) res.es = require('../es/verifactu').info(kopf);
+  }
   return res;
 }
 
@@ -97,7 +108,7 @@ function template(typ, q = {}) {
   const kopf = {
     [v.nr]: L.nextNumber(v.numKey, v.table, v.nr, v.typ ? `TYP=${v.typ}` : ''),
     DATUM: L.today(), LIEFDATUM: L.today(), GEDRUCKT: 0, ARCHIV: 0,
-    ANSICHTBRUTTO: Number(L.sw('vorgang.ansichtbrutto', '1')), RABATTZEIGEN: 0, KUNLAND: L.opt('Länderkürzel', 'DE'),
+    ANSICHTBRUTTO: Number(L.sw('vorgang.ansichtbrutto', '1')), RABATTZEIGEN: 0, KUNLAND: L.land() !== 'DE' ? L.land() : L.opt('Länderkürzel', 'DE'),
     DRUCKFORMULAR: v.form, BENID: -1, AUFTYPID: -1,
   };
   if (v.typ) kopf.TYP = v.typ;
@@ -122,12 +133,14 @@ function kundeFelder(kunid) {
   if (!k) throw new L.HttpError(404, 'Kunde nicht gefunden');
   const f = {
     KUNID: k.KUNID, KUNNUMMER: k.NUMMER, KUNART: k.ART, KUNANREDE: k.ANREDE, KUNNAME: k.NAME, KUNVORNAME: k.VORNAME,
-    KUNZUSATZ: k.ZUSATZ, KUNSTRASSE: k.STRASSE, KUNPLZ: k.PLZ, KUNORT: k.ORT, KUNLAND: k.LAND || 'DE',
+    KUNZUSATZ: k.ZUSATZ, KUNSTRASSE: k.STRASSE, KUNPLZ: k.PLZ, KUNORT: k.ORT, KUNLAND: k.LAND || (L.land() !== 'DE' ? L.land() : 'DE'),
     RABATTART: k.RABATTART || 0, RABATTLOHN: k.RABATTLOHN || 0,
   };
   if (k.AUSNETTO === 1) f.ANSICHTBRUTTO = 0;
   f.STEUERART = Number(k.NETTORECHNUNG) === 1 ? (k.EXPORTART || 'REVERSE_CHARGE') : null;
   if (f.STEUERART) f.ANSICHTBRUTTO = 0;
+  f.ESRECARGO = Number(k.RECARGO) === 1 && require('../es').activo() ? 1 : 0;
+  if (f.ESRECARGO) f.ANSICHTBRUTTO = 0;
   if (k.KUNZAHLBDID) {
     const zb = d.prepare('SELECT * FROM ZAHLUNGSBEDINUNGEN WHERE ZAHLBDID=?').get(k.KUNZAHLBDID);
     if (zb) applyZahlbd(f, zb);
@@ -155,6 +168,10 @@ function save(typ, payload, user) {
     // So typing cannot create gaps, and two workstations never get the same number.
     const old = id ? d.prepare(`SELECT ${v.nr} nr FROM ${v.table} WHERE ${v.pk}=?`).get(id) : null;
     kopfIn[v.nr] = old ? old.nr : L.nextNumber(v.numKey, v.table, v.nr, `TYP=${v.typ}`);
+    const ES = require('../es');
+    if (id && require('../es/verifactu').vigente(id)) throw new L.HttpError(409, 'Die Rechnung ist ausgestellt und an VERI*FACTU gemeldet. Sie kann nicht mehr geändert werden. Bitte erstellen Sie eine Rechnungskorrektur.');
+    // Spain: never reuse a number that was already reported (e.g. after restoring an older backup)
+    if (!old && ES.activo()) kopfIn[v.nr] = Math.max(kopfIn[v.nr], require('../es/verifactu').siguienteNumero(ES.serie(v.typ)));
   }
   if (!kopfIn[v.nr]) kopfIn[v.nr] = L.nextNumber(v.numKey, v.table, v.nr, v.typ ? `TYP=${v.typ}` : '');
   kopfIn[v.nr] = parseInt(kopfIn[v.nr], 10);
@@ -347,6 +364,7 @@ function remove(typ, id, user) {
   if (v.table === 'RECHNUNGEN') {
     const pays = d.prepare('SELECT COUNT(*) n FROM ZAHLUNGSEINGAENGE WHERE RECHNUNGID=?').get(id).n;
     if (pays) throw new L.HttpError(409, 'Zu dieser Rechnung sind Zahlungen erfasst. Bitte zuerst die Zahlungen löschen oder die Rechnung stornieren.');
+    if (require('../es/verifactu').vigente(id)) throw new L.HttpError(409, 'Die Rechnung ist an VERI*FACTU gemeldet und darf nicht gelöscht werden. Bitte erstellen Sie eine Rechnungskorrektur.');
     if (k.GEDRUCKT) throw new L.HttpError(409, 'Die Rechnung wurde bereits gedruckt/versendet und darf nicht gelöscht werden (GoBD). Bitte stornieren Sie die Rechnung.');
     const exp = d.prepare('SELECT COUNT(*) n FROM FIBU WHERE RECHID=? AND EXPORTIERT=1').get(id).n;
     if (exp) throw new L.HttpError(409, 'Die Rechnung wurde bereits an die FIBU exportiert und kann nicht gelöscht werden.');
@@ -374,7 +392,7 @@ function remove(typ, id, user) {
 }
 
 // ---------- Continue / copy ----------
-const KOPF_SKIP = new Set(['GEDRUCKT', 'ARCHIV', 'AENDERUNGSDATUM', 'ZAHLSTATUS', 'GUTSCHRIFTID', 'REIDGUTSCHRIFT', 'AUFTRAGID', 'ANGEBOTID', 'LIEFERSCHEINID', 'RECHNUNGID', 'RECHID', 'LIEFID', 'TYP', 'DRUCKFORMULAR', 'ERECHNUNGERSTELLT', 'STORNOVONID', 'KEINEMAHNUNG']);
+const KOPF_SKIP = new Set(['ESNUMSERIE', 'ESTIPO', 'ESRECT', 'GEDRUCKT', 'ARCHIV', 'AENDERUNGSDATUM', 'ZAHLSTATUS', 'GUTSCHRIFTID', 'REIDGUTSCHRIFT', 'AUFTRAGID', 'ANGEBOTID', 'LIEFERSCHEINID', 'RECHNUNGID', 'RECHID', 'LIEFID', 'TYP', 'DRUCKFORMULAR', 'ERECHNUNGERSTELLT', 'STORNOVONID', 'KEINEMAHNUNG']);
 function convert(typ, id, ziel, mode, user) {
   const v = vt(typ); const zv = vt(ziel);
   const src = load(typ, id);
@@ -439,6 +457,13 @@ const de = iso => iso ? iso.slice(8, 10) + '.' + iso.slice(5, 7) + '.' + iso.sli
 function setFlag(typ, ids, flag, value) {
   const v = vt(typ);
   if (!['GEDRUCKT', 'ARCHIV'].includes(flag)) throw new L.HttpError(400, 'Ungültig');
+  if (v.table === 'RECHNUNGEN' && flag === 'GEDRUCKT') {
+    const VF = require('../es/verifactu');
+    for (const id of [].concat(ids)) {
+      if (value && require('../es').activo()) VF.emitir(id); // printed = issued: create the VERI*FACTU record
+      if (!value && VF.vigente(id)) throw new L.HttpError(409, 'Die Rechnung ist an VERI*FACTU gemeldet und bleibt als ausgestellt markiert.');
+    }
+  }
   const st = L.db().prepare(`UPDATE ${v.table} SET ${flag}=? WHERE ${v.pk}=?`);
   for (const id of [].concat(ids)) st.run(value ? 1 : 0, id);
   return { ok: true };

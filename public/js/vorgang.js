@@ -26,10 +26,14 @@ const Vorgang = {
       g.netto += p.SUMME; g.brutto += p.SUMMEBRUTTO;
     }
     let n = 0, b = 0; const tax = {};
+    const recargo = Number(kopf.ESRECARGO) === 1 && LK.data && LK.data.recargo; // Spain: recargo de equivalencia
     for (const [code, g] of Object.entries(groups)) {
       let gn, gm, gb;
       if (brutto) { gb = r2(g.brutto); gn = r2(gb / (1 + g.rate / 100)); gm = r2(gb - gn); } else { gn = r2(g.netto); gm = r2(gn * g.rate / 100); gb = r2(gn + gm); }
-      tax[code] = { rate: g.rate, netto: gn, mwst: gm, brutto: gb }; n += gn; b += gb;
+      const reRate = recargo && g.rate > 0 && Number(code) !== 63 ? (recargo[g.rate] || 0) : 0;
+      const re = reRate ? r2(gn * reRate / 100) : 0;
+      gb = r2(gb + re);
+      tax[code] = { rate: g.rate, netto: gn, mwst: gm, brutto: gb }; if (reRate) Object.assign(tax[code], { reRate, recargo: re }); n += gn; b += gb;
     }
     return { netto: r2(n), brutto: r2(b), mwst: r2(b - n), tax, roh: r2(roh), einsatz: r2(einsatz) };
   },
@@ -53,8 +57,8 @@ const Vorgang = {
     const items = [
       { label: 'Bearbeiten', icon: '✏️', onClick: () => Vorgang.open(typ, id).then(reload) },
       { label: 'Drucken', icon: '🖨', onClick: () => Vorgang.printById(typ, id).then(reload) },
-      { label: 'PDF herunterladen', icon: '📄', onClick: () => downloadUrl(`/api/pdf/vorgang/${typ}/${id}`, 'Beleg.pdf') },
-      ...(v.table === 'RECHNUNGEN' ? [{ label: 'ZUGFeRD-PDF herunterladen', icon: '🧾', onClick: () => Vorgang.zugferd(id) }] : []),
+      { label: 'PDF herunterladen', icon: '📄', onClick: () => Vorgang.pdf(typ, id).then(reload) },
+      ...(v.table === 'RECHNUNGEN' && Vorgang.land() === 'DE' ? [{ label: 'ZUGFeRD-PDF herunterladen', icon: '🧾', onClick: () => Vorgang.zugferd(id) }] : []),
       { label: 'Per E-Mail senden', icon: '✉️', onClick: () => Mail.dialog('vorgang', typ, id).then(reload) },
       '-',
     ];
@@ -71,7 +75,11 @@ const Vorgang = {
       items.push('-');
       if (typ === 'rechnung') items.push({ label: 'Rechnung stornieren', icon: '↩', disabled: row.GUTSCHRIFTID > 0, onClick: () => Vorgang.storno(id).then(reload) });
       items.push({ label: 'Zahlung erfassen', icon: '💶', onClick: () => Zahlung.erfassen(id).then(reload) });
-      items.push({ label: 'E-Rechnung (XRechnung)', icon: '🧾', items: [
+      if (Vorgang.es()) items.push({ label: 'VERI*FACTU-Status', icon: '🇪🇸', onClick: () => Vorgang.esStatus(typ, id).then(reload) },
+        { label: 'Facturae (E-Rechnung für Behörden)', icon: '🧾', items: [
+          { label: 'Facturae 3.2.2 herunterladen', onClick: () => Vorgang.facturae(id) },
+          { label: 'Pflichtangaben prüfen', onClick: () => Vorgang.facturae(id, true) }] });
+      else if (Vorgang.land() === 'DE') items.push({ label: 'E-Rechnung (XRechnung)', icon: '🧾', items: [
         { label: 'XRechnung CII herunterladen', onClick: () => Vorgang.erechnung(id, 'cii') },
         { label: 'XRechnung UBL herunterladen', onClick: () => Vorgang.erechnung(id, 'ubl') },
         { label: 'Pflichtangaben prüfen', onClick: () => Vorgang.erechnungPruefen(id) }] });
@@ -105,8 +113,58 @@ const Vorgang = {
       await Vorgang.open('korrektur', r.id);
     } catch (e) { showError(e); }
   },
+  // ---------- Spain (VERI*FACTU) ----------
+  es() { return !!(LK.data && LK.data.land === 'ES'); },
+  land() { return (LK.data && LK.data.land) || 'DE'; },
+  // Before an invoice leaves Kuenta (print, PDF) it is issued: VERI*FACTU record, then locked
+  async esEmitir(typ, id, d) {
+    if (!Vorgang.es() || ENT.V[typ].table !== 'RECHNUNGEN' || (d && d.es && d.es.emitida)) return d || true;
+    if (!(await confirmDlg('Die Rechnung wird jetzt ausgestellt und an VERI*FACTU gemeldet. Danach kann sie nicht mehr geändert werden, nur noch über eine Rechnungskorrektur.', { ok: 'Ausstellen' }))) return null;
+    try { await api('/api/es/emitir', { method: 'POST', body: { ids: [id] } }); } catch (e) { showError(e); return null; }
+    App.refresh(ENT.V[typ].ent);
+    return api(`/api/vorgang/${typ}/${id}`);
+  },
+  async pdf(typ, id) {
+    if (!(await Vorgang.esEmitir(typ, id, Vorgang.es() && ENT.V[typ].table === 'RECHNUNGEN' ? await api(`/api/vorgang/${typ}/${id}`) : null))) return;
+    await downloadUrl(`/api/pdf/vorgang/${typ}/${id}`, 'Beleg.pdf');
+  },
+  async facturae(id, pruefen = false) {
+    try {
+      const chk = await api(`/api/es/facturae/${id}?pruefen=1`);
+      if (pruefen) {
+        const content = h('div', { class: 'win-body flex', style: { padding: 0 } },
+          chk.problems.length ? h('div', { class: 'note err' }, h('b', null, 'Fehlende Angaben:'), h('ul', null, chk.problems.map(p => h('li', null, p)))) : h('div', { class: 'note ok' }, '✔ Alle Pflichtangaben für Facturae vorhanden.'),
+          h('div', { class: 'hint' }, 'Vor dem Hochladen in FACe die Datei mit AutoFirma signieren (XAdES).'), h('pre', { class: 'code' }, chk.xml));
+        const w = Win.open({ title: 'Facturae prüfen', width: 900, height: 640, content });
+        w.setButtons(['|', { label: 'Schließen', onClick: () => w.close() }]); w.el.append(w.foot);
+        return;
+      }
+      if (chk.problems.length && !(await confirmDlg('Für eine gültige Facturae fehlen Angaben:\n\n• ' + chk.problems.join('\n• ') + '\n\nTrotzdem erstellen?', { ok: 'Trotzdem erstellen' }))) return;
+      await downloadUrl(`/api/es/facturae/${id}`, 'Facturae.xml');
+      toast('Facturae erstellt. Vor dem Hochladen in FACe mit AutoFirma signieren.', 'ok');
+    } catch (e) { showError(e); }
+  },
+  async esStatus(typ, id) {
+    const d = await api(`/api/vorgang/${typ}/${id}`); const es = d.es || {};
+    const T2 = { pendiente: 'wartet auf Versand', aceptado: 'von der AEAT angenommen', aceptado_errores: 'angenommen mit Fehlern – bitte korrigieren', rechazado: 'von der AEAT abgelehnt' };
+    const rows = [['Rechnung', es.numSerie], ['Ausgestellt', es.emitida ? T('ja') : T('nein')], ['Typ', es.tipo ? `${es.tipo} – ${es.titulo}` : ''], ['Status', es.estado ? T(T2[es.estado] || es.estado) : ''],
+      ['Fehler', [es.codigo, es.mensaje].filter(Boolean).join(' ')], ['CSV der AEAT', es.csv], ['Umgebung', es.entorno === 'produccion' ? T('Produktion') : es.entorno ? T('Test') : ''], ['Erzeugt', es.generado], ['Hash', es.huella]];
+    const content = h('div', null, h('table', { class: 'simple' }, rows.filter(r => r[1]).map(([a, b]) => h('tr', null, h('td', null, a), h('td', { style: { wordBreak: 'break-all' } }, String(b))))));
+    const btns = [];
+    if (!es.emitida) btns.push({ label: 'Jetzt ausstellen', cls: 'primary', value: 'emitir' });
+    if (es.estado === 'aceptado_errores' || es.estado === 'rechazado') btns.push({ label: 'Korrigierten Datensatz senden (Subsanación)', value: 'subsanar' });
+    if (es.id) btns.push({ label: 'XML', value: 'xml' });
+    btns.push({ label: 'Schließen', value: null });
+    const r = await dialog('VERI*FACTU-Status', content, btns, { width: 640 });
+    try {
+      if (r === 'emitir') await Vorgang.esEmitir(typ, id, d);
+      if (r === 'subsanar') { await api(`/api/es/subsanar/${id}`, { method: 'POST' }); toast('Neuer Datensatz erzeugt, wird gesendet', 'ok'); }
+      if (r === 'xml') await downloadUrl(`/api/es/registro/${es.id}/xml`, 'VERIFACTU.xml');
+    } catch (e) { showError(e); }
+  },
   async printById(typ, id, opts = {}) {
-    const d = await api(`/api/vorgang/${typ}/${id}`);
+    const d = await Vorgang.esEmitir(typ, id, await api(`/api/vorgang/${typ}/${id}`));
+    if (!d) return;
     await Print.vorgang(typ, d, opts);
     if (!Number(d.kopf.GEDRUCKT)) await api(`/api/vorgang/${typ}/flag`, { method: 'POST', body: { ids: [id], flag: 'GEDRUCKT', value: 1 } });
   },
@@ -625,6 +683,11 @@ class VorgangWindow {
     const sa = h('select', null, [['', 'normal (mit MwSt)'], ['REVERSE_CHARGE', 'steuerfrei: Reverse Charge (EU-Unternehmer)'], ['IG_LIEFERUNG', 'steuerfrei: innergemeinschaftliche Lieferung'], ['AUSFUHR', 'steuerfrei: Ausfuhr / Drittland']].map(([k, l]) => h('option', { value: k, selected: (this.k.STEUERART || '') === k }, l)));
     sa.addEventListener('change', () => { this.k.STEUERART = sa.value || null; this.change(); this.drawPos(); });
     grid.append(h('label', { class: 'fld' }, h('span', null, 'Umsatzsteuer'), sa));
+    if (this.typ === 'korrektur' && Vorgang.es()) {
+      const rs = h('select', null, [['R4', 'R4 – sonstige Gründe (Resto)'], ['R1', 'R1 – Rechtsfehler, Art. 80 Uno, Dos, Seis LIVA'], ['R2', 'R2 – Insolvenz (Art. 80.3 LIVA)'], ['R3', 'R3 – uneinbringliche Forderung (Art. 80.4 LIVA)']].map(([k, l]) => h('option', { value: k, selected: (this.k.ESRECT || 'R4') === k }, l)));
+      rs.addEventListener('change', () => { this.k.ESRECT = rs.value; this.change(); });
+      grid.append(h('label', { class: 'fld' }, h('span', null, 'Grund der Korrektur (VERI*FACTU; bei vereinfachten Rechnungen immer R5)'), rs));
+    }
     if (this.v.table === 'RECHNUNGEN') {
       grid.append(h('label', { class: 'fld w1' }, h('span', null, 'Bestell-Nr. / Referenz des Kunden'), this.inp('BESTELLNR')));
       grid.append(chk('KEINEMAHNUNG', 'Keine Mahnung für diese Rechnung'));
@@ -718,9 +781,12 @@ class VorgangWindow {
       h('button', { class: 'btn', onclick: () => this.print() }, h('span', { class: 'ico' }, '🖨'), 'Drucken'),
       h('label', { class: 'inline' }, 'Formular:', this.formSel),
     ];
-    if (isRe) items.push(h('button', { class: 'btn', onclick: async ev => {
+    if (isRe && Vorgang.land() !== 'GB') items.push(h('button', { class: 'btn', onclick: async ev => {
       const r = ev.currentTarget.getBoundingClientRect();
-      const m = contextMenu(r.left, r.top, [
+      const m = contextMenu(r.left, r.top, Vorgang.es() ? [
+        { label: 'Facturae 3.2.2 herunterladen', onClick: () => this.withSaved(() => Vorgang.facturae(this.id)) },
+        { label: 'Pflichtangaben prüfen', onClick: () => this.withSaved(() => Vorgang.facturae(this.id, true)) },
+        { label: 'VERI*FACTU-Status', onClick: () => this.withSaved(() => Vorgang.esStatus(this.typ, this.id).then(() => this.reloadEs())) }] : [
         { label: 'XRechnung (CII) erstellen', onClick: () => this.withSaved(() => Vorgang.erechnung(this.id, 'cii')) },
         { label: 'XRechnung (UBL) erstellen', onClick: () => this.withSaved(() => Vorgang.erechnung(this.id, 'ubl')) },
         { label: 'Pflichtangaben prüfen / Vorschau', onClick: () => this.withSaved(() => Vorgang.erechnungPruefen(this.id)) }]);
@@ -736,12 +802,13 @@ class VorgangWindow {
     items.push(h('button', { class: 'btn', onclick: ev => {
       const r = ev.currentTarget.getBoundingClientRect();
       const m = contextMenu(r.left, r.top, [
-        { label: 'PDF herunterladen', icon: '📄', onClick: () => this.withSaved(() => downloadUrl(`/api/pdf/vorgang/${this.typ}/${this.id}`, 'Beleg.pdf')) },
-        ...(isRe ? [{ label: 'ZUGFeRD-PDF (mit XRechnung)', icon: '🧾', onClick: () => this.withSaved(() => Vorgang.zugferd(this.id)) }] : []),
+        { label: 'PDF herunterladen', icon: '📄', onClick: () => this.withSaved(async () => { await Vorgang.pdf(this.typ, this.id); this.reloadEs(); }) },
+        ...(isRe && Vorgang.land() === 'DE' ? [{ label: 'ZUGFeRD-PDF (mit XRechnung)', icon: '🧾', onClick: () => this.withSaved(() => Vorgang.zugferd(this.id)) }] : []),
         { label: 'Per E-Mail senden…', icon: '✉️', onClick: () => this.withSaved(async () => { await Mail.dialog('vorgang', this.typ, this.id); }) }]);
       m.style.transform = 'translateY(-100%)';
     } }, h('span', { class: 'ico' }, '✉️'), 'PDF / E-Mail ▾'));
     if (this.typ === 'auftrag') items.push(h('button', { class: 'btn', onclick: () => this.withSaved(() => Anzahlung.dialog(this.id)) }, h('span', { class: 'ico' }, '💰'), 'Anzahlung'));
+    if (isRe && Vorgang.es()) { this.esBox = h('span', { class: 'es-status' }); items.push(this.esBox); this.drawEs(); }
     items.push('|',
       { label: 'Speichern', icon: '💾', title: 'Speichern (Strg+S)', onClick: () => this.save(false) },
       { label: 'OK', icon: '✔', cls: 'primary', onClick: () => this.save(true) },
@@ -768,8 +835,26 @@ class VorgangWindow {
       return true;
     } catch (e) { showError(e); return false; }
   }
+  async reloadEs() {
+    if (!Vorgang.es() || this.v.table !== 'RECHNUNGEN' || !this.id) return;
+    const d = await api(`/api/vorgang/${this.typ}/${this.id}`);
+    this.data = d; this.k = { ...d.kopf, _preisgruppe: this.k._preisgruppe }; this.dirty = false; this.drawEs();
+  }
+  // Spain: status of the invoice (issued / VERI*FACTU) next to the buttons
+  drawEs() {
+    if (!this.esBox) return;
+    const es = this.data.es;
+    this.esBox.textContent = '';
+    if (!es) return;
+    const st = { pendiente: '⏳ wartet auf Versand', aceptado: '✅ AEAT angenommen', aceptado_errores: '⚠ angenommen mit Fehlern', rechazado: '❌ abgelehnt' }[es.estado] || '';
+    this.esBox.append(h('span', { class: 'chip', onclick: () => Vorgang.esStatus(this.typ, this.id).then(() => this.reloadEs()), title: 'VERI*FACTU-Status' },
+      es.emitida ? `${es.numSerie} · ${es.tipo || ''} · ${T(st)}` : `${es.numSerie} · ${T('noch nicht ausgestellt')}`));
+  }
   async print() {
     await this.withSaved(async () => {
+      const d = await Vorgang.esEmitir(this.typ, this.id, this.data);
+      if (!d) return;
+      if (d !== this.data && d !== true) { this.data = d; this.k = { ...d.kopf, _preisgruppe: this.k._preisgruppe }; this.drawEs(); }
       await Print.vorgang(this.typ, this.data, { formular: this.formSel.value, rabatt: Number(this.k.RABATTZEIGEN) === 1 });
       if (!Number(this.k.GEDRUCKT)) { await api(`/api/vorgang/${this.typ}/flag`, { method: 'POST', body: { ids: [this.id], flag: 'GEDRUCKT', value: 1 } }); this.k.GEDRUCKT = 1; App.refresh(this.v.ent); }
     });

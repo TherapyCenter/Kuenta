@@ -12,10 +12,12 @@ const { I18N, docLang } = require('../i18n');
 let LANG = 'de';
 const loc = () => I18N.locale(LANG);
 const sep = () => (LANG === 'de' ? '.' : '/');
-const money = v => v == null || v === '' ? '' : new Intl.NumberFormat(loc(), { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(v)) + ' €';
+const money = v => v == null || v === '' ? '' : L.geld(v, loc());
 const num = (v, d = 3) => v == null || v === '' ? '' : new Intl.NumberFormat(loc(), { maximumFractionDigits: d }).format(Number(v));
 const date = v => v ? [String(v).slice(8, 10), String(v).slice(5, 7), String(v).slice(0, 4)].join(sep()) : '';
 const month = v => v ? String(v).slice(5, 7) + sep() + String(v).slice(0, 4) : '';
+// postcode and town: "12345 Berlin", in the UK "London SW1A 1AA"
+const plzOrt = (plz, ort) => (L.land() === 'GB' ? [ort, plz] : [plz, ort]).filter(Boolean).join(' ');
 const GREY = [85, 85, 85]; const BLUE = [30, 63, 110];
 const TITLES = { angebot: 'Angebot', kostenvoranschlag: 'Kostenvoranschlag', auftrag: 'Auftrag', arbeitskarte: 'Arbeitskarte', auftrag_mit_unterschrift: 'Auftrag', lieferschein: 'Lieferschein', lieferschein_preise: 'Lieferschein', rechnung: 'Rechnung', rechnung_ohne_kopf: 'Rechnung', rechnungskorrektur: 'Rechnungskorrektur', gutschrift: 'Gutschrift', 'storno-rechnung': 'Stornorechnung', anzahlung: 'Anzahlungsrechnung', abschlag: 'Abschlagsrechnung', schluss: 'Schlussrechnung' };
 
@@ -46,7 +48,7 @@ class Layout {
     let y = 24;
     if (f.FIRMENZUSATZ) { d.text(this.L, y, f.FIRMENZUSATZ, { size: 9 }); y += 4.5; }
     const maxW = f.LOGOFILE ? this.R - 76 - this.L : this.R - this.L;
-    const lines = [...d.wrap([f.STRASSE, [f.PLZ, f.ORT].filter(Boolean).join(' ')].filter(Boolean).join(' · '), maxW, 'R', 8), ...d.wrap([f.TELEFON && 'Tel. ' + f.TELEFON, f.EMAIL, f.INTERNETSEITE].filter(Boolean).join(' · '), maxW, 'R', 8)];
+    const lines = [...d.wrap([f.STRASSE, plzOrt(f.PLZ, f.ORT)].filter(Boolean).join(' · '), maxW, 'R', 8), ...d.wrap([f.TELEFON && 'Tel. ' + f.TELEFON, f.EMAIL, f.INTERNETSEITE].filter(Boolean).join(' · '), maxW, 'R', 8)];
     for (const l of lines.slice(0, 4)) { d.text(this.L, y, l, { size: 8, color: GREY }); y += 3.6; }
     if (f.LOGOFILE) {
       const p = path.join(dbm.FILES_DIR, f.LOGOFILE);
@@ -57,7 +59,7 @@ class Layout {
   address(a, info) {
     const d = this.doc;
     if (this.kopf) {
-      const s = this.f.ABSENDER || [this.f.FIRMENNAME, this.f.STRASSE, [this.f.PLZ, this.f.ORT].filter(Boolean).join(' ')].filter(Boolean).join(' · ');
+      const s = this.f.ABSENDER || [this.f.FIRMENNAME, this.f.STRASSE, plzOrt(this.f.PLZ, this.f.ORT)].filter(Boolean).join(' · ');
       d.text(this.L, 49, s, { size: 7, color: GREY }); d.line(this.L, 49.8, this.L + Math.min(85, d.width(s, 'R', 7)), 49.8, { w: 0.2, color: GREY });
     }
     let y = 56;
@@ -78,10 +80,10 @@ class Layout {
       if (this.kopf) {
         d.line(this.L, 274, this.R, 274, { w: 0.3, color: [140, 140, 140] });
         const cols = [
-          [f.FIRMENNAME, f.FIRMENZUSATZ, f.STRASSE, [f.PLZ, f.ORT].filter(Boolean).join(' ')],
+          [f.FIRMENNAME, f.FIRMENZUSATZ, f.STRASSE, plzOrt(f.PLZ, f.ORT)],
           [f.TELEFON && 'Tel.: ' + f.TELEFON, f.FAX && 'Fax: ' + f.FAX, f.EMAIL, f.INTERNETSEITE],
           [f.BANKNAME, f.IBAN && 'IBAN: ' + f.IBAN, f.BIC && 'BIC: ' + f.BIC, f.BANKINHABER && 'Inhaber: ' + f.BANKINHABER],
-          [f.USTNR && 'USt-IdNr.: ' + f.USTNR, f.STEUERNR && 'Steuer-Nr.: ' + f.STEUERNR, f.HANDELSREGISTER, f.GESCHAEFTSFUEHRER && 'Inhaber/GF: ' + f.GESCHAEFTSFUEHRER],
+          [...(require('../es').activo() ? [(f.STEUERNR || f.USTNR) && 'NIF: ' + (f.STEUERNR || f.USTNR)] : L.land() === 'GB' ? [f.USTNR && 'VAT-Reg.-Nr.: ' + f.USTNR] : [f.USTNR && 'USt-IdNr.: ' + f.USTNR, f.STEUERNR && 'Steuer-Nr.: ' + f.STEUERNR]), f.HANDELSREGISTER, f.GESCHAEFTSFUEHRER && 'Inhaber/GF: ' + f.GESCHAEFTSFUEHRER],
         ];
         cols.forEach((c, ci) => { let y = 278; for (const l of c.filter(Boolean)) { d.text(this.L + ci * 44.5, y, l.slice(0, 48), { size: 6.8, color: GREY }); y += 3.1; } });
       }
@@ -115,8 +117,9 @@ function addrLines(a) {
   out.push(firma ? a.name || '' : [a.vorname, a.name].filter(Boolean).join(' '));
   if (a.zusatz) out.push(a.zusatz);
   if (a.strasse) out.push(a.strasse);
-  out.push([a.plz, a.ort].filter(Boolean).join(' '));
-  if (a.land && a.land !== 'DE') out.push(a.land);
+  if (L.land() === 'GB') out.push(a.ort, a.plz); // UK: town, then postcode on its own line
+  else out.push([a.plz, a.ort].filter(Boolean).join(' '));
+  if (a.land && a.land !== (L.firma().LAND || 'DE')) out.push(a.land);
   return out.filter(Boolean);
 }
 
@@ -129,36 +132,58 @@ function vorgangPdf(typ, d, opts = {}) {
   const rabatt = opts.rabatt ?? Number(k.RABATTZEIGEN) === 1;
   const klein = L.optNum('Kleinunternehmer', 0) === 1;
   const isRe = v.table === 'RECHNUNGEN';
+  const es = isRe && d.es ? d.es : null; // Spanish tax system
+  const vf = es && es.emitida && es.qr ? es : null;
+  const nrText = es ? es.numSerie : k[v.nr];
+  // UK VAT invoice: VAT rate per line, tax point, own title
+  const gb = L.land() === 'GB'; const gbReg = gb && require('../gb').registrado();
+  const rates = L.mwstRates();
+  const gbSatz = p => Number(p.DURCHLAUFER) === 1 || k.STEUERART === 'REVERSE_CHARGE' ? '–' : Number(p.DIFFSTEUER) === 1 ? 'Marge' : k.STEUERART ? '0 %' : Number(p.MWST) === 63 ? 'frei' : num(rates[Number(p.MWST) || 61] ?? 0, 2) + ' %';
+  const titleGb = gb && isRe && ['rechnung', 'rechnung_ohne_kopf', 'rechnungskorrektur', 'storno-rechnung', 'gutschrift'].includes(formular) ? (typ === 'korrektur' ? 'Gutschrift' : gbReg ? 'Umsatzsteuerrechnung' : 'Rechnung') : null;
   const ein = Object.fromEntries(L.db().prepare('SELECT EINHEITID, BEZEICHNUNG FROM EINHEITEN').all().map(e => [e.EINHEITID, e.BEZEICHNUNG]));
-  const lay = new Layout(`${title} ${k[v.nr]}`, { kopf: formular !== 'rechnung_ohne_kopf', facturx: opts.facturx });
+  const titel = vf ? ({ F1: 'Rechnung', F2: 'Vereinfachte Rechnung', R5: 'Vereinfachte Rechnungskorrektur' }[vf.tipo] || 'Rechnungskorrektur') : titleGb || title;
+  const lay = new Layout(`${titel} ${nrText}`, { kopf: formular !== 'rechnung_ohne_kopf', facturx: opts.facturx });
   const doc = lay.doc;
   lay.header();
   const nrLabel = { angebot: 'Angebots-Nr.', auftrag: 'Auftrags-Nr.', lieferschein: 'Lieferschein-Nr.', rechnung: 'Rechnungs-Nr.', korrektur: 'Beleg-Nr.' }[typ];
-  const info = [[nrLabel, k[v.nr]], ['Datum', date(k.DATUM)], ['Kunden-Nr.', k.KUNNUMMER ?? '']];
-  if (isRe || typ === 'lieferschein') info.push(['Leistungsdatum', date(k.LIEFDATUM || k.DATUM)]);
+  const info = [[nrLabel, nrText], ['Datum', date(k.DATUM)], ['Kunden-Nr.', k.KUNNUMMER ?? '']];
+  if (isRe || typ === 'lieferschein') info.push([gb ? 'Steuerzeitpunkt' : 'Leistungsdatum', date(k.LIEFDATUM || k.DATUM)]);
   if (k.BENNAME) info.push(['Ansprechpartner', [k.BENVORNAME, k.BENNAME].filter(Boolean).join(' ')]);
   if (k.BESTELLNR) info.push(['Ihre Bestellung', k.BESTELLNR]);
   const kd = k.KUNID ? L.db().prepare('SELECT USTID FROM KUNDEN WHERE KUNID=?').get(k.KUNID) : null;
-  if (kd && kd.USTID) info.push(['Ihre USt-IdNr.', kd.USTID]);
+  if (kd && kd.USTID) info.push([es ? 'NIF' : 'Ihre USt-IdNr.', kd.USTID]);
   const bezug = (d.verknuepft || []).find(l => l.typ === 'rechnung');
-  if (typ === 'korrektur' && bezug) info.push(['zu Rechnung', `${bezug.nr} vom ${date(bezug.datum)}`]);
+  if (typ === 'korrektur' && es && es.rectificada) info.push(['zu Rechnung', `${es.rectificada.numSerie} vom ${date(es.rectificada.fecha)}`]);
+  else if (typ === 'korrektur' && bezug) info.push(['zu Rechnung', `${bezug.nr} vom ${date(bezug.datum)}`]);
   lay.address({ anrede: k.KUNANREDE, name: k.KUNNAME, vorname: k.KUNVORNAME, zusatz: k.KUNZUSATZ, strasse: k.KUNSTRASSE, plz: k.KUNPLZ, ort: k.KUNORT, land: k.KUNLAND, firma: Number(k.KUNART) === 1 }, info);
-  doc.text(lay.L, lay.y + 6, `${title} Nr. ${k[v.nr]}`, { f: 'B', size: 15 }); lay.y += 11;
+  doc.text(lay.L, lay.y + 6, `${titel} Nr. ${nrText}`, { f: 'B', size: 15 });
+  if (vf) {
+    // VERI*FACTU QR code at the top of the invoice (art. 21 Orden HAC/1177/2024), 30 mm
+    const Q = 30, qx = lay.R - Q, qy = lay.y + 4;
+    doc.text(qx + Q / 2, qy, 'QR tributario:', { size: 7.5, align: 'center' });
+    qrZeichnen(doc, vf.qr, qx, qy + 1.5, Q);
+    doc.text(qx + Q / 2, qy + Q + 5, 'VERI*FACTU', { size: 8, f: 'B', align: 'center' });
+    if (vf.entorno === 'pruebas') doc.text(qx + Q / 2, qy + Q + 8.5, 'Testumgebung – nicht bei der AEAT registriert', { size: 6.5, align: 'center', color: GREY });
+    lay.y = qy + Q + 11;
+  } else lay.y += 11;
   if (k.FAHRKENNZEICHEN || k.FAHRMARKE) {
-    const cells = [['Kennzeichen', k.FAHRKENNZEICHEN], ['Fahrzeug', [k.FAHRMARKE, k.FAHRMODELL].filter(Boolean).join(' ')], ['FIN', k.FAHRIDENTNR], ['Erstzulassung', date(k.FAHREZ)], ['KM-Stand', k.FAHRKM ? Number(k.FAHRKM).toLocaleString('de-DE') : ''], ['HU', month(k.FAHRHU)]];
+    const cells = [['Kennzeichen', k.FAHRKENNZEICHEN], ['Fahrzeug', [k.FAHRMARKE, k.FAHRMODELL].filter(Boolean).join(' ')], ['FIN', k.FAHRIDENTNR], ['Erstzulassung', date(k.FAHREZ)], ['KM-Stand', k.FAHRKM ? num(k.FAHRKM, 0) : ''], ['HU', month(k.FAHRHU)]];
     doc.rect(lay.L, lay.y, lay.R - lay.L, 11, { stroke: [170, 170, 170], lw: 0.5 });
     cells.forEach(([a, b], i) => { const x = lay.L + 2.5 + (i % 3) * 58, y = lay.y + 4 + Math.floor(i / 3) * 4.5; doc.text(x, y, a + ':', { size: 8.3, color: GREY }); const lw = doc.width(a + ': ', 'R', 8.3); doc.text(x + lw, y, fit(doc, String(b || ''), 55 - lw, i === 0 ? 'B' : 'R', 8.3), { size: 8.3, f: i === 0 ? 'B' : 'R' }); });
     lay.y += 14;
   }
   lay.para(k.EINLEITUNGTXT);
   // table
-  const C = ohnePreise ? { pos: 20, art: 29, bez: 56, menge: 196 } : { pos: 20, art: 29, bez: 56, menge: rabatt ? 138 : 146, ep: rabatt ? 158 : 170, rab: 172, sum: 196 };
+  const vatCol = gbReg && !ohnePreise;
+  const C = ohnePreise ? { pos: 20, art: 29, bez: 56, menge: 196 }
+    : vatCol ? { pos: 20, art: 29, bez: 56, menge: rabatt ? 128 : 136, ep: rabatt ? 148 : 156, vat: rabatt ? 160 : 170, rab: 172, sum: 196 }
+      : { pos: 20, art: 29, bez: 56, menge: rabatt ? 138 : 146, ep: rabatt ? 158 : 170, rab: 172, sum: 196 };
   const bezW = (ohnePreise ? 160 : C.menge - 16) - C.bez;
   const head = () => {
     doc.rect(lay.L, lay.y, lay.R - lay.L, 6, { fill: [238, 243, 249] });
     const y = lay.y + 4.2; const o = { f: 'B', size: 8.3 };
     doc.text(C.pos + 1, y, 'Pos.', o); doc.text(C.art, y, 'Art.-Nr.', o); doc.text(C.bez, y, 'Bezeichnung', o); doc.text(C.menge, y, 'Menge', { ...o, align: 'right' });
-    if (!ohnePreise) { doc.text(C.ep, y, 'E-Preis', { ...o, align: 'right' }); if (rabatt) doc.text(C.rab, y, 'Rabatt', { ...o, align: 'right' }); doc.text(C.sum, y, 'Gesamt', { ...o, align: 'right' }); }
+    if (!ohnePreise) { doc.text(C.ep, y, 'E-Preis', { ...o, align: 'right' }); if (rabatt) doc.text(C.rab, y, 'Rabatt', { ...o, align: 'right' }); if (vatCol) doc.text(C.vat, y, 'MwSt', { ...o, align: 'right' }); doc.text(C.sum, y, 'Gesamt', { ...o, align: 'right' }); }
     doc.line(lay.L, lay.y + 6, lay.R, lay.y + 6, { w: 0.6 });
     lay.y += 7.5;
   };
@@ -191,6 +216,7 @@ function vorgangPdf(typ, d, opts = {}) {
     if (!ohnePreise) {
       doc.text(C.ep, y, money(brutto ? p.VKBRUTTO : p.VK), { size: 9, align: 'right' });
       if (rabatt && Number(p.RABATT)) doc.text(C.rab, y, num(p.RABATT, 2) + ' %', { size: 9, align: 'right' });
+      if (vatCol) doc.text(C.vat, y, gbSatz(p), { size: 8.5, align: 'right' });
       doc.text(C.sum, y, money(brutto ? p.SUMMEBRUTTO : p.SUMME), { size: 9, align: 'right' });
     }
     let yy = lay.y;
@@ -207,6 +233,7 @@ function vorgangPdf(typ, d, opts = {}) {
     if (!klein) {
       rows.push(['Summe netto', money(k.GNETTO)]);
       for (const t of Object.values(tax).filter(x => x.rate > 0)) rows.push([`zzgl. ${num(t.rate, 2)} % MwSt auf ${money(t.netto)}`, money(t.mwst)]);
+      for (const t of Object.values(tax).filter(x => x.recargo)) rows.push([`zzgl. ${num(t.reRate, 2)} % Recargo de equivalencia auf ${money(t.netto)}`, money(t.recargo)]);
       const frei = Object.values(tax).filter(x => !x.rate).reduce((s, x) => s + x.netto, 0);
       if (frei) rows.push(['davon steuerfrei / durchlaufend', money(frei), GREY]);
     }
@@ -223,9 +250,14 @@ function vorgangPdf(typ, d, opts = {}) {
       doc.text(110, lay.y + 3.5, 'bereits bezahlt', { size: 9.2, color: GREY }); doc.text(lay.R, lay.y + 3.5, money(bez), { size: 9.2, align: 'right', color: GREY }); lay.y += 5;
       doc.text(110, lay.y + 3.5, 'Offener Betrag', { size: 9.2, f: 'B' }); doc.text(lay.R, lay.y + 3.5, money(L.r2(k.GBRUTTO - bez)), { size: 9.2, f: 'B', align: 'right' }); lay.y += 7;
     }
-    if (klein) lay.para('Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.', { color: GREY });
-    if (hatDP) lay.para('(DP) = Durchlaufender Posten gemäß § 10 Abs. 1 Satz 6 UStG, nicht umsatzsteuerpflichtig.', { color: GREY, size: 8.5 });
-    if (hatDiff) lay.para('Gebrauchtgegenstände / Sonderregelung – Differenzbesteuerung nach § 25a UStG. Die Umsatzsteuer wird nicht gesondert ausgewiesen.', { size: 9 });
+    if (klein && L.land() === 'DE') lay.para('Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.', { color: GREY });
+    if (hatDP && gb) lay.para('(DP) = Auslage im Namen des Kunden (disbursement), nicht umsatzsteuerbar.', { color: GREY, size: 8.5 });
+    else if (hatDP) lay.para(es ? '(DP) = Suplido: im Namen und für Rechnung des Kunden verauslagt, nicht Teil der Bemessungsgrundlage (Art. 78.Tres.3.º LIVA).' : '(DP) = Durchlaufender Posten gemäß § 10 Abs. 1 Satz 6 UStG, nicht umsatzsteuerpflichtig.', { color: GREY, size: 8.5 });
+    if (es && k.STEUERART) lay.para({ REVERSE_CHARGE: 'Nicht steuerbar in Spanien, Steuerschuldnerschaft des Leistungsempfängers (Art. 69 und 84.Uno.2.º LIVA).', IG_LIEFERUNG: 'Steuerfreie innergemeinschaftliche Lieferung (Art. 25 LIVA).', AUSFUHR: 'Steuerfreie Ausfuhr (Art. 21 LIVA).' }[k.STEUERART] || '', { size: 9 });
+    if (vf && vf.tipo && vf.tipo[0] === 'R') lay.para(`Grund der Korrektur: ${vf.tipo} – ${vf.motivo}`, { size: 9, color: GREY });
+    if (gb && k.STEUERART) lay.para({ REVERSE_CHARGE: 'Im Vereinigten Königreich nicht umsatzsteuerbar (Leistungsort im Ausland); der Kunde schuldet die Steuer (reverse charge).', IG_LIEFERUNG: 'Steuerfreie Ausfuhr (zero-rated export).', AUSFUHR: 'Steuerfreie Ausfuhr (zero-rated export).' }[k.STEUERART] || '', { size: 9 });
+    if (hatDiff && gb) lay.para('Gebrauchtwagen: Margenbesteuerung (second-hand margin scheme, VAT Notice 718). Die Umsatzsteuer wird nicht gesondert ausgewiesen.', { size: 9 });
+    else if (hatDiff) lay.para('Gebrauchtgegenstände / Sonderregelung – Differenzbesteuerung nach § 25a UStG. Die Umsatzsteuer wird nicht gesondert ausgewiesen.', { size: 9 });
     if (d._steuerhinweis) lay.para(d._steuerhinweis, { size: 9 });
   }
   if (isRe || typ === 'angebot' || typ === 'auftrag') {

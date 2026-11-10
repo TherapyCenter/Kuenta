@@ -1,5 +1,5 @@
 'use strict';
-/* global h, $, $$, fmt, api, qs, parseNum, LK, ENT, Win, toast, showError, confirmDlg, promptDlg, dialog, alertDlg, Overview, miniGrid, editRecord, pickKunde, pickRecord, Vorgang, Zahlung, Print, App, today, addDays, addMonths, downloadUrl, pickFile, saveBlob, kname, r2, Pref */
+/* global h, $, $$, fmt, api, qs, parseNum, LK, ENT, Win, toast, showError, confirmDlg, promptDlg, dialog, alertDlg, Overview, miniGrid, editRecord, pickKunde, pickRecord, Vorgang, Zahlung, Print, App, today, addDays, addMonths, downloadUrl, pickFile, saveBlob, kname, r2, Pref, EsUI, GbUI */
 
 const Views = {};
 const title = (t, sub) => h('div', { class: 'view-title' }, t, sub ? h('span', { class: 'sub' }, sub) : null);
@@ -335,6 +335,8 @@ Views.rechnungsliste = async (main) => {
 
 // ---------------- Accounting export (FIBU) ----------------
 Views.fibu = async (main) => {
+  if (EsUI.activo()) return Views.librosEs(main); // Spain: VAT books instead of DATEV
+  if (GbUI.activo()) return Views.ukVat(main); // UK: Xero/QuickBooks/Sage exports and MTD VAT return
   let von = addMonths(today().slice(0, 7) + '-01', -1), bis = addDays(today().slice(0, 7) + '-01', -1);
   const alle = h('input', { type: 'checkbox' });
   const wrap = h('div', { class: 'overview' }); let g, rows = [];
@@ -594,9 +596,16 @@ Views.einstellungen = async (main) => {
       } }, '🖼 Logo hochladen'))), sb('druck.briefpapier', 'Vorgedrucktes Briefpapier verwenden (Briefkopf/Fußzeile nicht drucken)'))));
   });
   addTab('Steuer / Mahnung / Kasse', p => p.append(h('div', { class: 'groups' },
+    grp('Steuersystem / Tax system', (() => {
+      const x = h('select', null, [['DE', 'Deutschland (UStG, TSE, DATEV, XRechnung)'], ['ES', 'España (IVA, VERI*FACTU, Facturae)'], ['GB', 'United Kingdom (VAT, Making Tax Digital, £)']].map(([v, l]) => h('option', { value: v, selected: (s.sw['steuer.land'] || 'DE') === v }, l)));
+      x.addEventListener('change', () => { changes.sw['steuer.land'] = x.value; });
+      return fld('Steuersystem dieses Mandanten', x);
+    })(), h('div', { class: 'fld hint' }, 'Gilt nur für den aktuellen Mandanten. Vorhandene Rechnungen, Sicherungen und der Import aus KFZ-Faktura bleiben unverändert. Großbritannien rechnet in Pfund (£). Die Belegsprache stellen Sie unter Vorgabewerte → Sprache ein. Nach dem Umstellen speichern und das Programm neu laden.')),
     grp('Mehrwertsteuer', oi('volle MwSt', 'voller Satz %', true, 'num'), oi('verm. MwSt', 'ermäßigter Satz %', true, 'num'), oi('AT.-MwSt', 'AT-MwSt %', true, 'num'), ob('Kleinunternehmer', 'Kleinunternehmer nach § 19 UStG (keine MwSt)')),
     grp('Mahnwesen', ...[1, 2, 3, 4].flatMap(i => [oi(`Mahntage${i}`, `Stufe ${i}: Tage nach Fälligkeit`, true, 'num'), oi(`Mahntage${i}Gebuehren`, `Stufe ${i}: Gebühr €`, true, 'num')])),
     grp('Kasse', oi('Kassenanfang', 'Kassen-Anfangsbestand €', true, 'num')))));
+  addTab('España / VERI*FACTU', p => EsUI.settingsTab(p, { s, changes, si, grp, fld }));
+  addTab('United Kingdom / MTD', p => GbUI.settingsTab(p, { s, changes, si, grp, fld, ob }));
   addTab('Nummernkreise', p => p.append(h('div', { class: 'note info', style: { marginBottom: '8px' } }, 'Eingetragen ist jeweils die zuletzt vergebene Nummer. Die nächste Nummer ist um 1 höher.'),
     h('div', { class: 'groups' }, grp('Stammdaten', oi('Nummernkreis Kunden', 'Kunden', true), oi('Nummerkreis Fahrzeuge', 'Fahrzeuge', true), oi('Nummerkreis Artikel', 'Artikel', true), oi('Nummernkreis Arbeitswert', 'Arbeitswerte', true), oi('Nummernkreis Liefranten', 'Lieferanten', true), oi('Reifeneinlagerung', 'Reifeneinlagerung', true)),
       grp('Vorgänge', oi('Nummernkreis Angebot', 'Angebote', true), oi('Nummernkreis Auftrag', 'Aufträge', true), oi('Nummerkreis Lieferschein', 'Lieferscheine', true), oi('Nummernkreis Rechnung', 'Rechnungen', true), oi('Nummerkreis Gutschrift', 'Rechnungskorrekturen', true)))));

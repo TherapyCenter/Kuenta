@@ -460,6 +460,50 @@ docker compose up -d --build</code></pre></div>
       <p>Read incoming e-invoices under <span class="path">Purchasing → Incoming invoice</span>. To view an XRechnung use <span class="path">Purchasing → Visualise e-invoice</span>.</p>
     </section>
 
+    <section id="spanien">
+      <h2>Spain: IVA and VERI*FACTU</h2>
+      <p>Kuenta can work with Spanish tax law per company. Switch it under <span class="path">Settings → Tax / dunning / register → Tax system</span> (the settings are in the tab <span class="path">Spain / VERI*FACTU</span>), then save and reload the program. For Spanish documents set the document language to Español under <span class="path">Settings → Defaults → Language</span>. Other companies, existing invoices, backups and the import from KFZ-Faktura stay unchanged.</p>
+      <h3>What changes</h3>
+      <ul>
+        <li><strong>IVA:</strong> 21 %, 10 % and 4 % (adjustable), exempt items and suplidos (amounts paid on behalf of the customer, e.g. the ITV fee; enter them as pass-through items).</li>
+        <li><strong>Recargo de equivalencia:</strong> switch it on in the customer under <span class="path">Tax & accounting</span>. The surcharge (5.2 / 1.4 / 0.5 %) is added to the invoice automatically.</li>
+        <li><strong>NIF:</strong> in the customer in the field <em>VAT ID / NIF</em>. Your own NIF goes into <span class="path">Company details → Tax number</span>.</li>
+        <li><strong>Invoice numbers:</strong> series + consecutive number, e.g. F20260001; corrective invoices use the series R.</li>
+        <li><strong>Invoice types:</strong> customers with a NIF get a full invoice (F1), others a simplified invoice (F2) up to 400 €. Above that Kuenta asks for the NIF.</li>
+        <li><strong>Register:</strong> every sale is an invoice; the receipt shows series, number, NIF and the QR code. VERI*FACTU replaces the TSE.</li>
+        <li><strong>Accounting:</strong> <span class="path">Finance → FIBU export</span> offers the books <em>facturas expedidas</em> and <em>recibidas</em> as CSV and an overview for the <em>modelo 303</em>.</li>
+        <li><strong>E-invoice for public administrations:</strong> Facturae 3.2.2. Enter the DIR3 codes of the administration in the customer's Leitweg ID field as <code>Office/Body/Unit</code>. Sign the file with AutoFirma before uploading it to FACe.</li>
+      </ul>
+      <h3>VERI*FACTU</h3>
+      <p>An invoice is <strong>issued</strong> as soon as it leaves Kuenta: print, PDF, email or register. Kuenta asks first. A record with hash chain is created, and its QR code is printed at the top of the invoice. Kuenta sends the record to the AEAT, or automatically later when there is no internet. From then on the invoice is locked; corrections only by a corrective invoice (cancel invoice). The status is shown in the invoice window next to the buttons.</p>
+      <ol>
+        <li>Store the company's electronic certificate (.p12 / .pfx) under <span class="path">Settings → Spain / VERI*FACTU</span> and <em>test the connection</em>.</li>
+        <li>Issue some invoices in the <em>Test</em> environment and check that they are accepted. Best use a separate test company, because test invoices stay locked as well.</li>
+        <li>Switch to <em>Production</em>. From now on the invoices are registered with the AEAT.</li>
+      </ol>
+      <p>Certificate, hash chain and a copy of all records are in the data folder under <code>verifactu</code>. This folder is not part of the Kuenta backup and is kept when a backup is restored, so no record is lost and no reported number is used twice. Please back up this folder as well.</p>
+      <p>Not supported: TicketBAI (Basque Country), Navarre, IGIC (Canary Islands), margin scheme (REBU) in VERI*FACTU, the "No VERI*FACTU" mode and SII.</p>
+    </section>
+
+    <section id="uk">
+      <h2>United Kingdom: VAT and Making Tax Digital</h2>
+      <p>Choose "United Kingdom" under <span class="path">Settings → Tax / dunning / register → Tax system</span>, save and reload. The company then works in pounds (£). Enter your VAT number under <span class="path">Company details → VAT ID</span> (e.g. GB123456782) and set the document language to English.</p>
+      <ul>
+        <li><strong>Invoices</strong> are titled "VAT invoice" and show the tax point, the VAT rate of each line and your VAT Reg. No. Corrections are titled "Credit note".</li>
+        <li><strong>Rates:</strong> standard (20 %), reduced (5 %), zero rate, exempt. Enter disbursements such as the MOT fee as pass-through items (outside the scope). Used cars with margin taxation use the second-hand margin scheme.</li>
+        <li><strong>Not VAT registered:</strong> below the threshold tick "Not VAT registered" – invoices then carry no VAT.</li>
+        <li><strong>Scheme:</strong> standard, cash accounting (VAT when paid) or flat rate scheme (rate adjustable, vehicle repair 8.5 %).</li>
+      </ul>
+      <h3>VAT return through Making Tax Digital</h3>
+      <ol>
+        <li>Once: store the HMRC Developer Hub credentials (<span class="path">Settings → United Kingdom / MTD</span>), then <em>Connect to HMRC</em> and sign in with the business's Government Gateway account. The connection lasts 18 months.</li>
+        <li><span class="path">Finance → FIBU export</span>: <em>Load periods from HMRC</em>, then <em>Calculate &amp; submit</em> for the open period.</li>
+        <li>Check the 9 boxes, confirm the declaration and submit. HMRC replies with a receipt (form bundle number).</li>
+      </ol>
+      <p>Boxes 1 and 6 come from the invoices, boxes 4 and 7 from the purchase invoices. For testing use the HMRC sandbox. Sign-in data is kept in the data folder under <code>gb</code>, not in the backup.</p>
+      <p>The same page offers CSV exports for Xero (sales invoices and bills), QuickBooks Online, Sage 50 and a VAT journal.</p>
+    </section>
+
     <section id="datev">
       <h2>DATEV export for the tax adviser</h2>
       <p class="lead">Kuenta books invoices, payments, incoming invoices and register sales automatically and exports them as DATEV files. Your tax adviser reads them directly into DATEV, the accounting software common in Germany.</p>
@@ -758,7 +802,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>Check the TSE with a fiskaly test account before going live and register the register with the tax office.</li>
             <li>Check the card terminal and DSFinV-K before use or before an audit.</li>
-            <li>Kuenta is designed for Germany. Other countries (e.g. Spain with VeriFactu) are not supported, even though the interface is available in English and Spanish.</li>
+            <li>Kuenta is designed for Germany, Spain and the United Kingdom (see <a href="#spanien">Spain</a> and <a href="#uk">United Kingdom</a>). Other countries are not supported.</li>
             <li>Purchase contracts are templates and do not replace legal advice.</li>
           </ul></div>
       </div>
@@ -809,7 +853,7 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Crypto payment:</strong> tested against a simulated BTCPay Server, not yet against a real one. USDT only works via the Liquid network, as offered by BTCPay. USDT on Tron or Ethereum is not supported.</li>
         <li><strong>Container:</strong> the image has so far only been checked outside a real Docker or Podman environment.</li>
         <li><strong>Database:</strong> Kuenta uses a built-in database (SQLite). An external database such as PostgreSQL is not supported. Several workstations work via network mode.</li>
-        <li><strong>Countries and languages:</strong> tax, e-invoicing, register and DATEV are designed for Germany. The interface is available in German, English and Spanish, but country-specific obligations of other countries, e.g. VeriFactu in Spain, are not. The e-invoice and the DATEV export stay German.</li>
+        <li><strong>Countries and languages:</strong> Germany, Spain and the United Kingdom (switchable per company). Not supported in Spain: TicketBAI, Navarre, IGIC and REBU in VERI*FACTU; in the UK: Northern Ireland EU trade. The interface is available in German, English and Spanish.</li>
       </ul>
     </section>
 

@@ -47,7 +47,8 @@ const DEC_POINT = LOCALE === 'en-GB';
 const nfMoney = new Intl.NumberFormat(LOCALE, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const DATE_SEP = I18N.lang === 'de' ? '.' : '/';
 const fmt = {
-  money: v => v == null || v === '' ? '' : nfMoney.format(Number(v)) + ' €',
+  // currency of the tenant (lookups): euro after the number as before, pound sign in front
+  money: v => v == null || v === '' ? '' : (LK.data && LK.data.waehrung === 'GBP' ? (Number(v) < 0 ? '-£' : '£') + nfMoney.format(Math.abs(Number(v))) : nfMoney.format(Number(v)) + ' €'),
   money0: v => v == null || v === '' ? '' : nfMoney.format(Number(v)),
   num: (v, d = 2) => v == null || v === '' ? '' : new Intl.NumberFormat(LOCALE, { minimumFractionDigits: 0, maximumFractionDigits: d }).format(Number(v)),
   num2: v => v == null || v === '' ? '' : nfMoney.format(Number(v)),

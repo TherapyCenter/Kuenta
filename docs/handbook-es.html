@@ -460,6 +460,50 @@ docker compose up -d --build</code></pre></div>
       <p>Las facturas electrónicas recibidas se leen en <span class="path">Compras → Factura de proveedor</span>. Para ver una XRechnung use <span class="path">Compras → Visualizar factura electrónica</span>.</p>
     </section>
 
+    <section id="spanien">
+      <h2>España: IVA y VERI*FACTU</h2>
+      <p>Kuenta puede trabajar con la normativa fiscal española por empresa. Se activa en <span class="path">Ajustes → Impuestos / reclamaciones / caja → Sistema fiscal</span> (los ajustes están en la pestaña <span class="path">España / VERI*FACTU</span>); después guarde y vuelva a cargar el programa. Para documentos en español, ponga el idioma de los documentos en Español en <span class="path">Ajustes → Valores predeterminados → Idioma</span>. Las demás empresas, las facturas existentes, las copias de seguridad y la importación desde KFZ-Faktura no cambian.</p>
+      <h3>Qué cambia</h3>
+      <ul>
+        <li><strong>IVA:</strong> 21 %, 10 % y 4 % (configurables), líneas exentas y suplidos (importes pagados por cuenta del cliente, p. ej. la tasa de la ITV; regístrelos como partida de paso).</li>
+        <li><strong>Recargo de equivalencia:</strong> se activa en el cliente, en <span class="path">Impuestos y contabilidad</span>. El recargo (5,2 / 1,4 / 0,5 %) se añade automáticamente a la factura.</li>
+        <li><strong>NIF:</strong> en el cliente, campo <em>NIF / NIF-IVA</em>. El NIF propio va en <span class="path">Datos de la empresa → Número fiscal</span>.</li>
+        <li><strong>Numeración:</strong> serie + número correlativo, p. ej. F20260001; las rectificativas usan la serie R.</li>
+        <li><strong>Tipos de factura:</strong> los clientes con NIF reciben factura completa (F1), los demás factura simplificada (F2) hasta 400 €. Por encima, Kuenta pide el NIF.</li>
+        <li><strong>Caja:</strong> cada venta es una factura; el ticket muestra serie, número, NIF y el código QR. VERI*FACTU sustituye a la TSE alemana.</li>
+        <li><strong>Contabilidad:</strong> en <span class="path">Finanzas → Exportación contable</span> están los libros de <em>facturas expedidas</em> y <em>recibidas</em> en CSV y un resumen para el <em>modelo 303</em>.</li>
+        <li><strong>Factura electrónica para administraciones:</strong> Facturae 3.2.2. Introduzca los códigos DIR3 de la administración en el campo Leitweg-ID del cliente como <code>Oficina/Órgano/Unidad</code>. Firme el archivo con AutoFirma antes de subirlo a FACe.</li>
+      </ul>
+      <h3>VERI*FACTU</h3>
+      <p>Una factura queda <strong>expedida</strong> en cuanto sale de Kuenta: impresión, PDF, correo o caja. Kuenta lo pregunta antes. Se genera un registro con huella encadenada y su código QR se imprime en la parte superior de la factura. Kuenta envía el registro a la AEAT o, sin internet, más tarde automáticamente. A partir de ahí la factura queda bloqueada; solo se corrige con una factura rectificativa (anular factura). El estado aparece en la ventana de la factura, junto a los botones.</p>
+      <ol>
+        <li>Guarde el certificado electrónico de la empresa (.p12 / .pfx) en <span class="path">Ajustes → España / VERI*FACTU</span> y <em>pruebe la conexión</em>.</li>
+        <li>Expida algunas facturas en el entorno de <em>Pruebas</em> y compruebe que se aceptan. Mejor en una empresa de prueba aparte, porque las facturas de prueba también quedan bloqueadas.</li>
+        <li>Cambie a <em>Producción</em>. A partir de ahora las facturas se registran en la AEAT.</li>
+      </ol>
+      <p>El certificado, la cadena de huellas y una copia de todos los registros están en la carpeta de datos, en <code>verifactu</code>. Esta carpeta no forma parte de la copia de seguridad de Kuenta y se conserva al restaurar una copia, de modo que no se pierde ningún registro ni se repite ningún número ya remitido. Haga también copia de esa carpeta.</p>
+      <p>No soportado: TicketBAI (País Vasco), Navarra, IGIC (Canarias), régimen especial de bienes usados (REBU) en VERI*FACTU, la modalidad «No VERI*FACTU» y el SII.</p>
+    </section>
+
+    <section id="uk">
+      <h2>Reino Unido: VAT y Making Tax Digital</h2>
+      <p>Elija «Reino Unido» en <span class="path">Ajustes → Impuestos / reclamaciones / caja → Sistema fiscal</span>, guarde y vuelva a cargar. La empresa factura entonces en libras (£). Su número de IVA británico va en <span class="path">Datos de la empresa → NIF-IVA</span> (p. ej. GB123456782); ponga el idioma de los documentos en inglés.</p>
+      <ul>
+        <li><strong>Facturas:</strong> se titulan «VAT invoice» y muestran la fecha de devengo (tax point), el tipo de IVA de cada línea y el VAT Reg. No. Las rectificativas se titulan «Credit note».</li>
+        <li><strong>Tipos:</strong> estándar (20 %), reducido (5 %), tipo cero y exento. Los gastos por cuenta del cliente, como la tasa MOT, se registran como partida de paso (no sujetos). Los coches usados con régimen del margen usan el second-hand margin scheme.</li>
+        <li><strong>Sin registro de IVA:</strong> por debajo del umbral marque «No registrado a efectos de IVA»; las facturas van sin IVA.</li>
+        <li><strong>Régimen:</strong> estándar, criterio de caja o flat rate scheme (porcentaje configurable; reparación de vehículos 8,5 %).</li>
+      </ul>
+      <h3>VAT return con Making Tax Digital</h3>
+      <ol>
+        <li>Una vez: guarde las credenciales del HMRC Developer Hub (<span class="path">Ajustes → Reino Unido / MTD</span>), después <em>Conectar con HMRC</em> e inicie sesión con el Government Gateway de la empresa. La conexión dura 18 meses.</li>
+        <li><span class="path">Finanzas → Exportación contable</span>: <em>Cargar periodos de HMRC</em> y, en el periodo abierto, <em>Calcular y presentar</em>.</li>
+        <li>Revise las 9 casillas, confirme la declaración y envíela. HMRC responde con un justificante (form bundle number).</li>
+      </ol>
+      <p>Las casillas 1 y 6 salen de las facturas; la 4 y la 7, de las facturas recibidas. Para pruebas existe el sandbox de HMRC. Los datos de acceso están en la carpeta de datos, en <code>gb</code>, no en la copia de seguridad.</p>
+      <p>En la misma página hay exportaciones CSV para Xero (ventas y compras), QuickBooks Online, Sage 50 y un diario de IVA.</p>
+    </section>
+
     <section id="datev">
       <h2>Exportación DATEV para el asesor fiscal</h2>
       <p class="lead">Kuenta contabiliza automáticamente facturas, pagos, facturas de proveedor y ventas de caja y los exporta como archivos DATEV. Su asesor fiscal los importa directamente en DATEV, el programa contable habitual en Alemania.</p>
@@ -758,7 +802,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>Compruebe la TSE con una cuenta de prueba de fiskaly antes de usarla en real y comunique la caja a Hacienda (alemana).</li>
             <li>Compruebe el terminal de tarjetas y la DSFinV-K antes de usarlos o de una inspección.</li>
-            <li>Kuenta está pensado para Alemania. Otros países (p. ej. España con VeriFactu o TicketBAI) no están soportados, aunque la interfaz esté en español.</li>
+            <li>Kuenta está pensado para Alemania, España y el Reino Unido (vea <a href="#spanien">España</a> y <a href="#uk">Reino Unido</a>). TicketBAI, Navarra e IGIC no están soportados.</li>
             <li>Los contratos de compraventa son modelos y no sustituyen el asesoramiento jurídico.</li>
           </ul></div>
       </div>
@@ -809,7 +853,7 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Pago con criptomonedas:</strong> probado con un BTCPay Server simulado, aún no con uno real. USDT solo funciona mediante la red Liquid, como lo ofrece BTCPay. No se admite USDT en Tron ni en Ethereum.</li>
         <li><strong>Contenedor:</strong> la imagen solo se ha comprobado fuera de un entorno Docker o Podman real.</li>
         <li><strong>Base de datos:</strong> Kuenta usa una base de datos integrada (SQLite). No se admiten bases de datos externas como PostgreSQL. Varios puestos trabajan mediante el modo red.</li>
-        <li><strong>Países e idiomas:</strong> impuestos, factura electrónica, caja y DATEV están pensados para Alemania. La interfaz existe en alemán, inglés y español, pero no las obligaciones específicas de otros países, p. ej. VeriFactu o TicketBAI en España. La factura electrónica y la exportación DATEV siguen en alemán.</li>
+        <li><strong>Países e idiomas:</strong> Alemania, España y el Reino Unido (se cambia por empresa). En España no se soportan TicketBAI, Navarra, IGIC ni el REBU en VERI*FACTU. La interfaz existe en alemán, inglés y español.</li>
       </ul>
     </section>
 

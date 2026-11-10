@@ -456,6 +456,50 @@ docker compose up -d --build</code></pre></div>
       <p>Eingehende E-Rechnungen lesen Sie unter <span class="path">Einkauf → Eingangsrechnung</span> ein. Zum Anschauen einer XRechnung dient <span class="path">Einkauf → E-Rechnung visualisieren</span>.</p>
     </section>
 
+    <section id="spanien">
+      <h2>Spanien: IVA und VERI*FACTU</h2>
+      <p>Kuenta kann pro Mandant nach spanischem Steuerrecht arbeiten. Umgestellt wird unter <span class="path">Einstellungen → Steuer / Mahnung / Kasse → Steuersystem</span>, die Einstellungen stehen im Reiter <span class="path">España / VERI*FACTU</span>. Danach speichern und das Programm neu laden. Für spanische Belege unter <span class="path">Einstellungen → Vorgabewerte → Sprache</span> die Belegsprache auf Español stellen. Andere Mandanten, vorhandene Rechnungen, Sicherungen und der Import aus KFZ-Faktura bleiben unverändert.</p>
+      <h3>Was sich ändert</h3>
+      <ul>
+        <li><strong>IVA:</strong> 21 %, 10 % und 4 % (einstellbar), steuerfreie Posten und Suplidos (verauslagte Beträge, z. B. ITV-Gebühr, als „Durchlaufender Posten“ erfassen).</li>
+        <li><strong>Recargo de equivalencia:</strong> beim Kunden unter <span class="path">Steuer & Buchhaltung</span> einschalten. Der Zuschlag (5,2 / 1,4 / 0,5 %) kommt automatisch auf die Rechnung.</li>
+        <li><strong>NIF:</strong> im Kunden im Feld <em>USt-IdNr. / NIF</em>. Die eigene NIF steht unter <span class="path">Firmendaten → Steuernummer</span>.</li>
+        <li><strong>Rechnungsnummern:</strong> Serie + fortlaufende Nummer, z. B. F20260001; Korrekturen haben die Serie R.</li>
+        <li><strong>Rechnungsarten:</strong> Kunden mit NIF bekommen eine vollständige Rechnung (F1), andere bis 400 € eine vereinfachte (F2). Darüber verlangt Kuenta die NIF.</li>
+        <li><strong>Kasse:</strong> jeder Verkauf ist eine Rechnung; der Bon zeigt Serie, Nummer, NIF und den QR-Code. Statt TSE gilt VERI*FACTU.</li>
+        <li><strong>Buchhaltung:</strong> unter <span class="path">Finanzen → FIBU-Export</span> stehen die Bücher <em>facturas expedidas</em> und <em>recibidas</em> als CSV und eine Übersicht für das <em>modelo 303</em>.</li>
+        <li><strong>E-Rechnung für Behörden:</strong> Facturae 3.2.2. Die DIR3-Codes der Behörde im Kunden im Feld Leitweg-ID als <code>Oficina/Órgano/Unidad</code> eintragen. Die Datei vor dem Hochladen in FACe mit AutoFirma signieren.</li>
+      </ul>
+      <h3>VERI*FACTU</h3>
+      <p>Eine Rechnung wird <strong>ausgestellt</strong>, sobald sie Kuenta verlässt: Drucken, PDF, E-Mail oder Kasse. Kuenta fragt vorher nach. Dabei entsteht ein Datensatz mit Hash-Kette und dem QR-Code, der oben auf die Rechnung gedruckt wird. Kuenta sendet den Datensatz an die AEAT, ohne Internet später automatisch. Ab dann ist die Rechnung gesperrt; korrigiert wird nur über eine Rechnungskorrektur (Rechnung stornieren). Der Status steht im Rechnungsfenster neben den Knöpfen.</p>
+      <ol>
+        <li>Elektronisches Zertifikat der Firma (.p12 / .pfx) unter <span class="path">Einstellungen → España / VERI*FACTU</span> hinterlegen und <em>Verbindung testen</em>.</li>
+        <li>In der Umgebung <em>Test</em> einige Rechnungen ausstellen und prüfen, dass sie angenommen werden. Am besten in einem eigenen Test-Mandanten, denn auch Testrechnungen bleiben gesperrt.</li>
+        <li>Auf <em>Produktion</em> umstellen. Ab jetzt werden die Rechnungen bei der AEAT registriert.</li>
+      </ol>
+      <p>Zertifikat, Hash-Kette und eine Kopie aller Datensätze liegen im Datenordner unter <code>verifactu</code>. Dieser Ordner ist nicht Teil der Kuenta-Sicherung und bleibt beim Zurückspielen einer Sicherung erhalten. So geht kein Datensatz verloren und keine gemeldete Nummer wird doppelt vergeben. Den Ordner bitte zusätzlich sichern.</p>
+      <p>Nicht unterstützt: TicketBAI (Baskenland), Navarra, IGIC (Kanaren), Differenzbesteuerung (REBU) in VERI*FACTU, der Modus „No VERI*FACTU“ und SII.</p>
+    </section>
+
+    <section id="uk">
+      <h2>Großbritannien: VAT und Making Tax Digital</h2>
+      <p>Unter <span class="path">Einstellungen → Steuer / Mahnung / Kasse → Steuersystem</span> „United Kingdom“ wählen, speichern und neu laden. Der Mandant rechnet dann in Pfund (£). Die eigene VAT-Nummer gehört unter <span class="path">Firmendaten → USt-IdNr.</span> (z. B. GB123456782), die Belegsprache auf English stellen.</p>
+      <ul>
+        <li><strong>Rechnungen</strong> heißen „VAT invoice“, zeigen den Tax point, je Position den VAT-Satz und die VAT Reg. No. Gutschriften heißen „Credit note“.</li>
+        <li><strong>Sätze:</strong> Standard (20 %), Reduced (5 %), Zero rate, Exempt. Auslagen wie die MOT-Gebühr als durchlaufenden Posten erfassen (outside the scope). Gebrauchtwagen mit Differenzbesteuerung laufen über das second-hand margin scheme.</li>
+        <li><strong>Nicht registriert:</strong> Unter der VAT-Schwelle das Häkchen „Nicht umsatzsteuerregistriert“ setzen – dann ohne VAT.</li>
+        <li><strong>Schema:</strong> Standard, Cash accounting (VAT bei Zahlung) oder Flat rate scheme (Satz einstellbar, Kfz-Reparatur 8,5 %).</li>
+      </ul>
+      <h3>VAT return über Making Tax Digital</h3>
+      <ol>
+        <li>Einmalig: Zugangsdaten aus dem HMRC Developer Hub hinterlegen (<span class="path">Einstellungen → United Kingdom / MTD</span>), dann <em>Mit HMRC verbinden</em> und mit dem Government Gateway des Unternehmens anmelden. Die Verbindung hält 18 Monate.</li>
+        <li><span class="path">Finanzen → FIBU-Export</span>: <em>Zeiträume von HMRC laden</em>, beim offenen Zeitraum <em>Berechnen &amp; einreichen</em>.</li>
+        <li>Die 9 Boxen prüfen, die Erklärung bestätigen und senden. HMRC antwortet mit einer Quittung (Form bundle number).</li>
+      </ol>
+      <p>Box 1 und 6 kommen aus den Rechnungen, Box 4 und 7 aus den Eingangsrechnungen. Zum Testen gibt es die Sandbox von HMRC. Anmeldedaten liegen im Datenordner unter <code>gb</code>, nicht in der Sicherung.</p>
+      <p>Für die Buchhaltung gibt es auf derselben Seite Exporte für Xero (Verkaufs- und Eingangsrechnungen), QuickBooks Online, Sage 50 und ein VAT-Journal als CSV.</p>
+    </section>
+
     <section id="datev">
       <h2>DATEV-Export für den Steuerberater</h2>
       <p class="lead">Kuenta bucht Rechnungen, Zahlungen, Eingangsrechnungen und Kassenumsätze automatisch und exportiert sie als DATEV-Dateien. Ihr Steuerberater liest sie direkt in DATEV ein.</p>
@@ -753,7 +797,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>TSE vor dem Echtbetrieb mit fiskaly-Testzugang prüfen und die Kasse beim Finanzamt melden.</li>
             <li>EC-Terminal und DSFinV-K vor dem Einsatz bzw. vor einer Prüfung kontrollieren.</li>
-            <li>Kuenta ist auf Deutschland ausgelegt. Andere Länder (z. B. Spanien mit VeriFactu) werden nicht unterstützt.</li>
+            <li>Kuenta ist auf Deutschland, Spanien und Großbritannien ausgelegt (siehe <a href="#spanien">Spanien</a> und <a href="#uk">Großbritannien</a>). Andere Länder werden nicht unterstützt.</li>
             <li>Kaufverträge sind Muster und ersetzen keine Rechtsberatung.</li>
           </ul></div>
       </div>
@@ -803,7 +847,7 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Krypto-Zahlung:</strong> Getestet gegen einen nachgebauten BTCPay Server, noch nicht gegen einen echten. USDT geht nur über das Liquid-Netz, wie es BTCPay anbietet. USDT auf Tron oder Ethereum wird nicht unterstützt.</li>
         <li><strong>Container:</strong> Das Image wurde bisher nur außerhalb einer echten Docker- oder Podman-Umgebung geprüft.</li>
         <li><strong>Datenbank:</strong> Kuenta nutzt eine eingebaute Datenbank (SQLite). Eine externe Datenbank wie PostgreSQL wird nicht unterstützt. Mehrere Arbeitsplätze arbeiten über den Netzwerkbetrieb.</li>
-        <li><strong>Länder:</strong> Steuer, E-Rechnung, Kasse und DATEV sind auf Deutschland ausgelegt. Die Oberfläche gibt es auf Deutsch, Englisch und Spanisch, länderspezifische Pflichten anderer Länder, z. B. VeriFactu in Spanien, aber nicht.</li>
+        <li><strong>Länder:</strong> Deutschland, Spanien und Großbritannien (je Mandant umschaltbar). In Spanien nicht unterstützt: TicketBAI, Navarra, IGIC und REBU in VERI*FACTU. In Großbritannien nicht unterstützt: EU-Warenverkehr Nordirlands.</li>
       </ul>
     </section>
 

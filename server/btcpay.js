@@ -116,15 +116,15 @@ async function link(rid, { neu = false } = {}) {
   const pr = await call('POST', `/stores/${encodeURIComponent(c.store)}/payment-requests`, {
     title: `Rechnung ${r.RECHNUNGNUMMER}${firma ? ' – ' + firma : ''}`,
     description: `Rechnung Nr. ${r.RECHNUNGNUMMER} vom ${String(r.DATUM || '').split('-').reverse().join('.')}${r.KUNNAME ? ', ' + [r.KUNVORNAME, r.KUNNAME].filter(Boolean).join(' ') : ''}`,
-    amount: offen, currency: 'EUR', allowCustomPaymentAmounts: false,
+    amount: offen, currency: L.waehrung(), allowCustomPaymentAmounts: false,
     expiryDate: Math.floor(new Date(ablauf + 'T23:59:59').getTime() / 1000),
     email: (kd && (kd.EMAILRECHNUNG || kd.EMAIL)) || undefined,
     referenceId: `KUENTA-RE-${r.RECHNUNGNUMMER}`,
   }, c);
   if (!pr || !pr.id) throw new L.HttpError(502, 'BTCPay hat keine Payment-Request-ID geliefert.');
   const url = `${c.url}/payment-requests/${encodeURIComponent(pr.id)}`;
-  const id = Number(L.db().prepare("INSERT INTO SW_BTCPAY (ART, RECHNUNGID, BTCPAYID, LINK, BETRAG, WAEHRUNG, STATUS, ANGELEGT, ABLAUF) VALUES ('anfrage',?,?,?,?,'EUR',?,?,?)")
-    .run(rid, pr.id, url, offen, pr.status || 'Pending', L.now(), ablauf).lastInsertRowid);
+  const id = Number(L.db().prepare("INSERT INTO SW_BTCPAY (ART, RECHNUNGID, BTCPAYID, LINK, BETRAG, WAEHRUNG, STATUS, ANGELEGT, ABLAUF) VALUES ('anfrage',?,?,?,?,?,?,?,?)")
+    .run(rid, pr.id, url, offen, L.waehrung(), pr.status || 'Pending', L.now(), ablauf).lastInsertRowid);
   L.protocol(null, 'SW_BTCPAY', id, 'angelegt', { rechnung: r.RECHNUNGNUMMER, betrag: offen, btcpay: pr.id });
   return info(L.db().prepare('SELECT * FROM SW_BTCPAY WHERE ID=?').get(id));
 }
@@ -222,13 +222,13 @@ async function kasseStart({ betrag, text } = {}) {
   const eur = L.r2(Number(betrag));
   if (!(eur > 0)) throw new L.HttpError(400, 'Der Betrag muss größer als 0 sein.');
   const inv = await call('POST', `/stores/${encodeURIComponent(c.store)}/invoices`, {
-    amount: eur, currency: 'EUR',
+    amount: eur, currency: L.waehrung(),
     metadata: { orderId: `KUENTA-KASSE-${Date.now()}`, itemDesc: String(text || 'Einkauf').slice(0, 100) },
     checkout: { speedPolicy: 'HighSpeed', expirationMinutes: KASSE_MINUTEN, defaultLanguage: 'de-DE' },
   }, c);
   if (!inv || !inv.id) throw new L.HttpError(502, 'BTCPay hat keine Rechnungs-ID geliefert.');
-  const id = Number(L.db().prepare("INSERT INTO SW_BTCPAY (ART, BTCPAYID, LINK, BETRAG, WAEHRUNG, STATUS, ANGELEGT, ABLAUF) VALUES ('kasse',?,?,?,'EUR','New',?,?)")
-    .run(inv.id, inv.checkoutLink || `${c.url}/i/${inv.id}`, eur, L.now(), new Date(Date.now() + KASSE_MINUTEN * 60000).toISOString()).lastInsertRowid);
+  const id = Number(L.db().prepare("INSERT INTO SW_BTCPAY (ART, BTCPAYID, LINK, BETRAG, WAEHRUNG, STATUS, ANGELEGT, ABLAUF) VALUES ('kasse',?,?,?,?,'New',?,?)")
+    .run(inv.id, inv.checkoutLink || `${c.url}/i/${inv.id}`, eur, L.waehrung(), L.now(), new Date(Date.now() + KASSE_MINUTEN * 60000).toISOString()).lastInsertRowid);
   let methoden = [];
   try {
     const pm = await call('GET', `/stores/${encodeURIComponent(c.store)}/invoices/${encodeURIComponent(inv.id)}/payment-methods`, null, c);

@@ -86,7 +86,7 @@ Views.kasse = async (main) => {
     tbl.append(tb); tblWrap.innerHTML = ''; tblWrap.append(tbl);
     if (!lines.length) tblWrap.append(h('div', { class: 'grid-empty' }, 'Artikel scannen, Schnelltaste drücken oder über die Schaltflächen hinzufügen.'));
     summe.textContent = fmt.money(total());
-    bestand.textContent = T(`Kassenbestand: ${fmt.money(st.bestand)}${st.tse.aktiv ? ' · TSE aktiv' : ' · ohne TSE'}`);
+    bestand.textContent = T(`Kassenbestand: ${fmt.money(st.bestand)}${st.land === 'ES' ? ' · VERI*FACTU' : st.land === 'GB' ? '' : st.tse.aktiv ? ' · TSE aktiv' : ' · ohne TSE'}`);
   };
   const addArtikel = async (artid, menge = 1) => {
     const a = await api('/api/rec/artikel/' + artid);
