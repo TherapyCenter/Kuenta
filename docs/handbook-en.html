@@ -457,7 +457,7 @@ docker compose up -d --build</code></pre></div>
           <tr><td>Factur-X EN 16931</td><td>France: PDF with embedded CII, also for Chorus Pro</td></tr>
           <tr><td>FatturaPA 1.2.2</td><td>Italy: XML for the SdI (consumers, businesses, public bodies)</td></tr>
           <tr><td>ebInterface 6.1</td><td>Austria: XML for e-rechnung.gv.at</td></tr>
-          <tr><td>Peppol BIS Billing 3.0</td><td>Netherlands and Belgium: UBL through the Peppol network</td></tr>
+          <tr><td>Peppol BIS Billing 3.0</td><td>Netherlands, Belgium and Luxembourg: UBL through the Peppol network</td></tr>
           <tr><td>QR-bill</td><td>Switzerland: payment part with Swiss QR Code on the invoice</td></tr>
         </tbody>
       </table></div>
@@ -603,6 +603,17 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Rates:</strong> 21 % (full VAT), 6 % (reduced VAT), 12 % (code “AT-MwSt”), 0 % exempt. The small business exemption can be switched on.</li>
         <li><strong>E-invoice (Peppol):</strong> mandatory between Belgian businesses since 2026. Enter the customer's enterprise number or VAT number; it is the customer's Peppol address. In the invoice window <em>E-Rechnung (Peppol) → download</em> and send it through your Peppol service provider or Hermes.</li>
         <li><strong>VAT return:</strong> <span class="path">Finance → FIBU export</span> shows the grids (00–03, 44–49, 54, 59, 63, 64, 71/72, 82, 85) and creates the XML file for Intervat (monthly or quarterly). Small businesses under the exemption file no periodic return.</li>
+      </ul>
+    </section>
+
+    <section id="luxemburg">
+      <h2>Luxembourg: VAT, Peppol and eCDF</h2>
+      <p>Choose “Lëtzebuerg / Luxembourg” under <span class="path">Settings → Tax / dunning / register → Tax system</span>, save and reload. The settings are on the tab <span class="path">Lëtzebuerg</span>. Choose the document language “Français” or “Deutsch”; the legal texts follow it.</p>
+      <ul>
+        <li><strong>Company data:</strong> VAT number (LU15027442) into VAT ID, RCS and business permit on the tab Lëtzebuerg; they appear in the footer.</li>
+        <li><strong>Rates:</strong> 17 % (full VAT), 8 % (reduced VAT, adjustable e.g. to 3 %), 14 % (code “AT-MwSt”), 0 % exempt. The small business franchise (art. 57) can be switched on.</li>
+        <li><strong>E-invoice (Peppol):</strong> mandatory for public bodies. Enter the customer's VAT number; it is the customer's Peppol address. In the invoice window <em>E-Rechnung (Peppol) → download</em> and send it through your Peppol service provider.</li>
+        <li><strong>VAT return:</strong> <span class="path">Finance → FIBU export</span> shows the fields of the eCDF form (012, 021, 022, 701–706, 046, 458, 105 …) and creates the XML file for the eCDF platform. Enter the national identification number (matricule) and the eCDF prefix on the tab Lëtzebuerg. Small businesses under the franchise file only the annual return.</li>
       </ul>
     </section>
 
@@ -796,7 +807,7 @@ docker compose up -d --build</code></pre></div>
 
     <section id="sicherung">
       <h2>Backup and data folder</h2>
-      <p>The data is never in the program folder but in the user profile. Updates and uninstalling leave it untouched.</p>
+      <p>The data is never in the program folder but in the user profile. Updates leave it untouched; when uninstalling you decide whether to keep it.</p>
       <div class="tablewrap"><table>
         <thead><tr><th>System</th><th>Data folder</th></tr></thead>
         <tbody>
@@ -850,7 +861,9 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Windows:</strong> <span class="path">Settings → Apps → Kuenta</span> or start menu <span class="path">Uninstall Kuenta</span>. A running Kuenta is stopped first and the firewall rule removed.</li>
         <li><strong>Linux / macOS:</strong> <code>./installer/unix/install.sh --uninstall</code></li>
       </ul>
-      <p>The data folder is kept in any case. If you really want to remove the data, delete it by hand, preferably after a last backup.</p>
+      <p>On Windows you can also start the installer again: if Kuenta is already installed it offers to update or to uninstall.</p>
+      <p>Afterwards Kuenta asks whether to delete the data too. The default is <strong>keep the data</strong>. If you delete it, you can save a copy first: on Windows as a ZIP on the desktop, on Linux/macOS as a <code>.tar.gz</code> in the home folder. If the copy fails, nothing is deleted. Keep the retention periods in mind: invoices and cash register data usually have to be kept for up to 10 years.</p>
+      <p>For deployment tools: <code>unins000.exe /VERYSILENT</code> keeps the data, <code>/DELETEDATA</code> deletes it after a copy, with <code>/NOBACKUP</code> without a copy. On Linux/macOS use <code>--delete-data</code> and <code>--no-backup</code>.</p>
     </section>
 
     <section id="beachten">
@@ -898,13 +911,13 @@ docker compose up -d --build</code></pre></div>
             <li>The installer stops a running Kuenta and starts it again afterwards. A new tab opens in the browser.</li>
             <li>Under the system account (software distribution) Kuenta is not started again.</li>
             <li>The first update from version 1.0.0 kills Kuenta. The data stays intact.</li>
-            <li>Updates and uninstalling leave the data folder untouched. Each Windows user has their own.</li>
+            <li>Updates leave the data folder untouched, uninstalling asks. Each Windows user has their own.</li>
           </ul></div>
         <div class="module"><h3>Register and law</h3><div class="where"><a href="#grenzen">Notes and limits</a></div>
           <ul>
             <li>Check the TSE with a fiskaly test account before going live and register the register with the tax office.</li>
             <li>Check the card terminal and DSFinV-K before use or before an audit.</li>
-            <li>Kuenta is designed for Germany, Spain, the United Kingdom, the United States, France, Austria, Switzerland, Italy, the Netherlands and Belgium (see <a href="#spanien">Spain</a>, <a href="#uk">United Kingdom</a>, <a href="#usa">United States</a>, <a href="#frankreich">France</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Switzerland</a>, <a href="#italien">Italy</a>, <a href="#niederlande">the Netherlands</a> and <a href="#belgien">Belgium</a>). Other countries are not supported.</li>
+            <li>Kuenta is designed for Germany, Spain, the United Kingdom, the United States, France, Austria, Switzerland, Italy, the Netherlands, Belgium and Luxembourg (see <a href="#spanien">Spain</a>, <a href="#uk">United Kingdom</a>, <a href="#usa">United States</a>, <a href="#frankreich">France</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Switzerland</a>, <a href="#italien">Italy</a>, <a href="#niederlande">the Netherlands</a>, <a href="#belgien">Belgium</a> and <a href="#luxemburg">Luxembourg</a>). Other countries are not supported.</li>
             <li>Purchase contracts are templates and do not replace legal advice.</li>
           </ul></div>
       </div>

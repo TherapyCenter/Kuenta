@@ -348,6 +348,7 @@ require('./ch/routes')(route, { json, readBody });
 require('./it/routes')(route, { json, readBody });
 require('./nl/routes')(route, { json, readBody });
 require('./be/routes')(route, { json, readBody });
+require('./lu/routes')(route, { json, readBody });
 route('GET', '/api/us/export/quickbooks', (ctx) => { ctx.need('FIBU', 'anzeigen'); const r = require('./us/export').quickbooks(ctx.q); return { _download: r.buffer, filename: r.filename, type: 'text/csv; charset=utf-8' }; });
 
 // ---------- Server ----------

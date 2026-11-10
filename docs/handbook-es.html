@@ -457,7 +457,7 @@ docker compose up -d --build</code></pre></div>
           <tr><td>Factur-X EN 16931</td><td>Francia: PDF con CII incrustado, también para Chorus Pro</td></tr>
           <tr><td>FatturaPA 1.2.2</td><td>Italia: XML para el SdI (particulares, empresas, administraciones)</td></tr>
           <tr><td>ebInterface 6.1</td><td>Austria: XML para e-rechnung.gv.at</td></tr>
-          <tr><td>Peppol BIS Billing 3.0</td><td>Países Bajos y Bélgica: UBL por la red Peppol</td></tr>
+          <tr><td>Peppol BIS Billing 3.0</td><td>Países Bajos, Bélgica y Luxemburgo: UBL por la red Peppol</td></tr>
           <tr><td>Factura QR</td><td>Suiza: sección de pago con Swiss QR Code en la factura</td></tr>
         </tbody>
       </table></div>
@@ -603,6 +603,17 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Tipos:</strong> 21 %, 6 % y 12 % (código “AT-MwSt”), 0 % exento. Se puede activar la franquicia de pequeñas empresas.</li>
         <li><strong>Factura electrónica (Peppol):</strong> obligatoria entre empresas belgas desde 2026. Indique el número de empresa o NIF-IVA del cliente; es su dirección Peppol. En la ventana de la factura <em>E-Rechnung (Peppol) → descargar</em> y envíela mediante su proveedor Peppol o Hermes.</li>
         <li><strong>Declaración de IVA:</strong> <span class="path">Finanzas → Exportación contable</span> muestra las casillas (00–03, 44–49, 54, 59, 63, 64, 71/72, 82, 85) y genera el XML para Intervat (mensual o trimestral). Las pequeñas empresas en franquicia no presentan declaración periódica.</li>
+      </ul>
+    </section>
+
+    <section id="luxemburg">
+      <h2>Luxemburgo: IVA, Peppol y eCDF</h2>
+      <p>Elija “Lëtzebuerg / Luxembourg” en <span class="path">Ajustes → Impuestos / reclamaciones / caja → Sistema fiscal</span>, guarde y recargue. La configuración está en la pestaña <span class="path">Lëtzebuerg</span>. Elija el idioma de documentos “Français” o “Deutsch”; los textos legales lo siguen.</p>
+      <ul>
+        <li><strong>Datos de la empresa:</strong> número de IVA (LU15027442) en NIF-IVA, RCS y autorización de establecimiento en la pestaña Lëtzebuerg; aparecen en el pie.</li>
+        <li><strong>Tipos:</strong> 17 %, 8 % (ajustable p. ej. a 3 %) y 14 % (código “AT-MwSt”), 0 % exento. Se puede activar la franquicia de pequeñas empresas (art. 57).</li>
+        <li><strong>Factura electrónica (Peppol):</strong> obligatoria para las administraciones. Indique el NIF-IVA del cliente; es su dirección Peppol. En la ventana de la factura <em>E-Rechnung (Peppol) → descargar</em> y envíela mediante su proveedor Peppol.</li>
+        <li><strong>Declaración de IVA:</strong> <span class="path">Finanzas → Exportación contable</span> muestra las casillas del formulario eCDF (012, 021, 022, 701–706, 046, 458, 105 …) y genera el XML para la plataforma eCDF. Para ello indique el matricule y el prefijo eCDF en la pestaña Lëtzebuerg. Las pequeñas empresas en franquicia solo presentan la declaración anual.</li>
       </ul>
     </section>
 
@@ -796,7 +807,7 @@ docker compose up -d --build</code></pre></div>
 
     <section id="sicherung">
       <h2>Copias de seguridad y carpeta de datos</h2>
-      <p>Los datos nunca están en la carpeta del programa, sino en el perfil de usuario. Las actualizaciones y la desinstalación no los tocan.</p>
+      <p>Los datos nunca están en la carpeta del programa, sino en el perfil de usuario. Las actualizaciones no los tocan; al desinstalar usted decide si se conservan.</p>
       <div class="tablewrap"><table>
         <thead><tr><th>Sistema</th><th>Carpeta de datos</th></tr></thead>
         <tbody>
@@ -850,7 +861,9 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Windows:</strong> <span class="path">Configuración → Aplicaciones → Kuenta</span> o menú Inicio <span class="path">Desinstalar Kuenta</span>. Antes se detiene un Kuenta en marcha y se elimina la regla del cortafuegos.</li>
         <li><strong>Linux / macOS:</strong> <code>./installer/unix/install.sh --uninstall</code></li>
       </ul>
-      <p>La carpeta de datos se conserva en cualquier caso. Si de verdad quiere eliminar los datos, bórrela a mano, mejor después de una última copia.</p>
+      <p>En Windows también puede volver a iniciar el instalador: si Kuenta ya está instalado, ofrece actualizar o desinstalar.</p>
+      <p>Después Kuenta pregunta si también se borran los datos. Por defecto <strong>se conservan</strong>. Si los borra, puede guardar antes una copia: en Windows como ZIP en el escritorio, en Linux/macOS como <code>.tar.gz</code> en la carpeta personal. Si la copia falla, no se borra nada. Tenga en cuenta los plazos de conservación: facturas y datos de caja suelen conservarse hasta 10 años.</p>
+      <p>Para herramientas de distribución: <code>unins000.exe /VERYSILENT</code> conserva los datos, <code>/DELETEDATA</code> los borra tras una copia, con <code>/NOBACKUP</code> sin copia. En Linux/macOS use <code>--delete-data</code> y <code>--no-backup</code>.</p>
     </section>
 
     <section id="beachten">
@@ -898,13 +911,13 @@ docker compose up -d --build</code></pre></div>
             <li>El instalador detiene un Kuenta en marcha y lo vuelve a iniciar después. Se abre una pestaña nueva en el navegador.</li>
             <li>Con la cuenta del sistema (distribución de software), Kuenta no se vuelve a iniciar.</li>
             <li>La primera actualización desde la versión 1.0.0 cierra Kuenta a la fuerza. Los datos quedan intactos.</li>
-            <li>Las actualizaciones y la desinstalación no tocan la carpeta de datos. Cada usuario de Windows tiene la suya.</li>
+            <li>Las actualizaciones no tocan la carpeta de datos; al desinstalar se pregunta. Cada usuario de Windows tiene la suya.</li>
           </ul></div>
         <div class="module"><h3>Caja y legislación</h3><div class="where"><a href="#grenzen">Avisos y límites</a></div>
           <ul>
             <li>Compruebe la TSE con una cuenta de prueba de fiskaly antes de usarla en real y comunique la caja a Hacienda (alemana).</li>
             <li>Compruebe el terminal de tarjetas y la DSFinV-K antes de usarlos o de una inspección.</li>
-            <li>Kuenta está pensado para Alemania, España, el Reino Unido, Estados Unidos, Francia, Austria, Suiza, Italia, los Países Bajos y Bélgica (vea <a href="#spanien">España</a>, <a href="#uk">Reino Unido</a>, <a href="#usa">Estados Unidos</a>, <a href="#frankreich">Francia</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Suiza</a>, <a href="#italien">Italia</a>, <a href="#niederlande">Países Bajos</a> y <a href="#belgien">Bélgica</a>). TicketBAI, Navarra e IGIC no están soportados.</li>
+            <li>Kuenta está pensado para Alemania, España, el Reino Unido, Estados Unidos, Francia, Austria, Suiza, Italia, los Países Bajos, Bélgica y Luxemburgo (vea <a href="#spanien">España</a>, <a href="#uk">Reino Unido</a>, <a href="#usa">Estados Unidos</a>, <a href="#frankreich">Francia</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Suiza</a>, <a href="#italien">Italia</a>, <a href="#niederlande">Países Bajos</a>, <a href="#belgien">Bélgica</a> y <a href="#luxemburg">Luxemburgo</a>). TicketBAI, Navarra e IGIC no están soportados.</li>
             <li>Los contratos de compraventa son modelos y no sustituyen el asesoramiento jurídico.</li>
           </ul></div>
       </div>

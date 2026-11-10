@@ -453,7 +453,7 @@ docker compose up -d --build</code></pre></div>
           <tr><td>Factur-X EN 16931</td><td>Frankreich: PDF mit eingebetteter CII, auch für Chorus Pro</td></tr>
           <tr><td>FatturaPA 1.2.2</td><td>Italien: XML für das SdI (Privat, Unternehmen, Behörden)</td></tr>
           <tr><td>ebInterface 6.1</td><td>Österreich: XML für e-rechnung.gv.at</td></tr>
-          <tr><td>Peppol BIS Billing 3.0</td><td>Niederlande und Belgien: UBL über das Peppol-Netz</td></tr>
+          <tr><td>Peppol BIS Billing 3.0</td><td>Niederlande, Belgien und Luxemburg: UBL über das Peppol-Netz</td></tr>
           <tr><td>QR-Rechnung</td><td>Schweiz: Zahlteil mit Swiss QR Code auf der Rechnung</td></tr>
         </tbody>
       </table></div>
@@ -599,6 +599,17 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Steuersätze:</strong> 21 % (volle MwSt), 6 % (ermäßigte MwSt), 12 % (Code „AT-MwSt“), 0 % befreit. Die Vrijstellingsregeling / Franchise für Kleinunternehmen ist wählbar.</li>
         <li><strong>E-Rechnung (Peppol):</strong> seit 2026 Pflicht zwischen belgischen Unternehmen. Beim Kunden die Unternehmensnummer bzw. USt-IdNr. eintragen, sie ist seine Peppol-Adresse. Im Rechnungsfenster <em>E-Rechnung (Peppol) → herunterladen</em> und über Ihren Peppol-Dienstleister oder Hermes senden.</li>
         <li><strong>MwSt-Erklärung:</strong> <span class="path">Finanzen → FIBU-Export</span> zeigt die Raster (00–03, 44–49, 54, 59, 63, 64, 71/72, 82, 85) und erzeugt die XML-Datei für Intervat (monatlich oder vierteljährlich). Kleinunternehmen mit Franchise reichen keine periodische Erklärung ein.</li>
+      </ul>
+    </section>
+
+    <section id="luxemburg">
+      <h2>Luxemburg: TVA, Peppol und eCDF</h2>
+      <p>Unter <span class="path">Einstellungen → Steuer / Mahnung / Kasse → Steuersystem</span> „Lëtzebuerg / Luxembourg“ wählen, speichern und neu laden. Die Einstellungen stehen im Reiter <span class="path">Lëtzebuerg</span>. Belegsprache „Français“ oder „Deutsch“ wählen; die Rechtstexte folgen ihr.</p>
+      <ul>
+        <li><strong>Firmendaten:</strong> TVA-Nummer (LU15027442) unter USt-IdNr., RCS und Niederlassungsgenehmigung im Reiter Lëtzebuerg; sie stehen in der Fußzeile.</li>
+        <li><strong>Steuersätze:</strong> 17 % (volle MwSt), 8 % (ermäßigte MwSt, einstellbar z. B. auf 3 %), 14 % (Code „AT-MwSt“), 0 % befreit. Die Franchise für Kleinunternehmen (Art. 57) ist wählbar.</li>
+        <li><strong>E-Rechnung (Peppol):</strong> Pflicht für öffentliche Auftraggeber. Beim Kunden die USt-IdNr. eintragen, sie ist seine Peppol-Adresse. Im Rechnungsfenster <em>E-Rechnung (Peppol) → herunterladen</em> und über Ihren Peppol-Dienstleister senden.</li>
+        <li><strong>MwSt-Erklärung:</strong> <span class="path">Finanzen → FIBU-Export</span> zeigt die Felder des eCDF-Formulars (012, 021, 022, 701–706, 046, 458, 105 …) und erzeugt die XML-Datei für die Plattform eCDF. Dafür im Reiter Lëtzebuerg Matricule und eCDF-Präfix eintragen. Kleinunternehmen mit Franchise reichen nur die jährliche Erklärung ein.</li>
       </ul>
     </section>
 
@@ -791,7 +802,7 @@ docker compose up -d --build</code></pre></div>
 
     <section id="sicherung">
       <h2>Datensicherung und Datenordner</h2>
-      <p>Die Daten liegen nie im Programmordner, sondern im Benutzerprofil. Updates und Deinstallation lassen sie unangetastet.</p>
+      <p>Die Daten liegen nie im Programmordner, sondern im Benutzerprofil. Updates lassen sie unangetastet; bei der Deinstallation entscheiden Sie, ob sie erhalten bleiben.</p>
       <div class="tablewrap"><table>
         <thead><tr><th>System</th><th>Datenordner</th></tr></thead>
         <tbody>
@@ -845,7 +856,9 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Windows:</strong> <span class="path">Einstellungen → Apps → Kuenta</span> oder Startmenü <span class="path">Kuenta deinstallieren</span>. Ein laufendes Kuenta wird vorher beendet, die Firewall-Regel entfernt.</li>
         <li><strong>Linux / macOS:</strong> <code>./installer/unix/install.sh --uninstall</code></li>
       </ul>
-      <p>Der Datenordner bleibt in jedem Fall erhalten. Wer die Daten wirklich entfernen will, löscht ihn von Hand, am besten nach einer letzten Sicherung.</p>
+      <p>Unter Windows kann man auch den Installer erneut starten: Ist Kuenta schon installiert, bietet er „aktualisieren“ oder „deinstallieren“ an.</p>
+      <p>Danach fragt Kuenta, ob auch die Daten gelöscht werden sollen. Standard ist <strong>Daten behalten</strong>. Wer löscht, kann vorher eine Kopie speichern: unter Windows als ZIP auf dem Desktop, unter Linux/macOS als <code>.tar.gz</code> im Home-Ordner. Schlägt die Kopie fehl, wird nichts gelöscht. Bedenken Sie die Aufbewahrungspflichten: Rechnungen und Kassendaten sind in der Regel bis zu 10 Jahre aufzubewahren.</p>
+      <p>Für Verteilungssoftware: <code>unins000.exe /VERYSILENT</code> behält die Daten, <code>/DELETEDATA</code> löscht sie nach einer Kopie, zusätzlich <code>/NOBACKUP</code> ohne Kopie. Unter Linux/macOS entsprechend <code>--delete-data</code> und <code>--no-backup</code>.</p>
     </section>
 
     <section id="beachten">
@@ -893,13 +906,13 @@ docker compose up -d --build</code></pre></div>
             <li>Der Installer beendet ein laufendes Kuenta und startet es danach wieder. Im Browser öffnet sich ein neuer Tab.</li>
             <li>Unter dem Systemkonto (Softwareverteilung) wird Kuenta nicht wieder gestartet.</li>
             <li>Das erste Update von Version 1.0.0 beendet Kuenta hart. Die Daten bleiben unbeschädigt.</li>
-            <li>Updates und Deinstallation lassen den Datenordner unangetastet. Jeder Windows-Benutzer hat seinen eigenen.</li>
+            <li>Updates lassen den Datenordner unangetastet, bei der Deinstallation wird gefragt. Jeder Windows-Benutzer hat seinen eigenen.</li>
           </ul></div>
         <div class="module"><h3>Kasse und Recht</h3><div class="where"><a href="#grenzen">Hinweise und Grenzen</a></div>
           <ul>
             <li>TSE vor dem Echtbetrieb mit fiskaly-Testzugang prüfen und die Kasse beim Finanzamt melden.</li>
             <li>EC-Terminal und DSFinV-K vor dem Einsatz bzw. vor einer Prüfung kontrollieren.</li>
-            <li>Kuenta ist auf Deutschland, Spanien, Großbritannien, die USA, Frankreich, Österreich, die Schweiz, Italien, die Niederlande und Belgien ausgelegt (siehe <a href="#spanien">Spanien</a>, <a href="#uk">Großbritannien</a>, <a href="#usa">USA</a>, <a href="#frankreich">Frankreich</a>, <a href="#oesterreich">Österreich</a>, <a href="#schweiz">Schweiz</a>, <a href="#italien">Italien</a>, <a href="#niederlande">Niederlande</a> und <a href="#belgien">Belgien</a>). Andere Länder werden nicht unterstützt.</li>
+            <li>Kuenta ist auf Deutschland, Spanien, Großbritannien, die USA, Frankreich, Österreich, die Schweiz, Italien, die Niederlande, Belgien und Luxemburg ausgelegt (siehe <a href="#spanien">Spanien</a>, <a href="#uk">Großbritannien</a>, <a href="#usa">USA</a>, <a href="#frankreich">Frankreich</a>, <a href="#oesterreich">Österreich</a>, <a href="#schweiz">Schweiz</a>, <a href="#italien">Italien</a>, <a href="#niederlande">Niederlande</a>, <a href="#belgien">Belgien</a> und <a href="#luxemburg">Luxemburg</a>). Andere Länder werden nicht unterstützt.</li>
             <li>Kaufverträge sind Muster und ersetzen keine Rechtsberatung.</li>
           </ul></div>
       </div>

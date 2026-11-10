@@ -85,7 +85,7 @@ const Vorgang = {
       else if (Vorgang.land() === 'FR') items.push({ label: 'Factur-X / Chorus Pro', icon: '🧾', items: Vorgang.frMenu(id) });
       else if (Vorgang.land() === 'AT') items.push({ label: 'E-Rechnung (ebInterface)', icon: '🧾', items: Vorgang.atMenu(id) });
       else if (Vorgang.land() === 'IT') items.push({ label: 'Fattura elettronica (FatturaPA)', icon: '🧾', items: Vorgang.itMenu(id) });
-      else if (['NL', 'BE'].includes(Vorgang.land())) items.push({ label: 'E-Rechnung (Peppol)', icon: '🧾', items: Vorgang.peppolMenu(id) });
+      else if (['NL', 'BE', 'LU'].includes(Vorgang.land())) items.push({ label: 'E-Rechnung (Peppol)', icon: '🧾', items: Vorgang.peppolMenu(id) });
       else if (Vorgang.land() === 'DE') items.push({ label: 'E-Rechnung (XRechnung)', icon: '🧾', items: [
         { label: 'XRechnung CII herunterladen', onClick: () => Vorgang.erechnung(id, 'cii') },
         { label: 'XRechnung UBL herunterladen', onClick: () => Vorgang.erechnung(id, 'ubl') },
@@ -123,7 +123,7 @@ const Vorgang = {
   // ---------- Spain (VERI*FACTU) ----------
   es() { return !!(LK.data && LK.data.land === 'ES'); },
   land() { return (LK.data && LK.data.land) || 'DE'; },
-  // Netherlands and Belgium: Peppol BIS Billing 3.0 (sent by the user through a Peppol service provider)
+  // Netherlands, Belgium and Luxembourg: Peppol BIS Billing 3.0 (sent by the user through a Peppol service provider)
   peppolMenu(id, wrap = fn => fn()) {
     const pruefen = async (download) => {
       try {
@@ -918,9 +918,9 @@ class VorgangWindow {
       h('button', { class: 'btn', onclick: () => this.print() }, h('span', { class: 'ico' }, '🖨'), 'Drucken'),
       h('label', { class: 'inline' }, 'Formular:', this.formSel),
     ];
-    if (isRe && ['DE', 'ES', 'FR', 'AT', 'IT', 'NL', 'BE'].includes(Vorgang.land())) items.push(h('button', { class: 'btn', onclick: async ev => {
+    if (isRe && ['DE', 'ES', 'FR', 'AT', 'IT', 'NL', 'BE', 'LU'].includes(Vorgang.land())) items.push(h('button', { class: 'btn', onclick: async ev => {
       const r = ev.currentTarget.getBoundingClientRect();
-      const m = contextMenu(r.left, r.top, ['NL', 'BE'].includes(Vorgang.land()) ? Vorgang.peppolMenu(this.id, fn => this.withSaved(fn)) : Vorgang.land() === 'IT' ? Vorgang.itMenu(this.id, fn => this.withSaved(fn)) : Vorgang.land() === 'AT' ? Vorgang.atMenu(this.id, fn => this.withSaved(fn)) : Vorgang.land() === 'FR' ? Vorgang.frMenu(this.id, fn => this.withSaved(fn)) : Vorgang.es() ? [
+      const m = contextMenu(r.left, r.top, ['NL', 'BE', 'LU'].includes(Vorgang.land()) ? Vorgang.peppolMenu(this.id, fn => this.withSaved(fn)) : Vorgang.land() === 'IT' ? Vorgang.itMenu(this.id, fn => this.withSaved(fn)) : Vorgang.land() === 'AT' ? Vorgang.atMenu(this.id, fn => this.withSaved(fn)) : Vorgang.land() === 'FR' ? Vorgang.frMenu(this.id, fn => this.withSaved(fn)) : Vorgang.es() ? [
         { label: 'Facturae 3.2.2 herunterladen', onClick: () => this.withSaved(() => Vorgang.facturae(this.id)) },
         { label: 'Pflichtangaben prüfen', onClick: () => this.withSaved(() => Vorgang.facturae(this.id, true)) },
         { label: 'VERI*FACTU-Status', onClick: () => this.withSaved(() => Vorgang.esStatus(this.typ, this.id).then(() => this.reloadEs())) }] : [

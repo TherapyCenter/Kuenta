@@ -1,5 +1,5 @@
 'use strict';
-// Peppol BIS Billing 3.0 (UBL 2.1) for the Dutch and the Belgian tax system: invoices to the government and to
+// Peppol BIS Billing 3.0 (UBL 2.1) for the Dutch, Belgian and Luxembourg tax systems: invoices to the government and to
 // businesses on the Peppol network (in Belgium mandatory between businesses since 2026).
 // Electronic addresses by the Peppol EAS list: 0106 KvK and 0190 OIN (Netherlands), 0208 enterprise number
 // (Belgium), otherwise the VAT number of the country. The supplier is identified by its KvK or enterprise number.
@@ -56,6 +56,11 @@ function legal({ oin, kvk, btw }) {
 
 // the supplier's side per tax system
 function lieferant() {
+  if (L.land() === 'LU') {
+    const LU = require('./lu'); const t = LU.tva();
+    return { mod: LU, fr: !LU.de(), btw: t ? t.tva : '', end: t ? { scheme: '9938', id: t.tva } : null, legal: null, land: 'LU',
+      fehlt: t ? null : 'TVA-Nummer der Firma fehlt (Peppol-Adresse 9938)' };
+  }
   if (L.land() === 'BE') {
     const BE = require('./be'); const o = BE.ondernemingsnr();
     // small businesses under the franchise keep their VAT number (BR-E-02)

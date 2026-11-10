@@ -87,6 +87,7 @@ function load(typ, id) {
   if (L.land() === 'IT') res.lx = require('../it').info(typ, kopf, pos);
   if (L.land() === 'NL') res.lx = require('../nl').info(typ, kopf, pos);
   if (L.land() === 'BE') res.lx = require('../be').info(typ, kopf, pos);
+  if (L.land() === 'LU') res.lx = require('../lu').info(typ, kopf, pos);
   return res;
 }
 

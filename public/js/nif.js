@@ -2,7 +2,8 @@
 // Tax IDs: Spanish DNI (12345678Z), NIE (X1234567L), CIF of companies (B12345674) and special NIF (K/L/M);
 // UK VAT registration numbers (GB123456782); French SIREN (9 digits) and SIRET (14 digits);
 // Austrian UID (ATU12345678), Swiss UID (CHE-123.456.789), Italian partita IVA and codice fiscale,
-// Dutch btw-id (NL123456789B01) and KvK number, Belgian enterprise number (BE0123456749). Shared by server and browser (UMD).
+// Dutch btw-id (NL123456789B01) and KvK number, Belgian enterprise number (BE0123456749),
+// Luxembourg VAT number (LU15027442). Shared by server and browser (UMD).
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
   else root.NIF = factory();
@@ -149,5 +150,12 @@
     return { ok: 97 - (Number(x.slice(0, 8)) % 97) === Number(x.slice(8)), nr: x, btw: 'BE' + x, anzeige: `${x.slice(0, 4)}.${x.slice(4, 7)}.${x.slice(7)}` };
   }
 
-  return { validar, limpiar, extranjero, gbVat, frSiren, atUid, chUid, itPiva, itCf, nlBtw, nlKvk, beNr };
+  // Luxembourg VAT number (numéro d'identification TVA): LU + 8 digits, the last two are the first six modulo 89
+  function luTva(s) {
+    const x = String(s || '').toUpperCase().replace(/[\s.\-]/g, '').replace(/^LU/, '');
+    if (!/^\d{8}$/.test(x)) return { ok: false, nr: x };
+    return { ok: Number(x.slice(0, 6)) % 89 === Number(x.slice(6)), nr: x, tva: 'LU' + x };
+  }
+
+  return { validar, limpiar, extranjero, gbVat, frSiren, atUid, chUid, itPiva, itCf, nlBtw, nlKvk, beNr, luTva };
 });
