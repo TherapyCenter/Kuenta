@@ -25,6 +25,7 @@ WORKDIR /app
 COPY package.json README.md README.de.md INSTALL.md INSTALL.de.md LICENSE PRO.md PRO.de.md ./
 COPY server ./server
 COPY public ./public
+COPY docs ./docs
 
 # run without root rights (the Node image ships the user "node", UID 1000)
 RUN mkdir -p /data && chown node:node /data

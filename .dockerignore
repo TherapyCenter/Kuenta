@@ -1,8 +1,7 @@
-# Only server/, public/, package.json and the docs belong in the image (Podman reads this file too)
+# Only server/, public/, docs/ (handbooks), package.json and the docs belong in the image (Podman reads this file too)
 .git
 .claude
 build
-docs
 installer
 test
 node_modules

@@ -92,6 +92,7 @@ Source: "stop-kuenta.ps1"; Flags: dontcopy
 ; remove program files of earlier versions (user data lives in the user profile under AppData\Roaming\Kuenta and is kept)
 Type: filesandordirs; Name: "{app}\server"
 Type: filesandordirs; Name: "{app}\public"
+Type: filesandordirs; Name: "{app}\docs"
 Type: filesandordirs; Name: "{app}\node"
 Type: filesandordirs; Name: "{app}\sms-relais"
 

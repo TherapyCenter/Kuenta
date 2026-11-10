@@ -110,7 +110,7 @@ const App = {
       { l: 'Fahrzeughandel', items: NAV[4].items.map(([k, , l]) => [l, () => this.go(k)]) },
       { l: 'Finanzen', items: NAV[5].items.map(([k, , l]) => [l, () => this.go(k)]) },
       { l: 'Auswertung', items: NAV[6].items.map(([k, , l]) => [l, () => this.go(k)]) },
-      { l: 'Hilfe', items: [['Tastenkürzel', () => this.help()], ['Über Kuenta', () => this.about()]] },
+      { l: 'Hilfe', items: [['Handbuch (F1)', () => this.handbuch()], ['Tastenkürzel', () => this.help()], '-', ['Über Kuenta', () => this.about()]] },
     ];
     const host = $('#menus'); host.innerHTML = '';
     let openMenu = null;
@@ -167,6 +167,7 @@ const App = {
     inp.addEventListener('blur', () => setTimeout(() => res.classList.add('hidden'), 150));
     inp.addEventListener('keydown', e => { if (e.key === 'Enter') { const f = $('.item', res); if (f) f.dispatchEvent(new Event('mousedown')); } });
     document.addEventListener('keydown', e => { if (e.key === 'f' && e.ctrlKey && !Win.top()) { e.preventDefault(); inp.focus(); } });
+    document.addEventListener('keydown', e => { if (e.key === 'F1') { e.preventDefault(); this.handbuch(); } });
   },
   async go(route, push = true) {
     if (push && location.hash.slice(1) !== route) { location.hash = route; return; }
@@ -182,9 +183,14 @@ const App = {
   refresh(entName) {
     if (this.current && this.current.name === entName) this.current.reload();
   },
+  // Handbook in the language of the user interface, in a new browser tab
+  handbuch() {
+    const file = { de: 'handbuch.html', en: 'handbook-en.html', es: 'handbook-es.html' }[I18N.lang] || 'handbuch.html';
+    window.open('/docs/' + file, '_blank', 'noopener');
+  },
   help() {
     Win.open({ title: 'Tastenkürzel', width: 520, content: h('table', { class: 'simple' }, h('tbody', null, [
-      ['Strg + F', 'Globale Suche'], ['Enter (in Suchleiste)', 'Suche ausführen'], ['Doppelklick / Enter', 'Eintrag öffnen'], ['Rechtsklick', 'Kontextmenü (Weitere Funktionen)'], ['Rechtsklick auf Spaltenkopf', 'Spalten ein-/ausblenden, CSV-Export'],
+      ['F1', 'Handbuch öffnen'], ['Strg + F', 'Globale Suche'], ['Enter (in Suchleiste)', 'Suche ausführen'], ['Doppelklick / Enter', 'Eintrag öffnen'], ['Rechtsklick', 'Kontextmenü (Weitere Funktionen)'], ['Rechtsklick auf Spaltenkopf', 'Spalten ein-/ausblenden, CSV-Export'],
       ['Umschalt / Strg + Klick', 'Mehrere Einträge markieren'], ['Entf', 'Eintrag / Position löschen'], ['F2 (im Vorgang)', 'Artikel einfügen'], ['F3 (im Vorgang)', 'Arbeitswert einfügen'], ['Strg + S', 'Vorgang speichern'], ['Strg + P', 'Vorgang drucken'], ['Strg + Enter', 'Formular speichern (OK)'], ['Esc', 'Fenster schließen']].map(([a, b]) => h('tr', null, h('td', null, h('b', null, a)), h('td', null, b))))) });
   },
   about() {

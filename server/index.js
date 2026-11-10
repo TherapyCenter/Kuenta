@@ -21,6 +21,7 @@ const pkg = require('../package.json');
 const PORT = Number(process.env.PORT || process.env.KUENTA_PORT || 3700);
 const HOST = process.env.HOST || process.env.KUENTA_HOST || '127.0.0.1';
 const PUBLIC = path.join(__dirname, '..', 'public');
+const DOCS = path.join(__dirname, '..', 'docs');   // handbooks (Help → Handbook)
 const MAX_BODY = 1024 * 1024 * 1024;
 
 // ---------- Sessions / permissions ----------
@@ -367,6 +368,11 @@ async function handle(req, res) {
     if (pathname.startsWith('/dateien/')) {
       if (loginRequired() && !getUser(req)) throw new L.HttpError(401, 'Bitte anmelden.');
       return serveFile(res, safeJoin(dbm.FILES_DIR, pathname.slice('/dateien/'.length)), url.searchParams.get('download') ? { 'Content-Disposition': 'attachment' } : {});
+    }
+    if (pathname.startsWith('/docs/')) {
+      const doc = safeJoin(DOCS, pathname.slice('/docs/'.length));
+      if (!fs.existsSync(doc) || !fs.statSync(doc).isFile()) throw new L.HttpError(404, 'Nicht gefunden');
+      return serveFile(res, doc);
     }
     let file = pathname === '/' ? '/index.html' : pathname;
     file = safeJoin(PUBLIC, file);

@@ -42,9 +42,9 @@ if ! node -e 'const [a,b]=process.versions.node.split(".").map(Number);process.e
 fi
 
 msg "Installiere Kuenta nach $PREFIX ..." "Installing Kuenta to $PREFIX ..." "Instalando Kuenta en $PREFIX ..."
-rm -rf "$PREFIX/server" "$PREFIX/public"
+rm -rf "$PREFIX/server" "$PREFIX/public" "$PREFIX/docs"
 mkdir -p "$PREFIX" "$BIN"
-cp -R "$SRC/server" "$SRC/public" "$PREFIX/"
+cp -R "$SRC/server" "$SRC/public" "$SRC/docs" "$PREFIX/"
 for f in package.json README.md README.de.md INSTALL.md INSTALL.de.md LICENSE kuenta.sh; do
   if [ -f "$SRC/$f" ]; then cp "$SRC/$f" "$PREFIX/"; fi
 done
