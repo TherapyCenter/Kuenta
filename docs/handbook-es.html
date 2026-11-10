@@ -156,7 +156,7 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
     <div class="kicker">Invoicing &amp; POS for auto repair shops · uso, configuración, funcionamiento</div>
     <h1>Manual de Kuenta</h1>
     <p>Todo lo que necesita saber sobre la instalación y configuración de Kuenta, el trabajo diario, el envío de correos, las actualizaciones y las copias de seguridad.</p>
-    <div class="meta"><span>Versión <b>1.8.0</b></span><span>Fecha <b>noviembre de 2026</b></span><span>Windows · macOS · Linux · Tableta</span><span><a href="handbuch.html" hreflang="de">Deutsch</a> · <a href="handbook-en.html" hreflang="en">English</a></span></div>
+    <div class="meta"><span>Versión <b>1.8.1</b></span><span>Fecha <b>noviembre de 2026</b></span><span>Windows · macOS · Linux · Tableta</span><span><a href="handbuch.html" hreflang="de">Deutsch</a> · <a href="handbook-en.html" hreflang="en">English</a></span></div>
   </header>
 
   <nav class="toc" aria-label="Contenido">
@@ -207,7 +207,7 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
 
       <h3>Windows 10 / 11 (64 bits)</h3>
       <ol class="steps">
-        <li><div><strong>Ejecute <code>Kuenta-Setup-1.8.0.exe</code>.</strong><span>Node.js va incluido en el instalador; no hace falta instalar nada más.</span></div></li>
+        <li><div><strong>Ejecute <code>Kuenta-Setup-1.8.1.exe</code>.</strong><span>Node.js va incluido en el instalador; no hace falta instalar nada más.</span></div></li>
         <li><div><strong>Elija el tipo de instalación.</strong><span><em>Para todos los usuarios</em> (predeterminado, requiere derechos de administrador) instala en <code>C:\Archivos de programa\Kuenta</code>. <em>Solo para mí</em> no requiere derechos de administrador e instala en el perfil de usuario.</span></div></li>
         <li><div><strong>Elija las opciones.</strong><span>Acceso directo en el escritorio y, para el modo red, la regla del cortafuegos (solo en la instalación para todos los usuarios).</span></div></li>
         <li><div><strong>Iniciar:</strong><span>menú Inicio <span class="path">Kuenta</span>. Se abren la ventana de consola y el navegador con <code>http://127.0.0.1:3700</code>.</span></div></li>
@@ -263,9 +263,9 @@ loginctl enable-linger "$USER"</code></pre></div>
       <h3>Contenedor (Docker / Podman)</h3>
       <p>Para servidores Linux, NAS, Raspberry Pi o Mac, Kuenta también funciona en un contenedor. La imagen incluye Node.js y funciona en x86_64 y ARM64. En la carpeta de Kuenta hay un <code>Dockerfile</code> y un <code>compose.yaml</code>.</p>
       <div class="codeblock"><pre><code># Podman (con Docker, sustituya podman por docker)
-podman build -t kuenta:1.8.0 .
+podman build -t kuenta:1.8.1 .
 podman run -d --name kuenta --restart unless-stopped \
-  -p 3700:3700 -v kuenta-daten:/data kuenta:1.8.0
+  -p 3700:3700 -v kuenta-daten:/data kuenta:1.8.1
 
 # o con Compose
 docker compose up -d --build</code></pre></div>
@@ -840,7 +840,7 @@ docker compose up -d --build</code></pre></div>
       </ol>
       <h3>Desplegar sin preguntas</h3>
       <p>Para scripts o distribución de software:</p>
-      <div class="codeblock"><pre><code>Kuenta-Setup-1.8.0.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART</code></pre></div>
+      <div class="codeblock"><pre><code>Kuenta-Setup-1.8.1.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART</code></pre></div>
       <div class="tablewrap"><table>
         <thead><tr><th>Opción</th><th>Efecto</th></tr></thead>
         <tbody>
@@ -995,7 +995,7 @@ npm run installer:windows   # crear el instalador de Windows</code></pre></div>
     </section>
   </main>
 
-  <footer>Kuenta 1.8.0 · © 2026 Doc · Código abierto bajo la GNU AGPL 3.0, funciones Pro con licencia · Fuente de los documentos: Liberation Sans (SIL Open Font License) · Código QR: qrcode-generator (MIT)</footer>
+  <footer>Kuenta 1.8.1 · © 2026 Doc · Código abierto bajo la GNU AGPL 3.0, funciones Pro con licencia · Fuente de los documentos: Liberation Sans (SIL Open Font License) · Código QR: qrcode-generator (MIT)</footer>
 </div>
 
 <script>
