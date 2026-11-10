@@ -6,7 +6,7 @@ Kuenta is a web application: a small server runs on the workshop PC, and you use
 
 The installer, the console window and a new installation follow the language of the operating system (German, Spanish, otherwise English; choose with the environment variable `KUENTA_LANG=de|en|es`). To switch the user interface later, use the menu *Kuenta → Sprache / Language* or the language box on the login page.
 
-**Where is the data?** Never in the program folder, always in the user profile. Updates and uninstalling leave it untouched.
+**Where is the data?** Never in the program folder, always in the user profile. Updates leave it untouched; when uninstalling you decide whether to keep it.
 
 | System | Data folder |
 |---|---|
@@ -45,7 +45,7 @@ Kuenta-Setup-<version>.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
 - `/LOG="C:\Temp\kuenta-setup.log"` – write a log.
 - If the installation runs under the system account (software distribution), Kuenta is stopped but not started again (it would otherwise run in the wrong user profile). Users then start it from the start menu as usual.
 
-**Uninstall:** *Settings → Apps* → Kuenta. A running Kuenta is stopped first. The data folder is kept and can be deleted by hand if needed.
+**Uninstall:** *Settings → Apps* → Kuenta, or start the installer again and choose “Uninstall Kuenta”. A running Kuenta is stopped first. Then Kuenta asks whether to delete the data too; a copy can be saved as a ZIP on the desktop first. Silent: `unins000.exe /VERYSILENT` keeps the data, `/DELETEDATA` deletes it after a copy (`/NOBACKUP`: without a copy).
 
 ### Building the installer yourself
 
@@ -100,7 +100,7 @@ kuenta --netzwerk   # share with tablets / other workstations
 Stop with `Ctrl+C` or by closing the terminal window. Without installation it also runs directly from the unpacked folder: `./kuenta.sh`.
 
 **Update:** download the new version (`git pull`) and run `./installer/unix/install.sh` again.
-**Uninstall:** `./installer/unix/install.sh --uninstall` (data is kept).
+**Uninstall:** `./installer/unix/install.sh --uninstall` – asks in the terminal whether to delete the data too (after a copy as `.tar.gz` in the home folder); without a terminal it is kept. `--delete-data` deletes without asking after a copy, `--no-backup` without a copy.
 
 ### Optional: as a background service (server without a screen)
 
@@ -155,7 +155,7 @@ Double-click *Kuenta* in `~/Applications` (opens a terminal window and the brows
 When opening the app for the first time, macOS may show a security warning (unsigned app). Then right-click it in the Finder → *Open*, or choose "Open anyway" under *System Settings → Privacy & Security*.
 
 **Update:** download the new version and run `./installer/unix/install.sh` again.
-**Uninstall:** `./installer/unix/install.sh --uninstall` (data is kept).
+**Uninstall:** `./installer/unix/install.sh --uninstall` – asks in the terminal whether to delete the data too (after a copy as `.tar.gz` in the home folder); without a terminal it is kept. `--delete-data` deletes without asking after a copy, `--no-backup` without a copy.
 
 ---
 

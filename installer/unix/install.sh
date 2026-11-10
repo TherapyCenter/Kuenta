@@ -2,7 +2,9 @@
 # Install Kuenta for Linux / macOS (for the current user, without root).
 #
 #   ./installer/unix/install.sh               install or update
-#   ./installer/unix/install.sh --uninstall   remove the program (data is kept)
+#   ./installer/unix/install.sh --uninstall   remove the program; asks whether to delete the data too
+#       --delete-data   delete the data without asking (after a copy as .tar.gz in the home folder)
+#       --no-backup     with --delete-data: no copy
 #
 # Program files:    ~/.local/lib/kuenta  (elsewhere: PREFIX=/path ./install.sh)
 # Start command:    ~/.local/bin/kuenta  (network: kuenta --netzwerk)
@@ -21,11 +23,63 @@ L=${KUENTA_LANG:-${LC_ALL:-${LC_MESSAGES:-${LANG:-en}}}}
 case $L in de*) L=de ;; es*) L=es ;; *) L=en ;; esac
 msg() { case $L in de) printf '%s\n' "$1" ;; es) printf '%s\n' "$3" ;; *) printf '%s\n' "$2" ;; esac; }
 
+# data folder of Kuenta (as server/db/index.js): KUENTA_DATA, otherwise the folder of the operating system
+datadir() {
+  if [ -n "${KUENTA_DATA:-}" ]; then printf '%s\n' "$KUENTA_DATA"
+  elif [ "$OS" = "Darwin" ]; then printf '%s\n' "$HOME/Library/Application Support/Kuenta"
+  else printf '%s\n' "${XDG_DATA_HOME:-$HOME/.local/share}/kuenta"; fi
+}
+ja() { case $1 in j*|J*|y*|Y*|s*|S*) return 0 ;; *) return 1 ;; esac; }
+
 uninstall() {
   rm -rf "$PREFIX" "$BIN/kuenta" "$APPS/kuenta.desktop" "$ICONS/kuenta.svg" "$MACAPP"
-  msg "Kuenta wurde entfernt. Ihre Daten wurden nicht gelöscht." "Kuenta has been removed. Your data was not deleted." "Kuenta se ha eliminado. Sus datos no se han borrado."
+  msg "Kuenta wurde entfernt." "Kuenta has been removed." "Kuenta se ha eliminado."
+  D=$(datadir)
+  # only a folder that really holds Kuenta data is ever deleted
+  if [ ! -f "$D/kuenta.db" ] && [ ! -f "$D/mandanten.json" ]; then return 0; fi
+  case $D in "$HOME"|"$HOME/"|/) return 0 ;; esac
+  loeschen=no; kopie=yes
+  if [ "$DELETE_DATA" = 1 ]; then
+    loeschen=yes; if [ "$NO_BACKUP" = 1 ]; then kopie=no; fi
+  elif [ -t 0 ]; then
+    msg "Sollen auch Ihre Kuenta-Daten gelöscht werden? ($D)" "Also delete your Kuenta data? ($D)" "¿Borrar también sus datos de Kuenta? ($D)"
+    msg "Darin liegen Kunden, Rechnungen, Kassendaten und Sicherungen; Rechnungen und Kassendaten müssen in der Regel bis zu 10 Jahre aufbewahrt werden." \
+        "It contains customers, invoices, cash register data and backups; invoices and cash register data usually have to be kept for up to 10 years." \
+        "Contiene clientes, facturas, datos de caja y copias de seguridad; facturas y datos de caja suelen conservarse hasta 10 años."
+    printf '%s' "$(msg "Daten löschen? [j/N] " "Delete the data? [y/N] " "¿Borrar los datos? [s/N] ")"
+    read -r a || a=
+    if ja "$a"; then
+      loeschen=yes
+      printf '%s' "$(msg "Vorher eine Kopie als .tar.gz im Home-Ordner speichern? [J/n] " "Save a copy as .tar.gz in the home folder first? [Y/n] " "¿Guardar antes una copia .tar.gz en la carpeta personal? [S/n] ")"
+      read -r a || a=
+      case $a in n*|N*)
+        printf '%s' "$(msg "Wirklich ohne Kopie endgültig löschen? [j/N] " "Really delete for good without a copy? [y/N] " "¿Borrar definitivamente sin copia? [s/N] ")"
+        read -r a || a=
+        if ja "$a"; then kopie=no; else loeschen=no; fi ;;
+      esac
+    fi
+  fi
+  if [ "$loeschen" != yes ]; then
+    msg "Ihre Daten bleiben erhalten: $D" "Your data is kept: $D" "Sus datos se conservan: $D"
+    return 0
+  fi
+  if [ "$kopie" = yes ]; then
+    Z="$HOME/Kuenta-Daten-$(date +%Y-%m-%d_%H%M).tar.gz"
+    if ! tar -czf "$Z" -C "$(dirname "$D")" "$(basename "$D")"; then
+      rm -f "$Z"
+      msg "Die Kopie konnte nicht gespeichert werden. Ihre Daten wurden NICHT gelöscht: $D" "The copy could not be saved. Your data was NOT deleted: $D" "No se pudo guardar la copia. Sus datos NO se han borrado: $D" >&2
+      return 1
+    fi
+    msg "Kopie der Daten: $Z" "Copy of the data: $Z" "Copia de los datos: $Z"
+  fi
+  rm -rf "$D"
+  msg "Ihre Kuenta-Daten wurden gelöscht." "Your Kuenta data has been deleted." "Sus datos de Kuenta se han borrado."
 }
-if [ "${1:-}" = "--uninstall" ]; then uninstall; exit 0; fi
+DELETE_DATA=0; NO_BACKUP=0
+if [ "${1:-}" = "--uninstall" ]; then
+  for a in "$@"; do case $a in --delete-data) DELETE_DATA=1 ;; --no-backup) NO_BACKUP=1 ;; esac; done
+  uninstall; exit $?
+fi
 
 # check Node.js >= 22.13
 if ! command -v node >/dev/null 2>&1; then

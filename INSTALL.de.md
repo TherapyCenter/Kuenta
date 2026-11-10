@@ -4,7 +4,7 @@
 
 Kuenta ist eine Webanwendung: Ein kleiner Server läuft auf dem Werkstatt-PC, bedient wird im Browser (auch von Tablets und weiteren Arbeitsplätzen im Netzwerk). Nach der Installation ist der Datenbestand **leer** – eigene Firmendaten tragen Sie unter *Einstellungen* ein, vorhandene Daten holen Sie per Import herein (siehe [Daten übernehmen](#daten-übernehmen)).
 
-**Wo liegen die Daten?** Nie im Programmordner, sondern im Benutzerprofil. Updates und Deinstallation lassen sie unangetastet.
+**Wo liegen die Daten?** Nie im Programmordner, sondern im Benutzerprofil. Updates lassen sie unangetastet; bei der Deinstallation entscheiden Sie, ob sie erhalten bleiben.
 
 | System | Datenordner |
 |---|---|
@@ -43,7 +43,7 @@ Kuenta-Setup-<Version>.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
 - `/LOG="C:\Temp\kuenta-setup.log"` – Protokoll schreiben.
 - Läuft die Installation unter dem Systemkonto (Softwareverteilung), wird Kuenta zwar beendet, aber nicht wieder gestartet (es liefe sonst im falschen Benutzerprofil). Die Benutzer starten es dann wie gewohnt über das Startmenü.
 
-**Deinstallation:** *Einstellungen → Apps* → Kuenta. Ein laufendes Kuenta wird vorher beendet. Der Datenordner bleibt erhalten und kann bei Bedarf von Hand gelöscht werden.
+**Deinstallation:** *Einstellungen → Apps* → Kuenta, oder den Installer erneut starten und „Kuenta deinstallieren“ wählen. Ein laufendes Kuenta wird vorher beendet. Danach fragt Kuenta, ob auch die Daten gelöscht werden sollen; vorher kann eine Kopie als ZIP auf dem Desktop gespeichert werden. Still: `unins000.exe /VERYSILENT` behält die Daten, `/DELETEDATA` löscht sie nach einer Kopie (`/NOBACKUP`: ohne Kopie).
 
 ### Installer selbst bauen
 
@@ -98,7 +98,7 @@ kuenta --netzwerk   # für Tablets / weitere Arbeitsplätze freigeben
 Beenden mit `Strg+C` bzw. durch Schließen des Terminalfensters. Ohne Installation geht es auch direkt aus dem entpackten Ordner: `./kuenta.sh`.
 
 **Update:** neue Version herunterladen (`git pull`) und `./installer/unix/install.sh` erneut ausführen.
-**Deinstallation:** `./installer/unix/install.sh --uninstall` (Daten bleiben erhalten).
+**Deinstallation:** `./installer/unix/install.sh --uninstall` – fragt im Terminal, ob auch die Daten gelöscht werden (vorher Kopie als `.tar.gz` im Home-Ordner); ohne Terminal bleiben sie erhalten. `--delete-data` löscht ohne Rückfrage nach einer Kopie, `--no-backup` ohne Kopie.
 
 ### Optional: als Dienst im Hintergrund (Server ohne Bildschirm)
 
@@ -153,7 +153,7 @@ Doppelklick auf *Kuenta* in `~/Applications` (öffnet ein Terminalfenster und de
 Beim ersten Öffnen der App kann macOS eine Sicherheitswarnung zeigen (nicht signierte App). Dann im Finder Rechtsklick → *Öffnen* oder unter *Systemeinstellungen → Datenschutz & Sicherheit* „Trotzdem öffnen“ wählen.
 
 **Update:** neue Version herunterladen und `./installer/unix/install.sh` erneut ausführen.
-**Deinstallation:** `./installer/unix/install.sh --uninstall` (Daten bleiben erhalten).
+**Deinstallation:** `./installer/unix/install.sh --uninstall` – fragt im Terminal, ob auch die Daten gelöscht werden (vorher Kopie als `.tar.gz` im Home-Ordner); ohne Terminal bleiben sie erhalten. `--delete-data` löscht ohne Rückfrage nach einer Kopie, `--no-backup` ohne Kopie.
 
 ---
 

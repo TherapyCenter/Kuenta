@@ -11,10 +11,19 @@
   #define OutDir "..\..\build"
 #endif
 
-#define AppName "Kuenta"
+; name, id and data folder can be overridden for a separate test build (build.ps1 never does)
+#ifndef AppName
+  #define AppName "Kuenta"
+#endif
+#ifndef AppGuid
+  #define AppGuid "6E0B7C2A-3F1D-4B9E-9C55-2A7F4D8E1B63"
+#endif
+#ifndef DataName
+  #define DataName "Kuenta"
+#endif
 
 [Setup]
-AppId={{6E0B7C2A-3F1D-4B9E-9C55-2A7F4D8E1B63}
+AppId={{{#AppGuid}}
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} {#AppVersion}
@@ -29,7 +38,7 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0
 OutputDir={#OutDir}
-OutputBaseFilename=Kuenta-Setup-{#AppVersion}
+OutputBaseFilename={#AppName}-Setup-{#AppVersion}
 SetupIconFile=kuenta.ico
 UninstallDisplayIcon={app}\kuenta.ico
 Compression=lzma2/max
@@ -75,8 +84,47 @@ en.CommentNetwork=Share Kuenta with other devices in the network
 de.CommentNetwork=Kuenta für andere Geräte im Netzwerk freigeben
 es.CommentNetwork=Compartir Kuenta con otros dispositivos de la red
 en.RunNow=Start Kuenta now
+en.MaintTitle=Kuenta is already installed
+en.MaintSub=Version %1 is installed on this computer.
+en.MaintWhat=What would you like to do?
+en.MaintUpdate=Install Kuenta {#AppVersion} (replaces version %1, your data is kept)
+en.MaintRemove=Uninstall Kuenta (you can choose whether to keep your data)
+en.MaintNoUninst=The uninstaller of the installed version was not found. Please remove Kuenta under Settings → Apps.
+en.DelDataAsk=Also delete your Kuenta data?%n%nFolder: %1%n%nIt contains customers, vehicles, invoices, cash register data and backups. Tax law usually requires you to keep invoices and cash register data for up to 10 years.%n%nNo = keep the data (recommended, e.g. for a later reinstallation).
+en.DelDataBackup=Save a copy of all data as a ZIP file on the desktop before deleting?%n%nYes = save a copy, then delete (recommended)%nNo = delete without a copy
+en.DelDataNoBackup=The data will be deleted for good, without a copy. Continue?
+en.DelDataBackupFailed=The copy could not be saved. Your data was NOT deleted.%n%nFolder: %1
+en.DelDataDone=Your Kuenta data has been deleted.
+en.DelDataCopy=Copy of the data: %1
+en.DelDataFailed=Some files could not be deleted. Please remove the folder by hand: %1
 de.RunNow=Kuenta jetzt starten
+de.MaintTitle=Kuenta ist bereits installiert
+de.MaintSub=Auf diesem Computer ist Version %1 installiert.
+de.MaintWhat=Was möchten Sie tun?
+de.MaintUpdate=Kuenta {#AppVersion} installieren (ersetzt Version %1, Ihre Daten bleiben erhalten)
+de.MaintRemove=Kuenta deinstallieren (Sie entscheiden, ob Ihre Daten erhalten bleiben)
+de.MaintNoUninst=Das Deinstallationsprogramm der installierten Version wurde nicht gefunden. Bitte Kuenta unter Einstellungen → Apps entfernen.
+de.DelDataAsk=Sollen auch Ihre Kuenta-Daten gelöscht werden?%n%nOrdner: %1%n%nDarin liegen Kunden, Fahrzeuge, Rechnungen, Kassendaten und Sicherungen. Rechnungen und Kassendaten müssen Sie nach Steuerrecht in der Regel bis zu 10 Jahre aufbewahren.%n%nNein = Daten behalten (empfohlen, z. B. für eine spätere Neuinstallation).
+de.DelDataBackup=Vor dem Löschen eine Kopie aller Daten als ZIP-Datei auf dem Desktop speichern?%n%nJa = Kopie speichern und dann löschen (empfohlen)%nNein = ohne Kopie löschen
+de.DelDataNoBackup=Die Daten werden ohne Kopie endgültig gelöscht. Wirklich fortfahren?
+de.DelDataBackupFailed=Die Kopie konnte nicht gespeichert werden. Ihre Daten wurden NICHT gelöscht.%n%nOrdner: %1
+de.DelDataDone=Ihre Kuenta-Daten wurden gelöscht.
+de.DelDataCopy=Kopie der Daten: %1
+de.DelDataFailed=Einige Dateien konnten nicht gelöscht werden. Bitte den Ordner von Hand entfernen: %1
 es.RunNow=Iniciar Kuenta ahora
+es.MaintTitle=Kuenta ya está instalado
+es.MaintSub=En este ordenador está instalada la versión %1.
+es.MaintWhat=¿Qué desea hacer?
+es.MaintUpdate=Instalar Kuenta {#AppVersion} (sustituye la versión %1, sus datos se conservan)
+es.MaintRemove=Desinstalar Kuenta (puede elegir si conserva sus datos)
+es.MaintNoUninst=No se encontró el desinstalador de la versión instalada. Elimine Kuenta en Configuración → Aplicaciones.
+es.DelDataAsk=¿Borrar también sus datos de Kuenta?%n%nCarpeta: %1%n%nContiene clientes, vehículos, facturas, datos de caja y copias de seguridad. La legislación fiscal suele exigir conservar facturas y datos de caja hasta 10 años.%n%nNo = conservar los datos (recomendado, p. ej. para reinstalar más tarde).
+es.DelDataBackup=¿Guardar antes una copia de todos los datos como archivo ZIP en el escritorio?%n%nSí = guardar una copia y luego borrar (recomendado)%nNo = borrar sin copia
+es.DelDataNoBackup=Los datos se borrarán definitivamente, sin copia. ¿Continuar?
+es.DelDataBackupFailed=No se pudo guardar la copia. Sus datos NO se han borrado.%n%nCarpeta: %1
+es.DelDataDone=Sus datos de Kuenta se han borrado.
+es.DelDataCopy=Copia de los datos: %1
+es.DelDataFailed=Algunos archivos no se pudieron borrar. Elimine la carpeta a mano: %1
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:TaskDesktop}"; GroupDescription: "{cm:GroupShortcuts}"
@@ -100,7 +148,7 @@ Type: filesandordirs; Name: "{app}\sms-relais"
 Name: "{group}\Kuenta"; Filename: "{app}\Kuenta starten.bat"; WorkingDir: "{app}"; IconFilename: "{app}\kuenta.ico"; Comment: "{cm:CommentStart}"
 Name: "{group}\{cm:IconNetwork}"; Filename: "{app}\Kuenta im Netzwerk starten.bat"; WorkingDir: "{app}"; IconFilename: "{app}\kuenta.ico"; Comment: "{cm:CommentNetwork}"
 Name: "{group}\{cm:IconUninstall}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\Kuenta"; Filename: "{app}\Kuenta starten.bat"; WorkingDir: "{app}"; IconFilename: "{app}\kuenta.ico"; Tasks: desktopicon
+Name: "{autodesktop}\{#AppName}"; Filename: "{app}\Kuenta starten.bat"; WorkingDir: "{app}"; IconFilename: "{app}\kuenta.ico"; Tasks: desktopicon
 
 [Run]
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Kuenta"""; Flags: runhidden; Tasks: firewall
@@ -114,13 +162,74 @@ Filename: "{app}\Kuenta im Netzwerk starten.bat"; WorkingDir: "{app}"; Flags: no
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Kuenta"""; Flags: runhidden; RunOnceId: "DelFirewall"; Check: IsAdminInstallMode
 
 [Messages]
-en.FinishedLabel=Kuenta has been installed.%n%nYour data is stored in the user profile (AppData\Roaming\Kuenta) and is kept during updates and when uninstalling. To take over existing data after the start, use "Kuenta → Import data from KFZ-Faktura" or "Restore data". The language can be changed in Kuenta under "Kuenta → Sprache / Language".
-es.FinishedLabel=Kuenta se ha instalado.%n%nSus datos se guardan en el perfil de usuario (AppData\Roaming\Kuenta) y se conservan en las actualizaciones y al desinstalar. Para importar datos existentes tras el inicio, use «Kuenta → Importar datos de KFZ-Faktura» o «Restaurar datos». El idioma se cambia en Kuenta en «Kuenta → Sprache / Language».
-de.FinishedLabel=Kuenta wurde installiert.%n%nIhre Daten werden im Benutzerprofil gespeichert (AppData\Roaming\Kuenta) und bleiben bei Updates und bei der Deinstallation erhalten. Vorhandene Daten übernehmen Sie nach dem Start über „Kuenta → Daten aus KFZ-Faktura importieren“ oder „Daten wiederherstellen“.
+en.FinishedLabel=Kuenta has been installed.%n%nYour data is stored in the user profile (AppData\Roaming\Kuenta) and is kept during updates. When uninstalling you can choose whether to keep it. To take over existing data after the start, use "Kuenta → Import data from KFZ-Faktura" or "Restore data". The language can be changed in Kuenta under "Kuenta → Sprache / Language".
+es.FinishedLabel=Kuenta se ha instalado.%n%nSus datos se guardan en el perfil de usuario (AppData\Roaming\Kuenta) y se conservan en las actualizaciones. Al desinstalar puede elegir si los conserva. Para importar datos existentes tras el inicio, use «Kuenta → Importar datos de KFZ-Faktura» o «Restaurar datos». El idioma se cambia en Kuenta en «Kuenta → Sprache / Language».
+de.FinishedLabel=Kuenta wurde installiert.%n%nIhre Daten werden im Benutzerprofil gespeichert (AppData\Roaming\Kuenta) und bleiben bei Updates erhalten. Bei der Deinstallation entscheiden Sie, ob sie erhalten bleiben. Vorhandene Daten übernehmen Sie nach dem Start über „Kuenta → Daten aus KFZ-Faktura importieren“ oder „Daten wiederherstellen“.
 
 [Code]
 var
   KuentaLief: Integer; { 0 = not running, 1 = running locally, 2 = running in network mode }
+  Wartung: TInputOptionWizardPage; { installed already: update or uninstall }
+  AltUninst, AltVersion: String;
+  Beenden: Boolean;
+
+{ ---------- an installed version: offer update or uninstall ---------- }
+function UninstallKey: String;
+begin
+  Result := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{' + '{#AppGuid}' + '}_is1';
+end;
+
+function Installiert(var Uninst, Version: String): Boolean;
+begin
+  Result := False;
+  if IsWin64 and RegQueryStringValue(HKLM64, UninstallKey, 'UninstallString', Uninst) then Result := True
+  else if RegQueryStringValue(HKLM32, UninstallKey, 'UninstallString', Uninst) then Result := True
+  else if RegQueryStringValue(HKCU, UninstallKey, 'UninstallString', Uninst) then Result := True;
+  if Result then
+  begin
+    if not (RegQueryStringValue(HKLM64, UninstallKey, 'DisplayVersion', Version) or RegQueryStringValue(HKLM32, UninstallKey, 'DisplayVersion', Version) or RegQueryStringValue(HKCU, UninstallKey, 'DisplayVersion', Version)) then Version := '?';
+    Uninst := RemoveQuotes(Uninst);
+  end;
+end;
+
+procedure InitializeWizard;
+begin
+  Beenden := False;
+  if WizardSilent or not Installiert(AltUninst, AltVersion) then exit;
+  Wartung := CreateInputOptionPage(wpWelcome, CustomMessage('MaintTitle'), FmtMessage(CustomMessage('MaintSub'), [AltVersion]), CustomMessage('MaintWhat'), True, False);
+  Wartung.Add(FmtMessage(CustomMessage('MaintUpdate'), [AltVersion]));
+  Wartung.Add(CustomMessage('MaintRemove'));
+  Wartung.SelectedValueIndex := 0;
+end;
+
+function NextButtonClick(CurPageID: Integer): Boolean;
+var
+  Rc: Integer;
+begin
+  Result := True;
+  if (Wartung <> nil) and (CurPageID = Wartung.ID) and (Wartung.SelectedValueIndex = 1) then
+  begin
+    Result := False;
+    if not FileExists(AltUninst) then
+    begin
+      MsgBox(CustomMessage('MaintNoUninst'), mbError, MB_OK);
+      exit;
+    end;
+    { the uninstaller asks for confirmation and whether to keep the data }
+    Exec(AltUninst, '', '', SW_SHOW, ewWaitUntilTerminated, Rc);
+    Beenden := True;
+    WizardForm.Close;
+  end;
+end;
+
+procedure CancelButtonClick(CurPageID: Integer; var Cancel, Confirm: Boolean);
+begin
+  if Beenden then
+  begin
+    Cancel := True;
+    Confirm := False;
+  end;
+end;
 
 function StopKuenta(Script, AppDir: String): Integer;
 var
@@ -165,9 +274,90 @@ begin
   Result := not ((KuentaLief > 0) and NeustartErlaubt);
 end;
 
-{ Stop it before uninstalling as well }
+{ ---------- uninstall: optionally delete the data, after a copy on the desktop ---------- }
+{ data folder of Kuenta: KUENTA_DATA, otherwise AppData\Roaming\Kuenta of the current user (as server/db/index.js) }
+function DatenOrdner: String;
+begin
+  Result := GetEnv('KUENTA_DATA');
+  if Result = '' then Result := ExpandConstant('{userappdata}\{#DataName}');
+  Result := RemoveBackslashUnlessRoot(Result);
+end;
+
+{ only a folder that really holds Kuenta data is ever deleted (never a drive or the user profile) }
+function SindKuentaDaten(Dir: String): Boolean;
+begin
+  Result := (Length(Dir) > 8) and DirExists(Dir) and (FileExists(Dir + '\kuenta.db') or FileExists(Dir + '\mandanten.json'))
+    and (CompareText(Dir, RemoveBackslashUnlessRoot(GetEnv('USERPROFILE'))) <> 0) and (CompareText(Dir, RemoveBackslashUnlessRoot(ExpandConstant('{userappdata}'))) <> 0);
+end;
+
+{ ZIP copy of the whole data folder on the desktop (.NET ZipFile, no size limit of Compress-Archive) }
+function KopieAnlegen(Dir: String; var Ziel: String): Boolean;
+var
+  Rc: Integer;
+  Q, Z: String;
+begin
+  Ziel := ExpandConstant('{userdesktop}\{#DataName}-Daten-') + GetDateTimeString('yyyy-mm-dd_hhnn', '-', '-') + '.zip';
+  Q := Dir; StringChangeEx(Q, '''', '''''', True);
+  Z := Ziel; StringChangeEx(Z, '''', '''''', True);
+  Result := Exec(ExpandConstant('{sys}\WindowsPowerShell\v1.0\powershell.exe'),
+    '-NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "$ErrorActionPreference=''Stop''; Add-Type -AssemblyName System.IO.Compression.FileSystem; [IO.Compression.ZipFile]::CreateFromDirectory(''' + Q + ''', ''' + Z + ''', [IO.Compression.CompressionLevel]::Optimal, $true)"',
+    '', SW_HIDE, ewWaitUntilTerminated, Rc) and (Rc = 0) and FileExists(Ziel);
+  Log('Copy of the data: ' + Ziel + ' (exit code ' + IntToStr(Rc) + ')');
+  { an incomplete ZIP must not look like a backup }
+  if not Result and FileExists(Ziel) then DeleteFile(Ziel);
+end;
+
+procedure DatenEntfernen;
+var
+  Dir, Ziel, Tail: String;
+  Kopie: Boolean;
+begin
+  Dir := DatenOrdner;
+  if not SindKuentaDaten(Dir) then exit;
+  Tail := Uppercase(GetCmdTail);
+  if UninstallSilent then
+  begin
+    { silent: only with /DELETEDATA; a copy is made unless /NOBACKUP }
+    if Pos('/DELETEDATA', Tail) = 0 then exit;
+    Kopie := Pos('/NOBACKUP', Tail) = 0;
+  end else
+  begin
+    if MsgBox(FmtMessage(CustomMessage('DelDataAsk'), [Dir]), mbConfirmation, MB_YESNO or MB_DEFBUTTON2) <> IDYES then exit;
+    case MsgBox(CustomMessage('DelDataBackup'), mbConfirmation, MB_YESNOCANCEL) of
+      IDYES: Kopie := True;
+      IDNO:
+        begin
+          if MsgBox(CustomMessage('DelDataNoBackup'), mbError, MB_YESNO or MB_DEFBUTTON2) <> IDYES then exit;
+          Kopie := False;
+        end;
+    else
+      exit;
+    end;
+  end;
+  Ziel := '';
+  if Kopie and not KopieAnlegen(Dir, Ziel) then
+  begin
+    Log('Data kept: the copy failed.');
+    if not UninstallSilent then MsgBox(FmtMessage(CustomMessage('DelDataBackupFailed'), [Dir]), mbError, MB_OK);
+    exit;
+  end;
+  if DelTree(Dir, True, True, True) then
+  begin
+    Log('Data folder deleted: ' + Dir);
+    if not UninstallSilent then
+      if Ziel <> '' then MsgBox(CustomMessage('DelDataDone') + #13#10#13#10 + FmtMessage(CustomMessage('DelDataCopy'), [Ziel]), mbInformation, MB_OK)
+      else MsgBox(CustomMessage('DelDataDone'), mbInformation, MB_OK);
+  end else
+  begin
+    Log('Data folder could not be deleted completely: ' + Dir);
+    if not UninstallSilent then MsgBox(FmtMessage(CustomMessage('DelDataFailed'), [Dir]), mbError, MB_OK);
+  end;
+end;
+
+{ Stop it before uninstalling as well; afterwards ask about the data }
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
   if (CurUninstallStep = usUninstall) and FileExists(ExpandConstant('{app}\stop-kuenta.ps1')) then
     StopKuenta(ExpandConstant('{app}\stop-kuenta.ps1'), ExpandConstant('{app}'));
+  if CurUninstallStep = usPostUninstall then DatenEntfernen;
 end;
