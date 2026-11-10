@@ -156,7 +156,7 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
     <div class="kicker">Invoicing &amp; POS for auto repair shops · Bedienung, Einrichtung, Betrieb</div>
     <h1>Kuenta Handbuch</h1>
     <p>Alles, was Sie für Installation, Einrichtung, die tägliche Arbeit, den E-Mail-Versand, Updates und die Datensicherung von Kuenta wissen müssen.</p>
-    <div class="meta"><span>Version <b>1.1.0</b></span><span>Stand <b>November 2026</b></span><span>Windows · macOS · Linux · Tablet</span><span><a href="handbook-en.html" hreflang="en">English</a> · <a href="handbook-es.html" hreflang="es">Español</a></span></div>
+    <div class="meta"><span>Version <b>1.2.0</b></span><span>Stand <b>November 2026</b></span><span>Windows · macOS · Linux · Tablet</span><span><a href="handbook-en.html" hreflang="en">English</a> · <a href="handbook-es.html" hreflang="es">Español</a></span></div>
   </header>
 
   <nav class="toc" aria-label="Inhalt">
@@ -205,7 +205,7 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
 
       <h3>Windows 10 / 11 (64 Bit)</h3>
       <ol class="steps">
-        <li><div><strong><code>Kuenta-Setup-1.1.0.exe</code> ausführen.</strong><span>Node.js ist im Installer enthalten, es muss nichts weiter installiert werden.</span></div></li>
+        <li><div><strong><code>Kuenta-Setup-1.2.0.exe</code> ausführen.</strong><span>Node.js ist im Installer enthalten, es muss nichts weiter installiert werden.</span></div></li>
         <li><div><strong>Installationsart wählen.</strong><span><em>Für alle Benutzer</em> (Standard, braucht Administratorrechte) installiert nach <code>C:\Programme\Kuenta</code>. <em>Nur für mich</em> kommt ohne Administratorrechte aus und installiert ins Benutzerprofil.</span></div></li>
         <li><div><strong>Optionen auswählen.</strong><span>Desktop-Verknüpfung und, für den Netzwerkbetrieb, die Firewall-Freigabe (nur bei Installation für alle Benutzer).</span></div></li>
         <li><div><strong>Starten:</strong><span>Startmenü <span class="path">Kuenta</span>. Es öffnen sich das Konsolenfenster und der Browser mit <code>http://127.0.0.1:3700</code>.</span></div></li>
@@ -260,9 +260,9 @@ loginctl enable-linger "$USER"</code></pre></div>
       <h3>Container (Docker / Podman)</h3>
       <p>Für Linux-Server, NAS-Systeme, Raspberry Pi oder Macs läuft Kuenta auch im Container. Das Image bringt Node.js mit und läuft auf x86_64 und ARM64. Im Kuenta-Ordner liegen dafür ein <code>Dockerfile</code> und eine <code>compose.yaml</code>.</p>
       <div class="codeblock"><pre><code># Podman (bei Docker: podman durch docker ersetzen)
-podman build -t kuenta:1.1.0 .
+podman build -t kuenta:1.2.0 .
 podman run -d --name kuenta --restart unless-stopped \
-  -p 3700:3700 -v kuenta-daten:/data kuenta:1.1.0
+  -p 3700:3700 -v kuenta-daten:/data kuenta:1.2.0
 
 # oder mit Compose
 docker compose up -d --build</code></pre></div>
@@ -500,6 +500,21 @@ docker compose up -d --build</code></pre></div>
       <p>Für die Buchhaltung gibt es auf derselben Seite Exporte für Xero (Verkaufs- und Eingangsrechnungen), QuickBooks Online, Sage 50 und ein VAT-Journal als CSV.</p>
     </section>
 
+    <section id="usa">
+      <h2>USA: Sales Tax</h2>
+      <p>Unter <span class="path">Einstellungen → Steuer / Mahnung / Kasse → Steuersystem</span> „United States“ wählen, speichern und neu laden. Der Mandant rechnet dann in Dollar, das Datum steht mit dem Monat zuerst (MM/TT/JJJJ). Den Ort im Format „Springfield, IL“ eintragen, den ZIP-Code ins PLZ-Feld.</p>
+      <ul>
+        <li><strong>Sales tax:</strong> unter <span class="path">Einstellungen → United States / Sales tax</span> den kombinierten Satz des Standorts (State + County + City) eintragen. Ob Arbeit sowie Shop supplies und Gebühren steuerpflichtig sind, ist je Staat verschieden und einstellbar. Steuerpflichtige Positionen tragen auf der Rechnung ein „T“.</li>
+        <li><strong>Steuerbefreite Kunden</strong> (Resale, Government, Non-profit): im Kunden unter <span class="path">Steuer & Buchhaltung</span> mit Nummer des Exemption Certificate.</li>
+        <li><strong>Rechnungspflichten:</strong> Registriernummer der Werkstatt in der Fußzeile, Zustand der Teile (neu, gebraucht, aufbereitet) in der Position, Tacho bei Annahme und Rückgabe, Verbleib der ersetzten Teile (Reiter <em>Sonstiges</em>).</li>
+        <li><strong>Shop supplies und Gebühren:</strong> Knöpfe in der Positionsleiste. Shop supplies sind ein Prozentsatz der Arbeit mit Obergrenze; Gebühren (Altstoffe, Reifen je Stück, Core charge) stehen als Liste in den Einstellungen.</li>
+        <li><strong>Freigabe des Kostenvoranschlags:</strong> im Reiter <em>Sonstiges</em> jede Freigabe des Kunden mit Betrag, Datum, Art und Person erfassen. Sie wird auf Auftrag und Rechnung gedruckt; liegt die Rechnung darüber, fragt Kuenta vor dem Drucken nach. Der Kostenvoranschlag enthält den Hinweis und eine Unterschriftszeile.</li>
+        <li><strong>Kasse:</strong> Preise ohne Steuer, die Sales Tax kommt in der Summe dazu.</li>
+        <li><strong>Buchhaltung:</strong> <span class="path">Finanzen → FIBU-Export</span> erzeugt eine CSV für den Rechnungsimport in QuickBooks Online (Steuercode TAX/NON).</li>
+      </ul>
+      <p>Kuenta ermittelt den Satz nicht automatisch und reicht keine Steuererklärung ein; das erledigt Ihr Steuerberater oder QuickBooks.</p>
+    </section>
+
     <section id="datev">
       <h2>DATEV-Export für den Steuerberater</h2>
       <p class="lead">Kuenta bucht Rechnungen, Zahlungen, Eingangsrechnungen und Kassenumsätze automatisch und exportiert sie als DATEV-Dateien. Ihr Steuerberater liest sie direkt in DATEV ein.</p>
@@ -720,7 +735,7 @@ docker compose up -d --build</code></pre></div>
       </ol>
       <h3>Ohne Rückfragen ausrollen</h3>
       <p>Für Skripte oder Softwareverteilung:</p>
-      <div class="codeblock"><pre><code>Kuenta-Setup-1.1.0.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART</code></pre></div>
+      <div class="codeblock"><pre><code>Kuenta-Setup-1.2.0.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART</code></pre></div>
       <div class="tablewrap"><table>
         <thead><tr><th>Schalter</th><th>Wirkung</th></tr></thead>
         <tbody>
@@ -797,7 +812,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>TSE vor dem Echtbetrieb mit fiskaly-Testzugang prüfen und die Kasse beim Finanzamt melden.</li>
             <li>EC-Terminal und DSFinV-K vor dem Einsatz bzw. vor einer Prüfung kontrollieren.</li>
-            <li>Kuenta ist auf Deutschland, Spanien und Großbritannien ausgelegt (siehe <a href="#spanien">Spanien</a> und <a href="#uk">Großbritannien</a>). Andere Länder werden nicht unterstützt.</li>
+            <li>Kuenta ist auf Deutschland, Spanien, Großbritannien und die USA ausgelegt (siehe <a href="#spanien">Spanien</a>, <a href="#uk">Großbritannien</a> und <a href="#usa">USA</a>). Andere Länder werden nicht unterstützt.</li>
             <li>Kaufverträge sind Muster und ersetzen keine Rechtsberatung.</li>
           </ul></div>
       </div>
@@ -847,7 +862,7 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Krypto-Zahlung:</strong> Getestet gegen einen nachgebauten BTCPay Server, noch nicht gegen einen echten. USDT geht nur über das Liquid-Netz, wie es BTCPay anbietet. USDT auf Tron oder Ethereum wird nicht unterstützt.</li>
         <li><strong>Container:</strong> Das Image wurde bisher nur außerhalb einer echten Docker- oder Podman-Umgebung geprüft.</li>
         <li><strong>Datenbank:</strong> Kuenta nutzt eine eingebaute Datenbank (SQLite). Eine externe Datenbank wie PostgreSQL wird nicht unterstützt. Mehrere Arbeitsplätze arbeiten über den Netzwerkbetrieb.</li>
-        <li><strong>Länder:</strong> Deutschland, Spanien und Großbritannien (je Mandant umschaltbar). In Spanien nicht unterstützt: TicketBAI, Navarra, IGIC und REBU in VERI*FACTU. In Großbritannien nicht unterstützt: EU-Warenverkehr Nordirlands.</li>
+        <li><strong>Länder:</strong> Deutschland, Spanien, Großbritannien und USA (je Mandant umschaltbar). In Spanien nicht unterstützt: TicketBAI, Navarra, IGIC und REBU in VERI*FACTU. In Großbritannien nicht unterstützt: EU-Warenverkehr Nordirlands.</li>
       </ul>
     </section>
 
@@ -872,7 +887,7 @@ npm run installer:windows   # Windows-Installer bauen</code></pre></div>
     </section>
   </main>
 
-  <footer>Kuenta 1.1.0 · © 2026 DoctorD · Open Source unter der GNU AGPL 3.0, Pro-Funktionen mit Lizenz · Schrift in den Belegen: Liberation Sans (SIL Open Font License) · QR-Code: qrcode-generator (MIT)</footer>
+  <footer>Kuenta 1.2.0 · © 2026 DoctorD · Open Source unter der GNU AGPL 3.0, Pro-Funktionen mit Lizenz · Schrift in den Belegen: Liberation Sans (SIL Open Font License) · QR-Code: qrcode-generator (MIT)</footer>
 </div>
 
 <script>

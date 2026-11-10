@@ -16,11 +16,14 @@ function calc(kopf, pos) {
   const brutto = Number(kopf.ANSICHTBRUTTO) === 1;
   const groups = {};
   let einsatz = 0; let sub = 0;
+  // US: labor is non-taxable in many states (setting)
+  const usLaborFree = L.land() === 'US' && L.sw('us.labor.taxable', '0') !== '1';
   pos.forEach((p, i) => {
     p.PRTSORT = i + 1;
     if (p.POSART === 'T') { p.SUMME = 0; p.SUMMEBRUTTO = 0; p.POS = 0; return; }
     if (p.POSART === 'Z') { p.SUMME = L.r2(sub); p.SUMMEBRUTTO = 0; p.POS = 0; sub = 0; return; }
-    const code = Number(p.DURCHLAUFER) === 1 || Number(p.DIFFSTEUER) === 1 || kopf.STEUERART ? 63 : (Number(p.MWST) || 61);
+    let code = Number(p.DURCHLAUFER) === 1 || Number(p.DIFFSTEUER) === 1 || kopf.STEUERART ? 63 : (Number(p.MWST) || 61);
+    if (usLaborFree && p.POSART === 'L') code = 63;
     if (!p.MWST) p.MWST = 61;
     const rate = rates[code] ?? 0;
     const menge = num(p.MENGE), rab = num(p.RABATT);
@@ -108,7 +111,7 @@ function template(typ, q = {}) {
   const kopf = {
     [v.nr]: L.nextNumber(v.numKey, v.table, v.nr, v.typ ? `TYP=${v.typ}` : ''),
     DATUM: L.today(), LIEFDATUM: L.today(), GEDRUCKT: 0, ARCHIV: 0,
-    ANSICHTBRUTTO: Number(L.sw('vorgang.ansichtbrutto', '1')), RABATTZEIGEN: 0, KUNLAND: L.land() !== 'DE' ? L.land() : L.opt('Länderkürzel', 'DE'),
+    ANSICHTBRUTTO: L.land() === 'US' ? 0 : Number(L.sw('vorgang.ansichtbrutto', '1')), RABATTZEIGEN: 0, KUNLAND: L.land() !== 'DE' ? L.land() : L.opt('Länderkürzel', 'DE'),
     DRUCKFORMULAR: v.form, BENID: -1, AUFTYPID: -1,
   };
   if (v.typ) kopf.TYP = v.typ;
@@ -140,6 +143,8 @@ function kundeFelder(kunid) {
   f.STEUERART = Number(k.NETTORECHNUNG) === 1 ? (k.EXPORTART || 'REVERSE_CHARGE') : null;
   if (f.STEUERART) f.ANSICHTBRUTTO = 0;
   f.ESRECARGO = Number(k.RECARGO) === 1 && require('../es').activo() ? 1 : 0;
+  if (L.land() === 'US' && Number(k.TAXEXEMPT) === 1) f.STEUERART = 'EXEMPT'; // resale / exemption certificate
+  if (L.land() === 'US') f.ANSICHTBRUTTO = 0; // US prices are quoted before sales tax
   if (f.ESRECARGO) f.ANSICHTBRUTTO = 0;
   if (k.KUNZAHLBDID) {
     const zb = d.prepare('SELECT * FROM ZAHLUNGSBEDINUNGEN WHERE ZAHLBDID=?').get(k.KUNZAHLBDID);

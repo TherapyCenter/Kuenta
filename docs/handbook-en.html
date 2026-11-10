@@ -156,7 +156,7 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
     <div class="kicker">Invoicing &amp; POS for auto repair shops · use, setup, operation</div>
     <h1>Kuenta Handbook</h1>
     <p>Everything you need to know about installing and setting up Kuenta, daily work, sending email, updates and backups.</p>
-    <div class="meta"><span>Version <b>1.1.0</b></span><span>As of <b>November 2026</b></span><span>Windows · macOS · Linux · Tablet</span><span><a href="handbuch.html" hreflang="de">Deutsch</a> · <a href="handbook-es.html" hreflang="es">Español</a></span></div>
+    <div class="meta"><span>Version <b>1.2.0</b></span><span>As of <b>November 2026</b></span><span>Windows · macOS · Linux · Tablet</span><span><a href="handbuch.html" hreflang="de">Deutsch</a> · <a href="handbook-es.html" hreflang="es">Español</a></span></div>
   </header>
 
   <nav class="toc" aria-label="Contents">
@@ -207,7 +207,7 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
 
       <h3>Windows 10 / 11 (64 bit)</h3>
       <ol class="steps">
-        <li><div><strong>Run <code>Kuenta-Setup-1.1.0.exe</code>.</strong><span>Node.js is included in the installer, nothing else needs to be installed.</span></div></li>
+        <li><div><strong>Run <code>Kuenta-Setup-1.2.0.exe</code>.</strong><span>Node.js is included in the installer, nothing else needs to be installed.</span></div></li>
         <li><div><strong>Choose the installation type.</strong><span><em>For all users</em> (default, needs administrator rights) installs to <code>C:\Program Files\Kuenta</code>. <em>Only for me</em> needs no administrator rights and installs into the user profile.</span></div></li>
         <li><div><strong>Choose options.</strong><span>Desktop shortcut and, for network mode, the firewall rule (only when installing for all users).</span></div></li>
         <li><div><strong>Start:</strong><span>Start menu <span class="path">Kuenta</span>. The console window opens, and the browser opens <code>http://127.0.0.1:3700</code>.</span></div></li>
@@ -263,9 +263,9 @@ loginctl enable-linger "$USER"</code></pre></div>
       <h3>Container (Docker / Podman)</h3>
       <p>For Linux servers, NAS systems, Raspberry Pi or Macs, Kuenta also runs in a container. The image includes Node.js and runs on x86_64 and ARM64. The Kuenta folder contains a <code>Dockerfile</code> and a <code>compose.yaml</code> for this.</p>
       <div class="codeblock"><pre><code># Podman (for Docker replace podman with docker)
-podman build -t kuenta:1.1.0 .
+podman build -t kuenta:1.2.0 .
 podman run -d --name kuenta --restart unless-stopped \
-  -p 3700:3700 -v kuenta-daten:/data kuenta:1.1.0
+  -p 3700:3700 -v kuenta-daten:/data kuenta:1.2.0
 
 # or with Compose
 docker compose up -d --build</code></pre></div>
@@ -504,6 +504,21 @@ docker compose up -d --build</code></pre></div>
       <p>The same page offers CSV exports for Xero (sales invoices and bills), QuickBooks Online, Sage 50 and a VAT journal.</p>
     </section>
 
+    <section id="usa">
+      <h2>United States: sales tax</h2>
+      <p>Choose "United States" under <span class="path">Settings → Tax / dunning / register → Tax system</span>, save and reload. The company then works in dollars and dates are written month first (MM/DD/YYYY). Enter the town as "Springfield, IL" and the ZIP code in the postcode field.</p>
+      <ul>
+        <li><strong>Sales tax:</strong> enter the combined rate of your location (state + county + city) under <span class="path">Settings → United States / Sales tax</span>. Whether labor, shop supplies and fees are taxable differs by state and is adjustable. Taxable lines carry a "T" on the invoice.</li>
+        <li><strong>Tax-exempt customers</strong> (resale, government, non-profit): in the customer under <span class="path">Tax & accounting</span> with the exemption certificate number.</li>
+        <li><strong>Invoice requirements:</strong> the shop's registration number in the footer, condition of parts (new, used, rebuilt) on the line, odometer in and out, what happened to replaced parts (tab <em>Other</em>).</li>
+        <li><strong>Shop supplies and fees:</strong> buttons in the line toolbar. Shop supplies are a percentage of labor with a maximum; fees (hazardous waste, tires per tire, core charge) are a list in the settings.</li>
+        <li><strong>Estimate authorization:</strong> record every authorization of the customer with amount, date, method and person in the tab <em>Other</em>. It is printed on the order and invoice; if the invoice is above it, Kuenta asks before printing. The estimate carries the notice and a signature line.</li>
+        <li><strong>Register:</strong> prices before tax; the sales tax is added to the total.</li>
+        <li><strong>Accounting:</strong> <span class="path">Finance → FIBU export</span> creates a CSV for the invoice import into QuickBooks Online (tax code TAX/NON).</li>
+      </ul>
+      <p>Kuenta does not look up rates automatically and does not file returns; your accountant or QuickBooks does that.</p>
+    </section>
+
     <section id="datev">
       <h2>DATEV export for the tax adviser</h2>
       <p class="lead">Kuenta books invoices, payments, incoming invoices and register sales automatically and exports them as DATEV files. Your tax adviser reads them directly into DATEV, the accounting software common in Germany.</p>
@@ -725,7 +740,7 @@ docker compose up -d --build</code></pre></div>
       </ol>
       <h3>Rolling out without questions</h3>
       <p>For scripts or software distribution:</p>
-      <div class="codeblock"><pre><code>Kuenta-Setup-1.1.0.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART</code></pre></div>
+      <div class="codeblock"><pre><code>Kuenta-Setup-1.2.0.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART</code></pre></div>
       <div class="tablewrap"><table>
         <thead><tr><th>Switch</th><th>Effect</th></tr></thead>
         <tbody>
@@ -802,7 +817,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>Check the TSE with a fiskaly test account before going live and register the register with the tax office.</li>
             <li>Check the card terminal and DSFinV-K before use or before an audit.</li>
-            <li>Kuenta is designed for Germany, Spain and the United Kingdom (see <a href="#spanien">Spain</a> and <a href="#uk">United Kingdom</a>). Other countries are not supported.</li>
+            <li>Kuenta is designed for Germany, Spain, the United Kingdom and the United States (see <a href="#spanien">Spain</a>, <a href="#uk">United Kingdom</a> and <a href="#usa">United States</a>). Other countries are not supported.</li>
             <li>Purchase contracts are templates and do not replace legal advice.</li>
           </ul></div>
       </div>
@@ -853,7 +868,7 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Crypto payment:</strong> tested against a simulated BTCPay Server, not yet against a real one. USDT only works via the Liquid network, as offered by BTCPay. USDT on Tron or Ethereum is not supported.</li>
         <li><strong>Container:</strong> the image has so far only been checked outside a real Docker or Podman environment.</li>
         <li><strong>Database:</strong> Kuenta uses a built-in database (SQLite). An external database such as PostgreSQL is not supported. Several workstations work via network mode.</li>
-        <li><strong>Countries and languages:</strong> Germany, Spain and the United Kingdom (switchable per company). Not supported in Spain: TicketBAI, Navarre, IGIC and REBU in VERI*FACTU; in the UK: Northern Ireland EU trade. The interface is available in German, English and Spanish.</li>
+        <li><strong>Countries and languages:</strong> Germany, Spain, the United Kingdom and the United States (switchable per company). Not supported in Spain: TicketBAI, Navarre, IGIC and REBU in VERI*FACTU; in the UK: Northern Ireland EU trade. The interface is available in German, English and Spanish.</li>
       </ul>
     </section>
 
@@ -878,7 +893,7 @@ npm run installer:windows   # build the Windows installer</code></pre></div>
     </section>
   </main>
 
-  <footer>Kuenta 1.1.0 · © 2026 DoctorD · Open source under the GNU AGPL 3.0, Pro features with a license · Font in documents: Liberation Sans (SIL Open Font License) · QR code: qrcode-generator (MIT)</footer>
+  <footer>Kuenta 1.2.0 · © 2026 DoctorD · Open source under the GNU AGPL 3.0, Pro features with a license · Font in documents: Liberation Sans (SIL Open Font License) · QR code: qrcode-generator (MIT)</footer>
 </div>
 
 <script>

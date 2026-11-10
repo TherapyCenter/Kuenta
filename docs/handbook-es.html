@@ -156,7 +156,7 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
     <div class="kicker">Invoicing &amp; POS for auto repair shops · uso, configuración, funcionamiento</div>
     <h1>Manual de Kuenta</h1>
     <p>Todo lo que necesita saber sobre la instalación y configuración de Kuenta, el trabajo diario, el envío de correos, las actualizaciones y las copias de seguridad.</p>
-    <div class="meta"><span>Versión <b>1.1.0</b></span><span>Fecha <b>noviembre de 2026</b></span><span>Windows · macOS · Linux · Tableta</span><span><a href="handbuch.html" hreflang="de">Deutsch</a> · <a href="handbook-en.html" hreflang="en">English</a></span></div>
+    <div class="meta"><span>Versión <b>1.2.0</b></span><span>Fecha <b>noviembre de 2026</b></span><span>Windows · macOS · Linux · Tableta</span><span><a href="handbuch.html" hreflang="de">Deutsch</a> · <a href="handbook-en.html" hreflang="en">English</a></span></div>
   </header>
 
   <nav class="toc" aria-label="Contenido">
@@ -207,7 +207,7 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
 
       <h3>Windows 10 / 11 (64 bits)</h3>
       <ol class="steps">
-        <li><div><strong>Ejecute <code>Kuenta-Setup-1.1.0.exe</code>.</strong><span>Node.js va incluido en el instalador; no hace falta instalar nada más.</span></div></li>
+        <li><div><strong>Ejecute <code>Kuenta-Setup-1.2.0.exe</code>.</strong><span>Node.js va incluido en el instalador; no hace falta instalar nada más.</span></div></li>
         <li><div><strong>Elija el tipo de instalación.</strong><span><em>Para todos los usuarios</em> (predeterminado, requiere derechos de administrador) instala en <code>C:\Archivos de programa\Kuenta</code>. <em>Solo para mí</em> no requiere derechos de administrador e instala en el perfil de usuario.</span></div></li>
         <li><div><strong>Elija las opciones.</strong><span>Acceso directo en el escritorio y, para el modo red, la regla del cortafuegos (solo en la instalación para todos los usuarios).</span></div></li>
         <li><div><strong>Iniciar:</strong><span>menú Inicio <span class="path">Kuenta</span>. Se abren la ventana de consola y el navegador con <code>http://127.0.0.1:3700</code>.</span></div></li>
@@ -263,9 +263,9 @@ loginctl enable-linger "$USER"</code></pre></div>
       <h3>Contenedor (Docker / Podman)</h3>
       <p>Para servidores Linux, NAS, Raspberry Pi o Mac, Kuenta también funciona en un contenedor. La imagen incluye Node.js y funciona en x86_64 y ARM64. En la carpeta de Kuenta hay un <code>Dockerfile</code> y un <code>compose.yaml</code>.</p>
       <div class="codeblock"><pre><code># Podman (con Docker, sustituya podman por docker)
-podman build -t kuenta:1.1.0 .
+podman build -t kuenta:1.2.0 .
 podman run -d --name kuenta --restart unless-stopped \
-  -p 3700:3700 -v kuenta-daten:/data kuenta:1.1.0
+  -p 3700:3700 -v kuenta-daten:/data kuenta:1.2.0
 
 # o con Compose
 docker compose up -d --build</code></pre></div>
@@ -504,6 +504,21 @@ docker compose up -d --build</code></pre></div>
       <p>En la misma página hay exportaciones CSV para Xero (ventas y compras), QuickBooks Online, Sage 50 y un diario de IVA.</p>
     </section>
 
+    <section id="usa">
+      <h2>Estados Unidos: sales tax</h2>
+      <p>Elija «Estados Unidos» en <span class="path">Ajustes → Impuestos / reclamaciones / caja → Sistema fiscal</span>, guarde y vuelva a cargar. La empresa factura entonces en dólares y la fecha va con el mes primero (MM/DD/AAAA). Escriba la ciudad como «Springfield, IL» y el ZIP code en el campo del código postal.</p>
+      <ul>
+        <li><strong>Sales tax:</strong> introduzca el tipo combinado de su ubicación (estado + condado + ciudad) en <span class="path">Ajustes → Estados Unidos / Sales tax</span>. Si la mano de obra, los suministros de taller y las tasas están sujetos depende del estado y se puede configurar. Las líneas sujetas llevan una «T» en la factura.</li>
+        <li><strong>Clientes exentos</strong> (reventa, gobierno, sin ánimo de lucro): en el cliente, en <span class="path">Impuestos y contabilidad</span>, con el número del certificado de exención.</li>
+        <li><strong>Requisitos de la factura:</strong> número de registro del taller en el pie, estado de las piezas (nueva, usada, reconstruida) en la línea, odómetro a la entrada y a la salida, destino de las piezas sustituidas (pestaña <em>Otros</em>).</li>
+        <li><strong>Suministros de taller y tasas:</strong> botones en la barra de líneas. Los suministros son un porcentaje de la mano de obra con un máximo; las tasas (residuos, neumáticos por unidad, core charge) son una lista en los ajustes.</li>
+        <li><strong>Autorización del presupuesto:</strong> registre cada autorización del cliente con importe, fecha, forma y persona en la pestaña <em>Otros</em>. Se imprime en la orden y la factura; si la factura la supera, Kuenta pregunta antes de imprimir. El presupuesto lleva el aviso y una línea de firma.</li>
+        <li><strong>Caja:</strong> precios sin impuesto; el sales tax se suma al total.</li>
+        <li><strong>Contabilidad:</strong> <span class="path">Finanzas → Exportación contable</span> genera un CSV para importar facturas en QuickBooks Online (código TAX/NON).</li>
+      </ul>
+      <p>Kuenta no determina los tipos automáticamente ni presenta declaraciones; de eso se encarga su asesor o QuickBooks.</p>
+    </section>
+
     <section id="datev">
       <h2>Exportación DATEV para el asesor fiscal</h2>
       <p class="lead">Kuenta contabiliza automáticamente facturas, pagos, facturas de proveedor y ventas de caja y los exporta como archivos DATEV. Su asesor fiscal los importa directamente en DATEV, el programa contable habitual en Alemania.</p>
@@ -725,7 +740,7 @@ docker compose up -d --build</code></pre></div>
       </ol>
       <h3>Desplegar sin preguntas</h3>
       <p>Para scripts o distribución de software:</p>
-      <div class="codeblock"><pre><code>Kuenta-Setup-1.1.0.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART</code></pre></div>
+      <div class="codeblock"><pre><code>Kuenta-Setup-1.2.0.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART</code></pre></div>
       <div class="tablewrap"><table>
         <thead><tr><th>Opción</th><th>Efecto</th></tr></thead>
         <tbody>
@@ -802,7 +817,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>Compruebe la TSE con una cuenta de prueba de fiskaly antes de usarla en real y comunique la caja a Hacienda (alemana).</li>
             <li>Compruebe el terminal de tarjetas y la DSFinV-K antes de usarlos o de una inspección.</li>
-            <li>Kuenta está pensado para Alemania, España y el Reino Unido (vea <a href="#spanien">España</a> y <a href="#uk">Reino Unido</a>). TicketBAI, Navarra e IGIC no están soportados.</li>
+            <li>Kuenta está pensado para Alemania, España, el Reino Unido y Estados Unidos (vea <a href="#spanien">España</a>, <a href="#uk">Reino Unido</a> y <a href="#usa">Estados Unidos</a>). TicketBAI, Navarra e IGIC no están soportados.</li>
             <li>Los contratos de compraventa son modelos y no sustituyen el asesoramiento jurídico.</li>
           </ul></div>
       </div>
@@ -853,7 +868,7 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Pago con criptomonedas:</strong> probado con un BTCPay Server simulado, aún no con uno real. USDT solo funciona mediante la red Liquid, como lo ofrece BTCPay. No se admite USDT en Tron ni en Ethereum.</li>
         <li><strong>Contenedor:</strong> la imagen solo se ha comprobado fuera de un entorno Docker o Podman real.</li>
         <li><strong>Base de datos:</strong> Kuenta usa una base de datos integrada (SQLite). No se admiten bases de datos externas como PostgreSQL. Varios puestos trabajan mediante el modo red.</li>
-        <li><strong>Países e idiomas:</strong> Alemania, España y el Reino Unido (se cambia por empresa). En España no se soportan TicketBAI, Navarra, IGIC ni el REBU en VERI*FACTU. La interfaz existe en alemán, inglés y español.</li>
+        <li><strong>Países e idiomas:</strong> Alemania, España, el Reino Unido y Estados Unidos (se cambia por empresa). En España no se soportan TicketBAI, Navarra, IGIC ni el REBU en VERI*FACTU. La interfaz existe en alemán, inglés y español.</li>
       </ul>
     </section>
 
@@ -878,7 +893,7 @@ npm run installer:windows   # crear el instalador de Windows</code></pre></div>
     </section>
   </main>
 
-  <footer>Kuenta 1.1.0 · © 2026 DoctorD · Código abierto bajo la GNU AGPL 3.0, funciones Pro con licencia · Fuente de los documentos: Liberation Sans (SIL Open Font License) · Código QR: qrcode-generator (MIT)</footer>
+  <footer>Kuenta 1.2.0 · © 2026 DoctorD · Código abierto bajo la GNU AGPL 3.0, funciones Pro con licencia · Fuente de los documentos: Liberation Sans (SIL Open Font License) · Código QR: qrcode-generator (MIT)</footer>
 </div>
 
 <script>

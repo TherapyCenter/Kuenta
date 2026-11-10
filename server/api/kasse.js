@@ -51,11 +51,15 @@ function status() {
 
 function rateOf(code) { return L.mwstRates()[Number(code) || 61] ?? 0; }
 function linien(positionen) {
+  const us = L.land() === 'US'; const usLaborFree = us && L.sw('us.labor.taxable', '0') !== '1';
   return positionen.filter(p => num(p.MENGE)).map((p, i) => {
-    const rate = Number(p.DURCHLAUFER) === 1 ? 0 : rateOf(p.MWST);
-    const brutto = L.r2(num(p.MENGE) * num(p.EINZEL) * (1 - num(p.RABATT) / 100));
+    const frei = Number(p.DURCHLAUFER) === 1 || (usLaborFree && p.POSART === 'L');
+    const rate = frei ? 0 : rateOf(p.MWST);
+    // US: the unit price is before sales tax, elsewhere it includes VAT
+    const betrag = L.r2(num(p.MENGE) * num(p.EINZEL) * (1 - num(p.RABATT) / 100));
+    const brutto = us ? L.r2(betrag * (1 + rate / 100)) : betrag;
     return { POS: i + 1, POSART: p.POSART || 'A', ARTID: p.ARTID || null, ARTNUMMER: p.ARTNUMMER || '', BEZEICHNUNG: p.BEZEICHNUNG || 'Artikel', MENGE: num(p.MENGE), EINZEL: num(p.EINZEL), RABATT: num(p.RABATT),
-      MWSTSATZ: rate, MWSTCODE: Number(p.DURCHLAUFER) === 1 ? 63 : (Number(p.MWST) || 61), BRUTTO: brutto, NETTO: L.r2(brutto / (1 + rate / 100)), GVTYP: p.GVTYP || 'Umsatz', EK: num(p.EK), DURCHLAUFER: p.DURCHLAUFER ? 1 : 0, EINHEITID: p.EINHEITID || null };
+      MWSTSATZ: rate, MWSTCODE: frei ? 63 : (Number(p.MWST) || 61), BRUTTO: brutto, NETTO: us ? betrag : L.r2(brutto / (1 + rate / 100)), GVTYP: p.GVTYP || 'Umsatz', EK: num(p.EK), DURCHLAUFER: p.DURCHLAUFER ? 1 : 0, EINHEITID: p.EINHEITID || null };
   });
 }
 function summen(lines) {
@@ -116,14 +120,14 @@ async function bonBuchen(p, user, krypto) {
     // Spain: every sale is an invoice (factura simplificada or completa) with a VERI*FACTU record
     if (!rechnungid && (L.sw('kasse.autorechnung', '1') === '1' || ES.activo())) {
       const t = VG.template('rechnung', kunid ? { kunid } : {}); delete t.kopf._kunde;
-      t.kopf.ANSICHTBRUTTO = 1; t.kopf.ZAHLBDTEXT = zahlart === 'KRYPTO' ? 'Betrag per Krypto-Zahlung (BTCPay) erhalten.' : `Betrag ${ZAHLART_TEXT[zahlart].toLowerCase()} erhalten.`; t.kopf.FAELLING = 0;
+      t.kopf.ANSICHTBRUTTO = L.land() === 'US' ? 0 : 1; t.kopf.ZAHLBDTEXT = zahlart === 'KRYPTO' ? 'Betrag per Krypto-Zahlung (BTCPay) erhalten.' : `Betrag ${ZAHLART_TEXT[zahlart].toLowerCase()} erhalten.`; t.kopf.FAELLING = 0;
       if (!kunid) { t.kopf.KUNNAME = 'Barverkauf'; }
-      const r = VG.save('rechnung', { kopf: t.kopf, pos: lines.map(l => ({ POSART: l.POSART === 'L' ? 'L' : 'A', ARTID: l.ARTID, ARTNUMMER: l.ARTNUMMER, BEZEICHNUNG: l.BEZEICHNUNG, MENGE: l.MENGE, VKBRUTTO: l.EINZEL, RABATT: l.RABATT, MWST: l.MWSTCODE, EK: l.EK, DURCHLAUFER: l.DURCHLAUFER, EINHEITID: l.EINHEITID })) }, user);
+      const r = VG.save('rechnung', { kopf: t.kopf, pos: lines.map(l => ({ POSART: l.POSART === 'L' ? 'L' : 'A', ARTID: l.ARTID, ARTNUMMER: l.ARTNUMMER, BEZEICHNUNG: l.BEZEICHNUNG, MENGE: l.MENGE, ...(L.land() === 'US' ? { VK: l.EINZEL } : { VKBRUTTO: l.EINZEL }), RABATT: l.RABATT, MWST: l.MWSTCODE, EK: l.EK, DURCHLAUFER: l.DURCHLAUFER, EINHEITID: l.EINHEITID })) }, user);
       rechnungid = r.kopf.RECHNUNGID;
       if (ES.activo()) {
         try { VF.emitir(rechnungid); } catch (e) { VG.remove('rechnung', rechnungid, user); throw e; }
         bezahlBetrag = r.kopf.GBRUTTO; // incl. recargo de equivalencia
-      }
+      } else if (L.land() === 'US') bezahlBetrag = r.kopf.GBRUTTO; // sales tax rounded per rate as on the invoice
     }
   }
   if (rechnungid && ES.activo()) VF.emitir(rechnungid); // invoice paid at the register is issued now at the latest

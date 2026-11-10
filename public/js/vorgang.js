@@ -9,10 +9,12 @@ const Vorgang = {
     const klein = LK.data && LK.data.klein;
     const brutto = Number(kopf.ANSICHTBRUTTO) === 1;
     const groups = {}; let sub = 0; let roh = 0; let einsatz = 0;
+    const usLaborFree = LK.data && LK.data.usLaborFree; // US: labor non-taxable
     for (const p of pos) {
       if (p.POSART === 'T') { p.SUMME = 0; p.SUMMEBRUTTO = 0; continue; }
       if (p.POSART === 'Z') { p.SUMME = r2(sub); p.SUMMEBRUTTO = r2(sub); sub = 0; continue; }
-      const code = Number(p.DURCHLAUFER) === 1 || Number(p.DIFFSTEUER) === 1 || kopf.STEUERART ? 63 : (Number(p.MWST) || 61);
+      let code = Number(p.DURCHLAUFER) === 1 || Number(p.DIFFSTEUER) === 1 || kopf.STEUERART ? 63 : (Number(p.MWST) || 61);
+      if (usLaborFree && p.POSART === 'L') code = 63;
       const rate = klein ? 0 : LK.rate(code);
       const menge = parseNum(p.MENGE), rab = parseNum(p.RABATT);
       let vk, vkb;
@@ -344,8 +346,11 @@ class VorgangWindow {
       tb('➕', 'Freier AW', 'Freien Arbeitswert einfügen', () => this.insFrei('L')),
       tb('📝', 'Text', 'Textbaustein / Textposition einfügen', () => this.insText()),
       tb('Σ', '', 'Zwischensumme einfügen', () => this.insert({ POSART: 'Z', BEZEICHNUNG: 'Zwischensumme' })),
-      tb('', 'KET', 'Kleinteilzuschlag (auf alle vorherigen Ersatzteile)', () => this.insKET()),
-      tb('', 'MTZ', 'Lackiermaterialzuschlag (auf markierte Positionen)', () => this.insMTZ()),
+      ...(Vorgang.land() === 'US' ? [
+        tb('🧴', 'Shop supplies', 'Shop supplies (Prozent der Arbeitsleistung, mit Obergrenze)', () => this.insSupplies()),
+        tb('♻', 'Gebühren', 'Gebühr einfügen (Altstoffe, Reifen, Core charge …)', ev => this.insGebuehr(ev))] : [
+        tb('', 'KET', 'Kleinteilzuschlag (auf alle vorherigen Ersatzteile)', () => this.insKET()),
+        tb('', 'MTZ', 'Lackiermaterialzuschlag (auf markierte Positionen)', () => this.insMTZ())]),
       tb('%', '', 'Rabatt', () => this.rabattDialog()),
       h('span', { class: 'sep' }),
       tb('🚙', 'Fz-Verkauf', 'Fahrzeug aus dem Fahrzeuglager verkaufen', () => this.insFahrzeug('verkauf')),
@@ -539,6 +544,29 @@ class VorgangWindow {
     const vk = r2(base * pct / 100);
     this.insert({ POSART: 'A', ARTNUMMER: 'KET', BEZEICHNUNG: `Kleinteile / Ersatzteilzuschlag ${fmt.num(pct)} %`, MENGE: 1, MWST: 61, ...this.priceFor(vk, 61) }, upto + 1);
   }
+  // US: shop supplies as a percentage of labor, limited to a maximum amount (replaces an existing line)
+  insSupplies() {
+    const pct = parseNum(App.setting('us.supplies.pct', '10')); const max = parseNum(App.setting('us.supplies.max', '0'));
+    const lohn = this.pos.filter(p => p.POSART === 'L').reduce((s, p) => s + (p.SUMME || 0), 0);
+    if (!lohn) { toast('Keine Arbeitspositionen vorhanden.'); return; }
+    let vk = r2(lohn * pct / 100); if (max > 0) vk = Math.min(vk, max);
+    const code = App.setting('us.fees.taxable', '0') === '1' ? 61 : 63;
+    const i = this.pos.findIndex(p => p.ARTNUMMER === 'SHOP');
+    const line = { POSART: 'A', ARTNUMMER: 'SHOP', BEZEICHNUNG: `Shop supplies ${fmt.num(pct)} %`, MENGE: 1, MWST: code, ...this.priceFor(vk, code) };
+    if (i >= 0) { Object.assign(this.pos[i], line); this.change(); this.drawPos(); } else this.insert(line);
+  }
+  // US: fees from the settings (environmental, tire disposal per tire, core charge …)
+  insGebuehr(ev) {
+    const liste = String(App.setting('us.fees', 'Hazardous waste disposal;5;n\nTire disposal fee (per tire);3;n;q\nCore charge;0;y')).split(/\r?\n/).map(l => l.split(';').map(s => s.trim())).filter(x => x[0]);
+    const r = ev && ev.currentTarget ? ev.currentTarget.getBoundingClientRect() : { left: 200, top: 200 };
+    contextMenu(r.left, r.bottom || r.top, liste.map(([name, betrag, steuer, menge]) => ({ label: `${name}${Number(parseNum(betrag)) ? ' · ' + fmt.money(parseNum(betrag)) : ''}`, onClick: async () => {
+      let vk = parseNum(betrag || '0'); let m = 1;
+      if (!vk) { const v = await promptDlg(`Betrag für „${name}“ (negativ = Gutschrift, z. B. Core return)`, '', { title: name }); if (v == null) return; vk = parseNum(v); }
+      if (menge === 'q') { const v = await promptDlg('Anzahl', '4', { title: name }); if (v == null) return; m = parseNum(v) || 1; }
+      const code = /^y/i.test(steuer || '') ? 61 : 63;
+      this.insert({ POSART: 'A', ARTNUMMER: 'FEE', BEZEICHNUNG: name, MENGE: m, MWST: code, ...this.priceFor(vk, code) });
+    } })));
+  }
   async insMTZ() {
     let pct = parseNum(App.setting('vorgang.mtz', '0'));
     if (!pct) { const v = await promptDlg('Prozentsatz für Lackiermaterial (MTZ)', '20', { title: 'MTZ' }); if (v == null) return; pct = parseNum(v); }
@@ -578,6 +606,7 @@ class VorgangWindow {
       { f: 'RABATT', l: 'Rabatt %', t: 'pct', w: 1 }, { f: 'MWST', l: 'MwSt', t: 'select', src: 'mwst', w: 1 },
       ...(App.denied('Einkaufspreis anzeigen') ? [] : [{ f: 'EK', l: 'Einkaufspreis / Kosten netto', t: 'money', w: 1 }]),
       { f: 'DURCHLAUFER', l: 'Durchlaufender Posten (ohne MwSt)', t: 'bool', w: 1 },
+      ...(Vorgang.land() === 'US' && p.POSART !== 'L' ? [{ f: 'TEILEZUSTAND', l: 'Zustand des Teils', t: 'select', opts: [['', 'neu'], ['GEBRAUCHT', 'gebraucht'], ['AUFBEREITET', 'aufbereitet (rebuilt)']], w: 1 }] : []),
       { f: p.POSART === 'L' ? 'ARBEITSTEXT' : 'MEMOTEXT', l: p.POSART === 'L' ? 'Arbeitstext' : 'Langtext', t: 'memo', rows: 4 },
     ];
     const form = new Form({ form: [{ tab: 'Position', groups: [{ title: 'Position', fields }] }] }, vals);
@@ -675,12 +704,45 @@ class VorgangWindow {
     pane.append(block('Einleitungstext', 'EINLEITUNGTXT', 'einleitung'), block('Schlusstext', 'SCHLUSSTXT', 'schluss'),
       h('fieldset', { class: 'grp' }, h('legend', null, 'Zahlungsbedingung (Text auf dem Beleg)'), zb));
   }
+  // US: odometer out, replaced parts and the customer's authorizations of the estimate
+  usFreigaben() {
+    const k = this.k;
+    const out = this.inp('FAHRKMOUT', { int: true, num: true });
+    const alt = h('select', null, [['', '–'], ['zurueck', 'dem Kunden zurückgegeben'], ['entsorgt', 'auf Wunsch entsorgt']].map(([v, l]) => h('option', { value: v, selected: (k.USALTTEILE || '') === v }, l)));
+    alt.addEventListener('change', () => { k.USALTTEILE = alt.value || null; this.change(); });
+    const liste = h('div');
+    const lesen = () => { try { return JSON.parse(k.USFREIGABE || '[]'); } catch { return []; } };
+    const zeichnen = () => {
+      liste.textContent = '';
+      const fr = lesen();
+      if (!fr.length) liste.append(h('div', { class: 'hint' }, 'Noch keine Freigabe erfasst.'));
+      fr.forEach((a, i) => liste.append(h('div', { class: 'inline' }, h('span', null, `${fmt.money(a.betrag)} · ${fmt.date(a.datum)} ${a.zeit || ''} · ${T(a.art || '')} · ${a.person || ''}${a.notiz ? ' · ' + a.notiz : ''}`),
+        h('button', { class: 'btn icon sm', title: 'Entfernen', onclick: () => { const x = lesen(); x.splice(i, 1); k.USFREIGABE = JSON.stringify(x); this.change(); zeichnen(); } }, '✕'))));
+    };
+    const neu = async () => {
+      const betrag = h('input', { type: 'text', class: 'num', value: fmt.num2(this.calcTotals ? this.calcTotals().brutto : Vorgang.calc(k, this.pos).brutto) });
+      const datum = h('input', { type: 'date', value: today() }); const zeit = h('input', { type: 'time', value: new Date().toTimeString().slice(0, 5) });
+      const art = h('select', null, ['persönlich', 'telefonisch', 'E-Mail / Text', 'Unterschrift'].map(x => h('option', { value: x }, x)));
+      const person = h('input', { type: 'text', value: [k.KUNVORNAME, k.KUNNAME].filter(Boolean).join(' ') }); const notiz = h('input', { type: 'text' });
+      const ok = await dialog('Freigabe des Kunden erfassen', h('div', { class: 'fgrid' }, h('label', { class: 'fld w1' }, h('span', null, 'Freigegebener Betrag'), betrag), h('label', { class: 'fld w1' }, h('span', null, 'Datum'), datum),
+        h('label', { class: 'fld w1' }, h('span', null, 'Uhrzeit'), zeit), h('label', { class: 'fld w1' }, h('span', null, 'Art'), art), h('label', { class: 'fld' }, h('span', null, 'Freigegeben durch'), person), h('label', { class: 'fld' }, h('span', null, 'Notiz (z. B. zusätzliche Arbeiten)'), notiz)),
+      [{ label: 'Übernehmen', cls: 'primary', value: true }, { label: 'Abbrechen', value: false }], { width: 560 });
+      if (!ok) return;
+      const x = lesen(); x.push({ betrag: parseNum(betrag.value), datum: datum.value, zeit: zeit.value, art: art.value, person: person.value, notiz: notiz.value });
+      k.USFREIGABE = JSON.stringify(x); this.change(); zeichnen();
+    };
+    zeichnen();
+    return h('fieldset', { class: 'grp' }, h('legend', null, 'Freigabe & Fahrzeug (USA)'),
+      h('div', { class: 'fgrid' }, h('label', { class: 'fld w1' }, h('span', null, 'Tacho bei Rückgabe'), out), h('label', { class: 'fld w1' }, h('span', null, 'Ersetzte Teile'), alt)),
+      h('div', { class: 'hint', style: { margin: '6px 0 2px' } }, 'Freigaben des Kunden (Kostenvoranschlag und Mehrkosten):'), liste,
+      h('div', { class: 'fld inline' }, h('button', { class: 'btn sm', onclick: neu }, '➕ Freigabe erfassen')));
+  }
   renderSonstiges() {
     const pane = this.panes[2]; pane.innerHTML = '';
     const grid = h('div', { class: 'fgrid' });
     const chk = (f, l) => { const c = h('input', { type: 'checkbox', checked: Number(this.k[f]) === 1, onchange: () => { this.k[f] = c.checked ? 1 : 0; this.change(); } }); return h('label', { class: 'fld chk' }, c, h('span', null, l)); };
     grid.append(chk('RABATTZEIGEN', 'Rabattspalte drucken'));
-    const sa = h('select', null, [['', 'normal (mit MwSt)'], ['REVERSE_CHARGE', 'steuerfrei: Reverse Charge (EU-Unternehmer)'], ['IG_LIEFERUNG', 'steuerfrei: innergemeinschaftliche Lieferung'], ['AUSFUHR', 'steuerfrei: Ausfuhr / Drittland']].map(([k, l]) => h('option', { value: k, selected: (this.k.STEUERART || '') === k }, l)));
+    const sa = h('select', null, [['', 'normal (mit MwSt)'], ['REVERSE_CHARGE', 'steuerfrei: Reverse Charge (EU-Unternehmer)'], ['IG_LIEFERUNG', 'steuerfrei: innergemeinschaftliche Lieferung'], ['AUSFUHR', 'steuerfrei: Ausfuhr / Drittland'], ...(Vorgang.land() === 'US' ? [['EXEMPT', 'steuerfrei: Exemption certificate (Resale u. a.)']] : [])].map(([k, l]) => h('option', { value: k, selected: (this.k.STEUERART || '') === k }, l)));
     sa.addEventListener('change', () => { this.k.STEUERART = sa.value || null; this.change(); this.drawPos(); });
     grid.append(h('label', { class: 'fld' }, h('span', null, 'Umsatzsteuer'), sa));
     if (this.typ === 'korrektur' && Vorgang.es()) {
@@ -702,6 +764,7 @@ class VorgangWindow {
     const links = h('div', { class: 'vg-links' }, (this.data.verknuepft || []).map(l => h('span', { class: 'chip', onclick: () => Vorgang.open(l.typ, l.id) }, `${l.title} ${l.nr} · ${fmt.date(l.datum)}`)));
     pane.append(h('div', { class: 'groups' },
       h('fieldset', { class: 'grp' }, h('legend', null, 'Optionen'), grid),
+      ...(Vorgang.land() === 'US' && this.typ !== 'lieferschein' ? [this.usFreigaben()] : []),
       h('fieldset', { class: 'grp' }, h('legend', null, 'Verknüpfte Vorgänge'), (this.data.verknuepft || []).length ? links : h('div', { class: 'hint' }, 'Keine')),
       h('fieldset', { class: 'grp' }, h('legend', null, 'Individuelle Felder'), ind.length ? h('div', { class: 'fgrid' }, ind) : h('div', { class: 'hint' }, 'Keine aktiven individuellen Felder (Einstellungen → Individuelle Felder).')),
       h('fieldset', { class: 'grp' }, h('legend', null, 'Info'), h('div', { class: 'hint', style: { lineHeight: 1.7 } },
@@ -781,7 +844,7 @@ class VorgangWindow {
       h('button', { class: 'btn', onclick: () => this.print() }, h('span', { class: 'ico' }, '🖨'), 'Drucken'),
       h('label', { class: 'inline' }, 'Formular:', this.formSel),
     ];
-    if (isRe && Vorgang.land() !== 'GB') items.push(h('button', { class: 'btn', onclick: async ev => {
+    if (isRe && ['DE', 'ES'].includes(Vorgang.land())) items.push(h('button', { class: 'btn', onclick: async ev => {
       const r = ev.currentTarget.getBoundingClientRect();
       const m = contextMenu(r.left, r.top, Vorgang.es() ? [
         { label: 'Facturae 3.2.2 herunterladen', onClick: () => this.withSaved(() => Vorgang.facturae(this.id)) },

@@ -1,5 +1,5 @@
 'use strict';
-/* global h, $, fmt, api, esc, Win, App, LK, kname, today, toast, showError, r2, I18N, confirmDlg */
+/* global h, $, fmt, api, esc, Win, App, LK, ENT, kname, today, toast, showError, r2, I18N, confirmDlg */
 
 const Print = {
   firma: null,
@@ -72,11 +72,12 @@ ${extra}`;
     const zeile = (...xs) => xs.filter(Boolean).map(esc).join('<br>');
     const es = LK.data && LK.data.land === 'ES';
     const gb = LK.data && LK.data.land === 'GB';
+    const us = LK.data && LK.data.land === 'US';
     return `<div class="footer">
       <div>${zeile(f.FIRMENNAME, f.FIRMENZUSATZ, f.STRASSE, Print.plzOrt(f.PLZ, f.ORT))}</div>
       <div>${zeile(f.TELEFON && 'Tel.: ' + f.TELEFON, f.FAX && 'Fax: ' + f.FAX, f.EMAIL, f.INTERNETSEITE)}</div>
       <div>${zeile(f.BANKNAME, f.IBAN && 'IBAN: ' + f.IBAN, f.BIC && 'BIC: ' + f.BIC, f.BANKINHABER && 'Inhaber: ' + f.BANKINHABER)}</div>
-      <div>${zeile(...(es ? [(f.STEUERNR || f.USTNR) && 'NIF: ' + (f.STEUERNR || f.USTNR)] : gb ? [f.USTNR && 'VAT-Reg.-Nr.: ' + f.USTNR] : [f.USTNR && 'USt-IdNr.: ' + f.USTNR, f.STEUERNR && 'Steuer-Nr.: ' + f.STEUERNR]), f.HANDELSREGISTER, f.GESCHAEFTSFUEHRER && 'Inhaber/GF: ' + f.GESCHAEFTSFUEHRER, f.FUSSZEILE)}</div>
+      <div>${zeile(...(es ? [(f.STEUERNR || f.USTNR) && 'NIF: ' + (f.STEUERNR || f.USTNR)] : us ? [App.setting('us.reg.nr', '') && `${App.setting('us.reg.label', 'Registration No.')}: ${App.setting('us.reg.nr', '')}`] : gb ? [f.USTNR && 'VAT-Reg.-Nr.: ' + f.USTNR] : [f.USTNR && 'USt-IdNr.: ' + f.USTNR, f.STEUERNR && 'Steuer-Nr.: ' + f.STEUERNR]), f.HANDELSREGISTER, f.GESCHAEFTSFUEHRER && 'Inhaber/GF: ' + f.GESCHAEFTSFUEHRER, f.FUSSZEILE)}</div>
     </div>`;
   },
   headHtml(f) {
@@ -85,7 +86,7 @@ ${extra}`;
       <div class="contact">${[f.STRASSE, Print.plzOrt(f.PLZ, f.ORT)].filter(Boolean).map(esc).join(' · ')}<br>${[f.TELEFON && 'Tel. ' + f.TELEFON, f.EMAIL, f.INTERNETSEITE].filter(Boolean).map(esc).join(' · ')}</div></div>${logo}</div>`;
   },
   // postcode and town: "12345 Berlin", in the UK "London SW1A 1AA"
-  plzOrt(plz, ort) { return (LK.data && LK.data.land === 'GB' ? [ort, plz] : [plz, ort]).filter(Boolean).join(' '); },
+  plzOrt(plz, ort) { return (LK.data && ['GB', 'US'].includes(LK.data.land) ? [ort, plz] : [plz, ort]).filter(Boolean).join(' '); },
   senderLine(f) { return esc(f.ABSENDER || [f.FIRMENNAME, f.STRASSE, Print.plzOrt(f.PLZ, f.ORT)].filter(Boolean).join(' · ')); },
   addressHtml(a) {
     const lines = [];
@@ -95,6 +96,7 @@ ${extra}`;
     if (a.zusatz) lines.push(a.zusatz);
     if (a.strasse) lines.push(a.strasse);
     if (LK.data && LK.data.land === 'GB') lines.push(a.ort, a.plz); // UK: town, then postcode on its own line
+    else if (LK.data && LK.data.land === 'US') lines.push([a.ort, a.plz].filter(Boolean).join(' ')); // US: "Springfield, IL 62701"
     else lines.push([a.plz, a.ort].filter(Boolean).join(' '));
     if (a.land && a.land !== ((Print.firma && Print.firma.LAND) || 'DE')) lines.push(a.land);
     return lines.filter(Boolean).map(esc).join('<br>');
@@ -156,6 +158,11 @@ ${extra}`;
     // UK VAT invoice: VAT rate per line, tax point, own title
     const gb = LK.data && LK.data.land === 'GB'; const gbReg = gb && LK.data.gbRegistrado;
     const gbSatz = p => Number(p.DURCHLAUFER) === 1 || k.STEUERART === 'REVERSE_CHARGE' ? '–' : Number(p.DIFFSTEUER) === 1 ? 'Marge' : k.STEUERART ? '0 %' : Number(p.MWST) === 63 ? 'frei' : fmt.num(LK.rate(Number(p.MWST) || 61)) + ' %';
+    // US: sales tax marker per line, condition of parts, authorizations of the estimate
+    const us = LK.data && LK.data.land === 'US';
+    const usTax = p => Number(p.DURCHLAUFER) === 1 || k.STEUERART || (LK.data.usLaborFree && p.POSART === 'L') ? '' : LK.rate(Number(p.MWST) || 61) > 0 ? 'T' : '';
+    const zustand = p => ({ GEBRAUCHT: '(gebraucht)', AUFBEREITET: '(aufbereitet)' }[p.TEILEZUSTAND] || '');
+    const freigaben = (() => { try { return JSON.parse(k.USFREIGABE || '[]'); } catch { return []; } })();
     const titleGb = gb && isRe && ['rechnung', 'rechnung_ohne_kopf', 'rechnungskorrektur', 'storno-rechnung', 'gutschrift'].includes(formular) ? (typ === 'korrektur' ? 'Gutschrift' : gbReg ? 'Umsatzsteuerrechnung' : 'Rechnung') : null;
     const titleEs = vf ? { F1: 'Rechnung', F2: 'Vereinfachte Rechnung', R5: 'Vereinfachte Rechnungskorrektur' }[vf.tipo] || 'Rechnungskorrektur' : null;
     const nrLabel = { angebot: 'Angebots-Nr.', auftrag: 'Auftrags-Nr.', lieferschein: 'Lieferschein-Nr.', rechnung: 'Rechnungs-Nr.', korrektur: 'Beleg-Nr.' }[typ];
@@ -177,14 +184,14 @@ ${extra}`;
     } else html += `<h1>${esc(titleGb || title)} Nr. ${esc(es ? es.numSerie : k[v.nr])}</h1>`;
     if (k.FAHRKENNZEICHEN || k.FAHRMARKE) {
       html += `<div class="fz"><div><span>Kennzeichen:</span> <b>${esc(k.FAHRKENNZEICHEN || '')}</b></div><div><span>Fahrzeug:</span> ${esc([k.FAHRMARKE, k.FAHRMODELL].filter(Boolean).join(' '))}</div><div><span>FIN:</span> ${esc(k.FAHRIDENTNR || '')}</div>
-        <div><span>Erstzulassung:</span> ${fmt.date(k.FAHREZ)}</div><div><span>KM-Stand:</span> ${k.FAHRKM ? Number(k.FAHRKM).toLocaleString(I18N.locale(Print.docLang())) : ''}</div><div><span>HU:</span> ${fmt.month(k.FAHRHU)}</div>
+        <div><span>Erstzulassung:</span> ${fmt.date(k.FAHREZ)}</div>${us ? `<div><span>Tacho bei Annahme:</span> ${k.FAHRKM ? fmt.num(k.FAHRKM, 0) : ''}</div><div><span>Tacho bei Rückgabe:</span> ${k.FAHRKMOUT ? fmt.num(k.FAHRKMOUT, 0) : ''}</div>` : `<div><span>KM-Stand:</span> ${k.FAHRKM ? Number(k.FAHRKM).toLocaleString(I18N.locale(Print.docLang())) : ''}</div><div><span>HU:</span> ${fmt.month(k.FAHRHU)}</div>`}
         ${k.FAHRHSN ? `<div><span>HSN/TSN:</span> ${esc(k.FAHRHSN)} / ${esc(k.FAHRTSN || '')}</div>` : ''}</div>`;
     }
     if (k.EINLEITUNGTXT) html += `<div class="txt">${esc(k.EINLEITUNGTXT)}</div>`;
     // line items
-    const vatCol = gbReg && !ohnePreise;
+    const vatCol = (gbReg || us) && !ohnePreise;
     const cols = (ohnePreise ? 4 : (rabatt ? 7 : 6)) + (vatCol ? 1 : 0);
-    html += `<table class="items"><thead><tr><th style="width:9mm">Pos.</th><th style="width:26mm">Art.-Nr.</th><th>Bezeichnung</th><th class="r" style="width:16mm">Menge</th>${ohnePreise ? '' : `<th class="r" style="width:22mm">E-Preis</th>${rabatt ? '<th class="r" style="width:13mm">Rabatt</th>' : ''}${vatCol ? '<th class="r" style="width:14mm">MwSt</th>' : ''}<th class="r" style="width:24mm">Gesamt</th>`}</tr></thead><tbody>`;
+    html += `<table class="items"><thead><tr><th style="width:9mm">Pos.</th><th style="width:26mm">Art.-Nr.</th><th>Bezeichnung</th><th class="r" style="width:16mm">Menge</th>${ohnePreise ? '' : `<th class="r" style="width:22mm">E-Preis</th>${rabatt ? '<th class="r" style="width:13mm">Rabatt</th>' : ''}${vatCol ? `<th class="r" style="width:14mm">${us ? 'Steuer' : 'MwSt'}</th>` : ''}<th class="r" style="width:24mm">Gesamt</th>`}</tr></thead><tbody>`;
     let nr = 0; let hatDP = false; let hatMarge = false;
     for (const p of d.pos) {
       if (p.POSART === 'T') { html += `<tr class="t"><td></td><td colspan="${cols - 1}">${esc([p.BEZEICHNUNG, p.MEMOTEXT].filter(Boolean).join('\n'))}</td></tr>`; continue; }
@@ -195,8 +202,8 @@ ${extra}`;
       const sub = [p.BEZEICHNUNG ? p.BESCHREIBUNG : null, p.ARBEITSTEXT, p.MEMOTEXT].filter(x => x && String(x).trim()).join('\n');
       const ep = brutto ? p.VKBRUTTO : p.VK;
       const sum = brutto ? p.SUMMEBRUTTO : p.SUMME;
-      html += `<tr><td>${nr}</td><td>${esc(p.ARTNUMMER || '')}</td><td>${esc(p.BEZEICHNUNG || p.BESCHREIBUNG || '')}${Number(p.DURCHLAUFER) === 1 ? ' <span class="muted">(DP)</span>' : ''}${sub ? `<div class="sub">${esc(sub)}</div>` : ''}</td>
-        <td class="r">${fmt.num(p.MENGE, 3)} ${esc(einheit(p.EINHEITID) || '')}</td>${ohnePreise ? '' : `<td class="r">${fmt.money(ep)}</td>${rabatt ? `<td class="r">${Number(p.RABATT) ? fmt.num(p.RABATT) + ' %' : ''}</td>` : ''}${vatCol ? `<td class="r">${gbSatz(p)}</td>` : ''}<td class="r">${fmt.money(sum)}</td>`}</tr>`;
+      html += `<tr><td>${nr}</td><td>${esc(p.ARTNUMMER || '')}</td><td>${esc(p.BEZEICHNUNG || p.BESCHREIBUNG || '')}${us && zustand(p) ? ` <span>${zustand(p)}</span>` : ''}${Number(p.DURCHLAUFER) === 1 ? ' <span class="muted">(DP)</span>' : ''}${sub ? `<div class="sub">${esc(sub)}</div>` : ''}</td>
+        <td class="r">${fmt.num(p.MENGE, 3)} ${esc(einheit(p.EINHEITID) || '')}</td>${ohnePreise ? '' : `<td class="r">${fmt.money(ep)}</td>${rabatt ? `<td class="r">${Number(p.RABATT) ? fmt.num(p.RABATT) + ' %' : ''}</td>` : ''}${vatCol ? `<td class="r">${us ? usTax(p) : gbSatz(p)}</td>` : ''}<td class="r">${fmt.money(sum)}</td>`}</tr>`;
     }
     html += '</tbody></table>';
     // totals
@@ -205,14 +212,14 @@ ${extra}`;
       let t = '<table class="totals">';
       const taxRows = Object.values(tax).filter(x => x.rate > 0);
       if (brutto && !klein) {
-        t += `<tr><td>Summe netto</td><td class="r">${fmt.money(k.GNETTO)}</td></tr>`;
-        for (const x of taxRows) t += `<tr><td>zzgl. ${fmt.num(x.rate)} % MwSt auf ${fmt.money(x.netto)}</td><td class="r">${fmt.money(x.mwst)}</td></tr>`;
+        t += `<tr><td>${us ? 'Zwischensumme' : 'Summe netto'}</td><td class="r">${fmt.money(k.GNETTO)}</td></tr>`;
+        for (const x of taxRows) t += `<tr><td>zzgl. ${fmt.num(x.rate)} % ${us ? 'Sales Tax' : 'MwSt'} auf ${fmt.money(x.netto)}</td><td class="r">${fmt.money(x.mwst)}</td></tr>`;
       } else if (!klein) {
-        t += `<tr><td>Summe netto</td><td class="r">${fmt.money(k.GNETTO)}</td></tr>`;
-        for (const x of taxRows) t += `<tr><td>zzgl. ${fmt.num(x.rate)} % MwSt auf ${fmt.money(x.netto)}</td><td class="r">${fmt.money(x.mwst)}</td></tr>`;
+        t += `<tr><td>${us ? 'Zwischensumme' : 'Summe netto'}</td><td class="r">${fmt.money(k.GNETTO)}</td></tr>`;
+        for (const x of taxRows) t += `<tr><td>zzgl. ${fmt.num(x.rate)} % ${us ? 'Sales Tax' : 'MwSt'} auf ${fmt.money(x.netto)}</td><td class="r">${fmt.money(x.mwst)}</td></tr>`;
         for (const x of taxRows.filter(x => x.recargo)) t += `<tr><td>zzgl. ${fmt.num(x.reRate)} % Recargo de equivalencia auf ${fmt.money(x.netto)}</td><td class="r">${fmt.money(x.recargo)}</td></tr>`;
         const frei = Object.values(tax).filter(x => !x.rate).reduce((s, x) => s + x.netto, 0);
-        if (frei) t += `<tr><td class="muted">davon steuerfrei / durchlaufend</td><td class="r muted">${fmt.money(frei)}</td></tr>`;
+        if (frei) t += `<tr><td class="muted">${us ? 'davon nicht steuerpflichtig' : 'davon steuerfrei / durchlaufend'}</td><td class="r muted">${fmt.money(frei)}</td></tr>`;
       }
       t += `<tr class="grand"><td>${typ === 'korrektur' ? 'Gesamtbetrag' : isRe ? 'Rechnungsbetrag' : 'Gesamtbetrag'}</td><td class="r">${fmt.money(k.GBRUTTO)}</td></tr>`;
       if (isRe && d.zahlungen && d.zahlungen.length) {
@@ -223,7 +230,8 @@ ${extra}`;
       t += '</table>';
       html += t;
       if (klein) html += '<div class="txt muted">Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</div>';
-      if (hatDP && gb) html += '<div class="txt muted">(DP) = Auslage im Namen des Kunden (disbursement), nicht umsatzsteuerbar.</div>';
+      if (hatDP && us) html += '<div class="txt muted">(DP) = Durchlaufende Gebühr, nicht steuerpflichtig.</div>';
+      else if (hatDP && gb) html += '<div class="txt muted">(DP) = Auslage im Namen des Kunden (disbursement), nicht umsatzsteuerbar.</div>';
       else if (hatDP) html += es ? '<div class="txt muted">(DP) = Suplido: im Namen und für Rechnung des Kunden verauslagt, nicht Teil der Bemessungsgrundlage (Art. 78.Tres.3.º LIVA).</div>' : '<div class="txt muted">(DP) = Durchlaufender Posten gemäß § 10 Abs. 1 Satz 6 UStG, nicht umsatzsteuerpflichtig.</div>';
       if (gb && hatMarge) html += '<div class="txt">Gebrauchtwagen: Margenbesteuerung (second-hand margin scheme, VAT Notice 718). Die Umsatzsteuer wird nicht gesondert ausgewiesen.</div>';
       if (gb && k.STEUERART) html += `<div class="txt muted">${esc({ REVERSE_CHARGE: 'Im Vereinigten Königreich nicht umsatzsteuerbar (Leistungsort im Ausland); der Kunde schuldet die Steuer (reverse charge).', IG_LIEFERUNG: 'Steuerfreie Ausfuhr (zero-rated export).', AUSFUHR: 'Steuerfreie Ausfuhr (zero-rated export).' }[k.STEUERART] || '')}</div>`;
@@ -235,17 +243,31 @@ ${extra}`;
       if (isRe && typ === 'rechnung' && Number(k.FAELLING) > 0) zt += (zt ? '\n' : '') + `Zahlbar bis ${fmt.date(addDaysIso(k.DATUM, k.FAELLING))}${Number(k.SKONTO) > 0 ? `, bei Zahlung bis ${fmt.date(addDaysIso(k.DATUM, k.TAGESKONTO))} abzüglich ${fmt.num(k.SKONTO)} % Skonto` : ''}.`;
       if (zt && typ !== 'korrektur') html += `<div class="txt">${esc(zt)}</div>`;
     }
-    if (isRe && !es && !gb && !(isRe && k.LIEFDATUM)) html += '<div class="txt muted">Leistungsdatum entspricht dem Rechnungsdatum.</div>';
+    if (isRe && !es && !gb && !us && !(isRe && k.LIEFDATUM)) html += '<div class="txt muted">Leistungsdatum entspricht dem Rechnungsdatum.</div>';
     if (k.SCHLUSSTXT) html += `<div class="txt">${esc(k.SCHLUSSTXT)}</div>`;
-    if (formular === 'auftrag_mit_unterschrift') html += `<div class="txt" style="margin-top:6mm">Hiermit erteile ich den Auftrag zur Durchführung der oben genannten Arbeiten. Erforderliche Probefahrten dürfen durchgeführt werden. Es gelten die Allgemeinen Geschäftsbedingungen für die Ausführung von Arbeiten an Kraftfahrzeugen.</div><div class="sign"><div>Ort, Datum</div><div>Unterschrift Auftraggeber</div></div>`;
+    if (formular === 'auftrag_mit_unterschrift' && us) html += '<div class="txt" style="margin-top:6mm">Ich beauftrage die oben genannten Arbeiten bis zum angegebenen Betrag. Zusätzliche Arbeiten oder Mehrkosten nur nach meiner weiteren Freigabe.</div><div class="sign"><div>Ort, Datum</div><div>Unterschrift Auftraggeber</div></div>';
+    else if (formular === 'auftrag_mit_unterschrift') html += `<div class="txt" style="margin-top:6mm">Hiermit erteile ich den Auftrag zur Durchführung der oben genannten Arbeiten. Erforderliche Probefahrten dürfen durchgeführt werden. Es gelten die Allgemeinen Geschäftsbedingungen für die Ausführung von Arbeiten an Kraftfahrzeugen.</div><div class="sign"><div>Ort, Datum</div><div>Unterschrift Auftraggeber</div></div>`;
     if (formular === 'arbeitskarte') html += `<div class="box" style="min-height:45mm"><b>Notizen / ausgeführte Arbeiten:</b></div><div class="grid2"><div class="box">Monteur: ____________________</div><div class="box">Arbeitszeit: von _______ bis _______</div></div>`;
     if (typ === 'lieferschein') html += '<div class="sign"><div>Ware vollständig erhalten – Datum</div><div>Unterschrift Empfänger</div></div>';
-    if (typ === 'angebot' && formular === 'kostenvoranschlag') html += '<div class="txt muted">Dieser Kostenvoranschlag ist unverbindlich. Abweichungen bis 15 % bleiben vorbehalten.</div>';
+    if (us) {
+      if (k.STEUERART === 'EXEMPT') html += `<div class="txt">${esc(I18N.tr('Steuerfreier Verkauf (tax exempt)', Print.docLang()) + (d._kd && d._kd.EXEMPTCERT ? ' – ' + I18N.tr('Zertifikat', Print.docLang()) + ' ' + d._kd.EXEMPTCERT : '') + (d._kd && d._kd.EXEMPTREASON ? ' (' + d._kd.EXEMPTREASON + ')' : ''))}</div>`;
+      if (!ohnePreise && d.pos.some(p => p.POSART === 'A')) html += '<div class="txt muted">Alle Teile sind neu, sofern nicht anders angegeben.</div>';
+      if (k.USALTTEILE === 'zurueck') html += '<div class="txt">Ersetzte Teile wurden dem Kunden zurückgegeben.</div>';
+      if (k.USALTTEILE === 'entsorgt') html += '<div class="txt">Ersetzte Teile wurden auf Wunsch des Kunden entsorgt.</div>';
+      for (const a of freigaben) html += `<div class="txt muted">${esc(I18N.tr(`Freigegeben: ${fmt.money(a.betrag)} am ${fmt.date(a.datum)} (${I18N.tr(a.art || 'persönlich', Print.docLang())}) durch ${a.person || ''}`, Print.docLang()))}</div>`;
+      if (typ === 'angebot' && formular === 'kostenvoranschlag') html += '<div class="txt">Schriftlicher Kostenvoranschlag. Ohne Ihre Freigabe werden keine Arbeiten ausgeführt und keine Beträge über diesem Kostenvoranschlag berechnet.</div><div class="sign"><div>Datum</div><div>Unterschrift Kunde (Freigabe)</div></div>';
+    } else if (typ === 'angebot' && formular === 'kostenvoranschlag') html += '<div class="txt muted">Dieser Kostenvoranschlag ist unverbindlich. Abweichungen bis 15 % bleiben vorbehalten.</div>';
     return Print.sheet(html, f, kopf);
   },
   async vorgang(typ, d, opts = {}) {
     const f = await Print.ensureFirma();
-    if (d.kopf.KUNID) { try { const kd = await api('/api/rec/kunden/' + d.kopf.KUNID); d._ust = kd.USTID; } catch { /* ignore */ } }
+    if (d.kopf.KUNID) { try { const kd = await api('/api/rec/kunden/' + d.kopf.KUNID); d._ust = kd.USTID; d._kd = kd; } catch { /* ignore */ } }
+    // US: the invoice must not exceed the amount the customer authorized
+    if (LK.data && LK.data.land === 'US' && ENT.V[typ].table === 'RECHNUNGEN' && typ === 'rechnung') {
+      let fr = []; try { fr = JSON.parse(d.kopf.USFREIGABE || '[]'); } catch { /* none */ }
+      const max = fr.reduce((m, a) => Math.max(m, Number(a.betrag) || 0), 0);
+      if (fr.length && Number(d.kopf.GBRUTTO) > max + 0.005 && !(await confirmDlg(`Der Rechnungsbetrag ${fmt.money(d.kopf.GBRUTTO)} liegt über dem freigegebenen Betrag ${fmt.money(max)}. Trotzdem drucken?`, { ok: 'Drucken' }))) return;
+    }
     const html = Print.wrap(Print.vorgangHtml(typ, d, opts, f), f);
     await Print.preview(html, `${ENT.V[typ].title} ${d.kopf[ENT.V[typ].nr]} – Seitenvorschau`);
   },

@@ -189,6 +189,7 @@ function lookups() {
     land: L.land(),
     waehrung: L.waehrung(),
     gbRegistrado: L.land() === 'GB' && require('../gb').registrado(),
+    usLaborFree: L.land() === 'US' && !require('../us').laborTaxable(),
     recargo: require('../es').activo() ? require('../es').RECARGO : null,
     opt30: opts(30), opt40: opts(40), opt50: opts(50), opt60: opts(60), opt100: opts(100),
     ind,

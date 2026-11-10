@@ -48,13 +48,14 @@ const nfMoney = new Intl.NumberFormat(LOCALE, { minimumFractionDigits: 2, maximu
 const DATE_SEP = I18N.lang === 'de' ? '.' : '/';
 const fmt = {
   // currency of the tenant (lookups): euro after the number as before, pound sign in front
-  money: v => v == null || v === '' ? '' : (LK.data && LK.data.waehrung === 'GBP' ? (Number(v) < 0 ? '-£' : '£') + nfMoney.format(Math.abs(Number(v))) : nfMoney.format(Number(v)) + ' €'),
+  money: v => { if (v == null || v === '') return ''; const sym = { GBP: '£', USD: '$' }[LK.data && LK.data.waehrung]; return sym ? (Number(v) < 0 ? '-' : '') + sym + nfMoney.format(Math.abs(Number(v))) : nfMoney.format(Number(v)) + ' €'; },
   money0: v => v == null || v === '' ? '' : nfMoney.format(Number(v)),
   num: (v, d = 2) => v == null || v === '' ? '' : new Intl.NumberFormat(LOCALE, { minimumFractionDigits: 0, maximumFractionDigits: d }).format(Number(v)),
   num2: v => v == null || v === '' ? '' : nfMoney.format(Number(v)),
   int: v => v == null || v === '' ? '' : String(v),
-  date: v => { if (!v) return ''; const s = String(v); return s.length >= 10 ? `${s.slice(8, 10)}${DATE_SEP}${s.slice(5, 7)}${DATE_SEP}${s.slice(0, 4)}` : s; },
-  month: v => { if (!v) return ''; const s = String(v); return s.length >= 7 ? `${s.slice(5, 7)}${DATE_SEP}${s.slice(0, 4)}` : s; },
+  // day first; companies with the US tax system write the month first (MM/DD/YYYY)
+  date: v => { if (!v) return ''; const s = String(v); if (s.length < 10) return s; return LK.data && LK.data.land === 'US' ? `${s.slice(5, 7)}/${s.slice(8, 10)}/${s.slice(0, 4)}` : `${s.slice(8, 10)}${DATE_SEP}${s.slice(5, 7)}${DATE_SEP}${s.slice(0, 4)}`; },
+  month: v => { if (!v) return ''; const s = String(v); return s.length >= 7 ? `${s.slice(5, 7)}${LK.data && LK.data.land === 'US' ? '/' : DATE_SEP}${s.slice(0, 4)}` : s; },
   datetime: v => v ? fmt.date(v) + ' ' + String(v).slice(11, 16) : '',
   bool: v => Number(v) ? '✓' : '',
   pct: v => v == null || v === '' ? '' : fmt.num(v) + ' %',

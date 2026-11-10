@@ -73,7 +73,15 @@ Views.kasse = async (main) => {
   const tblWrap = h('div', { class: 'pos-wrap', style: { minHeight: '300px' } });
   const summe = h('div', { style: { fontSize: '38px', fontWeight: 700, textAlign: 'right', fontVariantNumeric: 'tabular-nums' } });
   const bestand = h('div', { class: 'hint', style: { textAlign: 'right' } });
-  const total = () => r2(lines.reduce((s, l) => s + r2(parseNum(l.MENGE) * parseNum(l.EINZEL) * (1 - parseNum(l.RABATT) / 100)), 0));
+  // US: prices before sales tax, the tax is added per rate (labor non-taxable if so set)
+  const us = LK.data && LK.data.land === 'US';
+  const zeile = l => r2(parseNum(l.MENGE) * parseNum(l.EINZEL) * (1 - parseNum(l.RABATT) / 100));
+  const usRate = l => Number(l.DURCHLAUFER) === 1 || (LK.data.usLaborFree && l.POSART === 'L') ? 0 : LK.rate(l.MWST || 61);
+  const total = () => {
+    if (!us) return r2(lines.reduce((s, l) => s + zeile(l), 0));
+    const g = {}; for (const l of lines) g[usRate(l)] = (g[usRate(l)] || 0) + zeile(l);
+    return r2(Object.entries(g).reduce((s, [rt, n]) => s + r2(n) + r2(r2(n) * Number(rt) / 100), 0));
+  };
   const draw = () => {
     const tbl = h('table', { class: 'pos' }, h('thead', null, h('tr', null, ['Bezeichnung', 'Menge', 'Einzel', 'Rabatt %', 'MwSt', 'Summe', ''].map(x => h('th', null, x)))));
     const tb = h('tbody');
@@ -86,21 +94,21 @@ Views.kasse = async (main) => {
     tbl.append(tb); tblWrap.innerHTML = ''; tblWrap.append(tbl);
     if (!lines.length) tblWrap.append(h('div', { class: 'grid-empty' }, 'Artikel scannen, Schnelltaste drücken oder über die Schaltflächen hinzufügen.'));
     summe.textContent = fmt.money(total());
-    bestand.textContent = T(`Kassenbestand: ${fmt.money(st.bestand)}${st.land === 'ES' ? ' · VERI*FACTU' : st.land === 'GB' ? '' : st.tse.aktiv ? ' · TSE aktiv' : ' · ohne TSE'}`);
+    bestand.textContent = T(`Kassenbestand: ${fmt.money(st.bestand)}${st.land === 'ES' ? ' · VERI*FACTU' : st.land === 'GB' ? '' : st.land === 'US' ? ` · ${T('inkl. Sales Tax')}` : st.tse.aktiv ? ' · TSE aktiv' : ' · ohne TSE'}`);
   };
   const addArtikel = async (artid, menge = 1) => {
     const a = await api('/api/rec/artikel/' + artid);
     const mw = a.MWST > 0 ? a.MWST : 61;
     const ex = lines.find(l => l.ARTID === a.ARTID && l.POSART === 'A');
     if (ex) ex.MENGE = parseNum(ex.MENGE) + menge;
-    else lines.push({ POSART: 'A', ARTID: a.ARTID, ARTNUMMER: a.ARTNUMMER, BEZEICHNUNG: a.BEZEICHNUNG1, MENGE: menge, EINZEL: r2((a.VKPNETTO || 0) * (1 + LK.rate(mw) / 100)), MWST: mw, EK: a.EKPNETTO || 0, EINHEITID: a.EINHEITID });
+    else lines.push({ POSART: 'A', ARTID: a.ARTID, ARTNUMMER: a.ARTNUMMER, BEZEICHNUNG: a.BEZEICHNUNG1, MENGE: menge, EINZEL: r2((a.VKPNETTO || 0) * (us ? 1 : 1 + LK.rate(mw) / 100)), MWST: mw, EK: a.EKPNETTO || 0, EINHEITID: a.EINHEITID });
     draw();
   };
   const addAw = async (id, menge) => {
     const aw = await api('/api/rec/arbeitswerte/' + id);
     const ks = LK.list('kostensaetze').find(x => String(x.id) === String(aw.KOSTENSATZID));
     const fest = Number(aw.FESTPREISCHECK) === 1 || !ks; const mw = aw.MWST > 0 ? aw.MWST : 61;
-    lines.push({ POSART: 'L', ARTID: aw.LEISTUNGID, ARTNUMMER: aw.LEISTUNGNUMMER, BEZEICHNUNG: aw.BEZEICHNUNG1, MENGE: menge ?? (fest ? 1 : aw.ANZAHLAW || 1), EINZEL: r2((fest ? aw.VKPNETTO || 0 : ks.preis || 0) * (1 + LK.rate(mw) / 100)), MWST: mw, DURCHLAUFER: aw.DURCHLAUF || 0, EINHEITID: aw.EINHEITID });
+    lines.push({ POSART: 'L', ARTID: aw.LEISTUNGID, ARTNUMMER: aw.LEISTUNGNUMMER, BEZEICHNUNG: aw.BEZEICHNUNG1, MENGE: menge ?? (fest ? 1 : aw.ANZAHLAW || 1), EINZEL: r2((fest ? aw.VKPNETTO || 0 : ks.preis || 0) * (us ? 1 : 1 + LK.rate(mw) / 100)), MWST: mw, DURCHLAUFER: aw.DURCHLAUF || 0, EINHEITID: aw.EINHEITID });
     draw();
   };
   eingabe.addEventListener('keydown', async e => {

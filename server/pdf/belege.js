@@ -14,10 +14,10 @@ const loc = () => I18N.locale(LANG);
 const sep = () => (LANG === 'de' ? '.' : '/');
 const money = v => v == null || v === '' ? '' : L.geld(v, loc());
 const num = (v, d = 3) => v == null || v === '' ? '' : new Intl.NumberFormat(loc(), { maximumFractionDigits: d }).format(Number(v));
-const date = v => v ? [String(v).slice(8, 10), String(v).slice(5, 7), String(v).slice(0, 4)].join(sep()) : '';
+const date = v => !v ? '' : L.land() === 'US' ? [String(v).slice(5, 7), String(v).slice(8, 10), String(v).slice(0, 4)].join('/') : [String(v).slice(8, 10), String(v).slice(5, 7), String(v).slice(0, 4)].join(sep());
 const month = v => v ? String(v).slice(5, 7) + sep() + String(v).slice(0, 4) : '';
 // postcode and town: "12345 Berlin", in the UK "London SW1A 1AA"
-const plzOrt = (plz, ort) => (L.land() === 'GB' ? [ort, plz] : [plz, ort]).filter(Boolean).join(' ');
+const plzOrt = (plz, ort) => (['GB', 'US'].includes(L.land()) ? [ort, plz] : [plz, ort]).filter(Boolean).join(' ');
 const GREY = [85, 85, 85]; const BLUE = [30, 63, 110];
 const TITLES = { angebot: 'Angebot', kostenvoranschlag: 'Kostenvoranschlag', auftrag: 'Auftrag', arbeitskarte: 'Arbeitskarte', auftrag_mit_unterschrift: 'Auftrag', lieferschein: 'Lieferschein', lieferschein_preise: 'Lieferschein', rechnung: 'Rechnung', rechnung_ohne_kopf: 'Rechnung', rechnungskorrektur: 'Rechnungskorrektur', gutschrift: 'Gutschrift', 'storno-rechnung': 'Stornorechnung', anzahlung: 'Anzahlungsrechnung', abschlag: 'Abschlagsrechnung', schluss: 'Schlussrechnung' };
 
@@ -83,7 +83,7 @@ class Layout {
           [f.FIRMENNAME, f.FIRMENZUSATZ, f.STRASSE, plzOrt(f.PLZ, f.ORT)],
           [f.TELEFON && 'Tel.: ' + f.TELEFON, f.FAX && 'Fax: ' + f.FAX, f.EMAIL, f.INTERNETSEITE],
           [f.BANKNAME, f.IBAN && 'IBAN: ' + f.IBAN, f.BIC && 'BIC: ' + f.BIC, f.BANKINHABER && 'Inhaber: ' + f.BANKINHABER],
-          [...(require('../es').activo() ? [(f.STEUERNR || f.USTNR) && 'NIF: ' + (f.STEUERNR || f.USTNR)] : L.land() === 'GB' ? [f.USTNR && 'VAT-Reg.-Nr.: ' + f.USTNR] : [f.USTNR && 'USt-IdNr.: ' + f.USTNR, f.STEUERNR && 'Steuer-Nr.: ' + f.STEUERNR]), f.HANDELSREGISTER, f.GESCHAEFTSFUEHRER && 'Inhaber/GF: ' + f.GESCHAEFTSFUEHRER],
+          [...(require('../es').activo() ? [(f.STEUERNR || f.USTNR) && 'NIF: ' + (f.STEUERNR || f.USTNR)] : L.land() === 'US' ? [L.sw('us.reg.nr', '') && `${L.sw('us.reg.label', 'Registration No.')}: ${L.sw('us.reg.nr', '')}`] : L.land() === 'GB' ? [f.USTNR && 'VAT-Reg.-Nr.: ' + f.USTNR] : [f.USTNR && 'USt-IdNr.: ' + f.USTNR, f.STEUERNR && 'Steuer-Nr.: ' + f.STEUERNR]), f.HANDELSREGISTER, f.GESCHAEFTSFUEHRER && 'Inhaber/GF: ' + f.GESCHAEFTSFUEHRER],
         ];
         cols.forEach((c, ci) => { let y = 278; for (const l of c.filter(Boolean)) { d.text(this.L + ci * 44.5, y, l.slice(0, 48), { size: 6.8, color: GREY }); y += 3.1; } });
       }
@@ -118,6 +118,7 @@ function addrLines(a) {
   if (a.zusatz) out.push(a.zusatz);
   if (a.strasse) out.push(a.strasse);
   if (L.land() === 'GB') out.push(a.ort, a.plz); // UK: town, then postcode on its own line
+  else if (L.land() === 'US') out.push([a.ort, a.plz].filter(Boolean).join(' ')); // US: "Springfield, IL 62701"
   else out.push([a.plz, a.ort].filter(Boolean).join(' '));
   if (a.land && a.land !== (L.firma().LAND || 'DE')) out.push(a.land);
   return out.filter(Boolean);
@@ -139,6 +140,11 @@ function vorgangPdf(typ, d, opts = {}) {
   const gb = L.land() === 'GB'; const gbReg = gb && require('../gb').registrado();
   const rates = L.mwstRates();
   const gbSatz = p => Number(p.DURCHLAUFER) === 1 || k.STEUERART === 'REVERSE_CHARGE' ? '–' : Number(p.DIFFSTEUER) === 1 ? 'Marge' : k.STEUERART ? '0 %' : Number(p.MWST) === 63 ? 'frei' : num(rates[Number(p.MWST) || 61] ?? 0, 2) + ' %';
+  // US: sales tax marker per line, condition of parts, authorizations of the estimate
+  const us = L.land() === 'US'; const usLaborFree = us && L.sw('us.labor.taxable', '0') !== '1';
+  const usTax = p => Number(p.DURCHLAUFER) === 1 || k.STEUERART || (usLaborFree && p.POSART === 'L') ? '' : (rates[Number(p.MWST) || 61] ?? 0) > 0 ? 'T' : '';
+  const zustand = p => ({ GEBRAUCHT: '(gebraucht)', AUFBEREITET: '(aufbereitet)' }[p.TEILEZUSTAND] || '');
+  const freigaben = (() => { try { return JSON.parse(k.USFREIGABE || '[]'); } catch { return []; } })();
   const titleGb = gb && isRe && ['rechnung', 'rechnung_ohne_kopf', 'rechnungskorrektur', 'storno-rechnung', 'gutschrift'].includes(formular) ? (typ === 'korrektur' ? 'Gutschrift' : gbReg ? 'Umsatzsteuerrechnung' : 'Rechnung') : null;
   const ein = Object.fromEntries(L.db().prepare('SELECT EINHEITID, BEZEICHNUNG FROM EINHEITEN').all().map(e => [e.EINHEITID, e.BEZEICHNUNG]));
   const titel = vf ? ({ F1: 'Rechnung', F2: 'Vereinfachte Rechnung', R5: 'Vereinfachte Rechnungskorrektur' }[vf.tipo] || 'Rechnungskorrektur') : titleGb || title;
@@ -167,14 +173,14 @@ function vorgangPdf(typ, d, opts = {}) {
     lay.y = qy + Q + 11;
   } else lay.y += 11;
   if (k.FAHRKENNZEICHEN || k.FAHRMARKE) {
-    const cells = [['Kennzeichen', k.FAHRKENNZEICHEN], ['Fahrzeug', [k.FAHRMARKE, k.FAHRMODELL].filter(Boolean).join(' ')], ['FIN', k.FAHRIDENTNR], ['Erstzulassung', date(k.FAHREZ)], ['KM-Stand', k.FAHRKM ? num(k.FAHRKM, 0) : ''], ['HU', month(k.FAHRHU)]];
+    const cells = [['Kennzeichen', k.FAHRKENNZEICHEN], ['Fahrzeug', [k.FAHRMARKE, k.FAHRMODELL].filter(Boolean).join(' ')], ['FIN', k.FAHRIDENTNR], ['Erstzulassung', date(k.FAHREZ)], ...(us ? [['Tacho bei Annahme', k.FAHRKM ? num(k.FAHRKM, 0) : ''], ['Tacho bei Rückgabe', k.FAHRKMOUT ? num(k.FAHRKMOUT, 0) : '']] : [['KM-Stand', k.FAHRKM ? num(k.FAHRKM, 0) : ''], ['HU', month(k.FAHRHU)]])];
     doc.rect(lay.L, lay.y, lay.R - lay.L, 11, { stroke: [170, 170, 170], lw: 0.5 });
     cells.forEach(([a, b], i) => { const x = lay.L + 2.5 + (i % 3) * 58, y = lay.y + 4 + Math.floor(i / 3) * 4.5; doc.text(x, y, a + ':', { size: 8.3, color: GREY }); const lw = doc.width(a + ': ', 'R', 8.3); doc.text(x + lw, y, fit(doc, String(b || ''), 55 - lw, i === 0 ? 'B' : 'R', 8.3), { size: 8.3, f: i === 0 ? 'B' : 'R' }); });
     lay.y += 14;
   }
   lay.para(k.EINLEITUNGTXT);
   // table
-  const vatCol = gbReg && !ohnePreise;
+  const vatCol = (gbReg || us) && !ohnePreise;
   const C = ohnePreise ? { pos: 20, art: 29, bez: 56, menge: 196 }
     : vatCol ? { pos: 20, art: 29, bez: 56, menge: rabatt ? 128 : 136, ep: rabatt ? 148 : 156, vat: rabatt ? 160 : 170, rab: 172, sum: 196 }
       : { pos: 20, art: 29, bez: 56, menge: rabatt ? 138 : 146, ep: rabatt ? 158 : 170, rab: 172, sum: 196 };
@@ -183,7 +189,7 @@ function vorgangPdf(typ, d, opts = {}) {
     doc.rect(lay.L, lay.y, lay.R - lay.L, 6, { fill: [238, 243, 249] });
     const y = lay.y + 4.2; const o = { f: 'B', size: 8.3 };
     doc.text(C.pos + 1, y, 'Pos.', o); doc.text(C.art, y, 'Art.-Nr.', o); doc.text(C.bez, y, 'Bezeichnung', o); doc.text(C.menge, y, 'Menge', { ...o, align: 'right' });
-    if (!ohnePreise) { doc.text(C.ep, y, 'E-Preis', { ...o, align: 'right' }); if (rabatt) doc.text(C.rab, y, 'Rabatt', { ...o, align: 'right' }); if (vatCol) doc.text(C.vat, y, 'MwSt', { ...o, align: 'right' }); doc.text(C.sum, y, 'Gesamt', { ...o, align: 'right' }); }
+    if (!ohnePreise) { doc.text(C.ep, y, 'E-Preis', { ...o, align: 'right' }); if (rabatt) doc.text(C.rab, y, 'Rabatt', { ...o, align: 'right' }); if (vatCol) doc.text(C.vat, y, us ? 'Steuer' : 'MwSt', { ...o, align: 'right' }); doc.text(C.sum, y, 'Gesamt', { ...o, align: 'right' }); }
     doc.line(lay.L, lay.y + 6, lay.R, lay.y + 6, { w: 0.6 });
     lay.y += 7.5;
   };
@@ -205,7 +211,7 @@ function vorgangPdf(typ, d, opts = {}) {
     nr++;
     if (Number(p.DURCHLAUFER) === 1) hatDP = true;
     if (Number(p.DIFFSTEUER) === 1) hatDiff = true;
-    const name = (p.BEZEICHNUNG || p.BESCHREIBUNG || '') + (Number(p.DURCHLAUFER) === 1 ? ' (DP)' : '');
+    const name = (p.BEZEICHNUNG || p.BESCHREIBUNG || '') + (us && zustand(p) ? ' ' + I18N.tr(zustand(p), LANG) : '') + (Number(p.DURCHLAUFER) === 1 ? ' (DP)' : '');
     const sub = [p.BEZEICHNUNG ? p.BESCHREIBUNG : null, p.ARBEITSTEXT, p.MEMOTEXT].filter(x => x && String(x).trim()).join('\n');
     const l1 = doc.wrap(name, bezW, 'R', 9); const l2 = sub ? doc.wrap(sub, bezW, 'R', 7.8) : [];
     const h = l1.length * 4 + l2.length * 3.4 + 2.5;
@@ -216,7 +222,7 @@ function vorgangPdf(typ, d, opts = {}) {
     if (!ohnePreise) {
       doc.text(C.ep, y, money(brutto ? p.VKBRUTTO : p.VK), { size: 9, align: 'right' });
       if (rabatt && Number(p.RABATT)) doc.text(C.rab, y, num(p.RABATT, 2) + ' %', { size: 9, align: 'right' });
-      if (vatCol) doc.text(C.vat, y, gbSatz(p), { size: 8.5, align: 'right' });
+      if (vatCol) doc.text(C.vat, y, us ? usTax(p) : gbSatz(p), { size: 8.5, align: 'right' });
       doc.text(C.sum, y, money(brutto ? p.SUMMEBRUTTO : p.SUMME), { size: 9, align: 'right' });
     }
     let yy = lay.y;
@@ -231,11 +237,11 @@ function vorgangPdf(typ, d, opts = {}) {
     const rows = [];
     const tax = d.tax || {};
     if (!klein) {
-      rows.push(['Summe netto', money(k.GNETTO)]);
-      for (const t of Object.values(tax).filter(x => x.rate > 0)) rows.push([`zzgl. ${num(t.rate, 2)} % MwSt auf ${money(t.netto)}`, money(t.mwst)]);
+      rows.push([us ? 'Zwischensumme' : 'Summe netto', money(k.GNETTO)]);
+      for (const t of Object.values(tax).filter(x => x.rate > 0)) rows.push([`zzgl. ${num(t.rate, 2)} % ${us ? 'Sales Tax' : 'MwSt'} auf ${money(t.netto)}`, money(t.mwst)]);
       for (const t of Object.values(tax).filter(x => x.recargo)) rows.push([`zzgl. ${num(t.reRate, 2)} % Recargo de equivalencia auf ${money(t.netto)}`, money(t.recargo)]);
       const frei = Object.values(tax).filter(x => !x.rate).reduce((s, x) => s + x.netto, 0);
-      if (frei) rows.push(['davon steuerfrei / durchlaufend', money(frei), GREY]);
+      if (frei) rows.push([us ? 'davon nicht steuerpflichtig' : 'davon steuerfrei / durchlaufend', money(frei), GREY]);
     }
     lay.ensure(rows.length * 5 + 18);
     lay.y += 2;
@@ -251,7 +257,8 @@ function vorgangPdf(typ, d, opts = {}) {
       doc.text(110, lay.y + 3.5, 'Offener Betrag', { size: 9.2, f: 'B' }); doc.text(lay.R, lay.y + 3.5, money(L.r2(k.GBRUTTO - bez)), { size: 9.2, f: 'B', align: 'right' }); lay.y += 7;
     }
     if (klein && L.land() === 'DE') lay.para('Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.', { color: GREY });
-    if (hatDP && gb) lay.para('(DP) = Auslage im Namen des Kunden (disbursement), nicht umsatzsteuerbar.', { color: GREY, size: 8.5 });
+    if (hatDP && us) lay.para('(DP) = Durchlaufende Gebühr, nicht steuerpflichtig.', { color: GREY, size: 8.5 });
+    else if (hatDP && gb) lay.para('(DP) = Auslage im Namen des Kunden (disbursement), nicht umsatzsteuerbar.', { color: GREY, size: 8.5 });
     else if (hatDP) lay.para(es ? '(DP) = Suplido: im Namen und für Rechnung des Kunden verauslagt, nicht Teil der Bemessungsgrundlage (Art. 78.Tres.3.º LIVA).' : '(DP) = Durchlaufender Posten gemäß § 10 Abs. 1 Satz 6 UStG, nicht umsatzsteuerpflichtig.', { color: GREY, size: 8.5 });
     if (es && k.STEUERART) lay.para({ REVERSE_CHARGE: 'Nicht steuerbar in Spanien, Steuerschuldnerschaft des Leistungsempfängers (Art. 69 und 84.Uno.2.º LIVA).', IG_LIEFERUNG: 'Steuerfreie innergemeinschaftliche Lieferung (Art. 25 LIVA).', AUSFUHR: 'Steuerfreie Ausfuhr (Art. 21 LIVA).' }[k.STEUERART] || '', { size: 9 });
     if (vf && vf.tipo && vf.tipo[0] === 'R') lay.para(`Grund der Korrektur: ${vf.tipo} – ${vf.motivo}`, { size: 9, color: GREY });
@@ -280,9 +287,20 @@ function vorgangPdf(typ, d, opts = {}) {
     for (const l of zeilen) { doc.text(tx, ty, l, { size: 8.2, color: BLUE }); ty += 3.8; }
     lay.y = Math.max(y0 + Q, ty) + 3;
   }
+  if (us) {
+    if (k.STEUERART === 'EXEMPT') {
+      const kd = k.KUNID ? L.db().prepare('SELECT EXEMPTCERT, EXEMPTREASON FROM KUNDEN WHERE KUNID=?').get(k.KUNID) || {} : {};
+      lay.para(I18N.tr('Steuerfreier Verkauf (tax exempt)', LANG) + (kd.EXEMPTCERT ? ' – ' + I18N.tr('Zertifikat', LANG) + ' ' + kd.EXEMPTCERT : '') + (kd.EXEMPTREASON ? ` (${kd.EXEMPTREASON})` : ''), { size: 9 });
+    }
+    if (!ohnePreise && d.pos.some(p => p.POSART === 'A')) lay.para('Alle Teile sind neu, sofern nicht anders angegeben.', { size: 8.5, color: GREY });
+    if (k.USALTTEILE === 'zurueck') lay.para('Ersetzte Teile wurden dem Kunden zurückgegeben.', { size: 9 });
+    if (k.USALTTEILE === 'entsorgt') lay.para('Ersetzte Teile wurden auf Wunsch des Kunden entsorgt.', { size: 9 });
+    for (const a of freigaben) lay.para(`Freigegeben: ${money(a.betrag)} am ${date(a.datum)} (${I18N.tr(a.art || 'persönlich', LANG)}) durch ${a.person || ''}`, { size: 8.5, color: GREY });
+  }
   lay.para(k.SCHLUSSTXT);
   const sign = (a, b) => { lay.ensure(24); lay.y += 16; doc.line(lay.L, lay.y, lay.L + 75, lay.y, { w: 0.4 }); doc.line(115, lay.y, lay.R, lay.y, { w: 0.4 }); doc.text(lay.L, lay.y + 3.5, a, { size: 8, color: GREY }); doc.text(115, lay.y + 3.5, b, { size: 8, color: GREY }); lay.y += 6; };
-  if (formular === 'auftrag_mit_unterschrift') { lay.para('Hiermit erteile ich den Auftrag zur Durchführung der oben genannten Arbeiten. Erforderliche Probefahrten dürfen durchgeführt werden. Es gelten die Allgemeinen Geschäftsbedingungen für die Ausführung von Arbeiten an Kraftfahrzeugen.'); sign('Ort, Datum', 'Unterschrift Auftraggeber'); }
+  if (us && typ === 'angebot' && formular === 'kostenvoranschlag') { lay.para('Schriftlicher Kostenvoranschlag. Ohne Ihre Freigabe werden keine Arbeiten ausgeführt und keine Beträge über diesem Kostenvoranschlag berechnet.'); sign('Datum', 'Unterschrift Kunde (Freigabe)'); }
+  if (us && formular === 'auftrag_mit_unterschrift') { lay.para('Ich beauftrage die oben genannten Arbeiten bis zum angegebenen Betrag. Zusätzliche Arbeiten oder Mehrkosten nur nach meiner weiteren Freigabe.'); sign('Ort, Datum', 'Unterschrift Auftraggeber'); } else if (formular === 'auftrag_mit_unterschrift') { lay.para('Hiermit erteile ich den Auftrag zur Durchführung der oben genannten Arbeiten. Erforderliche Probefahrten dürfen durchgeführt werden. Es gelten die Allgemeinen Geschäftsbedingungen für die Ausführung von Arbeiten an Kraftfahrzeugen.'); sign('Ort, Datum', 'Unterschrift Auftraggeber'); }
   if (formular === 'arbeitskarte') { lay.ensure(50); doc.rect(lay.L, lay.y + 2, lay.R - lay.L, 40, { stroke: [150, 150, 150] }); doc.text(lay.L + 2, lay.y + 6, 'Notizen / ausgeführte Arbeiten:', { f: 'B', size: 9 }); lay.y += 45; lay.para('Monteur: ______________________     Arbeitszeit: von ________ bis ________'); }
   if (typ === 'lieferschein') sign('Ware vollständig erhalten – Datum', 'Unterschrift Empfänger');
   if (opts.attach) doc.attach(opts.attach.name, opts.attach.data, { mime: 'text/xml', relationship: 'Alternative', description: opts.attach.description });
