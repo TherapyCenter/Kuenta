@@ -156,7 +156,7 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
     <div class="kicker">Invoicing &amp; POS for auto repair shops · Bedienung, Einrichtung, Betrieb</div>
     <h1>Kuenta Handbuch</h1>
     <p>Alles, was Sie für Installation, Einrichtung, die tägliche Arbeit, den E-Mail-Versand, Updates und die Datensicherung von Kuenta wissen müssen.</p>
-    <div class="meta"><span>Version <b>1.4.0</b></span><span>Stand <b>November 2026</b></span><span>Windows · macOS · Linux · Tablet</span><span><a href="handbook-en.html" hreflang="en">English</a> · <a href="handbook-es.html" hreflang="es">Español</a></span></div>
+    <div class="meta"><span>Version <b>1.4.1</b></span><span>Stand <b>November 2026</b></span><span>Windows · macOS · Linux · Tablet</span><span><a href="handbook-en.html" hreflang="en">English</a> · <a href="handbook-es.html" hreflang="es">Español</a></span></div>
   </header>
 
   <nav class="toc" aria-label="Inhalt">
@@ -205,7 +205,7 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
 
       <h3>Windows 10 / 11 (64 Bit)</h3>
       <ol class="steps">
-        <li><div><strong><code>Kuenta-Setup-1.4.0.exe</code> ausführen.</strong><span>Node.js ist im Installer enthalten, es muss nichts weiter installiert werden.</span></div></li>
+        <li><div><strong><code>Kuenta-Setup-1.4.1.exe</code> ausführen.</strong><span>Node.js ist im Installer enthalten, es muss nichts weiter installiert werden.</span></div></li>
         <li><div><strong>Installationsart wählen.</strong><span><em>Für alle Benutzer</em> (Standard, braucht Administratorrechte) installiert nach <code>C:\Programme\Kuenta</code>. <em>Nur für mich</em> kommt ohne Administratorrechte aus und installiert ins Benutzerprofil.</span></div></li>
         <li><div><strong>Optionen auswählen.</strong><span>Desktop-Verknüpfung und, für den Netzwerkbetrieb, die Firewall-Freigabe (nur bei Installation für alle Benutzer).</span></div></li>
         <li><div><strong>Starten:</strong><span>Startmenü <span class="path">Kuenta</span>. Es öffnen sich das Konsolenfenster und der Browser mit <code>http://127.0.0.1:3700</code>.</span></div></li>
@@ -260,9 +260,9 @@ loginctl enable-linger "$USER"</code></pre></div>
       <h3>Container (Docker / Podman)</h3>
       <p>Für Linux-Server, NAS-Systeme, Raspberry Pi oder Macs läuft Kuenta auch im Container. Das Image bringt Node.js mit und läuft auf x86_64 und ARM64. Im Kuenta-Ordner liegen dafür ein <code>Dockerfile</code> und eine <code>compose.yaml</code>.</p>
       <div class="codeblock"><pre><code># Podman (bei Docker: podman durch docker ersetzen)
-podman build -t kuenta:1.4.0 .
+podman build -t kuenta:1.4.1 .
 podman run -d --name kuenta --restart unless-stopped \
-  -p 3700:3700 -v kuenta-daten:/data kuenta:1.4.0
+  -p 3700:3700 -v kuenta-daten:/data kuenta:1.4.1
 
 # oder mit Compose
 docker compose up -d --build</code></pre></div>
@@ -768,7 +768,7 @@ docker compose up -d --build</code></pre></div>
       </ol>
       <h3>Ohne Rückfragen ausrollen</h3>
       <p>Für Skripte oder Softwareverteilung:</p>
-      <div class="codeblock"><pre><code>Kuenta-Setup-1.4.0.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART</code></pre></div>
+      <div class="codeblock"><pre><code>Kuenta-Setup-1.4.1.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART</code></pre></div>
       <div class="tablewrap"><table>
         <thead><tr><th>Schalter</th><th>Wirkung</th></tr></thead>
         <tbody>
@@ -920,7 +920,7 @@ npm run installer:windows   # Windows-Installer bauen</code></pre></div>
     </section>
   </main>
 
-  <footer>Kuenta 1.4.0 · © 2026 DoctorD · Open Source unter der GNU AGPL 3.0, Pro-Funktionen mit Lizenz · Schrift in den Belegen: Liberation Sans (SIL Open Font License) · QR-Code: qrcode-generator (MIT)</footer>
+  <footer>Kuenta 1.4.1 · © 2026 DoctorD · Open Source unter der GNU AGPL 3.0, Pro-Funktionen mit Lizenz · Schrift in den Belegen: Liberation Sans (SIL Open Font License) · QR-Code: qrcode-generator (MIT)</footer>
 </div>
 
 <script>

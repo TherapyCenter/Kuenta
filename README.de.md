@@ -13,7 +13,7 @@ Handbuch: **[Deutsch](docs/handbuch.html)** · **[English](docs/handbook-en.html
 |---|---|---|
 | Windows | `Kuenta-Setup-<Version>.exe` (Node.js ist enthalten) | Startmenü → *Kuenta* bzw. *Kuenta im Netzwerk* |
 | Linux / macOS | Node.js ab 22.13, dann `./installer/unix/install.sh` | `kuenta` (Netzwerk: `kuenta --netzwerk`) |
-| Container (Docker/Podman) | `podman build -t kuenta:1.4.0 .` bzw. `docker compose up -d --build` | `http://<Rechner>:3700` (Daten im Volume `/data`) |
+| Container (Docker/Podman) | `podman build -t kuenta:1.4.1 .` bzw. `docker compose up -d --build` | `http://<Rechner>:3700` (Daten im Volume `/data`) |
 | ohne Installation | Node.js ab 22.13 | `Kuenta starten.bat` bzw. `./kuenta.sh` oder `node server/index.js --open` |
 
 Danach öffnet sich der Browser mit `http://127.0.0.1:3700`. Im Netzwerkbetrieb zeigt das Startfenster die Adresse für die anderen Geräte an. **Wichtig:** Im Netzwerkbetrieb unter *Einstellungen → Vorgabewerte* die Anmeldung aktivieren und Benutzer anlegen.
