@@ -1,7 +1,7 @@
 {
   "name": "kuenta",
   "version": "1.1.0",
-  "description": "Kuenta – Werkstatt-Faktura als plattformunabhängige Webanwendung (übernimmt Datensicherungen aus KFZ-Faktura)",
+  "description": "Kuenta – invoicing & point of sale for auto repair shops, runs in the browser on any platform (imports KFZ-Faktura backups)",
   "main": "server/index.js",
   "private": true,
   "license": "SEE LICENSE IN LICENSE",

@@ -70,7 +70,7 @@ else
 [Desktop Entry]
 Type=Application
 Name=Kuenta
-Comment=Werkstatt-Faktura
+Comment=Invoicing & POS for auto repair shops
 Exec="$PREFIX/kuenta.sh"
 Icon=kuenta
 Terminal=true

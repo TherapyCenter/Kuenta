@@ -1,10 +1,11 @@
-# Kuenta – Werkstatt-Faktura als Webanwendung
+# Kuenta – Invoicing & POS for auto repair shops
 
 Kuenta ist eine plattformunabhängige Faktura für Kfz-Werkstätten. Es läuft im Browser auf Windows, macOS, Linux und Tablets und übernimmt den kompletten Datenbestand aus **KFZ-Faktura** (Datensicherung `*.kfz`, `DB1.bak` oder direkt aus dem Programmordner). Bedienung und Masken sind an KFZ-Faktura angelehnt: Menüleiste, Navigationsmenü, Schnellmenü, Übersichtstabellen mit Suchleiste und Buchstabenleiste, „Weitere Funktionen“ und Rechtsklick-Menüs, Eingabemasken mit Reitern.
 
 ## Installation und Start
 
 Ausführliche Anleitung für Windows, Linux und macOS: **[INSTALL.md](INSTALL.md)**.
+Handbuch: **[Deutsch](docs/handbuch.html)** · **[English](docs/handbook-en.html)** · **[Español](docs/handbook-es.html)**.
 
 | System | Installation | Start |
 |---|---|---|

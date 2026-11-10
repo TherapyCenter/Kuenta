@@ -1,5 +1,5 @@
 'use strict';
-// Kuenta – workshop invoicing as a web application
+// Kuenta – Invoicing & POS for auto repair shops (web application)
 const http = require('http');
 const fs = require('fs');
 const path = require('path');

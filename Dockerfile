@@ -40,5 +40,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
 CMD ["node", "server/index.js"]
 
 LABEL org.opencontainers.image.title="Kuenta" \
-      org.opencontainers.image.description="Werkstatt-Faktura als Webanwendung" \
+      org.opencontainers.image.description="Invoicing & POS for auto repair shops" \
       org.opencontainers.image.version="1.0.7"

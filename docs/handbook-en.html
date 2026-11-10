@@ -1,0 +1,873 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Kuenta Handbook</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: workshop manual – fixed table of contents on the left, reading column on the right; single column with collapsible contents on phones */
+:root {
+  --bg: #f3f5f7;
+  --paper: #ffffff;
+  --ink: #18212b;
+  --muted: #5a6876;
+  --line: #d7dde3;
+  --accent: #1d5c9e;
+  --accent-soft: #e3edf8;
+  --warn: #9a5b00;
+  --warn-soft: #fbf0dc;
+  --ok: #1f7a4d;
+  --ok-soft: #e1f3e9;
+  --code-bg: #eef1f4;
+  --f-display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --f-body: "Source Sans 3", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-mono: "JetBrains Mono", Consolas, "Cascadia Mono", monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f151b; --paper: #161e26; --ink: #e3e9ef; --muted: #98a6b4; --line: #2a3541;
+    --accent: #6ea8e6; --accent-soft: #1a2b3d; --warn: #e8b05a; --warn-soft: #2e2416;
+    --ok: #63c592; --ok-soft: #15291f; --code-bg: #1d2731; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f151b; --paper: #161e26; --ink: #e3e9ef; --muted: #98a6b4; --line: #2a3541;
+  --accent: #6ea8e6; --accent-soft: #1a2b3d; --warn: #e8b05a; --warn-soft: #2e2416;
+  --ok: #63c592; --ok-soft: #15291f; --code-bg: #1d2731; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--f-body); font-size: 17px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+
+.shell { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 48px; padding-block: 40px 80px; }
+
+/* header */
+.masthead { grid-column: 1 / -1; display: grid; gap: 10px; padding-bottom: 28px; border-bottom: 3px solid var(--ink); }
+.masthead .kicker { font-family: var(--f-mono); font-size: 13px; color: var(--muted); letter-spacing: .04em; }
+.masthead h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(44px, 7vw, 76px); line-height: .95; margin: 0; letter-spacing: -.01em; text-wrap: balance; }
+.masthead p { margin: 0; max-width: 62ch; color: var(--muted); font-size: 19px; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 20px; font-family: var(--f-mono); font-size: 13px; color: var(--muted); }
+.meta b { color: var(--ink); font-weight: 500; }
+
+/* table of contents */
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); align-self: start; max-height: calc(100vh - 40px); overflow-y: auto; font-size: 15px; }
+nav.toc .label { font-family: var(--f-display); font-weight: 600; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: toc; display: grid; gap: 1px; }
+nav.toc li { counter-increment: toc; }
+nav.toc a { display: grid; grid-template-columns: 26px 1fr; padding: 4px 8px; border-left: 2px solid var(--line); color: var(--ink); text-decoration: none; }
+nav.toc a::before { content: counter(toc, decimal-leading-zero); font-family: var(--f-mono); font-size: 11px; color: var(--muted); padding-top: 4px; }
+nav.toc a:hover { background: var(--accent-soft); }
+nav.toc a.active { border-left-color: var(--accent); color: var(--accent); font-weight: 600; }
+details.toc-mobile { display: none; }
+
+/* content */
+main { min-width: 0; display: grid; gap: 56px; }
+section { display: grid; gap: 14px; min-width: 0; }
+section > h2 { font-family: var(--f-display); font-weight: 700; font-size: 36px; line-height: 1.05; margin: 0; display: flex; align-items: baseline; gap: 12px; text-wrap: balance; }
+section > h2 .no { font-family: var(--f-mono); font-size: 14px; font-weight: 500; color: var(--accent); }
+h3 { font-family: var(--f-display); font-weight: 600; font-size: 24px; margin: 14px 0 0; line-height: 1.15; }
+h4 { font-size: 17px; margin: 6px 0 0; }
+p, ul, ol { margin: 0; max-width: 68ch; }
+ul, ol { padding-left: 22px; display: grid; gap: 4px; }
+.lead { font-size: 19px; }
+.path { font-weight: 600; white-space: nowrap; }
+.path::before { content: "▸ "; color: var(--accent); font-weight: 400; }
+kbd { font-family: var(--f-mono); font-size: 13px; padding: 1px 6px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; background: var(--paper); white-space: nowrap; }
+code { font-family: var(--f-mono); font-size: .86em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+
+.codeblock { position: relative; background: var(--code-bg); border: 1px solid var(--line); border-radius: 6px; max-width: 100%; }
+.codeblock pre { margin: 0; padding: 14px 16px; overflow-x: auto; font-family: var(--f-mono); font-size: 13.5px; line-height: 1.55; }
+.codeblock pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
+.copy { position: absolute; top: 6px; right: 6px; font: 500 12px var(--f-body); color: var(--muted); background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 3px 8px; cursor: pointer; }
+.copy:hover { color: var(--accent); border-color: var(--accent); }
+
+.tablewrap { overflow-x: auto; max-width: 100%; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); }
+table { border-collapse: collapse; width: 100%; font-size: 15.5px; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+th { font-family: var(--f-display); font-weight: 600; font-size: 15px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); background: var(--bg); }
+tr:last-child td { border-bottom: 0; }
+td:first-child { white-space: nowrap; }
+
+.note { border-left: 4px solid var(--accent); background: var(--accent-soft); padding: 12px 16px; border-radius: 0 6px 6px 0; max-width: 72ch; display: grid; gap: 6px; }
+.note.warn { border-color: var(--warn); background: var(--warn-soft); }
+.note.ok { border-color: var(--ok); background: var(--ok-soft); }
+.note strong:first-child { font-family: var(--f-display); font-weight: 600; font-size: 15px; letter-spacing: .08em; text-transform: uppercase; }
+.note.warn strong:first-child { color: var(--warn); }
+.note.ok strong:first-child { color: var(--ok); }
+.note:not(.warn):not(.ok) strong:first-child { color: var(--accent); }
+
+.steps { list-style: none; padding: 0; counter-reset: st; display: grid; gap: 12px; }
+.steps > li { counter-increment: st; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; }
+.steps > li::before { content: counter(st); width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--accent); color: var(--accent); font: 700 15px var(--f-mono); display: grid; place-items: center; }
+.steps > li > div { display: grid; gap: 4px; min-width: 0; }
+
+.modules { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.module { background: var(--paper); padding: 16px 18px; display: grid; gap: 6px; align-content: start; min-width: 0; }
+.module h3 { margin: 0; font-size: 22px; }
+.module .where { font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.module ul { font-size: 15.5px; }
+
+.compare { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.compare > div { border: 1px solid var(--line); border-radius: 6px; background: var(--paper); padding: 16px 18px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.compare h4 { margin: 0; font-family: var(--f-display); font-size: 21px; font-weight: 600; }
+.compare .tag { font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+
+.diagram { border: 1px solid var(--line); border-radius: 6px; background: var(--paper); padding: 16px; overflow-x: auto; }
+.diagram svg { display: block; width: 100%; min-width: 560px; height: auto; }
+.diagram svg text { font-family: var(--f-body); fill: var(--ink); }
+.diagram svg .sub { fill: var(--muted); font-size: 12px; }
+.diagram svg .box { fill: var(--bg); stroke: var(--line); stroke-width: 1.5; }
+.diagram svg .box.main { fill: var(--accent-soft); stroke: var(--accent); }
+.diagram svg .wire { stroke: var(--accent); stroke-width: 2; fill: none; }
+.diagram svg .wire.dash { stroke-dasharray: 5 4; stroke: var(--muted); }
+.diagram svg .arrow { fill: var(--accent); }
+
+dl.faq { margin: 0; display: grid; gap: 14px; max-width: 72ch; }
+dl.faq dt { font-weight: 700; }
+dl.faq dd { margin: 4px 0 0; color: var(--ink); }
+
+footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18px; font-size: 14px; color: var(--muted); }
+
+@media (max-width: 900px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 28px; padding-block: 24px 60px; }
+  nav.toc { display: none; }
+  details.toc-mobile { display: block; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); padding: 10px 14px; }
+  details.toc-mobile summary { font-family: var(--f-display); font-weight: 600; font-size: 17px; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; }
+  details.toc-mobile ol { margin-top: 8px; padding-left: 26px; font-size: 16px; }
+  .modules, .compare { grid-template-columns: minmax(0, 1fr); }
+  section > h2 { font-size: 30px; }
+}
+</style>
+
+<div class="shell">
+  <header class="masthead">
+    <div class="kicker">Invoicing &amp; POS for auto repair shops · use, setup, operation</div>
+    <h1>Kuenta Handbook</h1>
+    <p>Everything you need to know about installing and setting up Kuenta, daily work, sending email, updates and backups.</p>
+    <div class="meta"><span>Version <b>1.1.0</b></span><span>As of <b>November 2026</b></span><span>Windows · macOS · Linux · Tablet</span><span><a href="handbuch.html" hreflang="de">Deutsch</a> · <a href="handbook-es.html" hreflang="es">Español</a></span></div>
+  </header>
+
+  <nav class="toc" aria-label="Contents">
+    <div class="label">Contents</div>
+    <ol id="toc"></ol>
+  </nav>
+
+  <main>
+    <details class="toc-mobile"><summary>Contents</summary><ol id="toc-m"></ol></details>
+
+    <div class="note"><strong>About this translation</strong><span>Kuenta is built for workshops in Germany: tax, e-invoicing, cash register (TSE) and DATEV follow German law. This handbook uses the menu names of the English user interface. German terms such as HU (the German MOT), TSE or GoBD are kept where they refer to German rules.</span></div>
+
+    <section id="ueberblick">
+      <h2>What is Kuenta?</h2>
+      <p class="lead">Kuenta is invoicing software for car workshops. You use it to write quotes, orders and invoices, manage customers and vehicles, run the cash register and the stock, and create e-invoices.</p>
+      <p>Kuenta is a web application: a small program runs in the background on the workshop PC (the Kuenta server). You use Kuenta in the browser, on the same PC or on tablets and other workstations in the network. Screens and workflow follow <strong>KFZ-Faktura</strong>, whose data Kuenta takes over completely.</p>
+      <div class="diagram" role="img" aria-label="Setup: the workshop PC runs the Kuenta server and stores the data in the user profile. A browser on the same PC as well as tablets and other workstations connect through the network.">
+        <svg viewBox="0 0 760 210" xmlns="http://www.w3.org/2000/svg">
+          <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="arrow"/></marker></defs>
+          <rect class="box main" x="250" y="20" width="260" height="110" rx="8"/>
+          <text x="380" y="50" text-anchor="middle" font-weight="700" font-size="16">Workshop PC</text>
+          <text x="380" y="74" text-anchor="middle" font-size="14">Kuenta server (console window)</text>
+          <text x="380" y="96" text-anchor="middle" class="sub">Address: http://127.0.0.1:3700</text>
+          <text x="380" y="116" text-anchor="middle" class="sub">Data: %APPDATA%\Kuenta</text>
+          <rect class="box" x="20" y="45" width="170" height="60" rx="8"/>
+          <text x="105" y="72" text-anchor="middle" font-weight="600" font-size="14">Browser on the PC</text>
+          <text x="105" y="92" text-anchor="middle" class="sub">always possible</text>
+          <rect class="box" x="570" y="20" width="170" height="60" rx="8"/>
+          <text x="655" y="47" text-anchor="middle" font-weight="600" font-size="14">Tablet</text>
+          <text x="655" y="67" text-anchor="middle" class="sub">network mode only</text>
+          <rect class="box" x="570" y="100" width="170" height="60" rx="8"/>
+          <text x="655" y="127" text-anchor="middle" font-weight="600" font-size="14">2nd workstation</text>
+          <text x="655" y="147" text-anchor="middle" class="sub">network mode only</text>
+          <path class="wire" d="M190 75 H248" marker-end="url(#ah)" marker-start="url(#ah)"/>
+          <path class="wire dash" d="M512 60 H568" marker-end="url(#ah)"/>
+          <path class="wire dash" d="M512 110 C540 110 540 130 568 130" marker-end="url(#ah)"/>
+          <rect class="box" x="250" y="150" width="260" height="44" rx="8"/>
+          <text x="380" y="177" text-anchor="middle" font-size="14">Thunderbird / mail program (optional)</text>
+          <path class="wire dash" d="M380 130 V148" marker-end="url(#ah)"/>
+        </svg>
+      </div>
+      <div class="note"><strong>Good to know</strong><span>The console window is the Kuenta server. It must stay open while Kuenta is in use. Closing it stops Kuenta.</span></div>
+    </section>
+
+    <section id="installation">
+      <h2>Installation</h2>
+      <p>After installation the database is empty. How to enter your company details and take over existing data is described in <a href="#einrichtung">First setup</a> and <a href="#datenuebernahme">Taking over data</a>.</p>
+
+      <h3>Windows 10 / 11 (64 bit)</h3>
+      <ol class="steps">
+        <li><div><strong>Run <code>Kuenta-Setup-1.1.0.exe</code>.</strong><span>Node.js is included in the installer, nothing else needs to be installed.</span></div></li>
+        <li><div><strong>Choose the installation type.</strong><span><em>For all users</em> (default, needs administrator rights) installs to <code>C:\Program Files\Kuenta</code>. <em>Only for me</em> needs no administrator rights and installs into the user profile.</span></div></li>
+        <li><div><strong>Choose options.</strong><span>Desktop shortcut and, for network mode, the firewall rule (only when installing for all users).</span></div></li>
+        <li><div><strong>Start:</strong><span>Start menu <span class="path">Kuenta</span>. The console window opens, and the browser opens <code>http://127.0.0.1:3700</code>.</span></div></li>
+      </ol>
+      <p>The start menu has three entries: <strong>Kuenta</strong> (this PC only), <strong>Kuenta im Netzwerk</strong> (for tablets and other workstations) and <strong>Kuenta deinstallieren</strong> (uninstall).</p>
+      <p>To switch Kuenta to English, use the menu <span class="path">Kuenta → Sprache / Language</span> or the language box on the login page.</p>
+
+      <h3>Linux</h3>
+      <p>Node.js version 22.13 or later is required. Check with <code>node -v</code>.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Distribution</th><th>Install Node.js</th></tr></thead>
+        <tbody>
+          <tr><td>Debian / Ubuntu / Mint</td><td>Via NodeSource: <code>curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -</code>, then <code>sudo apt install -y nodejs</code></td></tr>
+          <tr><td>Fedora (41 or later)</td><td><code>sudo dnf install nodejs</code></td></tr>
+          <tr><td>openSUSE</td><td><code>sudo zypper install nodejs24</code></td></tr>
+          <tr><td>Arch / Manjaro</td><td><code>sudo pacman -S nodejs</code></td></tr>
+          <tr><td>without root</td><td><a href="https://github.com/nvm-sh/nvm">nvm</a>: <code>nvm install 24</code></td></tr>
+        </tbody>
+      </table></div>
+      <div class="codeblock"><pre><code>git clone &lt;repository URL&gt; kuenta     # or unpack the archive
+cd kuenta
+./installer/unix/install.sh</code></pre></div>
+      <p>The script installs for the current user without root: the program goes to <code>~/.local/lib/kuenta</code>, the start command is <code>~/.local/bin/kuenta</code>, and an entry is added to the application menu. For a different location use <code>PREFIX=/opt/kuenta ./installer/unix/install.sh</code>.</p>
+      <div class="codeblock"><pre><code>kuenta              # this computer only
+kuenta --netzwerk   # share with tablets / other workstations</code></pre></div>
+      <p>Stop with <kbd>Ctrl</kbd>+<kbd>C</kbd> or by closing the terminal.</p>
+      <h4>Optional: as a service without a screen</h4>
+      <div class="codeblock"><pre><code>mkdir -p ~/.config/systemd/user
+cat &gt; ~/.config/systemd/user/kuenta.service &lt;&lt;'EOF'
+[Unit]
+Description=Kuenta
+
+[Service]
+Environment=HOST=0.0.0.0
+ExecStart=/usr/bin/env node %h/.local/lib/kuenta/server/index.js
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+EOF
+systemctl --user daemon-reload
+systemctl --user enable --now kuenta
+loginctl enable-linger "$USER"</code></pre></div>
+      <p>If a firewall is active, open port 3700/TCP, e.g. <code>sudo ufw allow 3700/tcp</code>.</p>
+
+      <h3>macOS</h3>
+      <ol class="steps">
+        <li><div><strong>Install Node.js</strong><span>Package from <a href="https://nodejs.org/en">nodejs.org</a> (LTS) or <code>brew install node@24</code>.</span></div></li>
+        <li><div><strong>Install Kuenta</strong><span>In the terminal, as on Linux: <code>./installer/unix/install.sh</code>. The app <em>Kuenta</em> is then in <code>~/Applications</code>.</span></div></li>
+        <li><div><strong>Start</strong><span>Double-click <em>Kuenta</em> or run <code>kuenta</code> in the terminal. On first opening, macOS may warn about an unsigned app: right-click it in the Finder → <em>Open</em>.</span></div></li>
+      </ol>
+
+      <h3>Container (Docker / Podman)</h3>
+      <p>For Linux servers, NAS systems, Raspberry Pi or Macs, Kuenta also runs in a container. The image includes Node.js and runs on x86_64 and ARM64. The Kuenta folder contains a <code>Dockerfile</code> and a <code>compose.yaml</code> for this.</p>
+      <div class="codeblock"><pre><code># Podman (for Docker replace podman with docker)
+podman build -t kuenta:1.1.0 .
+podman run -d --name kuenta --restart unless-stopped \
+  -p 3700:3700 -v kuenta-daten:/data kuenta:1.1.0
+
+# or with Compose
+docker compose up -d --build</code></pre></div>
+      <p>Then open <code>http://&lt;computer&gt;:3700</code> in the browser.</p>
+      <div class="note warn"><strong>Switch on login</strong><span>In a container Kuenta can be reached from the whole network. Switch on login right after the first start (<span class="path">Settings → Defaults</span>). For this computer only: <code>-p 127.0.0.1:3700:3700</code>.</span></div>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Topic</th><th>In the container</th></tr></thead>
+        <tbody>
+          <tr><td>Data</td><td>in the volume <code>kuenta-daten</code> (<code>/data</code> in the container). It is kept when the container is rebuilt. Own folder: <code>-v /srv/kuenta:/data</code>; it must belong to UID 1000. With rootless Podman append <code>:Z,U</code>.</td></tr>
+          <tr><td>Backups</td><td>also mount a folder from the NAS, e.g. <code>-v /mnt/nas/kuenta-sicherungen:/sicherungen</code>, and enter <code>/sicherungen</code> as the backup folder in Kuenta.</td></tr>
+          <tr><td>Time zone</td><td>default <code>Europe/Berlin</code>, change with <code>-e TZ=Europe/Madrid</code>.</td></tr>
+          <tr><td>Email</td><td>direct sending via SMTP only. Handing over to Thunderbird is not available in the container.</td></tr>
+          <tr><td>KFZ-Faktura import</td><td>upload the backup <code>*.kfz</code> or <code>DB1.bak</code>. The direct import from the program folder is only available on Windows.</td></tr>
+          <tr><td>Stop</td><td><code>podman stop kuenta</code> closes the database cleanly.</td></tr>
+          <tr><td>Update</td><td>build the image with the new version, remove the container with <code>podman rm -f kuenta</code> and create it again with the new image. The data in the volume is kept.</td></tr>
+        </tbody>
+      </table></div>
+      <p>Automatic start with Podman via a Quadlet file and more details: see <code>INSTALL.md</code>, section "Container".</p>
+
+      <h3>Without installation</h3>
+      <p>With Node.js (22.13 or later) installed, directly from the unpacked folder: <code>Kuenta starten.bat</code> (Windows), <code>./kuenta.sh</code> (Linux/macOS) or <code>node server/index.js --open</code>.</p>
+    </section>
+
+    <section id="einrichtung">
+      <h2>First setup</h2>
+      <p>After the first start, the overview shows buttons for the setup. The most important points:</p>
+      <ol class="steps">
+        <li><div><strong>Company details</strong><span><span class="path">Master data → Settings → Company details</span>: name, address, bank details, tax number/VAT ID and logo. These details appear on all documents and in the e-invoice.</span></div></li>
+        <li><div><strong>Tax, dunning, register</strong><span>VAT rates, small business rule, dunning levels with days and fees, opening cash balance.</span></div></li>
+        <li><div><strong>Number ranges</strong><span>Each field holds the last number used. The next invoice gets this number plus 1. If numbering should start at a certain number, e.g. at the beginning of the year, enter the number before it. More under <a href="#rechnungsnummern">Invoice numbers</a>.</span></div></li>
+        <li><div><strong>Email</strong><span>Choose the sending method (direct or via Thunderbird), see <a href="#email">Sending email</a>.</span></div></li>
+        <li><div><strong>Users and login</strong><span>Create users under <span class="path">Master data → Users / employees</span>, tick "Login allowed" and switch on login under <span class="path">Settings → Defaults</span>. This is required in network mode.</span></div></li>
+        <li><div><strong>Language</strong><span>User interface and document language under <span class="path">Settings → Defaults</span>, see <a href="#bedienung">Using Kuenta</a>.</span></div></li>
+      </ol>
+      <h3>All settings tabs</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Tab</th><th>Content</th></tr></thead>
+        <tbody>
+          <tr><td>Company details</td><td>address, bank, tax numbers, logo, preprinted letterhead</td></tr>
+          <tr><td>Tax / dunning / register</td><td>VAT rates, small business, 4 dunning levels, opening cash balance</td></tr>
+          <tr><td>Number ranges</td><td>customers, vehicles, articles, labour items, suppliers, tyres, all documents</td></tr>
+          <tr><td>Accounting (FIBU)</td><td>accounts (SKR03 default), revenue accounts, DATEV: adviser and client number, account length, start of the fiscal year, collective debtor, BU keys (see <a href="#datev">DATEV export</a>)</td></tr>
+          <tr><td>Crypto payment</td><td>BTCPay Server for Bitcoin, Lightning and USDT, validity of payment links, accounting account (see <a href="#krypto">Crypto payment</a>)</td></tr>
+          <tr><td>Defaults</td><td>gross/net entry, small parts surcharge, paint material, GoBD lock, login, colour scheme (light/dark) and colour, language of the user interface and of documents</td></tr>
+          <tr><td>Email</td><td>sending method, Thunderbird path, SMTP server, templates, signature, sending log</td></tr>
+          <tr><td>License</td><td>install or remove the Kuenta Pro license key, license status (see <a href="#pro">Kuenta Pro</a>)</td></tr>
+          <tr><td>Reminders &amp; SMS</td><td>texts of due date reminders by email and SMS, SMS gateway with templates and test, reminder log (see <a href="#erinnerungen">Reminders</a>)</td></tr>
+          <tr><td>Cash register</td><td>TSE (fiskaly), card terminal (ZVT), quick keys, cash sale customer</td></tr>
+          <tr><td>Time tracking</td><td>time tracking defaults, federal state for public holidays</td></tr>
+          <tr><td>Purchasing / trading</td><td>contra account for incoming invoices, creditor, revenue accounts for vehicle sales (standard taxation and § 25a)</td></tr>
+          <tr><td>Custom fields</td><td>your own labels for free fields, e.g. vehicle due dates and vehicle data</td></tr>
+          <tr><td>Master tables</td><td>payment terms, units, hourly rates, order types, product groups, manufacturers, payment types, text modules, dunning texts, countries, tyre brands, vehicle colours</td></tr>
+          <tr><td>Log</td><td>change log</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="datenuebernahme">
+      <h2>Taking over data</h2>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Source</th><th>Where in Kuenta</th></tr></thead>
+        <tbody>
+          <tr><td>KFZ-Faktura</td><td><span class="path">Kuenta → Import data from KFZ-Faktura</span></td></tr>
+          <tr><td>Kuenta backup <code>*.kuenta</code>, KFZ-Faktotum <code>*.kft</code>, Schraubwerk <code>*.swb</code></td><td><span class="path">Kuenta → Restore data</span></td></tr>
+          <tr><td>CSV, DATANORM 4/5</td><td><span class="path">Kuenta → Data import</span></td></tr>
+        </tbody>
+      </table></div>
+      <h3>From KFZ-Faktura</h3>
+      <ol>
+        <li><strong>Backup <code>*.kfz</code>:</strong> in KFZ-Faktura use "Daten sichern", then upload the file in Kuenta (drag and drop). Password-protected backups are supported.</li>
+        <li><strong>Database backup</strong> <code>DB1.bak</code> or <code>*.fbk</code>: upload directly.</li>
+        <li><strong>Program folder</strong> (Windows only), e.g. <code>C:\KFZ-Faktura</code>. Close KFZ-Faktura first. The original database is only copied, never changed.</li>
+      </ol>
+      <p>All tables are taken over: customers, vehicles, articles, labour items, suppliers, tyre storage, all documents, payments, open items, dunning letters, cash book, accounting entries, text modules, settings, number ranges, KBA vehicle codes and the postcode directory, plus documents, images and the company logo.</p>
+      <h3>Importing again: what is kept, what is replaced</h3>
+      <p>You can import KFZ-Faktura data more than once, e.g. during a transition period. Before the import Kuenta shows an overview:</p>
+      <div class="compare">
+        <div><span class="tag">is kept</span><h4>Data that only exists in Kuenta</h4>
+          <ul><li>settings: email, register, TSE, backup, printing</li><li>register receipts and closings</li><li>time tracking, appointments, tasks, letters</li><li>incoming invoices, vehicle trading, purchase contracts, down payments</li><li>documents uploaded in Kuenta, email and change log</li><li>Kuenta's own fields in master data, e.g. e-invoice format and Leitweg ID of the customer, IBAN of the supplier, target hours of employees</li></ul></div>
+        <div><span class="tag">is replaced</span><h4>Data from KFZ-Faktura</h4>
+          <ul><li>customers, vehicles, articles, labour items, suppliers</li><li>quotes, orders, delivery notes, invoices</li><li>payments, cash book, number ranges</li></ul>
+          <p>Beforehand Kuenta tells you how many of these records were created or changed in Kuenta since the last import. They are replaced by the state from the backup.</p></div>
+      </div>
+      <p>With the tick "Keep Kuenta's own data" (default) the above applies. Without the tick the import replaces everything with the backup.</p>
+      <div class="note ok"><strong>Safety copy</strong><span>Before every import Kuenta saves a copy of the previous data in the subfolder <code>sicherheitskopien</code> of the data folder.</span></div>
+      <div class="note warn"><strong>Working in parallel</strong><span>Do not work on the same invoices in KFZ-Faktura and Kuenta at the same time. Invoices you write in Kuenta (also automatically at the register) are overwritten by the next import.</span></div>
+      <div class="note warn"><strong>7-Zip backups</strong><span>Newer KFZ-Faktura versions pack the <code>.kfz</code> file in 7-Zip format. In that case unpack the file with 7-Zip and upload <code>db\DB1.bak</code>.</span></div>
+      <h3>CSV and DATANORM</h3>
+      <p>The import assistant takes over customers, vehicles, articles, labour items and suppliers from CSV files. Columns are mapped to Kuenta fields, and the mapping can be saved as a template. Article data from wholesalers comes via DATANORM 4/5.</p>
+      <h3>Moving to another computer</h3>
+      <p>On the old computer <span class="path">Kuenta → Back up data</span>, on the new one <span class="path">Kuenta → Restore data</span>.</p>
+    </section>
+
+    <section id="bedienung">
+      <h2>Using Kuenta</h2>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Element</th><th>What for</th></tr></thead>
+        <tbody>
+          <tr><td>Menu bar</td><td>At the top: Kuenta, Master data, Office, Purchasing, Sales, Vehicle trading, Finance, Reports. "New invoice", batch print, backup and import are here too.</td></tr>
+          <tr><td>Navigation</td><td>On the left: all overviews, grouped by area.</td></tr>
+          <tr><td>Quick bar</td><td>Frequent actions with one click.</td></tr>
+          <tr><td>Search</td><td>At the top of the bar, reachable with <kbd>Ctrl</kbd>+<kbd>F</kbd>. Finds customers, vehicles, documents.</td></tr>
+          <tr><td>Overviews</td><td>Tables with a search bar and letter bar (A–Z); a double click opens the record.</td></tr>
+          <tr><td>More functions / right click</td><td>Context menus with all actions for the selected record: continue, copy, print, send by email etc.</td></tr>
+          <tr><td>Input forms</td><td>With tabs, e.g. for a customer: vehicles, documents, files, terms.</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Keyboard shortcuts</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Key</th><th>Effect</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>F2</kbd></td><td>insert an article into the document</td></tr>
+          <tr><td><kbd>F3</kbd></td><td>insert a labour item into the document</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>save</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>P</kbd></td><td>print</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>F</kbd></td><td>search</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>close window or dialog</td></tr>
+          <tr><td><kbd>Enter</kbd></td><td>in input dialogs: confirm</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Overview: hiding amounts and switching currency</h3>
+      <p>At the top right of the overview there are two switches. Both apply only to the current workstation.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Switch</th><th>Effect</th></tr></thead>
+        <tbody>
+          <tr><td>👁 Eye</td><td>hides all amounts on the overview with asterisks, e.g. when customers can see the screen. Click again to show them.</td></tr>
+          <tr><td>€ · $ · ₿</td><td>shows the amounts in euros, US dollars or bitcoin at the current rate. Another click on ₿ switches to satoshis (1 bitcoin = 100,000,000 sats) and back. The button remembers the unit used last. Rate and source are shown below the tiles.</td></tr>
+        </tbody>
+      </table></div>
+      <div class="note"><strong>Display only</strong><span>Invoices, payments, bookings, DATEV and all printouts always stay in euros. The switch only changes how the figures are shown on the overview.</span></div>
+      <p>The rates come from the European Central Bank (US dollar, reference rate of the last banking day) and from the Bitstamp exchange (bitcoin, current rate).</p>
+      <div class="note"><strong>Internet</strong><span>For the rates the Kuenta computer asks the ECB and Bitstamp, at most every three hours. No data from Kuenta is sent. Kuenta caches the rates. Without internet the last loaded rates apply. If no rates were ever loaded, the display stays in euros.</span></div>
+
+      <h3>Colours</h3>
+      <p>Under <span class="path">Settings → Defaults → Appearance</span> you set two things:</p>
+      <ul>
+        <li><strong>Colour scheme:</strong> light, dark or automatic as in the operating system.</li>
+        <li><strong>Colour:</strong> blue (default), green, graphite or bordeaux. Each colour exists in light and dark.</li>
+      </ul>
+      <p>Both apply only to the current workstation or browser. This way the register, the tablet in the workshop or a demo company can be told apart at a glance.</p>
+
+      <h3>Language</h3>
+      <p>Kuenta is available in German, English and Spanish. There are two settings:</p>
+      <ul>
+        <li><strong>Language of the user interface:</strong> in the menu <span class="path">Kuenta → Sprache / Language</span>, on the login page or under <span class="path">Settings → Defaults</span>. It applies only to the current workstation. In English, numbers appear as 1,234.50 and dates as 31/12/2026.</li>
+        <li><strong>Language of documents:</strong> under <span class="path">Settings → Defaults</span>. It applies to the whole company and affects PDF documents, printing, dunning letters and the templates for emails and reminders.</li>
+      </ul>
+      <p>What you enter yourself stays as it is: article texts, customer names and your own text templates are not translated. Legal notes such as § 19 UStG appear translated, but German law still applies. The e-invoice (XRechnung) stays in German.</p>
+    </section>
+
+    <section id="module">
+      <h2>Areas and features</h2>
+      <div class="modules">
+        <div class="module"><h3>Master data</h3><div class="where">Customers · Vehicles · Articles · Labour items · Suppliers · Tyres</div>
+          <ul><li>Customers with vehicles, document history, files, terms, e-invoice settings and Leitweg ID</li><li>Foreign customers with net invoices</li><li>Vehicles with KBA lookup via HSN/TSN, due dates, owner, photos</li><li>Articles with price groups and stock, labour items with hourly rates</li><li>Tyre storage with storage receipt</li></ul></div>
+        <div class="module"><h3>Sales</h3><div class="where">Quotes · Orders · Delivery notes · Invoices · Corrections</div>
+          <ul><li>Line items with articles, labour items, texts, subtotals, small parts and paint material surcharges, discount, pass-through items</li><li>Continue (quote → order → invoice), copy, archive</li><li>Down payment, partial and final invoices, collective invoice</li><li>Invoice correction, credit note, cancellation</li><li>Batch print, PDF, sending by email</li><li>Shopping carts from parts catalogues (CSV/DATANORM)</li></ul></div>
+        <div class="module"><h3>Cash register</h3><div class="where">Sales → Cash register</div>
+          <ul><li>Scanner input and quick keys, cash with change, debit card, credit card, crypto</li><li>Pay orders and invoices at the register</li><li>Cash in/out, voiding receipts, Z report with cash count record</li><li>Cloud TSE fiskaly SIGN DE with QR code, DSFinV-K export, card terminal via ZVT</li></ul></div>
+        <div class="module"><h3>Purchasing</h3><div class="where">Incoming invoice · Stock · Stock movement · Stocktaking</div>
+          <ul><li>Incoming invoices with stock booking, purchase price update, payment and accounting entry</li><li>Read incoming e-invoices (XRechnung, ZUGFeRD); the supplier is created</li><li>Stock levels with minimum stock, quick entry by scanner</li><li>Stocktaking with counting list and booking</li></ul></div>
+        <div class="module"><h3>Office</h3><div class="where">Appointment planner · Tasks · Letters · Time tracking · Time clock</div>
+          <ul><li>Appointment planner, tasks, letters</li><li>Time tracking with time account, absence, month-end closing, time sheet, public holidays per federal state</li><li>Time clock: clock in/out, break, order, attendance list</li></ul></div>
+        <div class="module"><h3>Vehicle trading</h3><div class="where">Vehicle stock · Purchase contracts · Sales statistics</div>
+          <ul><li>New and used cars with equipment and Pkw-EnVKV details</li><li>Costing, margin scheme according to § 25a UStG, price tag</li><li>Trade-in, purchase contracts with invoice creation</li></ul></div>
+        <div class="module"><h3>Finance</h3><div class="where">Cash book · Payments · Open items · Invoice list · Dunning · Accounting</div>
+          <ul><li>Payments and open items</li><li>Dunning in 4 levels, as PDF or by email</li><li>Cash book, DATEV export, GoBD data export</li></ul></div>
+        <div class="module"><h3>Reports</h3><div class="where">Vehicle due dates · Revenue · Mail merge · Performance rate</div>
+          <ul><li>HU (MOT) and service due dates with reminder letters</li><li>Revenue and gross profit</li><li>Mail merge, performance rate per order and employee</li></ul></div>
+      </div>
+      <h3>System</h3>
+      <ul>
+        <li><strong>Companies:</strong> keep several businesses or demo data separate, <span class="path">Kuenta → Switch company</span>.</li>
+        <li><strong>Users and permissions:</strong> define per user which areas may be shown, created, edited or deleted and whether purchase prices are visible.</li>
+        <li><strong>Logs:</strong> change log and email sending log.</li>
+      </ul>
+    </section>
+
+    <section id="erechnung">
+      <h2>E-invoice</h2>
+      <p>Kuenta creates e-invoices according to EN 16931 and reads incoming e-invoices.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Format</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>XRechnung 3.0 (CII)</td><td>pure XML file, e.g. for public authorities</td></tr>
+          <tr><td>XRechnung 3.0 (UBL)</td><td>pure XML file in UBL syntax</td></tr>
+          <tr><td>ZUGFeRD 2.3 / Factur-X</td><td>PDF/A-3 with embedded XRechnung, readable by people and software</td></tr>
+        </tbody>
+      </table></div>
+      <p>Which format a customer gets is set in their e-invoice settings. It is suggested automatically when sending by email. Supported tax cases: reverse charge, intra-community supply, export, small business, margin scheme. Checked with the Mustang validator.</p>
+      <p>Read incoming e-invoices under <span class="path">Purchasing → Incoming invoice</span>. To view an XRechnung use <span class="path">Purchasing → Visualise e-invoice</span>.</p>
+    </section>
+
+    <section id="datev">
+      <h2>DATEV export for the tax adviser</h2>
+      <p class="lead">Kuenta books invoices, payments, incoming invoices and register sales automatically and exports them as DATEV files. Your tax adviser reads them directly into DATEV, the accounting software common in Germany.</p>
+      <h3>Set up once</h3>
+      <p>Under <span class="path">Settings → Accounting</span>. Your tax adviser gives you the values.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Setting</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>Adviser number, client number</td><td>your numbers at the DATEV firm</td></tr>
+          <tr><td>General ledger account length</td><td>usually 4. Also determines the personal accounts (see below)</td></tr>
+          <tr><td>Fiscal year starts in month</td><td>1 = calendar year. For a different fiscal year the start month, e.g. 7 for 01.07.–30.06.</td></tr>
+          <tr><td>Collective debtor</td><td>account for customers without their own debtor account (default 10000)</td></tr>
+          <tr><td>Collective creditor</td><td>under <span class="path">Settings → Purchasing / trading</span> (default 70000)</td></tr>
+          <tr><td>Include BU keys</td><td>only switch on if your tax adviser uses revenue and expense accounts <em>without</em> the automatic function. Revenue then gets the VAT key (19 %: 3, 7 %: 2), incoming invoices the input tax key (19 %: 9, 7 %: 8).</td></tr>
+          <tr><td>Accounts</td><td>cash, bank and revenue accounts (SKR03 default). For SKR04 please agree with your tax adviser and adjust.</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Personal accounts (debtors and creditors)</h3>
+      <p>Personal accounts have one digit more than general ledger accounts. With account length 4:</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Kind</th><th>Range</th><th>Where the number comes from</th></tr></thead>
+        <tbody>
+          <tr><td>Debtors (customers)</td><td>10000–69999</td><td>debtor no. of the customer, otherwise customer number, otherwise collective debtor</td></tr>
+          <tr><td>Creditors (suppliers)</td><td>70000–99999</td><td>creditor no. of the supplier, otherwise supplier number, otherwise collective creditor</td></tr>
+        </tbody>
+      </table></div>
+      <p>A number outside the range, e.g. supplier no. 3 from a KFZ-Faktura import, is not used, because it would be a general ledger account. The booking then goes to the collective account. If the customer should get an account of their own, enter the <strong>debtor no.</strong> for the customer or the <strong>creditor no.</strong> for the supplier.</p>
+      <h3>Monthly routine</h3>
+      <ol class="steps">
+        <li><div><strong>Choose the period</strong><span><span class="path">Finance → Accounting export</span>, e.g. the previous month. The list shows all bookings not yet exported.</span></div></li>
+        <li><div><strong>Export debtors/creditors</strong><span>The file <code>EXTF_Debitoren_Kreditoren_….csv</code> contains name, address, country and VAT ID of all customers and suppliers with bookings in the period. That way the tax adviser sees names instead of just account numbers.</span></div></li>
+        <li><div><strong>Create the DATEV export</strong><span>The file <code>EXTF_Buchungsstapel_….csv</code> contains the bookings. Kuenta marks them as exported so they do not come twice next time. "Preview export" creates the same file without marking.</span></div></li>
+        <li><div><strong>Send to the tax adviser</strong><span>Both files. The adviser reads the debtors/creditors first, then the booking batch.</span></div></li>
+      </ol>
+      <div class="note warn"><strong>Please note</strong>
+        <span>One export may only cover one fiscal year. Export December and January separately. Kuenta points this out.</span>
+        <span>The invoices as PDF are not included. The tax adviser still gets the documents separately.</span>
+        <span>The first time, have your tax adviser read both files as a test (booking batch and debtors/creditors) and check the accounts.</span>
+        <span>Bookings already saved keep their accounts. If bookings were made earlier for a customer or supplier with a short number (below 10000 or 70000), the booking may be on a general ledger account. The export cannot detect this, because e.g. "3" is a valid general ledger account. Enter a debtor or creditor no. for such customers and suppliers and have older bookings checked by the tax adviser.</span></div>
+      <p>The files are saved in the Windows-1252 character set, as DATEV expects. Umlauts therefore arrive correctly.</p>
+    </section>
+
+    <section id="email">
+      <h2>Sending email</h2>
+      <p>Send invoices, quotes and dunning letters via <strong>More functions / right click → Send by email</strong>. Recipient, subject and text are filled in, and the document is attached as PDF, ZUGFeRD or XRechnung. You can add more files.</p>
+      <p>Under <span class="path">Settings → Email → Sending method</span> you choose how Kuenta sends the mail:</p>
+      <div class="compare">
+        <div><span class="tag">Sending method 1</span><h4>Directly from Kuenta (SMTP)</h4>
+          <p>Kuenta sends the mail itself via your provider's outgoing mail server.</p>
+          <ul><li>works from every device, including the tablet</li><li>SMTP server, port, encryption, user and password must be entered</li><li>the mail does <strong>not</strong> appear in Thunderbird under "Sent"; use the sending log or a BCC copy to yourself instead</li></ul></div>
+        <div><span class="tag">Sending method 2</span><h4>Hand over to mail program</h4>
+          <p>Kuenta opens a finished mail with attachment in Thunderbird. You check it and click Send there.</p>
+          <ul><li>afterwards the mail is in Thunderbird's "Sent" folder</li><li>no SMTP details needed in Kuenta</li><li>without Thunderbird, the default mail program (e.g. Outlook) gets a draft</li><li>only possible on the PC Kuenta runs on</li></ul></div>
+      </div>
+      <h3>Setting up Thunderbird</h3>
+      <ol class="steps">
+        <li><div><strong>Change the sending method</strong><span><span class="path">Settings → Email → Sending method</span> to "Hand over to mail program (e.g. Thunderbird)".</span></div></li>
+        <li><div><strong>Check what was found</strong><span>Below, Kuenta shows whether Thunderbird was found. For a portable or unusual installation enter the path to <code>thunderbird.exe</code> yourself.</span></div></li>
+        <li><div><strong>Test</strong><span>"Save settings &amp; test mail program" opens a test mail in Thunderbird.</span></div></li>
+      </ol>
+      <div class="note warn"><strong>Please note</strong>
+        <span>In Kuenta the invoice counts as "sent by mail" as soon as it is handed over, even if you do not send the mail in Thunderbird.</span>
+        <span>Kuenta adds its signature. If Thunderbird has one too, both appear. Empty one of them.</span>
+        <span>The handed-over attachments are stored in <code>%APPDATA%\Kuenta\mail-ausgang</code> and deleted after 14 days.</span></div>
+      <h3>Templates and placeholders</h3>
+      <p>Subject and text for documents and dunning letters as well as the signature are set under <span class="path">Settings → Email</span>. The default texts follow the document language. These placeholders are replaced:</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Placeholder</th><th>becomes</th></tr></thead>
+        <tbody>
+          <tr><td><code>{Vorgang}</code></td><td>type of document, e.g. invoice</td></tr>
+          <tr><td><code>{Nummer}</code></td><td>document number</td></tr>
+          <tr><td><code>{Name}</code></td><td>customer name</td></tr>
+          <tr><td><code>{Anrede}</code></td><td>salutation from the customer data</td></tr>
+          <tr><td><code>{Briefanrede}</code></td><td>"Dear Mr …," / "Dear Ms …," / "Dear Sir or Madam," (in the document language)</td></tr>
+          <tr><td><code>{Firma}</code></td><td>your company name</td></tr>
+          <tr><td><code>{Betrag}</code></td><td>gross amount, for dunning letters the open amount</td></tr>
+          <tr><td><code>{Datum}</code></td><td>document date</td></tr>
+          <tr><td><code>{Zahlungslink}</code></td><td>link for paying with Bitcoin, Lightning or USDT (see <a href="#krypto">Crypto payment</a>)</td></tr>
+        </tbody>
+      </table></div>
+      <p>The placeholder names stay German in all languages. Every mail is listed in the <strong>sending log</strong> (<span class="path">Settings → Email → Show log</span>) with time, recipient, subject, attachments and status, e.g. "sent" or "handed over to the mail program".</p>
+    </section>
+
+    <section id="erinnerungen">
+      <h2>Reminders by email and SMS</h2>
+      <p class="lead">Kuenta reminds customers of the HU, service and other vehicle due dates by letter, email or SMS. Every reminder is logged so no customer gets it twice.</p>
+      <h3>How it works</h3>
+      <ol class="steps">
+        <li><div><strong>Open the list</strong><span><span class="path">Reports → Vehicle due dates</span>, choose the due date (e.g. HU) and the period. The column "last reminded" shows who already got a reminder and by which channel.</span></div></li>
+        <li><div><strong>Choose the channel</strong><span>"Reminder letters" prints letters; "Remind by email" and "Remind by SMS" send to all matching vehicles in the list.</span></div></li>
+        <li><div><strong>Confirm</strong><span>Kuenta shows the number. Vehicles already reminded are skipped by default. A summary then shows what was sent, skipped or failed.</span></div></li>
+      </ol>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Skipped if …</th><th>Remedy</th></tr></thead>
+        <tbody>
+          <tr><td>no email address or no mobile number</td><td>enter it for the customer. For SMS the field "Mobile" counts, otherwise "Phone" if it holds a mobile number. Landline numbers cannot receive SMS.</td></tr>
+          <tr><td>the customer has "No reminders by email/SMS"</td><td>tick box in the customer's "Contact" section. Letters are still sent.</td></tr>
+          <tr><td>the vehicle has no owner</td><td>assign the vehicle to a customer</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Texts</h3>
+      <p>Under <span class="path">Settings → Reminders &amp; SMS</span> you find subject and text of the email and the text of the SMS. Placeholders: <code>{Briefanrede}</code> <code>{Anrede}</code> <code>{Name}</code> <code>{Vorname}</code> <code>{Kennzeichen}</code> <code>{Fahrzeug}</code> <code>{Termin}</code> <code>{Terminart}</code> <code>{Firma}</code> <code>{Telefon}</code>. An SMS has 160 characters. Longer texts are sent in several parts and cost more accordingly.</p>
+      <p>Emails use the sending method in the "Email" tab. With direct sending (SMTP), Kuenta sends all at once. With "Hand over to mail program", one window opens for each reminder, so at most 20 at a time.</p>
+      <div class="note"><strong>SMS is part of Kuenta Pro</strong><span>Reminders by letter and email are free. For sending SMS you need a Pro license, see <a href="#pro">Kuenta Pro</a>. You can set up the gateway beforehand.</span></div>
+      <h3>SMS gateway: three options</h3>
+      <p>Kuenta sends SMS via a gateway. Under <span class="path">Settings → Reminders &amp; SMS → Template</span> there is a template for each option that you only need to adjust. Check the setup with "Save settings &amp; send test SMS".</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Option</th><th>You need</th><th>Good to know</th></tr></thead>
+        <tbody>
+          <tr><td>USB modem on another computer (Kuenta SMS relay)</td><td>a computer (e.g. Raspberry Pi), a USB modem with modem mode, a SIM card, the program <code>gammu</code></td><td>The relay comes with Kuenta in the folder <code>sms-relais</code> with its own instructions. Running costs only for the SIM card.</td></tr>
+          <tr><td>Old Android phone</td><td>phone with SIM card and a gateway app, e.g. "SMS Gateway for Android"</td><td>No extra computer needed. The phone must be in the same network and stay switched on. Address and credentials are shown in the app.</td></tr>
+          <tr><td>SMS provider on the internet</td><td>customer account, e.g. at seven.io, and its API key</td><td>No hardware. Cost per SMS. Other providers can be connected via the free fields (address, headers, body) as well.</td></tr>
+        </tbody>
+      </table></div>
+      <div class="note warn"><strong>UMTS has been switched off</strong><span>In Germany all network operators switched off UMTS (3G) in 2021/2022. A pure UMTS stick only sends SMS over the old GSM network as long as it is operated. Better use an LTE stick that can register as a modem. It does not need a data plan for SMS.</span></div>
+      <div class="note"><strong>Consent</strong><span>Reminders by email or SMS count as advertising under German competition law. Only write to customers who have agreed, and record opt-outs immediately with the tick "No reminders". If in doubt, ask your legal adviser.</span></div>
+      <p>All reminders are listed in the <strong>reminder log</strong> (<span class="path">Settings → Reminders &amp; SMS</span>) with time, vehicle, channel, recipient and status. Emails are also listed in the email sending log.</p>
+    </section>
+
+    <section id="krypto">
+      <h2>Crypto payment: Bitcoin, Lightning, USDT</h2>
+      <p class="lead">Customers can pay invoices with Bitcoin, Lightning or USDT. Kuenta uses your own <strong>BTCPay Server</strong> for this. It is free open source software that holds no money: payments go directly into your own wallet. The feature is included in Kuenta free of charge.</p>
+      <h3>Set up once</h3>
+      <ol class="steps">
+        <li><div><strong>Provide a BTCPay Server</strong><span>The server must be reachable from the internet so customers can pay. Usual is a rented server with the official Docker setup (docs.btcpayserver.org) or a provider that runs BTCPay. Create a store there and connect your wallet. For Lightning you need a Lightning node, for USDT the Liquid network.</span></div></li>
+        <li><div><strong>Create an API key</strong><span>In BTCPay under <span class="path">Account → API keys</span>. Required rights: view and modify payment requests, view, create and modify invoices, view store settings. The store ID is shown in the store settings.</span></div></li>
+        <li><div><strong>Enter it in Kuenta</strong><span><span class="path">Settings → Crypto payment</span>: enable crypto payments, enter address, store ID and API key, then "Save &amp; test connection". Kuenta shows the payment methods active in the store.</span></div></li>
+        <li><div><strong>Clarify the accounting</strong><span>Kuenta books incoming payments to the configured accounting account, default 1360 (money in transit, SKR03). Agree the account with your tax adviser.</span></div></li>
+      </ol>
+      <h3>How a payment works</h3>
+      <ul>
+        <li>Open the invoice, tab <span class="path">Payments</span>, "Payment link". Kuenta creates a payment page at BTCPay for the open euro amount. It is valid for 30 days (adjustable).</li>
+        <li>QR code and link then appear automatically on the PDF invoice and in the email. In your own email templates <code>{Zahlungslink}</code> inserts the link.</li>
+        <li>The customer pays the euro amount in Bitcoin, Lightning or USDT, converted at the rate on the day of payment.</li>
+        <li>Kuenta checks with BTCPay every 2 minutes and books paid invoices automatically, with the payment type "Krypto (BTCPay)". "Check for payment" does it immediately.</li>
+        <li>If the open amount changes, e.g. after a partial payment by bank transfer, the old link disappears from the PDF. Create a new one then. If the invoice is paid in full some other way, Kuenta closes the payment page at BTCPay.</li>
+      </ul>
+      <p>Kuenta does not need to be reachable from the internet for this. It asks BTCPay itself.</p>
+      <h3>At the register</h3>
+      <ul>
+        <li>Once crypto payment is set up, the register shows the button <strong>"₿ Bitcoin / Lightning"</strong>. "Pay order" and "Pay invoice" then offer "Crypto" too.</li>
+        <li>The register shows a QR code, first for Lightning, on request for Bitcoin or USDT. The customer scans it with their wallet. The rate is fixed for 15 minutes.</li>
+        <li>As soon as BTCPay reports the payment, the window closes and the receipt is printed. Bitcoin on-chain counts as soon as the payment is in the network, without waiting for a confirmation. Lightning arrives within seconds.</li>
+        <li>Kuenta verifies the payment with BTCPay itself before the receipt. Only then are invoice and receipt created. Each payment can only be used for one receipt.</li>
+        <li><strong>Cancel:</strong> Kuenta marks the payment as invalid at BTCPay. For this the API key also needs the right "modify invoices". Without it the payment expires after 15 minutes. If the customer still pays, the register shows a notice when opened. Refund the amount via BTCPay then.</li>
+        <li><strong>Void:</strong> Kuenta books the refund. Refund the money in BTCPay with the "Refund" function on the invoice, or in cash.</li>
+        <li>Crypto payments are non-cash. They do not go into the cash book, the TSE signs them as non-cash, and in the DSFinV-K export they appear as "Unbar / Krypto".</li>
+      </ul>
+    </section>
+
+    <section id="pro">
+      <h2>Kuenta Pro</h2>
+      <p class="lead">Kuenta is open source and free. Some extra features are available as add-ons. They are unlocked with a license key and cost 10 € each, one-off. Payment is made with Bitcoin or Tether (USDT).</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Add-on</th><th>since</th><th>Price</th></tr></thead>
+        <tbody><tr><td>SMS reminders and SMS gateway</td><td>1.0.8</td><td>10 €</td></tr></tbody>
+      </table></div>
+      <p>The licensor is the open source developer DoctorD. Order by email to <a href="mailto:heidepower@proton.me">heidepower@proton.me</a> with the workshop name, billing address and the add-ons you want. After payment the license key arrives by email. If you buy another add-on later, you get a new key with all your add-ons that replaces the old one.</p>
+      <p>Add-ons without a license show a lock 🔒. Clicking it explains how to get the license.</p>
+      <h3>Installing the license</h3>
+      <ol class="steps">
+        <li><div><strong>Copy the key</strong><span>After payment you receive a key that starts with <code>KUENTA1.</code></span></div></li>
+        <li><div><strong>Paste it</strong><span><span class="path">Settings → License</span>, paste the complete key, "Install license".</span></div></li>
+        <li><div><strong>Done</strong><span>Kuenta shows who the license is for and until when. No restart is needed.</span></div></li>
+      </ol>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Question</th><th>Answer</th></tr></thead>
+        <tbody>
+          <tr><td>Does Kuenta need internet for this?</td><td>No. The key is digitally signed and checked on the computer.</td></tr>
+          <tr><td>For how many workstations?</td><td>For the whole installation with all companies. The other workstations work in <a href="#netzwerk">network mode</a>.</td></tr>
+          <tr><td>Where is the license stored?</td><td>As <code>lizenz.key</code> in the data folder. Updates do not change it. When moving to a new computer, install the key again.</td></tr>
+          <tr><td>Does the license expire?</td><td>No, add-ons are paid once and unlimited.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="netzwerk">
+      <h2>Network mode</h2>
+      <p>So that tablets and other workstations can use Kuenta, start <span class="path">Start menu → Kuenta im Netzwerk</span> on the workshop PC (Linux/macOS: <code>kuenta --netzwerk</code>).</p>
+      <ol>
+        <li>The console window shows the address for the other devices, e.g. <code>http://192.168.1.20:3700</code>.</li>
+        <li>Open this address in the browser on the tablet.</li>
+        <li>If Windows asks for a firewall permission, allow it for "Private networks".</li>
+      </ol>
+      <div class="note warn"><strong>Required in the network</strong><span>Switch on login (<span class="path">Settings → Defaults</span>) and create users. Otherwise every device in the network can open Kuenta without a password.</span></div>
+      <p>Each workstation can choose its own interface language. Handing over to Thunderbird only works on the workshop PC itself. From other devices use direct sending via SMTP.</p>
+    </section>
+
+    <section id="sicherung">
+      <h2>Backup and data folder</h2>
+      <p>The data is never in the program folder but in the user profile. Updates and uninstalling leave it untouched.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>System</th><th>Data folder</th></tr></thead>
+        <tbody>
+          <tr><td>Windows</td><td><code>%APPDATA%\Kuenta</code> (e.g. <code>C:\Users\&lt;name&gt;\AppData\Roaming\Kuenta</code>)</td></tr>
+          <tr><td>macOS</td><td><code>~/Library/Application Support/Kuenta</code></td></tr>
+          <tr><td>Linux</td><td><code>~/.local/share/kuenta</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>Among other things, the data folder contains the database <code>kuenta.db</code>, documents and images (<code>dateien</code>), automatic backups (<code>sicherungen</code>), safety copies before imports (<code>sicherheitskopien</code>) and the attachments for the mail program (<code>mail-ausgang</code>).</p>
+      <h3>Backing up</h3>
+      <ul>
+        <li><strong>By hand:</strong> <span class="path">Kuenta → Back up data</span> creates a <code>*.kuenta</code> file with database and documents. With a password it is AES-256 encrypted.</li>
+        <li><strong>Automatically:</strong> Kuenta backs up daily into the folder <code>sicherungen</code>. Folder and number of backups kept (default 14) are set on the same page.</li>
+        <li><strong>Whole folder:</strong> alternatively copy the complete data folder while Kuenta is stopped.</li>
+      </ul>
+      <div class="note"><strong>Recommendation</strong><span>Put the backup folder on another drive, a NAS or a USB stick. A backup on the same hard disk does not help if that disk fails.</span></div>
+      <div class="note warn"><strong>Do not put the data folder on a network drive</strong><span>Backups belong on the NAS, the data folder itself does not. Kuenta works in its database all the time. Over a network share it can get damaged, e.g. during a short network outage. If the data folder is on a network drive, Kuenta warns at start. For several workstations use <a href="#netzwerk">network mode</a>: one computer holds the data, all others work in the browser.</span></div>
+    </section>
+
+    <section id="update">
+      <h2>Updating and rolling out</h2>
+      <p>To update, simply run the new installer. It does everything itself:</p>
+      <ol class="steps">
+        <li><div><strong>Find a running Kuenta</strong><span>The installer looks for Kuenta processes from the program folder, including the console window.</span></div></li>
+        <li><div><strong>Stop cleanly</strong><span>Kuenta is asked to stop and closes the database properly. If it does not respond, it is killed.</span></div></li>
+        <li><div><strong>Install the update</strong><span>Program files are replaced. The data in the user profile stays unchanged.</span></div></li>
+        <li><div><strong>Start again</strong><span>Kuenta starts in the same mode as before (local or network). A new tab opens in the browser.</span></div></li>
+      </ol>
+      <h3>Rolling out without questions</h3>
+      <p>For scripts or software distribution:</p>
+      <div class="codeblock"><pre><code>Kuenta-Setup-1.1.0.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART</code></pre></div>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Switch</th><th>Effect</th></tr></thead>
+        <tbody>
+          <tr><td><code>/VERYSILENT</code></td><td>no windows</td></tr>
+          <tr><td><code>/SUPPRESSMSGBOXES</code></td><td>no questions</td></tr>
+          <tr><td><code>/NORESTART</code></td><td>do not restart Windows</td></tr>
+          <tr><td><code>/ALLUSERS</code> · <code>/CURRENTUSER</code></td><td>install for all users or only the current one (default: as in the first installation)</td></tr>
+          <tr><td><code>/NOSTART</code></td><td>do not start Kuenta again after the update</td></tr>
+          <tr><td><code>/LOG="C:\Temp\kuenta-setup.log"</code></td><td>write an installation log</td></tr>
+        </tbody>
+      </table></div>
+      <div class="note"><strong>Updating from version 1.0.0</strong><span>Version 1.0.0 does not know the clean stop yet. On the first update from it Kuenta is therefore killed. The data is not harmed.</span></div>
+      <div class="note warn"><strong>System account</strong><span>If the installation runs under the system account (typical for software distribution), Kuenta is stopped but not started again. Otherwise it would run in the wrong user profile with empty data. Users then start Kuenta from the start menu as usual.</span></div>
+      <p><strong>Linux / macOS:</strong> get the new version (<code>git pull</code> or archive) and run <code>./installer/unix/install.sh</code> again.</p>
+    </section>
+
+    <section id="deinstallation">
+      <h2>Uninstalling</h2>
+      <ul>
+        <li><strong>Windows:</strong> <span class="path">Settings → Apps → Kuenta</span> or start menu <span class="path">Kuenta deinstallieren</span>. A running Kuenta is stopped first and the firewall rule removed.</li>
+        <li><strong>Linux / macOS:</strong> <code>./installer/unix/install.sh --uninstall</code></li>
+      </ul>
+      <p>The data folder is kept in any case. If you really want to remove the data, delete it by hand, preferably after a last backup.</p>
+    </section>
+
+    <section id="beachten">
+      <h2>Important to know</h2>
+      <p>All notes from this handbook at a glance. Each point is explained in the linked chapter.</p>
+      <div class="modules">
+        <div class="module"><h3>Data and backup</h3><div class="where"><a href="#sicherung">Backup</a> · <a href="#datenuebernahme">Taking over data</a></div>
+          <ul>
+            <li>Never put the data folder on a network drive or NAS. Kuenta warns at start.</li>
+            <li>Backups, on the other hand, go to another drive, a NAS or a USB stick.</li>
+            <li>A KFZ-Faktura import replaces customers, invoices etc. with the state of the backup. Kuenta's own data is kept.</li>
+            <li>Do not work in KFZ-Faktura and Kuenta in parallel for long. Invoices from Kuenta, including those from the register, are overwritten by the next import.</li>
+            <li>Kuenta creates a safety copy before every import.</li>
+          </ul></div>
+        <div class="module"><h3>Network and container</h3><div class="where"><a href="#netzwerk">Network mode</a> · <a href="#installation">Installation</a></div>
+          <ul>
+            <li>In network mode and in the container, switch on login immediately and create users.</li>
+            <li>Use network mode for several workstations. There is no external database.</li>
+            <li>For dollar and bitcoin rates on the overview the Kuenta computer needs internet (ECB, Bitstamp). The rates are display only; invoices stay in euros.</li>
+            <li>There is no mail program in the container. Send via SMTP there.</li>
+            <li>The container image has not yet been built in a real Docker or Podman environment. Please check on first use.</li>
+          </ul></div>
+        <div class="module"><h3>Email</h3><div class="where"><a href="#email">Sending email</a></div>
+          <ul>
+            <li>Handing over to Thunderbird only works on the PC Kuenta runs on.</li>
+            <li>The invoice counts as "sent by mail" as soon as it is handed over, even if the mail is not sent in Thunderbird.</li>
+            <li>If Thunderbird has its own signature, two signatures appear. Empty one of them.</li>
+            <li>Handed-over attachments are stored in <code>mail-ausgang</code> and deleted after 14 days.</li>
+            <li>With direct sending via SMTP the mail does not appear in Thunderbird. Use the sending log or a BCC copy instead.</li>
+            <li>Reminders by email or SMS only to customers who have agreed. Record opt-outs with "No reminders" for the customer.</li>
+            <li>Sending SMS needs a Kuenta Pro license. Keep the license key and install it again when changing computers.</li>
+            <li>For SMS use an LTE stick instead of a UMTS stick. Check whether your tariff allows bulk sending.</li>
+          </ul></div>
+        <div class="module"><h3>DATEV</h3><div class="where"><a href="#datev">DATEV export</a></div>
+          <ul>
+            <li>The first time, have the tax adviser read both files as a test.</li>
+            <li>Export each fiscal year separately.</li>
+            <li>Documents (PDF) are not included and still have to go to the tax adviser separately.</li>
+            <li>Have older bookings for customers or suppliers with short numbers checked.</li>
+            <li>Only switch on BU keys if the tax adviser uses accounts without the automatic function.</li>
+            <li>For SKR04 agree the accounts with the tax adviser.</li>
+          </ul></div>
+        <div class="module"><h3>Update and installation</h3><div class="where"><a href="#update">Update</a> · <a href="#deinstallation">Uninstalling</a></div>
+          <ul>
+            <li>The installer stops a running Kuenta and starts it again afterwards. A new tab opens in the browser.</li>
+            <li>Under the system account (software distribution) Kuenta is not started again.</li>
+            <li>The first update from version 1.0.0 kills Kuenta. The data stays intact.</li>
+            <li>Updates and uninstalling leave the data folder untouched. Each Windows user has their own.</li>
+          </ul></div>
+        <div class="module"><h3>Register and law</h3><div class="where"><a href="#grenzen">Notes and limits</a></div>
+          <ul>
+            <li>Check the TSE with a fiskaly test account before going live and register the register with the tax office.</li>
+            <li>Check the card terminal and DSFinV-K before use or before an audit.</li>
+            <li>Kuenta is designed for Germany. Other countries (e.g. Spain with VeriFactu) are not supported, even though the interface is available in English and Spanish.</li>
+            <li>Purchase contracts are templates and do not replace legal advice.</li>
+          </ul></div>
+      </div>
+    </section>
+
+    <section id="probleme">
+      <h2>Frequent questions and problems</h2>
+      <dl class="faq">
+        <div><dt>At start "Kuenta läuft bereits auf Port 3700" (already running on port 3700) appears.</dt><dd>Kuenta is already running, e.g. in another console window. The browser opens the running Kuenta, and the new window closes by itself.</dd></div>
+        <div><dt>"Node.js wurde nicht gefunden" (Node.js not found).</dt><dd>Only happens without the installer. Install Node.js LTS from nodejs.org or use the Windows installer, which includes Node.js.</dd></div>
+        <div><dt>The tablet cannot reach Kuenta.</dt><dd>Kuenta must have been started via "Kuenta im Netzwerk". Check the address shown in the console window and the firewall permission for private networks. Tablet and PC must be in the same network.</dd></div>
+        <div><dt>"Thunderbird not found".</dt><dd>Enter the path to <code>thunderbird.exe</code> under <span class="path">Settings → Email</span>, e.g. <code>C:\Program Files\Mozilla Thunderbird\thunderbird.exe</code>.</dd></div>
+        <div><dt>"The mail program can only be opened on the computer Kuenta runs on".</dt><dd>You are working on another device in the network. Send via SMTP there or open the mail on the workshop PC.</dd></div>
+        <div><dt>"No mail server has been set up".</dt><dd>The sending method is SMTP, but the server details are missing. Enter them under <span class="path">Settings → Email</span> or switch to "Hand over to mail program".</dd></div>
+        <div><dt>Printed invoices can no longer be changed.</dt><dd>The GoBD lock is active (<span class="path">Settings → Defaults</span>). Changes are then made with an invoice correction.</dd></div>
+        <div><dt>DATEV export: "The period goes beyond the fiscal year".</dt><dd>DATEV only accepts bookings from one fiscal year. Export separately, e.g. up to 31.12. and from 01.01. For a different fiscal year enter the start month under <span class="path">Settings → Accounting</span>.</dd></div>
+        <div><dt>DATEV export: "Invalid accounts for DATEV".</dt><dd>A booking has an account with too many digits or without a number. Check the documents listed and the accounts under <span class="path">Settings → Accounting</span>, especially the account length.</dd></div>
+        <div><dt>The data is gone after the update.</dt><dd>Updates do not touch the data folder. Check whether Kuenta runs under a different Windows user. Each user has their own data folder.</dd></div>
+        <div><dt>Part of the screen is still in German.</dt><dd>A few texts may not be translated yet. Messages from the console window and the installer are German only. Please report missing translations, see <code>CONTRIBUTING.md</code>.</dd></div>
+      </dl>
+    </section>
+
+    <section id="rechnungsnummern">
+      <h2>Invoice numbers</h2>
+      <p>Invoice numbers are sequential, as in KFZ-Faktura. Kuenta assigns the number itself when saving: last number used plus 1. The invoice number field is therefore locked. For a new invoice it only shows a suggestion. If another workstation saves an invoice first, your invoice gets the next free number.</p>
+      <ul>
+        <li><strong>Separate number ranges:</strong> invoices and invoice corrections (including cancellations and credit notes) are counted separately. The settings are under <span class="path">Settings → Number ranges</span>.</li>
+        <li><strong>After importing from KFZ-Faktura</strong> Kuenta continues from the last number used.</li>
+        <li><strong>No restart at the turn of the year:</strong> the numbers simply continue. A new database starts at year + 0001, e.g. 20260001.</li>
+      </ul>
+      <h3>How gaps can occur</h3>
+      <ul>
+        <li><strong>Unprinted invoice deleted:</strong> the number is not assigned again. Write down the reason so you can explain the gap in an audit. Better: do not delete the invoice, cancel it.</li>
+        <li><strong>Number range raised by hand:</strong> entering a higher number under <span class="path">Settings → Number ranges</span> skips the numbers in between.</li>
+      </ul>
+      <p>Printed or sent invoices cannot be deleted, only cancelled. The cancellation invoice gets a number from the range of invoice corrections.</p>
+    </section>
+
+    <section id="grenzen">
+      <h2>Notes and limits</h2>
+      <ul>
+        <li><strong>TSE:</strong> the cloud TSE from fiskaly (SIGN DE) is supported. Check with a fiskaly test account before going live and register the register with the tax office. USB TSEs and the Austrian RKSV are not supported.</li>
+        <li><strong>Card terminal:</strong> ZVT over TCP/IP has been tested against a simulated terminal, not against a real device.</li>
+        <li><strong>DSFinV-K:</strong> check with the DSFinV-K test tool before an audit.</li>
+        <li><strong>Parts catalogues:</strong> live connections to TecDoc, DAT or Elekat need manufacturer licenses and are not included. Shopping carts are taken over as CSV/DATANORM.</li>
+        <li><strong>Purchase contract:</strong> the contract texts are a template and do not replace legal advice.</li>
+        <li><strong>DATEV:</strong> booking batch and debtors/creditors follow the DATEV format but have not been cross-checked in a DATEV program. Documents (PDF) and a connection to DATEV Unternehmen online are not included.</li>
+        <li><strong>Crypto payment:</strong> tested against a simulated BTCPay Server, not yet against a real one. USDT only works via the Liquid network, as offered by BTCPay. USDT on Tron or Ethereum is not supported.</li>
+        <li><strong>Container:</strong> the image has so far only been checked outside a real Docker or Podman environment.</li>
+        <li><strong>Database:</strong> Kuenta uses a built-in database (SQLite). An external database such as PostgreSQL is not supported. Several workstations work via network mode.</li>
+        <li><strong>Countries and languages:</strong> tax, e-invoicing, register and DATEV are designed for Germany. The interface is available in German, English and Spanish, but country-specific obligations of other countries, e.g. VeriFactu in Spain, are not. The e-invoice, DATEV export, console messages and the installer stay German.</li>
+      </ul>
+    </section>
+
+    <section id="technik">
+      <h2>For administrators</h2>
+      <h3>Environment variables</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Variable</th><th>Default</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>PORT</code></td><td><code>3700</code></td><td>port of the server</td></tr>
+          <tr><td><code>HOST</code></td><td><code>127.0.0.1</code></td><td><code>0.0.0.0</code> shares Kuenta in the network</td></tr>
+          <tr><td><code>KUENTA_DATA</code></td><td>user profile</td><td>a different data folder on a local drive, e.g. a second hard disk. Do not put it on a network drive or NAS (see <a href="#sicherung">Backup</a>).</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Development and installer</h3>
+      <div class="codeblock"><pre><code>npm test                    # automated tests
+npm run server              # start the server without a browser
+npm run installer:windows   # build the Windows installer</code></pre></div>
+      <p>The installer needs Windows, <a href="https://jrsoftware.org/isdl.php">Inno Setup 6</a> and internet access (Node.js is downloaded from nodejs.org and verified with SHA-256). The result is in <code>build\Kuenta-Setup-&lt;version&gt;.exe</code>; the version comes from <code>package.json</code>.</p>
+      <p>Structure: <code>server/</code> (server, business logic, import, e-invoice, PDF/A, email, register, backup), <code>public/</code> (user interface), <code>installer/</code> (Windows installer, Linux/macOS script). The database is SQLite with the table and column names of KFZ-Faktura. Code comments are in English. Translations of the interface are in <code>public/js/lang/</code>; <code>node tools/i18n/missing.js</code> lists missing ones. Customer and company data never belongs in the repository.</p>
+    </section>
+  </main>
+
+  <footer>Kuenta 1.1.0 · © 2026 DoctorD · Open source under the GNU AGPL 3.0, Pro features with a license · Font in documents: Liberation Sans (SIL Open Font License) · QR code: qrcode-generator (MIT)</footer>
+</div>
+
+<script>
+(function () {
+  var sections = Array.prototype.slice.call(document.querySelectorAll('main section[id]'));
+  var toc = document.getElementById('toc'), tocM = document.getElementById('toc-m');
+  sections.forEach(function (s, i) {
+    var h = s.querySelector('h2');
+    var title = h.textContent.trim();
+    var no = document.createElement('span'); no.className = 'no'; no.textContent = String(i + 1).padStart(2, '0');
+    h.insertBefore(no, h.firstChild);
+    [toc, tocM].forEach(function (list) {
+      var li = document.createElement('li'), a = document.createElement('a');
+      a.href = '#' + s.id; a.textContent = title; li.appendChild(a); list.appendChild(li);
+    });
+  });
+  tocM.addEventListener('click', function (e) { if (e.target.tagName === 'A') tocM.closest('details').open = false; });
+
+  var links = toc.querySelectorAll('a');
+  function mark() {
+    var cur = sections[0].id;
+    for (var i = 0; i < sections.length; i++) if (sections[i].getBoundingClientRect().top < 140) cur = sections[i].id;
+    links.forEach(function (a) { a.classList.toggle('active', a.getAttribute('href') === '#' + cur); });
+  }
+  window.addEventListener('scroll', mark, { passive: true }); mark();
+
+  document.querySelectorAll('.codeblock').forEach(function (b) {
+    var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'copy'; btn.textContent = 'Copy';
+    btn.addEventListener('click', function () {
+      var text = b.querySelector('code').textContent;
+      var done = function () { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy'; }, 1500); };
+      var fallback = function () { var r = document.createRange(); r.selectNodeContents(b.querySelector('code')); var s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Selected – Ctrl+C'; };
+      try { navigator.clipboard.writeText(text).then(done, fallback); } catch (e) { fallback(); }
+    });
+    b.appendChild(btn);
+  });
+})();
+</script>

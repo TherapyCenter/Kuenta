@@ -1,3 +1,5 @@
+<!doctype html>
+<html lang="de">
 <meta charset="utf-8">
 <title>Kuenta Handbuch</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -5,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: Werkstatthandbuch – feste Inhaltsleiste links, Lesespalte rechts; auf dem Handy einspaltig mit aufklappbarem Inhalt */
+/* Layout: workshop manual – fixed table of contents on the left, reading column on the right; single column with collapsible contents on phones */
 :root {
   --bg: #f3f5f7;
   --paper: #ffffff;
@@ -51,7 +53,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 
 .shell { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 48px; padding-block: 40px 80px; }
 
-/* Kopf */
+/* header */
 .masthead { grid-column: 1 / -1; display: grid; gap: 10px; padding-bottom: 28px; border-bottom: 3px solid var(--ink); }
 .masthead .kicker { font-family: var(--f-mono); font-size: 13px; color: var(--muted); letter-spacing: .04em; }
 .masthead h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(44px, 7vw, 76px); line-height: .95; margin: 0; letter-spacing: -.01em; text-wrap: balance; }
@@ -59,7 +61,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 .meta { display: flex; flex-wrap: wrap; gap: 8px 20px; font-family: var(--f-mono); font-size: 13px; color: var(--muted); }
 .meta b { color: var(--ink); font-weight: 500; }
 
-/* Inhaltsverzeichnis */
+/* table of contents */
 nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); align-self: start; max-height: calc(100vh - 40px); overflow-y: auto; font-size: 15px; }
 nav.toc .label { font-family: var(--f-display); font-weight: 600; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
 nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: toc; display: grid; gap: 1px; }
@@ -70,7 +72,7 @@ nav.toc a:hover { background: var(--accent-soft); }
 nav.toc a.active { border-left-color: var(--accent); color: var(--accent); font-weight: 600; }
 details.toc-mobile { display: none; }
 
-/* Inhalt */
+/* content */
 main { min-width: 0; display: grid; gap: 56px; }
 section { display: grid; gap: 14px; min-width: 0; }
 section > h2 { font-family: var(--f-display); font-weight: 700; font-size: 36px; line-height: 1.05; margin: 0; display: flex; align-items: baseline; gap: 12px; text-wrap: balance; }
@@ -151,10 +153,10 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
 
 <div class="shell">
   <header class="masthead">
-    <div class="kicker">Werkstatt-Faktura · Bedienung, Einrichtung, Betrieb</div>
+    <div class="kicker">Invoicing &amp; POS for auto repair shops · Bedienung, Einrichtung, Betrieb</div>
     <h1>Kuenta Handbuch</h1>
     <p>Alles, was Sie für Installation, Einrichtung, die tägliche Arbeit, den E-Mail-Versand, Updates und die Datensicherung von Kuenta wissen müssen.</p>
-    <div class="meta"><span>Version <b>1.1.0</b></span><span>Stand <b>November 2026</b></span><span>Windows · macOS · Linux · Tablet</span></div>
+    <div class="meta"><span>Version <b>1.1.0</b></span><span>Stand <b>November 2026</b></span><span>Windows · macOS · Linux · Tablet</span><span><a href="handbook-en.html" hreflang="en">English</a> · <a href="handbook-es.html" hreflang="es">Español</a></span></div>
   </header>
 
   <nav class="toc" aria-label="Inhalt">
@@ -800,7 +802,7 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Krypto-Zahlung:</strong> Getestet gegen einen nachgebauten BTCPay Server, noch nicht gegen einen echten. USDT geht nur über das Liquid-Netz, wie es BTCPay anbietet. USDT auf Tron oder Ethereum wird nicht unterstützt.</li>
         <li><strong>Container:</strong> Das Image wurde bisher nur außerhalb einer echten Docker- oder Podman-Umgebung geprüft.</li>
         <li><strong>Datenbank:</strong> Kuenta nutzt eine eingebaute Datenbank (SQLite). Eine externe Datenbank wie PostgreSQL wird nicht unterstützt. Mehrere Arbeitsplätze arbeiten über den Netzwerkbetrieb.</li>
-        <li><strong>Länder:</strong> Steuer, E-Rechnung, Kasse und DATEV sind auf Deutschland ausgelegt. Sprachen außer Deutsch und länderspezifische Pflichten, z. B. VeriFactu in Spanien, gibt es nicht.</li>
+        <li><strong>Länder:</strong> Steuer, E-Rechnung, Kasse und DATEV sind auf Deutschland ausgelegt. Die Oberfläche gibt es auf Deutsch, Englisch und Spanisch, länderspezifische Pflichten anderer Länder, z. B. VeriFactu in Spanien, aber nicht.</li>
       </ul>
     </section>
 
