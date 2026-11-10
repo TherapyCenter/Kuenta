@@ -1,6 +1,6 @@
 {
   "name": "kuenta",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Kuenta – invoicing & point of sale for auto repair shops, runs in the browser on any platform (imports KFZ-Faktura backups)",
   "main": "server/index.js",
   "private": true,
