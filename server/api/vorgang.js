@@ -84,6 +84,7 @@ function load(typ, id) {
   // Austria / Switzerland: texts, footer, checks and (CH) the QR-bill of the open amount
   if (L.land() === 'AT') res.lx = require('../at').info(typ, kopf, pos);
   if (L.land() === 'CH') res.lx = require('../ch').info(typ, kopf, pos, res.offen);
+  if (L.land() === 'IT') res.lx = require('../it').info(typ, kopf, pos);
   return res;
 }
 
@@ -191,7 +192,7 @@ function save(typ, payload, user) {
   if (v.typ) kopfIn.TYP = v.typ;
   if (id && v.table === 'RECHNUNGEN') {
     const old = d.prepare('SELECT GEDRUCKT FROM RECHNUNGEN WHERE RECHNUNGID=?').get(id);
-    if (old && old.GEDRUCKT && (L.sw('gobd.sperre', '0') === '1' || L.land() === 'FR')) throw new L.HttpError(409, 'Gedruckte Rechnungen sind gesperrt (GoBD). Bitte erstellen Sie eine Rechnungskorrektur.');
+    if (old && old.GEDRUCKT && (L.sw('gobd.sperre', '0') === '1' || ['FR', 'IT'].includes(L.land()))) throw new L.HttpError(409, 'Gedruckte Rechnungen sind gesperrt (GoBD). Bitte erstellen Sie eine Rechnungskorrektur.');
   }
   const tax = calc(kopfIn, pos);
   const cols = L.tableColumns(v.table); const pcols = L.tableColumns(v.pos);

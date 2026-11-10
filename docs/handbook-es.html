@@ -552,6 +552,19 @@ docker compose up -d --build</code></pre></div>
       </ul>
     </section>
 
+    <section id="italien">
+      <h2>Italia: IVA y factura electrónica</h2>
+      <p>Elija “Italia” en <span class="path">Ajustes → Impuestos / reclamaciones / caja → Sistema fiscal</span>, guarde y recargue. La configuración está en la pestaña <span class="path">Italia</span>. Para documentos en italiano elija el idioma de documentos “Italiano” (la interfaz sigue en alemán, inglés o español).</p>
+      <ul>
+        <li><strong>Datos de la empresa:</strong> partita IVA (11 cifras) en NIF-IVA, codice fiscale en Número fiscal (vacío = igual que la partita IVA). Provincia, REA, capital social, socio único y liquidación en la pestaña Italia.</li>
+        <li><strong>Clientes:</strong> partita IVA en NIF-IVA; codice fiscale, código de destinatario SdI (7 caracteres, administraciones 6) o PEC y split payment en <span class="path">Impuestos y contabilidad</span>. Indique la población con la provincia, p. ej. “Torino (TO)”.</li>
+        <li><strong>Tipos:</strong> 22 %, 10 % y 4 % (código “AT-MwSt”, ajustable p. ej. a 5 %), 0 % exento. Se puede activar el regime forfettario. Las líneas sin IVA reciben automáticamente el código Natura (N1 suplidos, N2 no sujetas, N3 exportación/intracomunitarias, N4 exentas, N5 régimen del margen).</li>
+        <li><strong>Factura electrónica:</strong> en la ventana de la factura <em>Fattura elettronica (FatturaPA) → descargar XML</em> y envíe el archivo por el portal “Fatture e Corrispettivi”, por PEC al SdI o mediante su intermediario. Kuenta elige FPR12 o FPA12 para administraciones, notas de crédito TD04, imposta di bollo y split payment. La impresión es una copia de cortesía; las facturas impresas quedan bloqueadas.</li>
+        <li><strong>Caja:</strong> cada venta se registra como factura; el ticket indica “Documento non fiscale”. Para documentos comerciales hace falta un dispositivo RT homologado.</li>
+        <li><strong>Liquidación del IVA:</strong> <span class="path">Finanzas → Exportación contable</span> muestra IVA repercutido, IVA soportado, split payment, saldo y el código de tributo del F24 (mensual o trimestral con 1 % de intereses) y exporta el registro de IVA de ventas en CSV. La LIPE y la declaración anual las presenta su asesor.</li>
+      </ul>
+    </section>
+
     <section id="datev">
       <h2>Exportación DATEV para el asesor fiscal</h2>
       <p class="lead">Kuenta contabiliza automáticamente facturas, pagos, facturas de proveedor y ventas de caja y los exporta como archivos DATEV. Su asesor fiscal los importa directamente en DATEV, el programa contable habitual en Alemania.</p>
@@ -850,7 +863,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>Compruebe la TSE con una cuenta de prueba de fiskaly antes de usarla en real y comunique la caja a Hacienda (alemana).</li>
             <li>Compruebe el terminal de tarjetas y la DSFinV-K antes de usarlos o de una inspección.</li>
-            <li>Kuenta está pensado para Alemania, España, el Reino Unido, Estados Unidos, Francia, Austria y Suiza (vea <a href="#spanien">España</a>, <a href="#uk">Reino Unido</a>, <a href="#usa">Estados Unidos</a>, <a href="#oesterreich">Austria</a> y <a href="#schweiz">Suiza</a>). TicketBAI, Navarra e IGIC no están soportados.</li>
+            <li>Kuenta está pensado para Alemania, España, el Reino Unido, Estados Unidos, Francia, Austria, Suiza e Italia (vea <a href="#spanien">España</a>, <a href="#uk">Reino Unido</a>, <a href="#usa">Estados Unidos</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Suiza</a> e <a href="#italien">Italia</a>). TicketBAI, Navarra e IGIC no están soportados.</li>
             <li>Los contratos de compraventa son modelos y no sustituyen el asesoramiento jurídico.</li>
           </ul></div>
       </div>

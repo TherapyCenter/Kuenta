@@ -34,7 +34,7 @@ const App = {
   // Language per workstation; the page is reloaded so every view is built again
   setLang(code) { Pref.set('lang', code); location.reload(); },
   langMenu() {
-    return Object.entries(I18N.LANGS).map(([k, l]) => [(k === I18N.lang ? '✓ ' : '  ') + l.name, () => this.setLang(k)]);
+    return Object.entries(I18N.UI_LANGS).map(([k, l]) => [(k === I18N.lang ? '✓ ' : '  ') + l.name, () => this.setLang(k)]);
   },
   // Static texts from index.html
   translateStatic() {
@@ -47,7 +47,7 @@ const App = {
     this.setFarbe(Pref.get('farbe', 'blau'), false);
     try { this.session = await api('/api/session', { noLogin: true }); } catch (e) { showError(e); return; }
     // no language chosen on this workstation yet: use the default of the installation
-    if (Pref.get('lang', null) == null && I18N.LANGS[this.session.sprache] && this.session.sprache !== I18N.lang) { this.setLang(this.session.sprache); return; }
+    if (Pref.get('lang', null) == null && I18N.UI_LANGS[this.session.sprache] && this.session.sprache !== I18N.lang) { this.setLang(this.session.sprache); return; }
     if (this.session.loginRequired && !this.session.user) return this.showLogin();
     await LK.load();
     await this.loadSettings();
@@ -95,7 +95,7 @@ const App = {
       try { await api('/api/login', { method: 'POST', body: { user: u.value, pass: p.value }, noLogin: true }); location.reload(); }
       catch (e) { err.textContent = T(e.message); err.classList.remove('hidden'); }
     } }, h('h2', null, h('img', { src: 'img/icon.svg', width: 28 }), 'Kuenta'), u, p, err, h('button', { class: 'btn primary', type: 'submit' }, 'Anmelden'),
-      h('select', { class: 'lang', onchange: e => this.setLang(e.target.value) }, Object.entries(I18N.LANGS).map(([k, l]) => h('option', { value: k, selected: k === I18N.lang }, l.name))));
+      h('select', { class: 'lang', onchange: e => this.setLang(e.target.value) }, Object.entries(I18N.UI_LANGS).map(([k, l]) => h('option', { value: k, selected: k === I18N.lang }, l.name))));
     document.body.append(h('div', { class: 'login' }, form));
     setTimeout(() => u.focus(), 50);
   },

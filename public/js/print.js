@@ -89,7 +89,7 @@ ${extra}`;
       <div>${zeile(f.FIRMENNAME, f.FIRMENZUSATZ, f.STRASSE, Print.plzOrt(f.PLZ, f.ORT))}</div>
       <div>${zeile(f.TELEFON && 'Tel.: ' + f.TELEFON, f.FAX && 'Fax: ' + f.FAX, f.EMAIL, f.INTERNETSEITE)}</div>
       <div>${zeile(f.BANKNAME, f.IBAN && 'IBAN: ' + f.IBAN, f.BIC && 'BIC: ' + f.BIC, f.BANKINHABER && 'Inhaber: ' + f.BANKINHABER)}</div>
-      <div>${zeile(...(LK.data && ['AT', 'CH'].includes(LK.data.land) && Print.lxPied ? Print.lxPied : LK.data && LK.data.land === 'FR' && Print.frPied ? Print.frPied : es ? [(f.STEUERNR || f.USTNR) && 'NIF: ' + (f.STEUERNR || f.USTNR)] : us ? [App.setting('us.reg.nr', '') && `${App.setting('us.reg.label', 'Registration No.')}: ${App.setting('us.reg.nr', '')}`] : gb ? [f.USTNR && 'VAT-Reg.-Nr.: ' + f.USTNR] : [f.USTNR && 'USt-IdNr.: ' + f.USTNR, f.STEUERNR && 'Steuer-Nr.: ' + f.STEUERNR]), f.HANDELSREGISTER, f.GESCHAEFTSFUEHRER && 'Inhaber/GF: ' + f.GESCHAEFTSFUEHRER, f.FUSSZEILE)}</div>
+      <div>${zeile(...(LK.data && ['AT', 'CH', 'IT'].includes(LK.data.land) && Print.lxPied ? Print.lxPied : LK.data && LK.data.land === 'FR' && Print.frPied ? Print.frPied : es ? [(f.STEUERNR || f.USTNR) && 'NIF: ' + (f.STEUERNR || f.USTNR)] : us ? [App.setting('us.reg.nr', '') && `${App.setting('us.reg.label', 'Registration No.')}: ${App.setting('us.reg.nr', '')}`] : gb ? [f.USTNR && 'VAT-Reg.-Nr.: ' + f.USTNR] : [f.USTNR && 'USt-IdNr.: ' + f.USTNR, f.STEUERNR && 'Steuer-Nr.: ' + f.STEUERNR]), f.HANDELSREGISTER, f.GESCHAEFTSFUEHRER && 'Inhaber/GF: ' + f.GESCHAEFTSFUEHRER, f.FUSSZEILE)}</div>
     </div>`;
   },
   headHtml(f) {
@@ -187,6 +187,7 @@ ${extra}`;
     if (k.BESTELLNR) info.push(['Ihre Bestellung', k.BESTELLNR]);
     if (d._ust) info.push([es ? 'NIF' : lx ? lx.uidLabel : 'Ihre USt-IdNr.', d._ust]);
     if (fr && fr.sirenClient) info.push(['SIREN', fr.sirenClient]);
+    if (lx && lx.cfCliente) info.push(['C.F. cliente', lx.cfCliente]);
     const bezug = (d.verknuepft || []).find(l => l.typ === 'rechnung');
     if (typ === 'korrektur' && es && es.rectificada) info.push(['zu Rechnung', `${es.rectificada.numSerie} vom ${fmt.date(es.rectificada.fecha)}`]);
     else if (typ === 'korrektur' && bezug) info.push(['zu Rechnung', `${bezug.nr} vom ${fmt.date(bezug.datum)}`]);
@@ -243,6 +244,8 @@ ${extra}`;
         t += `<tr><td class="muted">bereits bezahlt (${esc([...new Set(d.zahlungen.map(z => z.ZAHLART))].join(', '))})</td><td class="r muted">${fmt.money(bez)}</td></tr>`;
         t += `<tr><td><b>Offener Betrag</b></td><td class="r"><b>${fmt.money(r2(k.GBRUTTO - bez))}</b></td></tr>`;
       }
+      // Italy, split payment: the customer pays the IVA to the treasury
+      if (lx && lx.split) t += `<tr><td class="muted">IVA versata dal cliente (art. 17-ter)</td><td class="r muted">${fmt.money(-lx.split)}</td></tr><tr><td><b>Netto a pagare</b></td><td class="r"><b>${fmt.money(r2(k.GBRUTTO - lx.split))}</b></td></tr>`;
       t += '</table>';
       html += t;
       if (klein) html += '<div class="txt muted">Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</div>';

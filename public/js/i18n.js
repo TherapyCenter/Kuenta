@@ -14,8 +14,10 @@
   if (typeof module === 'object' && module.exports) module.exports = factory();
   else root.I18N = factory();
 })(typeof self !== 'undefined' ? self : this, function () {
-  const LANGS = { de: { name: 'Deutsch', locale: 'de-DE' }, en: { name: 'English', locale: 'en-GB' }, es: { name: 'Español', locale: 'es-ES' } };
-  const DICT = { en: {}, es: {} };
+  // doc: only for customer documents (no translation of the user interface)
+  const LANGS = { de: { name: 'Deutsch', locale: 'de-DE' }, en: { name: 'English', locale: 'en-GB' }, es: { name: 'Español', locale: 'es-ES' }, it: { name: 'Italiano', locale: 'it-IT', doc: true } };
+  const UI_LANGS = Object.fromEntries(Object.entries(LANGS).filter(([, l]) => !l.doc));
+  const DICT = { en: {}, es: {}, it: {} };
   const compiled = {};   // per language: { patterns, prefixes, suffixes, cache }
   let current = 'de';
 
@@ -155,9 +157,9 @@
   }
 
   return {
-    LANGS, DICT, add, tr, t, word,
+    LANGS, UI_LANGS, DICT, add, tr, t, word,
     get lang() { return current; },
-    set lang(code) { current = LANGS[code] ? code : 'de'; },
+    set lang(code) { current = UI_LANGS[code] ? code : 'de'; },
     locale(code = current) { return (LANGS[code] || LANGS.de).locale; },
   };
 });

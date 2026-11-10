@@ -4,6 +4,7 @@
 const I18N = require('../public/js/i18n');
 I18N.add('en', require('../public/js/lang/en'));
 I18N.add('es', require('../public/js/lang/es'));
+I18N.add('it', require('../public/js/lang/it')); // documents only
 
 function docLang() {
   try { return require('./lib').sw('beleg.sprache', 'de') || 'de'; } catch { return 'de'; }
@@ -12,7 +13,7 @@ function docLang() {
 // (German or Spanish system → German or Spanish, anything else → English)
 function systemLang() {
   const set = String(process.env.KUENTA_LANG || '').toLowerCase().slice(0, 2);
-  if (I18N.LANGS[set]) return set;
+  if (I18N.UI_LANGS[set]) return set;
   let loc = '';
   try { loc = Intl.DateTimeFormat().resolvedOptions().locale || ''; } catch { /* ignore */ }
   loc = (process.env.LC_ALL || process.env.LC_MESSAGES || process.env.LANG || loc).toLowerCase();

@@ -548,6 +548,19 @@ docker compose up -d --build</code></pre></div>
       </ul>
     </section>
 
+    <section id="italien">
+      <h2>Italien: IVA und fattura elettronica</h2>
+      <p>Unter <span class="path">Einstellungen → Steuer / Mahnung / Kasse → Steuersystem</span> „Italia“ wählen, speichern und neu laden. Die Einstellungen stehen im Reiter <span class="path">Italia</span>. Für italienische Belege unter <span class="path">Vorgabewerte → Sprache</span> die Belegsprache „Italiano“ wählen (die Oberfläche bleibt deutsch, englisch oder spanisch).</p>
+      <ul>
+        <li><strong>Firmendaten:</strong> Partita IVA (11 Ziffern) unter USt-IdNr., Codice Fiscale unter Steuernummer (leer = wie Partita IVA). Provinz, REA, Capitale sociale, Socio unico und Liquidation im Reiter Italia.</li>
+        <li><strong>Kunden:</strong> Partita IVA unter USt-IdNr., dazu Codice Fiscale, Codice destinatario SdI (7 Zeichen, Behörden 6) oder PEC und Split payment unter <span class="path">Steuer & Buchhaltung</span>. Den Ort mit Provinz eintragen, z. B. „Torino (TO)“.</li>
+        <li><strong>Steuersätze:</strong> 22 % (volle MwSt), 10 % (ermäßigte MwSt), 4 % (Code „AT-MwSt“, einstellbar z. B. auf 5 %), 0 % esente. Regime forfettario ist wählbar. Steuerfreie Zeilen erhalten automatisch den Natura-Code (N1 Auslagen, N2 nicht steuerbar, N3 Ausfuhr/innergemeinschaftlich, N4 esente, N5 Regime del margine).</li>
+        <li><strong>Fattura elettronica:</strong> im Rechnungsfenster <em>Fattura elettronica (FatturaPA) → XML herunterladen</em> und die Datei im Portal „Fatture e Corrispettivi“, per PEC an das SdI oder über Ihren Dienstleister senden. Kuenta wählt FPR12 bzw. FPA12 für Behörden, Nota di credito als TD04, Marca da bollo und Split payment. Der Ausdruck ist eine copia di cortesia; gedruckte Rechnungen sind gesperrt.</li>
+        <li><strong>Kasse:</strong> jeder Verkauf wird als Rechnung erfasst; der Bon trägt „Documento non fiscale“. Für documenti commerciali ist ein zugelassenes RT-Gerät nötig.</li>
+        <li><strong>Liquidazione IVA:</strong> <span class="path">Finanzen → FIBU-Export</span> zeigt IVA a debito, IVA detraibile, Split payment, Saldo und den Codice tributo für das F24 (monatlich oder vierteljährlich mit 1 % Zinsen) und exportiert das Registro IVA vendite als CSV. LIPE und Dichiarazione IVA erstellt Ihr Commercialista.</li>
+      </ul>
+    </section>
+
     <section id="datev">
       <h2>DATEV-Export für den Steuerberater</h2>
       <p class="lead">Kuenta bucht Rechnungen, Zahlungen, Eingangsrechnungen und Kassenumsätze automatisch und exportiert sie als DATEV-Dateien. Ihr Steuerberater liest sie direkt in DATEV ein.</p>
@@ -845,7 +858,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>TSE vor dem Echtbetrieb mit fiskaly-Testzugang prüfen und die Kasse beim Finanzamt melden.</li>
             <li>EC-Terminal und DSFinV-K vor dem Einsatz bzw. vor einer Prüfung kontrollieren.</li>
-            <li>Kuenta ist auf Deutschland, Spanien, Großbritannien, die USA, Frankreich, Österreich und die Schweiz ausgelegt (siehe <a href="#spanien">Spanien</a>, <a href="#uk">Großbritannien</a>, <a href="#usa">USA</a>, <a href="#oesterreich">Österreich</a> und <a href="#schweiz">Schweiz</a>). Andere Länder werden nicht unterstützt.</li>
+            <li>Kuenta ist auf Deutschland, Spanien, Großbritannien, die USA, Frankreich, Österreich, die Schweiz und Italien ausgelegt (siehe <a href="#spanien">Spanien</a>, <a href="#uk">Großbritannien</a>, <a href="#usa">USA</a>, <a href="#oesterreich">Österreich</a>, <a href="#schweiz">Schweiz</a> und <a href="#italien">Italien</a>). Andere Länder werden nicht unterstützt.</li>
             <li>Kaufverträge sind Muster und ersetzen keine Rechtsberatung.</li>
           </ul></div>
       </div>

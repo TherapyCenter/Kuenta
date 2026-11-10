@@ -40,7 +40,7 @@ function status() {
     bediener: d.prepare("SELECT BENUTZERID id, TRIM(COALESCE(VORNAME,'')||' '||COALESCE(NAME,'')) name FROM BENUTZER WHERE COALESCE(KASSENBEDIENER,0)=1 ORDER BY NAME").all(),
     barkunde: Number(L.sw('kasse.barkunde', '0')) || null,
     schnelltasten: JSON.parse(L.sw('kasse.schnelltasten', '[]') || '[]'),
-    autorechnung: L.sw('kasse.autorechnung', '1') === '1' || ES.activo(),
+    autorechnung: L.sw('kasse.autorechnung', '1') === '1' || ES.activo() || L.land() === 'IT',
     land: L.land(),
     frCaisse: FRC.activo(),
     atRksv: RKSV.aktiv(),
@@ -132,7 +132,8 @@ async function bonBuchen(p, user, krypto) {
     }
     const s = summen(lines); bezahlBetrag = s.brutto;
     // Spain: every sale is an invoice (factura simplificada or completa) with a VERI*FACTU record
-    if (!rechnungid && (L.sw('kasse.autorechnung', '1') === '1' || ES.activo())) {
+    // Italy: without a certified RT the sale is documented by an (electronic) invoice
+    if (!rechnungid && (L.sw('kasse.autorechnung', '1') === '1' || ES.activo() || L.land() === 'IT')) {
       const t = VG.template('rechnung', kunid ? { kunid } : {}); delete t.kopf._kunde;
       t.kopf.ANSICHTBRUTTO = L.land() === 'US' ? 0 : 1; t.kopf.ZAHLBDTEXT = zahlart === 'KRYPTO' ? 'Betrag per Krypto-Zahlung (BTCPay) erhalten.' : `Betrag ${ZAHLART_TEXT[zahlart].toLowerCase()} erhalten.`; t.kopf.FAELLING = 0;
       if (!kunid) { t.kopf.KUNNAME = 'Barverkauf'; }

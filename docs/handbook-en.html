@@ -552,6 +552,19 @@ docker compose up -d --build</code></pre></div>
       </ul>
     </section>
 
+    <section id="italien">
+      <h2>Italy: VAT and electronic invoices</h2>
+      <p>Choose “Italia” under <span class="path">Settings → Tax / dunning / register → Tax system</span>, save and reload. The settings are on the tab <span class="path">Italia</span>. For Italian documents choose the document language “Italiano” (the user interface stays German, English or Spanish).</p>
+      <ul>
+        <li><strong>Company data:</strong> partita IVA (11 digits) into VAT ID, codice fiscale into Tax number (empty = same as partita IVA). Province, REA, share capital, single shareholder and liquidation on the tab Italia.</li>
+        <li><strong>Customers:</strong> partita IVA into VAT ID; codice fiscale, SdI recipient code (7 characters, public bodies 6) or PEC and split payment under <span class="path">Tax & accounting</span>. Enter the town with the province, e.g. “Torino (TO)”.</li>
+        <li><strong>Rates:</strong> 22 % (full VAT), 10 % (reduced VAT), 4 % (code “AT-MwSt”, adjustable e.g. to 5 %), 0 % exempt. The flat rate scheme can be switched on. Lines without VAT get the nature code automatically (N1 disbursements, N2 not subject, N3 export/intra-EU, N4 exempt, N5 margin scheme).</li>
+        <li><strong>Electronic invoice:</strong> in the invoice window <em>Fattura elettronica (FatturaPA) → download XML</em> and send the file through the portal “Fatture e Corrispettivi”, by PEC to the SdI or through your intermediary. Kuenta chooses FPR12 or FPA12 for public bodies, credit notes as TD04, stamp duty and split payment. The printout is a courtesy copy; printed invoices are locked.</li>
+        <li><strong>Register:</strong> every sale becomes an invoice; the receipt reads “Documento non fiscale”. Commercial documents need an approved RT device.</li>
+        <li><strong>VAT settlement:</strong> <span class="path">Finance → FIBU export</span> shows output VAT, input VAT, split payment, balance and the F24 payment code (monthly, or quarterly with 1 % interest) and exports the sales VAT register as CSV. The LIPE and the annual VAT return are filed by your accountant.</li>
+      </ul>
+    </section>
+
     <section id="datev">
       <h2>DATEV export for the tax adviser</h2>
       <p class="lead">Kuenta books invoices, payments, incoming invoices and register sales automatically and exports them as DATEV files. Your tax adviser reads them directly into DATEV, the accounting software common in Germany.</p>
@@ -850,7 +863,7 @@ docker compose up -d --build</code></pre></div>
           <ul>
             <li>Check the TSE with a fiskaly test account before going live and register the register with the tax office.</li>
             <li>Check the card terminal and DSFinV-K before use or before an audit.</li>
-            <li>Kuenta is designed for Germany, Spain, the United Kingdom, the United States, France, Austria and Switzerland (see <a href="#spanien">Spain</a>, <a href="#uk">United Kingdom</a>, <a href="#usa">United States</a>, <a href="#oesterreich">Austria</a> and <a href="#schweiz">Switzerland</a>). Other countries are not supported.</li>
+            <li>Kuenta is designed for Germany, Spain, the United Kingdom, the United States, France, Austria, Switzerland and Italy (see <a href="#spanien">Spain</a>, <a href="#uk">United Kingdom</a>, <a href="#usa">United States</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Switzerland</a> and <a href="#italien">Italy</a>). Other countries are not supported.</li>
             <li>Purchase contracts are templates and do not replace legal advice.</li>
           </ul></div>
       </div>

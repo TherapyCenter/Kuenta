@@ -1,7 +1,7 @@
 'use strict';
 // Tax IDs: Spanish DNI (12345678Z), NIE (X1234567L), CIF of companies (B12345674) and special NIF (K/L/M);
 // UK VAT registration numbers (GB123456782); French SIREN (9 digits) and SIRET (14 digits);
-// Austrian UID (ATU12345678) and Swiss UID (CHE-123.456.789). Shared by server and browser (UMD).
+// Austrian UID (ATU12345678), Swiss UID (CHE-123.456.789), Italian partita IVA and codice fiscale. Shared by server and browser (UMD).
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
   else root.NIF = factory();
@@ -102,5 +102,28 @@
     return { ok, uid: `CHE-${m[1].slice(0, 3)}.${m[1].slice(3, 6)}.${m[1].slice(6)}` };
   }
 
-  return { validar, limpiar, extranjero, gbVat, frSiren, atUid, chUid };
+  // Italian partita IVA: 11 digits, the last one is a Luhn-like check digit (optional prefix IT)
+  function itPiva(s) {
+    const x = String(s || '').toUpperCase().replace(/[\s.\-]/g, '').replace(/^IT(?=\d{11}$)/, '');
+    if (!/^\d{11}$/.test(x) || /^0{11}$/.test(x)) return { ok: false, piva: x };
+    let sum = 0;
+    for (let i = 0; i < 10; i++) { let d = Number(x[i]); if (i % 2 === 1) { d *= 2; if (d > 9) d -= 9; } sum += d; }
+    return { ok: (10 - sum % 10) % 10 === Number(x[10]), piva: x };
+  }
+
+  // Italian codice fiscale: 16 characters of persons (check letter, also with omocodia) or 11 digits of companies
+  const CF_DISPARI = [1, 0, 5, 7, 9, 13, 15, 17, 19, 21, 2, 4, 18, 20, 11, 3, 6, 8, 12, 14, 16, 10, 22, 25, 24, 23];
+  function itCf(s) {
+    const x = String(s || '').toUpperCase().replace(/[\s\-]/g, '');
+    if (/^\d{11}$/.test(x)) return { ok: itPiva(x).ok, cf: x, persona: false };
+    if (!/^[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]$/.test(x)) return { ok: false, cf: x, persona: true };
+    let sum = 0;
+    for (let i = 0; i < 15; i++) {
+      const c = x[i]; const v = /\d/.test(c) ? Number(c) : c.charCodeAt(0) - 65;
+      sum += i % 2 === 0 ? CF_DISPARI[v] : v;
+    }
+    return { ok: String.fromCharCode(65 + sum % 26) === x[15], cf: x, persona: true };
+  }
+
+  return { validar, limpiar, extranjero, gbVat, frSiren, atUid, chUid, itPiva, itCf };
 });

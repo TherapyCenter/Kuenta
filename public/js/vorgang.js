@@ -84,6 +84,7 @@ const Vorgang = {
           { label: 'Pflichtangaben prüfen', onClick: () => Vorgang.facturae(id, true) }] });
       else if (Vorgang.land() === 'FR') items.push({ label: 'Factur-X / Chorus Pro', icon: '🧾', items: Vorgang.frMenu(id) });
       else if (Vorgang.land() === 'AT') items.push({ label: 'E-Rechnung (ebInterface)', icon: '🧾', items: Vorgang.atMenu(id) });
+      else if (Vorgang.land() === 'IT') items.push({ label: 'Fattura elettronica (FatturaPA)', icon: '🧾', items: Vorgang.itMenu(id) });
       else if (Vorgang.land() === 'DE') items.push({ label: 'E-Rechnung (XRechnung)', icon: '🧾', items: [
         { label: 'XRechnung CII herunterladen', onClick: () => Vorgang.erechnung(id, 'cii') },
         { label: 'XRechnung UBL herunterladen', onClick: () => Vorgang.erechnung(id, 'ubl') },
@@ -121,6 +122,28 @@ const Vorgang = {
   // ---------- Spain (VERI*FACTU) ----------
   es() { return !!(LK.data && LK.data.land === 'ES'); },
   land() { return (LK.data && LK.data.land) || 'DE'; },
+  // Italy: FatturaPA for the SdI (the user sends the file via the portal, PEC or an intermediary)
+  itMenu(id, wrap = fn => fn()) {
+    const pruefen = async (download) => {
+      try {
+        const chk = await api(`/api/it/fattura/${id}?pruefen=1`);
+        if (download) {
+          if (chk.problems.length && !(await confirmDlg('Es fehlen Angaben:\n\n• ' + chk.problems.join('\n• ') + '\n\nTrotzdem erstellen?', { ok: 'Trotzdem erstellen' }))) return;
+          await downloadUrl(`/api/it/fattura/${id}`, 'fattura.xml');
+          return;
+        }
+        const content = h('div', { class: 'win-body flex', style: { padding: 0 } },
+          chk.problems.length ? h('div', { class: 'note err' }, h('b', null, 'Fehlende Angaben:'), h('ul', null, chk.problems.map(p => h('li', null, p)))) : h('div', { class: 'note ok' }, '✔ Alle Pflichtangaben für die FatturaPA vorhanden.'),
+          h('div', { class: 'hint' }, `${chk.formato} · Codice destinatario ${chk.codiceDestinatario}`), h('pre', { class: 'code' }, chk.xml));
+        const w = Win.open({ title: 'FatturaPA prüfen', width: 900, height: 640, content });
+        w.setButtons(['|', { label: 'Schließen', onClick: () => w.close() }]); w.el.append(w.foot);
+      } catch (e) { showError(e); }
+    };
+    return [
+      { label: 'FatturaPA (XML) herunterladen', onClick: () => wrap(() => pruefen(true)) },
+      { label: 'Pflichtangaben prüfen', onClick: () => wrap(() => pruefen(false)) },
+    ];
+  },
   // Austria: ebInterface 6.1 (e-rechnung.gv.at) and the checks of § 11 UStG
   atMenu(id, wrap = fn => fn()) {
     const pruefen = async (download) => {
@@ -877,9 +900,9 @@ class VorgangWindow {
       h('button', { class: 'btn', onclick: () => this.print() }, h('span', { class: 'ico' }, '🖨'), 'Drucken'),
       h('label', { class: 'inline' }, 'Formular:', this.formSel),
     ];
-    if (isRe && ['DE', 'ES', 'FR', 'AT'].includes(Vorgang.land())) items.push(h('button', { class: 'btn', onclick: async ev => {
+    if (isRe && ['DE', 'ES', 'FR', 'AT', 'IT'].includes(Vorgang.land())) items.push(h('button', { class: 'btn', onclick: async ev => {
       const r = ev.currentTarget.getBoundingClientRect();
-      const m = contextMenu(r.left, r.top, Vorgang.land() === 'AT' ? Vorgang.atMenu(this.id, fn => this.withSaved(fn)) : Vorgang.land() === 'FR' ? Vorgang.frMenu(this.id, fn => this.withSaved(fn)) : Vorgang.es() ? [
+      const m = contextMenu(r.left, r.top, Vorgang.land() === 'IT' ? Vorgang.itMenu(this.id, fn => this.withSaved(fn)) : Vorgang.land() === 'AT' ? Vorgang.atMenu(this.id, fn => this.withSaved(fn)) : Vorgang.land() === 'FR' ? Vorgang.frMenu(this.id, fn => this.withSaved(fn)) : Vorgang.es() ? [
         { label: 'Facturae 3.2.2 herunterladen', onClick: () => this.withSaved(() => Vorgang.facturae(this.id)) },
         { label: 'Pflichtangaben prüfen', onClick: () => this.withSaved(() => Vorgang.facturae(this.id, true)) },
         { label: 'VERI*FACTU-Status', onClick: () => this.withSaved(() => Vorgang.esStatus(this.typ, this.id).then(() => this.reloadEs())) }] : [

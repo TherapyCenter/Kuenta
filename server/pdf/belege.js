@@ -84,7 +84,7 @@ class Layout {
           [f.FIRMENNAME, f.FIRMENZUSATZ, f.STRASSE, plzOrt(f.PLZ, f.ORT)],
           [f.TELEFON && 'Tel.: ' + f.TELEFON, f.FAX && 'Fax: ' + f.FAX, f.EMAIL, f.INTERNETSEITE],
           [f.BANKNAME, f.IBAN && 'IBAN: ' + f.IBAN, f.BIC && 'BIC: ' + f.BIC, f.BANKINHABER && 'Inhaber: ' + f.BANKINHABER],
-          [...(L.land() === 'FR' ? require('../fr').pied() : ['AT', 'CH'].includes(L.land()) ? require(L.land() === 'AT' ? '../at' : '../ch').pied() : require('../es').activo() ? [(f.STEUERNR || f.USTNR) && 'NIF: ' + (f.STEUERNR || f.USTNR)] : L.land() === 'US' ? [L.sw('us.reg.nr', '') && `${L.sw('us.reg.label', 'Registration No.')}: ${L.sw('us.reg.nr', '')}`] : L.land() === 'GB' ? [f.USTNR && 'VAT-Reg.-Nr.: ' + f.USTNR] : [f.USTNR && 'USt-IdNr.: ' + f.USTNR, f.STEUERNR && 'Steuer-Nr.: ' + f.STEUERNR]), f.HANDELSREGISTER, f.GESCHAEFTSFUEHRER && 'Inhaber/GF: ' + f.GESCHAEFTSFUEHRER],
+          [...(L.land() === 'FR' ? require('../fr').pied() : ['AT', 'CH', 'IT'].includes(L.land()) ? require({ AT: '../at', CH: '../ch', IT: '../it' }[L.land()]).pied() : require('../es').activo() ? [(f.STEUERNR || f.USTNR) && 'NIF: ' + (f.STEUERNR || f.USTNR)] : L.land() === 'US' ? [L.sw('us.reg.nr', '') && `${L.sw('us.reg.label', 'Registration No.')}: ${L.sw('us.reg.nr', '')}`] : L.land() === 'GB' ? [f.USTNR && 'VAT-Reg.-Nr.: ' + f.USTNR] : [f.USTNR && 'USt-IdNr.: ' + f.USTNR, f.STEUERNR && 'Steuer-Nr.: ' + f.STEUERNR]), f.HANDELSREGISTER, f.GESCHAEFTSFUEHRER && 'Inhaber/GF: ' + f.GESCHAEFTSFUEHRER],
         ];
         cols.forEach((c, ci) => { let y = 278 + dy; for (const l of c.filter(Boolean)) { d.text(this.L + ci * 44.5, y, l.slice(0, 48), { size: 6.8, color: GREY }); y += 3.1; } });
       }
@@ -163,6 +163,7 @@ function vorgangPdf(typ, d, opts = {}) {
   const kd = k.KUNID ? L.db().prepare('SELECT USTID FROM KUNDEN WHERE KUNID=?').get(k.KUNID) : null;
   if (kd && kd.USTID) info.push([es ? 'NIF' : lx ? lx.uidLabel : 'Ihre USt-IdNr.', kd.USTID]);
   if (fr && fr.sirenClient) info.push(['SIREN', fr.sirenClient]);
+  if (lx && lx.cfCliente) info.push(['C.F. cliente', lx.cfCliente]);
   const bezug = (d.verknuepft || []).find(l => l.typ === 'rechnung');
   if (typ === 'korrektur' && es && es.rectificada) info.push(['zu Rechnung', `${es.rectificada.numSerie} vom ${date(es.rectificada.fecha)}`]);
   else if (typ === 'korrektur' && bezug) info.push(['zu Rechnung', `${bezug.nr} vom ${date(bezug.datum)}`]);
@@ -256,6 +257,11 @@ function vorgangPdf(typ, d, opts = {}) {
     doc.text(lay.R, lay.y + 5.3, money(k.GBRUTTO), { f: 'B', size: 11, align: 'right' });
     doc.line(108, lay.y + 7.2, lay.R, lay.y + 7.2, { w: 0.4 }); doc.line(108, lay.y + 7.9, lay.R, lay.y + 7.9, { w: 0.4 });
     lay.y += 10;
+    // Italy, split payment: the customer pays the IVA to the treasury
+    if (lx && lx.split) {
+      doc.text(110, lay.y + 3.5, 'IVA versata dal cliente (art. 17-ter)', { size: 9.2, color: GREY }); doc.text(lay.R, lay.y + 3.5, money(-lx.split), { size: 9.2, align: 'right', color: GREY }); lay.y += 5;
+      doc.text(110, lay.y + 3.5, 'Netto a pagare', { size: 9.2, f: 'B' }); doc.text(lay.R, lay.y + 3.5, money(L.r2(k.GBRUTTO - lx.split)), { size: 9.2, f: 'B', align: 'right' }); lay.y += 7;
+    }
     if (isRe && d.zahlungen && d.zahlungen.length) {
       const bez = d.zahlungen.reduce((s, z) => s + z.BETRAG, 0);
       doc.text(110, lay.y + 3.5, 'bereits bezahlt', { size: 9.2, color: GREY }); doc.text(lay.R, lay.y + 3.5, money(bez), { size: 9.2, align: 'right', color: GREY }); lay.y += 5;

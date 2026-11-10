@@ -5,7 +5,7 @@
 I18N.lang = (() => {
   const q = new URLSearchParams(location.search).get('lang');
   try {
-    if (q && I18N.LANGS[q]) localStorage.setItem('sw.lang', JSON.stringify(q));
+    if (q && I18N.UI_LANGS[q]) localStorage.setItem('sw.lang', JSON.stringify(q));
     return JSON.parse(localStorage.getItem('sw.lang')) || 'de';
   } catch { return q || 'de'; }
 })();

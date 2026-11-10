@@ -61,6 +61,8 @@ EXT_COLUMNS.KUNDEN.RECARGO = 'INTEGER DEFAULT 0';
 // US: tax exemption of the customer; odometer out, replaced parts, estimate authorizations (JSON); condition of parts
 Object.assign(EXT_COLUMNS.KUNDEN, { TAXEXEMPT: 'INTEGER DEFAULT 0', EXEMPTCERT: 'TEXT', EXEMPTREASON: 'TEXT' });
 EXT_COLUMNS.KUNDEN.SIREN = 'TEXT'; // France: SIREN/SIRET of business customers
+// Italy: codice fiscale, recipient code of the SdI, PEC address, split payment (public bodies)
+Object.assign(EXT_COLUMNS.KUNDEN, { IT_CF: 'TEXT', IT_SDI: 'TEXT', IT_PEC: 'TEXT', IT_SPLIT: 'INTEGER DEFAULT 0' });
 for (const t of ['ANGEBOTE', 'AUFTRAEGE', 'LIEFERSCHEIN', 'RECHNUNGEN']) Object.assign(EXT_COLUMNS[t], { FAHRKMOUT: 'INTEGER', USALTTEILE: 'TEXT', USFREIGABE: 'TEXT' });
 for (const t of ['ANGEBOTE_POS', 'AUFTRAEGE_POS', 'LIEFERSCHEIN_POS', 'RECHNUNGEN_POS']) EXT_COLUMNS[t] = { ...(EXT_COLUMNS[t] || {}), TEILEZUSTAND: 'TEXT' };
 const EXT_TABLES = `
