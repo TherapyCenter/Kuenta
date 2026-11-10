@@ -1,0 +1,356 @@
+'use strict';
+/* global h, $, fmt, api, esc, Win, App, LK, kname, today, toast, showError, r2, I18N */
+
+const Print = {
+  firma: null,
+  async ensureFirma() { const s = await api('/api/einstellungen'); Print.firma = s.firma; Print.settings = s; return s.firma; },
+
+  css(extra = '') {
+    return `
+@page { size: A4; margin: 12mm 14mm 8mm 20mm; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: Arial, Helvetica, sans-serif; font-size: 9.6pt; color: #111; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.sheet { width: 100%; }
+table.layout { width: 100%; border-collapse: collapse; }
+table.layout > thead td, table.layout > tfoot td { padding: 0; }
+.fspace { height: 24mm; }
+.footer { position: fixed; bottom: 0; left: 0; right: 0; height: 20mm; border-top: 0.6pt solid #888; padding-top: 2mm; display: flex; gap: 6mm; font-size: 7pt; color: #444; line-height: 1.35; background: #fff; }
+.footer > div { flex: 1; }
+.head { display: flex; justify-content: space-between; align-items: flex-start; height: 33mm; }
+.head .firm { font-size: 15pt; font-weight: bold; color: #1e3f6e; }
+.head .firm small { display: block; font-size: 9pt; font-weight: normal; color: #333; margin-top: 1mm; }
+.head .contact { font-size: 8pt; color: #333; line-height: 1.4; margin-top: 2mm; }
+.head img.logo { max-height: 30mm; max-width: 70mm; object-fit: contain; }
+.addrrow { display: flex; justify-content: space-between; gap: 8mm; min-height: 45mm; }
+.addr { width: 85mm; }
+.addr .sender { font-size: 7pt; text-decoration: underline; color: #444; margin-bottom: 3mm; white-space: nowrap; overflow: hidden; }
+.addr .to { font-size: 10.5pt; line-height: 1.35; }
+.info { width: 78mm; font-size: 8.8pt; }
+.info table { width: 100%; border-collapse: collapse; }
+.info td { padding: 0.4mm 0; vertical-align: top; }
+.info td:first-child { color: #444; width: 36mm; }
+h1 { font-size: 15pt; margin: 6mm 0 3mm; }
+.fz { border: 0.6pt solid #aaa; border-radius: 1.5mm; padding: 1.5mm 2.5mm; margin-bottom: 3mm; font-size: 8.8pt; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5mm 4mm; }
+.fz span { color: #555; }
+.txt { white-space: pre-wrap; margin: 2mm 0 3mm; line-height: 1.4; }
+table.items { width: 100%; border-collapse: collapse; margin: 2mm 0; }
+table.items th { text-align: left; font-size: 8.5pt; border-bottom: 0.8pt solid #333; padding: 1.2mm 1mm; background: #eef3f9; }
+table.items td { padding: 1.2mm 1mm; border-bottom: 0.3pt solid #ccc; vertical-align: top; }
+table.items .r { text-align: right; white-space: nowrap; }
+table.items .sub { font-size: 8pt; color: #444; white-space: pre-wrap; margin-top: 0.6mm; }
+table.items tr.t td { border-bottom: 0; white-space: pre-wrap; padding-top: 2mm; }
+table.items tr.z td { font-weight: bold; border-top: 0.6pt solid #333; background: #f5f7fa; }
+table.items tr { page-break-inside: avoid; }
+.totals { margin-left: auto; width: 88mm; border-collapse: collapse; margin-top: 2mm; page-break-inside: avoid; }
+.totals td { padding: 1mm 1mm; }
+.totals td.r { text-align: right; white-space: nowrap; }
+.totals tr.grand td { font-weight: bold; font-size: 11pt; border-top: 0.8pt solid #333; border-bottom: 2pt double #333; }
+.muted { color: #555; }
+.sign { display: flex; gap: 15mm; margin-top: 18mm; page-break-inside: avoid; }
+.sign div { flex: 1; border-top: 0.6pt solid #333; padding-top: 1mm; font-size: 8pt; color: #444; }
+.doc { page-break-after: always; }
+.doc:last-child { page-break-after: auto; }
+.listtitle { font-size: 13pt; font-weight: bold; margin: 0 0 1mm; }
+table.list { width: 100%; border-collapse: collapse; font-size: 8.3pt; }
+table.list th { text-align: left; border-bottom: 0.8pt solid #333; padding: 1mm; background: #eef3f9; }
+table.list td { padding: 0.8mm 1mm; border-bottom: 0.3pt solid #ddd; }
+table.list .r { text-align: right; white-space: nowrap; }
+table.list tfoot td { font-weight: bold; border-top: 0.8pt solid #333; }
+.box { border: 0.6pt solid #999; border-radius: 1.5mm; padding: 2mm 3mm; margin: 2mm 0; page-break-inside: avoid; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; }
+.kv { display: grid; grid-template-columns: 38mm 1fr; gap: 0.6mm 2mm; }
+.kv span { color: #555; }
+@media screen { body { background: #8a96a6; padding: 10px 0; } .sheet { background: #fff; width: 210mm; min-height: 297mm; margin: 0 auto 10px; padding: 12mm 14mm 8mm 20mm; box-shadow: 0 2px 10px rgba(0,0,0,.4); position: relative; } .footer { position: absolute; left: 20mm; right: 14mm; bottom: 8mm; } }
+${extra}`;
+  },
+
+  footerHtml(f) {
+    const zeile = (...xs) => xs.filter(Boolean).map(esc).join('<br>');
+    return `<div class="footer">
+      <div>${zeile(f.FIRMENNAME, f.FIRMENZUSATZ, f.STRASSE, [f.PLZ, f.ORT].filter(Boolean).join(' '))}</div>
+      <div>${zeile(f.TELEFON && 'Tel.: ' + f.TELEFON, f.FAX && 'Fax: ' + f.FAX, f.EMAIL, f.INTERNETSEITE)}</div>
+      <div>${zeile(f.BANKNAME, f.IBAN && 'IBAN: ' + f.IBAN, f.BIC && 'BIC: ' + f.BIC, f.BANKINHABER && 'Inhaber: ' + f.BANKINHABER)}</div>
+      <div>${zeile(f.USTNR && 'USt-IdNr.: ' + f.USTNR, f.STEUERNR && 'Steuer-Nr.: ' + f.STEUERNR, f.HANDELSREGISTER, f.GESCHAEFTSFUEHRER && 'Inhaber/GF: ' + f.GESCHAEFTSFUEHRER, f.FUSSZEILE)}</div>
+    </div>`;
+  },
+  headHtml(f) {
+    const logo = f.LOGOFILE ? `<img class="logo" src="${location.origin}/dateien/${f.LOGOFILE.split('/').map(encodeURIComponent).join('/')}">` : '';
+    return `<div class="head"><div><div class="firm">${esc(f.FIRMENNAME || '')}${f.FIRMENZUSATZ ? `<small>${esc(f.FIRMENZUSATZ)}</small>` : ''}</div>
+      <div class="contact">${[f.STRASSE, [f.PLZ, f.ORT].filter(Boolean).join(' ')].filter(Boolean).map(esc).join(' · ')}<br>${[f.TELEFON && 'Tel. ' + f.TELEFON, f.EMAIL, f.INTERNETSEITE].filter(Boolean).map(esc).join(' · ')}</div></div>${logo}</div>`;
+  },
+  senderLine(f) { return esc(f.ABSENDER || [f.FIRMENNAME, f.STRASSE, [f.PLZ, f.ORT].filter(Boolean).join(' ')].filter(Boolean).join(' · ')); },
+  addressHtml(a) {
+    const lines = [];
+    if (a.anrede && !/^firma$/i.test(a.anrede)) lines.push(a.anrede);
+    if (/^firma$/i.test(a.anrede || '') || a.firma) lines.push([a.name].filter(Boolean).join(' '));
+    else lines.push([a.vorname, a.name].filter(Boolean).join(' '));
+    if (a.zusatz) lines.push(a.zusatz);
+    if (a.strasse) lines.push(a.strasse);
+    lines.push([a.plz, a.ort].filter(Boolean).join(' '));
+    if (a.land && a.land !== 'DE') lines.push(a.land);
+    return lines.filter(Boolean).map(esc).join('<br>');
+  },
+  wrap(bodyHtml, f, { kopf = true, extraCss = '' } = {}) {
+    return `<!doctype html><html><head><meta charset="utf-8"><title>Druck</title><style>${Print.css(extraCss)}</style></head><body>${bodyHtml}</body></html>`;
+  },
+  sheet(inner, f, kopf = true) {
+    return `<div class="sheet doc">${kopf ? Print.footerHtml(f) : ''}<table class="layout"><tbody><tr><td>${inner}</td></tr></tbody><tfoot><tr><td><div class="fspace"></div></td></tr></tfoot></table></div>`;
+  },
+
+  // Language of customer documents (Settings → Defaults); lists and reports follow the user interface
+  docLang() { return App.setting('beleg.sprache', 'de'); },
+  // Translate the text of a finished HTML page (labels; data rarely matches a known text exactly)
+  translateHtml(html, lang) {
+    if (lang === 'de') return html;
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    doc.documentElement.lang = lang;
+    const walk = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
+    for (let n = walk.nextNode(); n; n = walk.nextNode()) {
+      if (n.parentNode.closest('style, script')) continue;
+      if (/\p{L}/u.test(n.nodeValue)) n.nodeValue = I18N.tr(n.nodeValue, lang);
+    }
+    return '<!doctype html>' + doc.documentElement.outerHTML;
+  },
+
+  // Preview window with a print button; doc = customer document (document language) or list (UI language)
+  preview(html, title = 'Seitenvorschau', { doc = true } = {}) {
+    html = Print.translateHtml(html, doc ? Print.docLang() : I18N.lang);
+    return new Promise(resolve => {
+      const frame = h('iframe', { style: { width: '100%', height: '100%', border: '0', background: '#8a96a6' } });
+      const w = Win.open({ title, width: 1000, height: Math.min(1100, window.innerHeight - 20), content: frame, flex: true, onClose: () => resolve() });
+      w.body.style.padding = '0';
+      frame.srcdoc = html;
+      w.setButtons([
+        { label: 'Drucken / als PDF speichern', icon: '🖨', cls: 'primary', onClick: () => frame.contentWindow.print() },
+        { label: 'In neuem Fenster', icon: '↗', onClick: () => { const nw = window.open('', '_blank'); if (nw) { nw.document.write(html); nw.document.close(); } } },
+        '|', { label: 'Schließen', onClick: () => w.close() }]);
+      w.el.append(w.foot);
+      frame.addEventListener('load', () => { frame.contentWindow.addEventListener('keydown', e => { if (e.key === 'Escape') w.close(); }); });
+    });
+  },
+
+  // ---------- Documents ----------
+  titles: { angebot: 'Angebot', kostenvoranschlag: 'Kostenvoranschlag', auftrag: 'Auftrag', arbeitskarte: 'Arbeitskarte', auftrag_mit_unterschrift: 'Auftrag', lieferschein: 'Lieferschein', lieferschein_preise: 'Lieferschein', rechnung: 'Rechnung', rechnung_ohne_kopf: 'Rechnung', rechnungskorrektur: 'Rechnungskorrektur', gutschrift: 'Gutschrift', 'storno-rechnung': 'Stornorechnung' },
+  vorgangHtml(typ, d, opts, f) {
+    const v = ENT.V[typ]; const k = d.kopf;
+    const formular = (opts.formular || String(k.DRUCKFORMULAR || v.form).replace(/\.fr3$/, '')).replace(/\.fr3$/, '');
+    const title = Print.titles[formular] || v.title;
+    const ohnePreise = ['arbeitskarte', 'lieferschein'].includes(formular);
+    const kopf = opts.briefpapier !== false && formular !== 'rechnung_ohne_kopf' && App.setting('druck.briefpapier', '0') !== '1';
+    const brutto = Number(k.ANSICHTBRUTTO) === 1;
+    const rabatt = opts.rabatt ?? Number(k.RABATTZEIGEN) === 1;
+    const klein = LK.data && LK.data.klein;
+    const einheit = id => LK.name('einheiten', id);
+    const isRe = v.table === 'RECHNUNGEN';
+    const nrLabel = { angebot: 'Angebots-Nr.', auftrag: 'Auftrags-Nr.', lieferschein: 'Lieferschein-Nr.', rechnung: 'Rechnungs-Nr.', korrektur: 'Beleg-Nr.' }[typ];
+    const info = [[nrLabel, k[v.nr]], ['Datum', fmt.date(k.DATUM)], ['Kunden-Nr.', k.KUNNUMMER]];
+    if (isRe || typ === 'lieferschein') info.push(['Liefer-/Leistungsdatum', fmt.date(k.LIEFDATUM || k.DATUM)]);
+    if (k.BENNAME) info.push(['Ansprechpartner', [k.BENVORNAME, k.BENNAME].filter(Boolean).join(' ')]);
+    if (k.BESTELLNR) info.push(['Ihre Bestellung', k.BESTELLNR]);
+    if (d._ust) info.push(['Ihre USt-IdNr.', d._ust]);
+    const bezug = (d.verknuepft || []).find(l => l.typ === 'rechnung');
+    if (typ === 'korrektur' && bezug) info.push(['zu Rechnung', `${bezug.nr} vom ${fmt.date(bezug.datum)}`]);
+    let html = '';
+    if (kopf) html += Print.headHtml(f); else html += '<div style="height:33mm"></div>';
+    html += `<div class="addrrow"><div class="addr"><div class="sender">${kopf ? Print.senderLine(f) : ''}</div><div class="to">${Print.addressHtml({ anrede: k.KUNANREDE, name: k.KUNNAME, vorname: k.KUNVORNAME, zusatz: k.KUNZUSATZ, strasse: k.KUNSTRASSE, plz: k.KUNPLZ, ort: k.KUNORT, land: k.KUNLAND, firma: Number(k.KUNART) === 1 })}</div></div>
+      <div class="info"><table>${info.map(([a, b]) => `<tr><td>${esc(a)}</td><td><b>${esc(b ?? '')}</b></td></tr>`).join('')}</table></div></div>`;
+    html += `<h1>${esc(title)} Nr. ${esc(k[v.nr])}</h1>`;
+    if (k.FAHRKENNZEICHEN || k.FAHRMARKE) {
+      html += `<div class="fz"><div><span>Kennzeichen:</span> <b>${esc(k.FAHRKENNZEICHEN || '')}</b></div><div><span>Fahrzeug:</span> ${esc([k.FAHRMARKE, k.FAHRMODELL].filter(Boolean).join(' '))}</div><div><span>FIN:</span> ${esc(k.FAHRIDENTNR || '')}</div>
+        <div><span>Erstzulassung:</span> ${fmt.date(k.FAHREZ)}</div><div><span>KM-Stand:</span> ${k.FAHRKM ? Number(k.FAHRKM).toLocaleString(I18N.locale(Print.docLang())) : ''}</div><div><span>HU:</span> ${fmt.month(k.FAHRHU)}</div>
+        ${k.FAHRHSN ? `<div><span>HSN/TSN:</span> ${esc(k.FAHRHSN)} / ${esc(k.FAHRTSN || '')}</div>` : ''}</div>`;
+    }
+    if (k.EINLEITUNGTXT) html += `<div class="txt">${esc(k.EINLEITUNGTXT)}</div>`;
+    // line items
+    const cols = ohnePreise ? 4 : (rabatt ? 7 : 6);
+    html += `<table class="items"><thead><tr><th style="width:9mm">Pos.</th><th style="width:26mm">Art.-Nr.</th><th>Bezeichnung</th><th class="r" style="width:16mm">Menge</th>${ohnePreise ? '' : `<th class="r" style="width:22mm">E-Preis</th>${rabatt ? '<th class="r" style="width:13mm">Rabatt</th>' : ''}<th class="r" style="width:24mm">Gesamt</th>`}</tr></thead><tbody>`;
+    let nr = 0; let hatDP = false;
+    for (const p of d.pos) {
+      if (p.POSART === 'T') { html += `<tr class="t"><td></td><td colspan="${cols - 1}">${esc([p.BEZEICHNUNG, p.MEMOTEXT].filter(Boolean).join('\n'))}</td></tr>`; continue; }
+      if (p.POSART === 'Z') { html += `<tr class="z"><td></td><td colspan="${cols - 2}">${esc(p.BEZEICHNUNG || 'Zwischensumme')}</td>${ohnePreise ? '<td></td>' : `<td class="r">${fmt.money(p.SUMME)}</td>`}</tr>`; continue; }
+      nr++;
+      if (Number(p.DURCHLAUFER) === 1) hatDP = true;
+      const sub = [p.BEZEICHNUNG ? p.BESCHREIBUNG : null, p.ARBEITSTEXT, p.MEMOTEXT].filter(x => x && String(x).trim()).join('\n');
+      const ep = brutto ? p.VKBRUTTO : p.VK;
+      const sum = brutto ? p.SUMMEBRUTTO : p.SUMME;
+      html += `<tr><td>${nr}</td><td>${esc(p.ARTNUMMER || '')}</td><td>${esc(p.BEZEICHNUNG || p.BESCHREIBUNG || '')}${Number(p.DURCHLAUFER) === 1 ? ' <span class="muted">(DP)</span>' : ''}${sub ? `<div class="sub">${esc(sub)}</div>` : ''}</td>
+        <td class="r">${fmt.num(p.MENGE, 3)} ${esc(einheit(p.EINHEITID) || '')}</td>${ohnePreise ? '' : `<td class="r">${fmt.money(ep)}</td>${rabatt ? `<td class="r">${Number(p.RABATT) ? fmt.num(p.RABATT) + ' %' : ''}</td>` : ''}<td class="r">${fmt.money(sum)}</td>`}</tr>`;
+    }
+    html += '</tbody></table>';
+    // totals
+    if (!ohnePreise) {
+      const tax = d.tax || {};
+      let t = '<table class="totals">';
+      const taxRows = Object.values(tax).filter(x => x.rate > 0);
+      if (brutto && !klein) {
+        t += `<tr><td>Summe netto</td><td class="r">${fmt.money(k.GNETTO)}</td></tr>`;
+        for (const x of taxRows) t += `<tr><td>zzgl. ${fmt.num(x.rate)} % MwSt auf ${fmt.money(x.netto)}</td><td class="r">${fmt.money(x.mwst)}</td></tr>`;
+      } else if (!klein) {
+        t += `<tr><td>Summe netto</td><td class="r">${fmt.money(k.GNETTO)}</td></tr>`;
+        for (const x of taxRows) t += `<tr><td>zzgl. ${fmt.num(x.rate)} % MwSt auf ${fmt.money(x.netto)}</td><td class="r">${fmt.money(x.mwst)}</td></tr>`;
+        const frei = Object.values(tax).filter(x => !x.rate).reduce((s, x) => s + x.netto, 0);
+        if (frei) t += `<tr><td class="muted">davon steuerfrei / durchlaufend</td><td class="r muted">${fmt.money(frei)}</td></tr>`;
+      }
+      t += `<tr class="grand"><td>${typ === 'korrektur' ? 'Gesamtbetrag' : isRe ? 'Rechnungsbetrag' : 'Gesamtbetrag'}</td><td class="r">${fmt.money(k.GBRUTTO)}</td></tr>`;
+      if (isRe && d.zahlungen && d.zahlungen.length) {
+        const bez = d.zahlungen.reduce((s, z) => s + z.BETRAG, 0);
+        t += `<tr><td class="muted">bereits bezahlt (${esc([...new Set(d.zahlungen.map(z => z.ZAHLART))].join(', '))})</td><td class="r muted">${fmt.money(bez)}</td></tr>`;
+        t += `<tr><td><b>Offener Betrag</b></td><td class="r"><b>${fmt.money(r2(k.GBRUTTO - bez))}</b></td></tr>`;
+      }
+      t += '</table>';
+      html += t;
+      if (klein) html += '<div class="txt muted">Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</div>';
+      if (hatDP) html += '<div class="txt muted">(DP) = Durchlaufender Posten gemäß § 10 Abs. 1 Satz 6 UStG, nicht umsatzsteuerpflichtig.</div>';
+    }
+    if (isRe || typ === 'angebot' || typ === 'auftrag') {
+      let zt = k.ZAHLBDTEXT || '';
+      if (isRe && typ === 'rechnung' && Number(k.FAELLING) > 0) zt += (zt ? '\n' : '') + `Zahlbar bis ${fmt.date(addDaysIso(k.DATUM, k.FAELLING))}${Number(k.SKONTO) > 0 ? `, bei Zahlung bis ${fmt.date(addDaysIso(k.DATUM, k.TAGESKONTO))} abzüglich ${fmt.num(k.SKONTO)} % Skonto` : ''}.`;
+      if (zt && typ !== 'korrektur') html += `<div class="txt">${esc(zt)}</div>`;
+    }
+    if (isRe && !(isRe && k.LIEFDATUM)) html += '<div class="txt muted">Leistungsdatum entspricht dem Rechnungsdatum.</div>';
+    if (k.SCHLUSSTXT) html += `<div class="txt">${esc(k.SCHLUSSTXT)}</div>`;
+    if (formular === 'auftrag_mit_unterschrift') html += `<div class="txt" style="margin-top:6mm">Hiermit erteile ich den Auftrag zur Durchführung der oben genannten Arbeiten. Erforderliche Probefahrten dürfen durchgeführt werden. Es gelten die Allgemeinen Geschäftsbedingungen für die Ausführung von Arbeiten an Kraftfahrzeugen.</div><div class="sign"><div>Ort, Datum</div><div>Unterschrift Auftraggeber</div></div>`;
+    if (formular === 'arbeitskarte') html += `<div class="box" style="min-height:45mm"><b>Notizen / ausgeführte Arbeiten:</b></div><div class="grid2"><div class="box">Monteur: ____________________</div><div class="box">Arbeitszeit: von _______ bis _______</div></div>`;
+    if (typ === 'lieferschein') html += '<div class="sign"><div>Ware vollständig erhalten – Datum</div><div>Unterschrift Empfänger</div></div>';
+    if (typ === 'angebot' && formular === 'kostenvoranschlag') html += '<div class="txt muted">Dieser Kostenvoranschlag ist unverbindlich. Abweichungen bis 15 % bleiben vorbehalten.</div>';
+    return Print.sheet(html, f, kopf);
+  },
+  async vorgang(typ, d, opts = {}) {
+    const f = await Print.ensureFirma();
+    if (d.kopf.KUNID) { try { const kd = await api('/api/rec/kunden/' + d.kopf.KUNID); d._ust = kd.USTID; } catch { /* ignore */ } }
+    const html = Print.wrap(Print.vorgangHtml(typ, d, opts, f), f);
+    await Print.preview(html, `${ENT.V[typ].title} ${d.kopf[ENT.V[typ].nr]} – Seitenvorschau`);
+  },
+  async stapel(list, opts = {}) {
+    const f = await Print.ensureFirma();
+    const body = list.map(d => Print.vorgangHtml(d.kopf.TYP === 2 ? 'korrektur' : 'rechnung', d, { briefpapier: opts.briefpapier }, f)).join('');
+    await Print.preview(Print.wrap(body, f), `Stapeldruck (${list.length} Belege)`);
+    const ids = list.filter(d => !Number(d.kopf.GEDRUCKT)).map(d => d.kopf.RECHNUNGID);
+    if (ids.length) await api('/api/vorgang/rechnung/flag', { method: 'POST', body: { ids, flag: 'GEDRUCKT', value: 1 } });
+  },
+
+  // ---------- Dunning letter ----------
+  async mahnungById(id) { const m = await api('/api/finanzen/mahnung/' + id); return Print.mahnung([m]); },
+  async mahnung(list) {
+    const f = await Print.ensureFirma();
+    const body = list.map(({ mahnung: m, rechnung: r, fruehere }) => {
+      const gebuehren = (Number(m.MAHNGEBUEHREN) || 0) + fruehere.reduce((s, x) => s + (Number(x.MAHNGEBUEHREN) || 0), 0);
+      let html = Print.headHtml(f);
+      html += `<div class="addrrow"><div class="addr"><div class="sender">${Print.senderLine(f)}</div><div class="to">${Print.addressHtml({ anrede: r.KUNANREDE, name: r.KUNNAME, vorname: r.KUNVORNAME, zusatz: r.KUNZUSATZ, strasse: r.KUNSTRASSE, plz: r.KUNPLZ, ort: r.KUNORT, land: r.KUNLAND })}</div></div>
+        <div class="info"><table><tr><td>Datum</td><td><b>${fmt.date(m.MAHNDATUM)}</b></td></tr><tr><td>Kunden-Nr.</td><td><b>${esc(r.KUNNUMMER ?? '')}</b></td></tr><tr><td>Mahnstufe</td><td><b>${esc(m.MAHNSTUFE)}</b></td></tr></table></div></div>`;
+      html += `<h1>${esc(m.BETREFFTXT || 'Zahlungserinnerung')}</h1>`;
+      if (m.VORTEXT) html += `<div class="txt">${esc(m.VORTEXT)}</div>`;
+      html += `<table class="items"><thead><tr><th>Rechnung</th><th>Datum</th><th>Fällig seit</th><th class="r">Rechnungsbetrag</th><th class="r">offen</th></tr></thead><tbody>
+        <tr><td>${esc(r.RECHNUNGNUMMER)}</td><td>${fmt.date(r.DATUM)}</td><td>${fmt.date(addDaysIso(r.DATUM, r.FAELLING || 0))}</td><td class="r">${fmt.money(r.GBRUTTO)}</td><td class="r">${fmt.money(r.OFFEN)}</td></tr></tbody></table>
+        <table class="totals"><tr><td>Offener Rechnungsbetrag</td><td class="r">${fmt.money(r.OFFEN)}</td></tr>${gebuehren ? `<tr><td>Mahngebühren</td><td class="r">${fmt.money(gebuehren)}</td></tr>` : ''}<tr class="grand"><td>Zu zahlender Betrag</td><td class="r">${fmt.money(r2(r.OFFEN + gebuehren))}</td></tr></table>`;
+      if (m.NACHTEXT) html += `<div class="txt">${esc(m.NACHTEXT)}</div>`;
+      if (f.IBAN) html += `<div class="txt">Bitte überweisen Sie den Betrag auf unser Konto: IBAN ${esc(f.IBAN)}${f.BIC ? ' · BIC ' + esc(f.BIC) : ''} · Verwendungszweck: Rechnung ${esc(r.RECHNUNGNUMMER)}</div>`;
+      return Print.sheet(html, f);
+    }).join('');
+    await Print.preview(Print.wrap(body, f), 'Mahnung – Seitenvorschau');
+  },
+
+  // ---------- Tyre storage ----------
+  async reifen(r) {
+    const f = await Print.ensureFirma();
+    const fz = r.FAHRZEUGID ? await api('/api/rec/fahrzeuge/' + r.FAHRZEUGID).catch(() => ({})) : {};
+    const kd = r.KUNID ? await api('/api/rec/kunden/' + r.KUNID).catch(() => ({})) : {};
+    const z = n => ({ 0: '–', 1: 'gut', 2: 'mittel', 3: 'schlecht', 4: 'erneuern' }[n] || '–');
+    const typ = { 1: 'Sommerreifen', 2: 'Winterreifen', 3: 'Ganzjahresreifen' }[r.REIFENTYP] || '';
+    const seite = p => `${esc(r['REIFEN' + p + 'HERSTELLER'] || '')} ${esc(r['REIFEN' + p + 'BREITE'] || '')}/${esc(r['REIFEN' + p + 'QUERSCHNITT'] || '')} R${esc(r['REIFEN' + p + 'DURCHM'] || '')} ${esc(r[p === 'VORNE' ? 'REIFENVORNETRAGINX' : 'REIFENHINTENTRAGINX'] || '')}${esc(r[p === 'VORNE' ? 'REIFENVORNEGESCHINX' : 'REIFENHINTENGESCHINX'] || '')} · Zustand: ${z(r[p === 'VORNE' ? 'REIFENVORNZUSTAND' : 'REIFENHINTENZUSTAND'])}`;
+    let html = Print.headHtml(f);
+    html += `<div class="addrrow"><div class="addr"><div class="sender">${Print.senderLine(f)}</div><div class="to">${Print.addressHtml({ anrede: kd.ANREDE, name: kd.NAME, vorname: kd.VORNAME, zusatz: kd.ZUSATZ, strasse: kd.STRASSE, plz: kd.PLZ, ort: kd.ORT })}</div></div>
+      <div class="info"><table><tr><td>Einlagerungs-Nr.</td><td><b>${esc(r.EINLNUMMER)}</b></td></tr><tr><td>Eingelagert am</td><td><b>${fmt.date(r.EINDATUM)}</b></td></tr>${r.AUSDATUM ? `<tr><td>Ausgelagert am</td><td><b>${fmt.date(r.AUSDATUM)}</b></td></tr>` : ''}<tr><td>Lagerort</td><td><b>${esc(r.LAGERORT || '')}</b></td></tr><tr><td>Kunden-Nr.</td><td><b>${esc(kd.NUMMER || '')}</b></td></tr></table></div></div>`;
+    html += `<h1>Einlagerungsbeleg / Reifenverwahrung Nr. ${esc(r.EINLNUMMER)}</h1>`;
+    html += `<div class="fz"><div><span>Kennzeichen:</span> <b>${esc(fz.KENNZEICHEN || '')}</b></div><div><span>Fahrzeug:</span> ${esc([fz.MARKE, fz.MODELL].filter(Boolean).join(' '))}</div><div><span>FIN:</span> ${esc(fz.FZIDENTNR || '')}</div></div>`;
+    html += `<div class="box"><div class="kv"><span>Reifentyp</span><b>${typ} ${Number(r.RFT) ? '(Runflat)' : ''}</b><span>Anzahl Reifen</span><b>${esc(r.REIFENANZAHL ?? '')}</b><span>Vorne</span><div>${seite('VORNE')}</div><span>Hinten</span><div>${seite('HINTEN')}</div>
+      <span>Profiltiefe (mm)</span><div>VL ${fmt.num(r.REIFENPROFILVL)} · VR ${fmt.num(r.REIFENPROFILVR)} · HL ${fmt.num(r.REIFENPROFILHL)} · HR ${fmt.num(r.REIFENPROFILHR)}${r.REIFENPROFILHL2 ? ' · Reserve ' + fmt.num(r.REIFENPROFILHL2) : ''}</div>
+      <span>DOT</span><div>${[r.REIFENDOTVL, r.REIFENDOTVR, r.REIFENDOTHL, r.REIFENDOTHR].filter(Boolean).map(esc).join(' · ')}</div></div></div>`;
+    html += `<div class="box"><div class="kv"><span>Felgen</span><b>${{ 1: 'Alufelgen', 2: 'Stahlfelgen' }[r.FELGENTYP] || '–'}</b><span>Felge vorne</span><div>${esc([r.FELGEVORNEMARKE, r.FELGEVORNEGROSSE].filter(Boolean).join(' '))} ${esc(r.FELGEVORNESCHADEN || '')}</div><span>Felge hinten</span><div>${esc([r.FELGEHINTENMARKE, r.FELGEHINTENGROSSE].filter(Boolean).join(' '))} ${esc(r.FELGEHINTENSCHADEN || '')}</div>
+      <span>Radkappen / Schrauben</span><div>${esc(r.RADKAPPENANZAHL ?? 0)} / ${esc(r.RADSCHRAUBENANZAHL ?? 0)}</div><span>Felgenschloss</span><div>${Number(r.RADSCHLOSS) ? 'ja ' + esc(r.RADSCHLOSSNR || '') : 'nein'}</div>
+      <span>Leistungen</span><div>${[Number(r.OPTWUCHTEN) && 'Wuchten', Number(r.OPTWASCHEN) && 'Waschen', Number(r.OPTSTICKSTOFF) && 'Stickstoff'].filter(Boolean).join(', ') || '–'}</div></div></div>`;
+    if (r.BEMERKUNG) html += `<div class="txt"><b>Bemerkung:</b> ${esc(r.BEMERKUNG)}</div>`;
+    html += '<div class="txt muted">Die eingelagerten Räder/Reifen werden gegen Vorlage dieses Belegs ausgehändigt. Für Schäden durch höhere Gewalt wird keine Haftung übernommen.</div>';
+    html += '<div class="sign"><div>Datum, Unterschrift Kunde</div><div>Datum, Unterschrift Werkstatt</div></div>';
+    await Print.preview(Print.wrap(Print.sheet(html, f), f), 'Einlagerungsbeleg');
+  },
+
+  // ---------- Letter / mail merge ----------
+  briefHtml(f, kd, betreff, text, datum) {
+    const anr = briefanrede(kd);
+    const t = String(text || '').replace(/\{Briefanrede\}/g, anr).replace(/\{Anrede\}/g, kd.ANREDE || '').replace(/\{Name\}/g, kd.NAME || '').replace(/\{Vorname\}/g, kd.VORNAME || '')
+      .replace(/\{Kennzeichen\}/g, kd.KENNZEICHEN || '').replace(/\{Termin\}/g, fmt.date(kd.TERMIN)).replace(/\{Fahrzeug\}/g, [kd.MARKE, kd.MODELL].filter(Boolean).join(' '));
+    let html = Print.headHtml(f);
+    html += `<div class="addrrow"><div class="addr"><div class="sender">${Print.senderLine(f)}</div><div class="to">${Print.addressHtml({ anrede: kd.ANREDE, name: kd.NAME, vorname: kd.VORNAME, zusatz: kd.ZUSATZ, strasse: kd.STRASSE, plz: kd.PLZ, ort: kd.ORT, land: kd.LAND })}</div></div>
+      <div class="info"><table><tr><td>Datum</td><td><b>${fmt.date(datum || today())}</b></td></tr>${kd.NUMMER ? `<tr><td>Kunden-Nr.</td><td><b>${esc(kd.NUMMER)}</b></td></tr>` : ''}</table></div></div>`;
+    html += `<h1 style="font-size:12pt">${esc(betreff || '')}</h1><div class="txt" style="font-size:10pt;line-height:1.5">${esc(t)}</div>`;
+    return Print.sheet(html, f);
+  },
+  async brief(b) {
+    const f = await Print.ensureFirma();
+    const kd = b.KUNID ? await api('/api/rec/kunden/' + b.KUNID) : {};
+    await Print.preview(Print.wrap(Print.briefHtml(f, kd, b.BETREFF, b.TEXT, b.DATUM), f), 'Brief');
+  },
+  async serienbrief(empfaenger, betreff, text) {
+    const f = await Print.ensureFirma();
+    await Print.preview(Print.wrap(empfaenger.map(k => Print.briefHtml(f, k, betreff, text)).join(''), f), `Serienbrief (${empfaenger.length} Briefe)`);
+  },
+
+  // ---------- Lists ----------
+  async liste(title, sub, cols, rows, footer, { quer = false } = {}) {
+    const f = await Print.ensureFirma();
+    const val = (c, r) => { const v = r[c.f]; return c.t === 'money' ? fmt.money0(v) : c.t === 'date' ? fmt.date(v) : c.t === 'month' ? fmt.month(v) : c.t === 'num' ? fmt.num(v) : esc(v ?? ''); };
+    const isR = c => ['money', 'num', 'int'].includes(c.t);
+    const html = `<div class="sheet"><div class="listtitle">${esc(title)}</div><div class="muted" style="margin-bottom:3mm">${esc(f.FIRMENNAME || '')} · ${esc(sub || '')} · erstellt am ${fmt.date(today())}</div>
+      <table class="list"><thead><tr>${cols.map(c => `<th class="${isR(c) ? 'r' : ''}">${esc(c.l)}</th>`).join('')}</tr></thead><tbody>
+      ${rows.map(r => `<tr>${cols.map(c => `<td class="${isR(c) ? 'r' : ''}">${val(c, r)}</td>`).join('')}</tr>`).join('')}</tbody>
+      ${footer ? `<tfoot><tr>${cols.map((c, i) => `<td class="${isR(c) ? 'r' : ''}">${footer[c.f] != null ? val(c, footer) : (i === 0 ? 'Summe' : '')}</td>`).join('')}</tr></tfoot>` : ''}</table></div>`;
+    await Print.preview(Print.wrap(html, f, { extraCss: `@page { size: A4 ${quer ? 'landscape' : 'portrait'}; margin: 12mm; } @media screen { .sheet { width: ${quer ? '297mm' : '210mm'}; min-height: auto; padding: 12mm; } }` }), title, { doc: false });
+  },
+
+  // ---------- Show e-invoice ----------
+  erechnungAnsicht(xml) {
+    const doc = new DOMParser().parseFromString(xml, 'application/xml');
+    if (doc.querySelector('parsererror')) { toast('Die Datei ist kein gültiges XML.', 'err'); return; }
+    const L = (el, name) => el ? [...el.getElementsByTagName('*')].filter(e => e.localName === name) : [];
+    const T = (el, ...path) => { let cur = [el]; for (const p of path) { cur = cur.flatMap(c => L(c, p)); if (!cur.length) return ''; } return cur[0].textContent.trim(); };
+    const root = doc.documentElement; const isCii = root.localName === 'CrossIndustryInvoice';
+    let d;
+    if (isCii) {
+      const sel = L(root, 'SellerTradeParty')[0], buy = L(root, 'BuyerTradeParty')[0], sum = L(root, 'SpecifiedTradeSettlementHeaderMonetarySummation')[0];
+      const addr = p => [T(p, 'Name'), T(p, 'LineOne'), [T(p, 'PostcodeCode'), T(p, 'CityName')].join(' '), T(p, 'CountryID')].filter(Boolean);
+      d = { nr: T(root, 'ExchangedDocument', 'ID'), typ: T(root, 'ExchangedDocument', 'TypeCode'), datum: T(root, 'ExchangedDocument', 'IssueDateTime', 'DateTimeString'),
+        seller: addr(sel), sellerTax: L(sel, 'SpecifiedTaxRegistration').map(e => e.textContent.trim()).join(', '), buyer: addr(buy), ref: T(root, 'BuyerReference'),
+        lines: L(root, 'IncludedSupplyChainTradeLineItem').map(li => ({ id: T(li, 'LineID'), name: T(li, 'SpecifiedTradeProduct', 'Name'), qty: T(li, 'BilledQuantity'), unit: (L(li, 'BilledQuantity')[0] || { getAttribute: () => '' }).getAttribute('unitCode'), price: T(li, 'NetPriceProductTradePrice', 'ChargeAmount'), tax: T(li, 'RateApplicablePercent'), total: T(li, 'LineTotalAmount') })),
+        netto: T(sum, 'TaxBasisTotalAmount'), steuer: T(sum, 'TaxTotalAmount'), brutto: T(sum, 'GrandTotalAmount'), faellig: T(sum, 'DuePayableAmount'),
+        iban: T(root, 'IBANID'), zahl: T(root, 'SpecifiedTradePaymentTerms', 'Description'), notes: L(root, 'IncludedNote').map(n => n.textContent.trim()) };
+    } else {
+      const sel = L(root, 'AccountingSupplierParty')[0], buy = L(root, 'AccountingCustomerParty')[0], sum = L(root, 'LegalMonetaryTotal')[0];
+      const addr = p => [T(p, 'RegistrationName') || T(p, 'Name'), T(p, 'StreetName'), [T(p, 'PostalZone'), T(p, 'CityName')].join(' '), T(p, 'IdentificationCode')].filter(Boolean);
+      d = { nr: [...root.children].find(e => e.localName === 'ID')?.textContent, typ: T(root, 'InvoiceTypeCode') || T(root, 'CreditNoteTypeCode'), datum: [...root.children].find(e => e.localName === 'IssueDate')?.textContent,
+        seller: addr(sel), sellerTax: L(sel, 'CompanyID').map(e => e.textContent).join(', '), buyer: addr(buy), ref: T(root, 'BuyerReference'),
+        lines: [...L(root, 'InvoiceLine'), ...L(root, 'CreditNoteLine')].map(li => ({ id: [...li.children].find(e => e.localName === 'ID')?.textContent, name: T(li, 'Item', 'Name'), qty: T(li, 'InvoicedQuantity') || T(li, 'CreditedQuantity'), unit: '', price: T(li, 'PriceAmount'), tax: T(li, 'ClassifiedTaxCategory', 'Percent'), total: [...li.children].find(e => e.localName === 'LineExtensionAmount')?.textContent })),
+        netto: T(sum, 'TaxExclusiveAmount'), steuer: T(root, 'TaxTotal', 'TaxAmount'), brutto: T(sum, 'TaxInclusiveAmount'), faellig: T(sum, 'PayableAmount'),
+        iban: T(root, 'PayeeFinancialAccount', 'ID'), zahl: T(root, 'PaymentTerms', 'Note'), notes: [...root.children].filter(e => e.localName === 'Note').map(n => n.textContent) };
+    }
+    const n = x => x === '' ? '' : fmt.money0(Number(x));
+    const dt = s => s && s.length === 8 ? `${s.slice(6)}.${s.slice(4, 6)}.${s.slice(0, 4)}` : fmt.date(s);
+    const html = `<div class="sheet"><div class="listtitle">E-Rechnung (${isCii ? 'XRechnung CII' : 'XRechnung UBL'}) – ${{ 380: 'Rechnung', 381: 'Gutschrift', 384: 'Korrekturrechnung' }[d.typ] || 'Typ ' + esc(d.typ)} Nr. ${esc(d.nr)}</div>
+      <div class="muted">Rechnungsdatum ${dt(d.datum)} · Käuferreferenz ${esc(d.ref)}</div>
+      <div class="grid2" style="margin:4mm 0"><div class="box"><b>Verkäufer</b><br>${d.seller.map(esc).join('<br>')}<br><span class="muted">${esc(d.sellerTax)}</span></div><div class="box"><b>Käufer</b><br>${d.buyer.map(esc).join('<br>')}</div></div>
+      <table class="list"><thead><tr><th>Pos</th><th>Bezeichnung</th><th class="r">Menge</th><th class="r">Preis</th><th class="r">USt %</th><th class="r">Betrag</th></tr></thead><tbody>
+      ${d.lines.map(l => `<tr><td>${esc(l.id)}</td><td>${esc(l.name)}</td><td class="r">${esc(l.qty)} ${esc(l.unit || '')}</td><td class="r">${n(l.price)}</td><td class="r">${esc(l.tax)}</td><td class="r">${n(l.total)}</td></tr>`).join('')}</tbody></table>
+      <table class="totals"><tr><td>Netto</td><td class="r">${n(d.netto)}</td></tr><tr><td>Umsatzsteuer</td><td class="r">${n(d.steuer)}</td></tr><tr class="grand"><td>Brutto</td><td class="r">${n(d.brutto)}</td></tr><tr><td>Zahlbetrag</td><td class="r">${n(d.faellig)}</td></tr></table>
+      <div class="txt">${esc(d.zahl)}${d.iban ? '<br>IBAN: ' + esc(d.iban) : ''}</div>${d.notes.map(x => `<div class="txt muted">${esc(x)}</div>`).join('')}</div>`;
+    Print.preview(Print.wrap(html, {}, { extraCss: '@media screen { .sheet { min-height: auto; } }' }), 'E-Rechnung visualisieren', { doc: false });
+  },
+};
+function addDaysIso(iso, n) { const d = new Date((iso || today()) + 'T12:00:00'); d.setDate(d.getDate() + Number(n || 0)); return d.toISOString().slice(0, 10); }
+function briefanrede(k) {
+  const a = String(k.ANREDE || '').trim();
+  if (/^herr/i.test(a)) return `Sehr geehrter ${a} ${k.NAME || ''},`.replace(/\s+,/, ',');
+  if (/^frau/i.test(a)) return `Sehr geehrte ${a} ${k.NAME || ''},`.replace(/\s+,/, ',');
+  if (/^familie/i.test(a)) return `Sehr geehrte Familie ${k.NAME || ''},`;
+  return 'Sehr geehrte Damen und Herren,';
+}

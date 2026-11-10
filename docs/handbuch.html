@@ -1,0 +1,865 @@
+<meta charset="utf-8">
+<title>Kuenta Handbuch</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: Werkstatthandbuch – feste Inhaltsleiste links, Lesespalte rechts; auf dem Handy einspaltig mit aufklappbarem Inhalt */
+:root {
+  --bg: #f3f5f7;
+  --paper: #ffffff;
+  --ink: #18212b;
+  --muted: #5a6876;
+  --line: #d7dde3;
+  --accent: #1d5c9e;
+  --accent-soft: #e3edf8;
+  --warn: #9a5b00;
+  --warn-soft: #fbf0dc;
+  --ok: #1f7a4d;
+  --ok-soft: #e1f3e9;
+  --code-bg: #eef1f4;
+  --f-display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --f-body: "Source Sans 3", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-mono: "JetBrains Mono", Consolas, "Cascadia Mono", monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f151b; --paper: #161e26; --ink: #e3e9ef; --muted: #98a6b4; --line: #2a3541;
+    --accent: #6ea8e6; --accent-soft: #1a2b3d; --warn: #e8b05a; --warn-soft: #2e2416;
+    --ok: #63c592; --ok-soft: #15291f; --code-bg: #1d2731; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f151b; --paper: #161e26; --ink: #e3e9ef; --muted: #98a6b4; --line: #2a3541;
+  --accent: #6ea8e6; --accent-soft: #1a2b3d; --warn: #e8b05a; --warn-soft: #2e2416;
+  --ok: #63c592; --ok-soft: #15291f; --code-bg: #1d2731; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--f-body); font-size: 17px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+
+.shell { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 48px; padding-block: 40px 80px; }
+
+/* Kopf */
+.masthead { grid-column: 1 / -1; display: grid; gap: 10px; padding-bottom: 28px; border-bottom: 3px solid var(--ink); }
+.masthead .kicker { font-family: var(--f-mono); font-size: 13px; color: var(--muted); letter-spacing: .04em; }
+.masthead h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(44px, 7vw, 76px); line-height: .95; margin: 0; letter-spacing: -.01em; text-wrap: balance; }
+.masthead p { margin: 0; max-width: 62ch; color: var(--muted); font-size: 19px; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 20px; font-family: var(--f-mono); font-size: 13px; color: var(--muted); }
+.meta b { color: var(--ink); font-weight: 500; }
+
+/* Inhaltsverzeichnis */
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); align-self: start; max-height: calc(100vh - 40px); overflow-y: auto; font-size: 15px; }
+nav.toc .label { font-family: var(--f-display); font-weight: 600; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: toc; display: grid; gap: 1px; }
+nav.toc li { counter-increment: toc; }
+nav.toc a { display: grid; grid-template-columns: 26px 1fr; padding: 4px 8px; border-left: 2px solid var(--line); color: var(--ink); text-decoration: none; }
+nav.toc a::before { content: counter(toc, decimal-leading-zero); font-family: var(--f-mono); font-size: 11px; color: var(--muted); padding-top: 4px; }
+nav.toc a:hover { background: var(--accent-soft); }
+nav.toc a.active { border-left-color: var(--accent); color: var(--accent); font-weight: 600; }
+details.toc-mobile { display: none; }
+
+/* Inhalt */
+main { min-width: 0; display: grid; gap: 56px; }
+section { display: grid; gap: 14px; min-width: 0; }
+section > h2 { font-family: var(--f-display); font-weight: 700; font-size: 36px; line-height: 1.05; margin: 0; display: flex; align-items: baseline; gap: 12px; text-wrap: balance; }
+section > h2 .no { font-family: var(--f-mono); font-size: 14px; font-weight: 500; color: var(--accent); }
+h3 { font-family: var(--f-display); font-weight: 600; font-size: 24px; margin: 14px 0 0; line-height: 1.15; }
+h4 { font-size: 17px; margin: 6px 0 0; }
+p, ul, ol { margin: 0; max-width: 68ch; }
+ul, ol { padding-left: 22px; display: grid; gap: 4px; }
+.lead { font-size: 19px; }
+.path { font-weight: 600; white-space: nowrap; }
+.path::before { content: "▸ "; color: var(--accent); font-weight: 400; }
+kbd { font-family: var(--f-mono); font-size: 13px; padding: 1px 6px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; background: var(--paper); white-space: nowrap; }
+code { font-family: var(--f-mono); font-size: .86em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+
+.codeblock { position: relative; background: var(--code-bg); border: 1px solid var(--line); border-radius: 6px; max-width: 100%; }
+.codeblock pre { margin: 0; padding: 14px 16px; overflow-x: auto; font-family: var(--f-mono); font-size: 13.5px; line-height: 1.55; }
+.codeblock pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
+.copy { position: absolute; top: 6px; right: 6px; font: 500 12px var(--f-body); color: var(--muted); background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 3px 8px; cursor: pointer; }
+.copy:hover { color: var(--accent); border-color: var(--accent); }
+
+.tablewrap { overflow-x: auto; max-width: 100%; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); }
+table { border-collapse: collapse; width: 100%; font-size: 15.5px; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+th { font-family: var(--f-display); font-weight: 600; font-size: 15px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); background: var(--bg); }
+tr:last-child td { border-bottom: 0; }
+td:first-child { white-space: nowrap; }
+
+.note { border-left: 4px solid var(--accent); background: var(--accent-soft); padding: 12px 16px; border-radius: 0 6px 6px 0; max-width: 72ch; display: grid; gap: 6px; }
+.note.warn { border-color: var(--warn); background: var(--warn-soft); }
+.note.ok { border-color: var(--ok); background: var(--ok-soft); }
+.note strong:first-child { font-family: var(--f-display); font-weight: 600; font-size: 15px; letter-spacing: .08em; text-transform: uppercase; }
+.note.warn strong:first-child { color: var(--warn); }
+.note.ok strong:first-child { color: var(--ok); }
+.note:not(.warn):not(.ok) strong:first-child { color: var(--accent); }
+
+.steps { list-style: none; padding: 0; counter-reset: st; display: grid; gap: 12px; }
+.steps > li { counter-increment: st; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; }
+.steps > li::before { content: counter(st); width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--accent); color: var(--accent); font: 700 15px var(--f-mono); display: grid; place-items: center; }
+.steps > li > div { display: grid; gap: 4px; min-width: 0; }
+
+.modules { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.module { background: var(--paper); padding: 16px 18px; display: grid; gap: 6px; align-content: start; min-width: 0; }
+.module h3 { margin: 0; font-size: 22px; }
+.module .where { font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.module ul { font-size: 15.5px; }
+
+.compare { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.compare > div { border: 1px solid var(--line); border-radius: 6px; background: var(--paper); padding: 16px 18px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.compare h4 { margin: 0; font-family: var(--f-display); font-size: 21px; font-weight: 600; }
+.compare .tag { font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+
+.diagram { border: 1px solid var(--line); border-radius: 6px; background: var(--paper); padding: 16px; overflow-x: auto; }
+.diagram svg { display: block; width: 100%; min-width: 560px; height: auto; }
+.diagram svg text { font-family: var(--f-body); fill: var(--ink); }
+.diagram svg .sub { fill: var(--muted); font-size: 12px; }
+.diagram svg .box { fill: var(--bg); stroke: var(--line); stroke-width: 1.5; }
+.diagram svg .box.main { fill: var(--accent-soft); stroke: var(--accent); }
+.diagram svg .wire { stroke: var(--accent); stroke-width: 2; fill: none; }
+.diagram svg .wire.dash { stroke-dasharray: 5 4; stroke: var(--muted); }
+.diagram svg .arrow { fill: var(--accent); }
+
+dl.faq { margin: 0; display: grid; gap: 14px; max-width: 72ch; }
+dl.faq dt { font-weight: 700; }
+dl.faq dd { margin: 4px 0 0; color: var(--ink); }
+
+footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18px; font-size: 14px; color: var(--muted); }
+
+@media (max-width: 900px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 28px; padding-block: 24px 60px; }
+  nav.toc { display: none; }
+  details.toc-mobile { display: block; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); padding: 10px 14px; }
+  details.toc-mobile summary { font-family: var(--f-display); font-weight: 600; font-size: 17px; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; }
+  details.toc-mobile ol { margin-top: 8px; padding-left: 26px; font-size: 16px; }
+  .modules, .compare { grid-template-columns: minmax(0, 1fr); }
+  section > h2 { font-size: 30px; }
+}
+</style>
+
+<div class="shell">
+  <header class="masthead">
+    <div class="kicker">Werkstatt-Faktura · Bedienung, Einrichtung, Betrieb</div>
+    <h1>Kuenta Handbuch</h1>
+    <p>Alles, was Sie für Installation, Einrichtung, die tägliche Arbeit, den E-Mail-Versand, Updates und die Datensicherung von Kuenta wissen müssen.</p>
+    <div class="meta"><span>Version <b>1.1.0</b></span><span>Stand <b>November 2026</b></span><span>Windows · macOS · Linux · Tablet</span></div>
+  </header>
+
+  <nav class="toc" aria-label="Inhalt">
+    <div class="label">Inhalt</div>
+    <ol id="toc"></ol>
+  </nav>
+
+  <main>
+    <details class="toc-mobile"><summary>Inhalt</summary><ol id="toc-m"></ol></details>
+
+    <section id="ueberblick">
+      <h2>Was ist Kuenta?</h2>
+      <p class="lead">Kuenta ist eine Faktura für Kfz-Werkstätten. Sie schreiben damit Angebote, Aufträge und Rechnungen, verwalten Kunden und Fahrzeuge, führen Kasse und Lager und erzeugen E-Rechnungen.</p>
+      <p>Kuenta ist eine Webanwendung: Auf dem Werkstatt-PC läuft ein kleines Programm im Hintergrund (der Kuenta-Server). Bedient wird Kuenta im Browser, auf demselben PC oder auf Tablets und weiteren Arbeitsplätzen im Netzwerk. Bedienung und Masken sind an <strong>KFZ-Faktura</strong> angelehnt, dessen Daten Kuenta vollständig übernimmt.</p>
+      <div class="diagram" role="img" aria-label="Aufbau: Der Werkstatt-PC führt den Kuenta-Server aus und speichert die Daten im Benutzerprofil. Browser auf demselben PC sowie Tablets und weitere Arbeitsplätze greifen über das Netzwerk zu.">
+        <svg viewBox="0 0 760 210" xmlns="http://www.w3.org/2000/svg">
+          <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="arrow"/></marker></defs>
+          <rect class="box main" x="250" y="20" width="260" height="110" rx="8"/>
+          <text x="380" y="50" text-anchor="middle" font-weight="700" font-size="16">Werkstatt-PC</text>
+          <text x="380" y="74" text-anchor="middle" font-size="14">Kuenta-Server (Konsolenfenster)</text>
+          <text x="380" y="96" text-anchor="middle" class="sub">Adresse: http://127.0.0.1:3700</text>
+          <text x="380" y="116" text-anchor="middle" class="sub">Daten: %APPDATA%\Kuenta</text>
+          <rect class="box" x="20" y="45" width="170" height="60" rx="8"/>
+          <text x="105" y="72" text-anchor="middle" font-weight="600" font-size="14">Browser am PC</text>
+          <text x="105" y="92" text-anchor="middle" class="sub">immer möglich</text>
+          <rect class="box" x="570" y="20" width="170" height="60" rx="8"/>
+          <text x="655" y="47" text-anchor="middle" font-weight="600" font-size="14">Tablet</text>
+          <text x="655" y="67" text-anchor="middle" class="sub">nur im Netzwerkbetrieb</text>
+          <rect class="box" x="570" y="100" width="170" height="60" rx="8"/>
+          <text x="655" y="127" text-anchor="middle" font-weight="600" font-size="14">2. Arbeitsplatz</text>
+          <text x="655" y="147" text-anchor="middle" class="sub">nur im Netzwerkbetrieb</text>
+          <path class="wire" d="M190 75 H248" marker-end="url(#ah)" marker-start="url(#ah)"/>
+          <path class="wire dash" d="M512 60 H568" marker-end="url(#ah)"/>
+          <path class="wire dash" d="M512 110 C540 110 540 130 568 130" marker-end="url(#ah)"/>
+          <rect class="box" x="250" y="150" width="260" height="44" rx="8"/>
+          <text x="380" y="177" text-anchor="middle" font-size="14">Thunderbird / Mailprogramm (optional)</text>
+          <path class="wire dash" d="M380 130 V148" marker-end="url(#ah)"/>
+        </svg>
+      </div>
+      <div class="note"><strong>Gut zu wissen</strong><span>Das Konsolenfenster ist der Kuenta-Server. Solange Kuenta benutzt wird, muss es geöffnet bleiben. Wird es geschlossen, ist Kuenta beendet.</span></div>
+    </section>
+
+    <section id="installation">
+      <h2>Installation</h2>
+      <p>Nach der Installation ist der Datenbestand leer. Wie Sie Firmendaten eintragen und vorhandene Daten übernehmen, steht in <a href="#einrichtung">Erste Einrichtung</a> und <a href="#datenuebernahme">Daten übernehmen</a>.</p>
+
+      <h3>Windows 10 / 11 (64 Bit)</h3>
+      <ol class="steps">
+        <li><div><strong><code>Kuenta-Setup-1.1.0.exe</code> ausführen.</strong><span>Node.js ist im Installer enthalten, es muss nichts weiter installiert werden.</span></div></li>
+        <li><div><strong>Installationsart wählen.</strong><span><em>Für alle Benutzer</em> (Standard, braucht Administratorrechte) installiert nach <code>C:\Programme\Kuenta</code>. <em>Nur für mich</em> kommt ohne Administratorrechte aus und installiert ins Benutzerprofil.</span></div></li>
+        <li><div><strong>Optionen auswählen.</strong><span>Desktop-Verknüpfung und, für den Netzwerkbetrieb, die Firewall-Freigabe (nur bei Installation für alle Benutzer).</span></div></li>
+        <li><div><strong>Starten:</strong><span>Startmenü <span class="path">Kuenta</span>. Es öffnen sich das Konsolenfenster und der Browser mit <code>http://127.0.0.1:3700</code>.</span></div></li>
+      </ol>
+      <p>Im Startmenü gibt es drei Einträge: <strong>Kuenta</strong> (nur dieser PC), <strong>Kuenta im Netzwerk</strong> (für Tablets und weitere Arbeitsplätze) und <strong>Kuenta deinstallieren</strong>.</p>
+
+      <h3>Linux</h3>
+      <p>Voraussetzung ist Node.js ab Version 22.13. Prüfen Sie mit <code>node -v</code>.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Distribution</th><th>Node.js installieren</th></tr></thead>
+        <tbody>
+          <tr><td>Debian / Ubuntu / Mint</td><td>Über NodeSource: <code>curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -</code>, danach <code>sudo apt install -y nodejs</code></td></tr>
+          <tr><td>Fedora (ab 41)</td><td><code>sudo dnf install nodejs</code></td></tr>
+          <tr><td>openSUSE</td><td><code>sudo zypper install nodejs24</code></td></tr>
+          <tr><td>Arch / Manjaro</td><td><code>sudo pacman -S nodejs</code></td></tr>
+          <tr><td>ohne root</td><td><a href="https://github.com/nvm-sh/nvm">nvm</a>: <code>nvm install 24</code></td></tr>
+        </tbody>
+      </table></div>
+      <div class="codeblock"><pre><code>git clone &lt;Repository-URL&gt; kuenta     # oder Archiv entpacken
+cd kuenta
+./installer/unix/install.sh</code></pre></div>
+      <p>Das Skript installiert ohne root für den aktuellen Benutzer: Programm nach <code>~/.local/lib/kuenta</code>, Startbefehl <code>~/.local/bin/kuenta</code> und einen Eintrag im Anwendungsmenü. Ein anderer Ort geht mit <code>PREFIX=/opt/kuenta ./installer/unix/install.sh</code>.</p>
+      <div class="codeblock"><pre><code>kuenta              # nur dieser Rechner
+kuenta --netzwerk   # für Tablets / weitere Arbeitsplätze freigeben</code></pre></div>
+      <p>Beenden mit <kbd>Strg</kbd>+<kbd>C</kbd> oder durch Schließen des Terminals.</p>
+      <h4>Optional: als Dienst ohne Bildschirm</h4>
+      <div class="codeblock"><pre><code>mkdir -p ~/.config/systemd/user
+cat &gt; ~/.config/systemd/user/kuenta.service &lt;&lt;'EOF'
+[Unit]
+Description=Kuenta
+
+[Service]
+Environment=HOST=0.0.0.0
+ExecStart=/usr/bin/env node %h/.local/lib/kuenta/server/index.js
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+EOF
+systemctl --user daemon-reload
+systemctl --user enable --now kuenta
+loginctl enable-linger "$USER"</code></pre></div>
+      <p>Bei aktiver Firewall Port 3700/TCP freigeben, z. B. <code>sudo ufw allow 3700/tcp</code>.</p>
+
+      <h3>macOS</h3>
+      <ol class="steps">
+        <li><div><strong>Node.js installieren</strong><span>Paket von <a href="https://nodejs.org/de">nodejs.org</a> (LTS) oder <code>brew install node@24</code>.</span></div></li>
+        <li><div><strong>Kuenta installieren</strong><span>Im Terminal wie unter Linux: <code>./installer/unix/install.sh</code>. Die App <em>Kuenta</em> liegt danach in <code>~/Applications</code>.</span></div></li>
+        <li><div><strong>Starten</strong><span>Doppelklick auf <em>Kuenta</em> oder im Terminal <code>kuenta</code>. Beim ersten Öffnen warnt macOS ggf. vor einer nicht signierten App: im Finder Rechtsklick → <em>Öffnen</em>.</span></div></li>
+      </ol>
+
+      <h3>Container (Docker / Podman)</h3>
+      <p>Für Linux-Server, NAS-Systeme, Raspberry Pi oder Macs läuft Kuenta auch im Container. Das Image bringt Node.js mit und läuft auf x86_64 und ARM64. Im Kuenta-Ordner liegen dafür ein <code>Dockerfile</code> und eine <code>compose.yaml</code>.</p>
+      <div class="codeblock"><pre><code># Podman (bei Docker: podman durch docker ersetzen)
+podman build -t kuenta:1.1.0 .
+podman run -d --name kuenta --restart unless-stopped \
+  -p 3700:3700 -v kuenta-daten:/data kuenta:1.1.0
+
+# oder mit Compose
+docker compose up -d --build</code></pre></div>
+      <p>Danach im Browser <code>http://&lt;Rechner&gt;:3700</code> öffnen.</p>
+      <div class="note warn"><strong>Anmeldung einschalten</strong><span>Im Container ist Kuenta im ganzen Netzwerk erreichbar. Schalten Sie gleich nach dem ersten Start die Anmeldung ein (<span class="path">Einstellungen → Vorgabewerte</span>). Nur für diesen Rechner: <code>-p 127.0.0.1:3700:3700</code>.</span></div>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Thema</th><th>Im Container</th></tr></thead>
+        <tbody>
+          <tr><td>Daten</td><td>im Volume <code>kuenta-daten</code> (im Container <code>/data</code>). Sie bleiben beim Neubauen des Containers erhalten. Eigener Ordner: <code>-v /srv/kuenta:/data</code>, er muss UID 1000 gehören; bei Podman ohne root <code>:Z,U</code> anhängen.</td></tr>
+          <tr><td>Sicherungen</td><td>zusätzlich einen Ordner vom NAS einbinden, z. B. <code>-v /mnt/nas/kuenta-sicherungen:/sicherungen</code>, und in Kuenta als Sicherungsordner <code>/sicherungen</code> eintragen.</td></tr>
+          <tr><td>Zeitzone</td><td>Standard <code>Europe/Berlin</code>, ändern mit <code>-e TZ=Europe/Vienna</code>.</td></tr>
+          <tr><td>E-Mail</td><td>nur direkter Versand per SMTP. Die Übergabe an Thunderbird gibt es im Container nicht.</td></tr>
+          <tr><td>KFZ-Faktura-Import</td><td>Datensicherung <code>*.kfz</code> oder <code>DB1.bak</code> hochladen. Den direkten Import aus dem Programmordner gibt es nur unter Windows.</td></tr>
+          <tr><td>Beenden</td><td><code>podman stop kuenta</code> schließt die Datenbank sauber.</td></tr>
+          <tr><td>Update</td><td>Image mit neuer Version bauen, Container mit <code>podman rm -f kuenta</code> entfernen und mit dem neuen Image neu anlegen. Die Daten im Volume bleiben.</td></tr>
+        </tbody>
+      </table></div>
+      <p>Automatischer Start mit Podman über eine Quadlet-Datei und mehr Details: siehe <code>INSTALL.md</code>, Abschnitt „Container“.</p>
+
+      <h3>Ohne Installation</h3>
+      <p>Mit installiertem Node.js (ab 22.13) direkt aus dem entpackten Ordner: <code>Kuenta starten.bat</code> (Windows), <code>./kuenta.sh</code> (Linux/macOS) oder <code>node server/index.js --open</code>.</p>
+    </section>
+
+    <section id="einrichtung">
+      <h2>Erste Einrichtung</h2>
+      <p>Nach dem ersten Start zeigt die Übersicht Schaltflächen für die Einrichtung. Die wichtigsten Punkte:</p>
+      <ol class="steps">
+        <li><div><strong>Firmendaten</strong><span><span class="path">Stammdaten → Einstellungen → Firmendaten</span>: Name, Anschrift, Bankverbindung, Steuernummer/USt-IdNr. und Logo. Diese Angaben stehen auf allen Belegen und in der E-Rechnung.</span></div></li>
+        <li><div><strong>Steuer, Mahnung, Kasse</strong><span>MwSt-Sätze, Kleinunternehmerregelung, Mahnstufen mit Tagen und Gebühren, Kassen-Anfangsbestand.</span></div></li>
+        <li><div><strong>Nummernkreise</strong><span>Eingetragen ist jeweils die zuletzt vergebene Nummer. Die nächste Rechnung bekommt diese Nummer plus 1. Soll die Zählung z. B. zum Jahresanfang bei einer bestimmten Nummer beginnen, tragen Sie hier die Nummer davor ein. Mehr dazu unter <a href="#rechnungsnummern">Rechnungsnummern</a>.</span></div></li>
+        <li><div><strong>E-Mail</strong><span>Versandart wählen (direkt oder über Thunderbird), siehe <a href="#email">E-Mail-Versand</a>.</span></div></li>
+        <li><div><strong>Benutzer und Anmeldung</strong><span><span class="path">Stammdaten → Benutzer / Mitarbeiter</span> anlegen, „Anmeldung erlaubt“ setzen und unter <span class="path">Einstellungen → Vorgabewerte</span> die Anmeldung einschalten. Im Netzwerkbetrieb ist das Pflicht.</span></div></li>
+      </ol>
+      <h3>Alle Reiter der Einstellungen</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Reiter</th><th>Inhalt</th></tr></thead>
+        <tbody>
+          <tr><td>Firmendaten</td><td>Anschrift, Bank, Steuernummern, Logo, vorgedrucktes Briefpapier</td></tr>
+          <tr><td>Steuer / Mahnung / Kasse</td><td>MwSt-Sätze, Kleinunternehmer, 4 Mahnstufen, Kassen-Anfangsbestand</td></tr>
+          <tr><td>Nummernkreise</td><td>Kunden, Fahrzeuge, Artikel, Arbeitswerte, Lieferanten, Reifen, alle Vorgänge</td></tr>
+          <tr><td>FIBU</td><td>Konten (SKR03-Vorgabe), Erlöskonten, DATEV: Berater- und Mandantennummer, Sachkontenlänge, Beginn des Wirtschaftsjahrs, Sammeldebitor, BU-Schlüssel (siehe <a href="#datev">DATEV-Export</a>)</td></tr>
+          <tr><td>Krypto-Zahlung</td><td>BTCPay Server für Bitcoin, Lightning und USDT, Gültigkeit der Zahlungslinks, FIBU-Konto (siehe <a href="#krypto">Krypto-Zahlung</a>)</td></tr>
+          <tr><td>Vorgabewerte</td><td>Brutto/Netto-Erfassung, KET, MTZ, GoBD-Sperre, Anmeldung, Farbschema (hell/dunkel) und Farbe, Sprache der Oberfläche und der Belege</td></tr>
+          <tr><td>E-Mail</td><td>Versandart, Thunderbird-Pfad, SMTP-Server, Vorlagen, Signatur, Versandprotokoll</td></tr>
+          <tr><td>Lizenz</td><td>Kuenta-Pro-Lizenzschlüssel einspielen oder entfernen, Stand der Lizenz (siehe <a href="#pro">Kuenta Pro</a>)</td></tr>
+          <tr><td>Erinnerungen &amp; SMS</td><td>Texte der Termin-Erinnerungen per E-Mail und SMS, SMS-Gateway mit Vorlagen und Test, Erinnerungsprotokoll (siehe <a href="#erinnerungen">Erinnerungen</a>)</td></tr>
+          <tr><td>Kasse</td><td>TSE (fiskaly), EC-Terminal (ZVT), Schnelltasten, Barverkaufskunde</td></tr>
+          <tr><td>Zeiterfassung</td><td>Vorgaben zur Zeiterfassung, Bundesland für die Feiertage</td></tr>
+          <tr><td>Einkauf / Handel</td><td>Gegenkonto für Eingangsrechnungen, Kreditor, Erlöskonten Fahrzeugverkauf (Regelbesteuerung und § 25a)</td></tr>
+          <tr><td>Individuelle Felder</td><td>eigene Bezeichnungen für freie Felder, z. B. Fahrzeugtermine und Fahrzeugdaten</td></tr>
+          <tr><td>Stammtabellen</td><td>Zahlungsbedingungen, Einheiten, Stundensätze, Auftragsarten, Warengruppen, Hersteller, Zahlungsarten, Textbausteine, Mahntexte, Länder, Reifenmarken, Fahrzeugfarben</td></tr>
+          <tr><td>Protokoll</td><td>Änderungsprotokoll</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="datenuebernahme">
+      <h2>Daten übernehmen</h2>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Quelle</th><th>Weg in Kuenta</th></tr></thead>
+        <tbody>
+          <tr><td>KFZ-Faktura</td><td><span class="path">Kuenta → Daten aus KFZ-Faktura importieren</span></td></tr>
+          <tr><td>Kuenta-Sicherung <code>*.kuenta</code>, KFZ-Faktotum <code>*.kft</code>, Schraubwerk <code>*.swb</code></td><td><span class="path">Kuenta → Daten wiederherstellen</span></td></tr>
+          <tr><td>CSV, DATANORM 4/5</td><td><span class="path">Kuenta → Datenimport</span></td></tr>
+        </tbody>
+      </table></div>
+      <h3>Aus KFZ-Faktura</h3>
+      <ol>
+        <li><strong>Datensicherung <code>*.kfz</code>:</strong> In KFZ-Faktura „Daten sichern“, die Datei in Kuenta hochladen (Ziehen und Ablegen). Passwortgeschützte Sicherungen werden unterstützt.</li>
+        <li><strong>Datenbanksicherung</strong> <code>DB1.bak</code> oder <code>*.fbk</code> direkt hochladen.</li>
+        <li><strong>Programmordner</strong> (nur Windows), z. B. <code>C:\KFZ-Faktura</code>. KFZ-Faktura vorher schließen. Die Originaldatenbank wird nur kopiert, nie verändert.</li>
+      </ol>
+      <p>Übernommen werden alle Tabellen: Kunden, Fahrzeuge, Artikel, Arbeitswerte, Lieferanten, Reifeneinlagerung, alle Vorgänge, Zahlungen, Offene Posten, Mahnungen, Kassenbuch, FIBU-Buchungen, Textbausteine, Einstellungen, Nummernkreise, KBA-Schlüsselnummern und PLZ-Verzeichnis, dazu Dokumente, Bilder und das Firmenlogo.</p>
+      <h3>Erneuter Import: was bleibt, was wird ersetzt</h3>
+      <p>Sie können KFZ-Faktura-Daten auch mehrfach importieren, z. B. während einer Übergangszeit. Vor dem Import zeigt Kuenta eine Übersicht:</p>
+      <div class="compare">
+        <div><span class="tag">bleibt erhalten</span><h4>Daten, die es nur in Kuenta gibt</h4>
+          <ul><li>Einstellungen: E-Mail, Kasse, TSE, Sicherung, Druck</li><li>Kassenbons und Kassenabschlüsse</li><li>Zeiterfassung, Termine, Aufgaben, Briefe</li><li>Eingangsrechnungen, Fahrzeughandel, Kaufverträge, Anzahlungen</li><li>in Kuenta hochgeladene Dokumente, E-Mail- und Änderungsprotokoll</li><li>Kuenta-eigene Felder in Stammdaten, z. B. E-Rechnungsformat und Leitweg-ID beim Kunden, IBAN beim Lieferanten, Sollzeiten der Mitarbeiter</li></ul></div>
+        <div><span class="tag">wird ersetzt</span><h4>Daten aus KFZ-Faktura</h4>
+          <ul><li>Kunden, Fahrzeuge, Artikel, Arbeitswerte, Lieferanten</li><li>Angebote, Aufträge, Lieferscheine, Rechnungen</li><li>Zahlungen, Kassenbuch, Nummernkreise</li></ul>
+          <p>Kuenta nennt vorher, wie viele dieser Datensätze seit dem letzten Import in Kuenta angelegt oder geändert wurden. Sie werden durch den Stand aus der Sicherung ersetzt.</p></div>
+      </div>
+      <p>Mit dem Haken „Kuenta-eigene Daten behalten“ (Standard) passiert das oben Beschriebene. Ohne Haken ersetzt der Import alles durch die Sicherung.</p>
+      <div class="note ok"><strong>Sicherheitskopie</strong><span>Vor jedem Import legt Kuenta eine Kopie der bisherigen Daten im Unterordner <code>sicherheitskopien</code> des Datenordners an.</span></div>
+      <div class="note warn"><strong>Parallelbetrieb</strong><span>Arbeiten Sie nicht gleichzeitig in KFZ-Faktura und Kuenta an denselben Rechnungen. Rechnungen, die Sie in Kuenta schreiben (auch automatisch an der Kasse), überschreibt der nächste Import.</span></div>
+      <div class="note warn"><strong>7-Zip-Sicherungen</strong><span>Neuere KFZ-Faktura-Versionen packen die <code>.kfz</code>-Datei im 7-Zip-Format. Dann die Datei mit 7-Zip entpacken und <code>db\DB1.bak</code> hochladen.</span></div>
+      <h3>CSV und DATANORM</h3>
+      <p>Der Import-Assistent übernimmt Kunden, Fahrzeuge, Artikel, Arbeitswerte und Lieferanten aus CSV-Dateien. Spalten werden den Kuenta-Feldern zugeordnet, die Zuordnung lässt sich als Vorlage speichern. Artikeldaten von Großhändlern kommen per DATANORM 4/5.</p>
+      <h3>Umzug auf einen anderen Rechner</h3>
+      <p>Auf dem alten Rechner <span class="path">Kuenta → Daten sichern</span>, auf dem neuen <span class="path">Kuenta → Daten wiederherstellen</span>.</p>
+    </section>
+
+    <section id="bedienung">
+      <h2>Bedienung</h2>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Element</th><th>Wofür</th></tr></thead>
+        <tbody>
+          <tr><td>Menüleiste</td><td>Oben: Kuenta, Stammdaten, Büro, Einkauf, Verkauf, Fahrzeughandel, Finanzen, Auswertung. Hier liegen auch „Neue Rechnung“, Stapeldruck, Sicherung und Import.</td></tr>
+          <tr><td>Navigationsmenü</td><td>Links: alle Übersichten nach Bereichen gruppiert.</td></tr>
+          <tr><td>Schnellmenü</td><td>Häufige Aktionen mit einem Klick.</td></tr>
+          <tr><td>Suche</td><td>Oben in der Leiste, mit <kbd>Strg</kbd>+<kbd>F</kbd> erreichbar. Findet Kunden, Fahrzeuge, Vorgänge.</td></tr>
+          <tr><td>Übersichten</td><td>Tabellen mit Suchleiste und Buchstabenleiste (A–Z), Doppelklick öffnet den Datensatz.</td></tr>
+          <tr><td>Weitere Funktionen / Rechtsklick</td><td>Kontextmenüs mit allen Aktionen zum markierten Datensatz: Weiterführen, Kopieren, Drucken, per E-Mail senden usw.</td></tr>
+          <tr><td>Eingabemasken</td><td>Mit Reitern, z. B. beim Kunden: Fahrzeuge, Vorgänge, Dokumente, Konditionen.</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Tastenkürzel</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Taste</th><th>Wirkung</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>F2</kbd></td><td>Artikel in den Vorgang einfügen</td></tr>
+          <tr><td><kbd>F3</kbd></td><td>Arbeitswert in den Vorgang einfügen</td></tr>
+          <tr><td><kbd>Strg</kbd>+<kbd>S</kbd></td><td>Speichern</td></tr>
+          <tr><td><kbd>Strg</kbd>+<kbd>P</kbd></td><td>Drucken</td></tr>
+          <tr><td><kbd>Strg</kbd>+<kbd>F</kbd></td><td>Suche</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>Fenster oder Dialog schließen</td></tr>
+          <tr><td><kbd>Enter</kbd></td><td>in Eingabedialogen: bestätigen</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Übersicht: Beträge ausblenden und Währung wechseln</h3>
+      <p>Oben rechts auf der Übersicht gibt es zwei Schalter. Beide gelten nur für den jeweiligen Arbeitsplatz.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Schalter</th><th>Wirkung</th></tr></thead>
+        <tbody>
+          <tr><td>👁 Auge</td><td>blendet alle Beträge auf der Übersicht mit Sternchen aus, z. B. wenn Kunden auf den Bildschirm sehen. Noch einmal klicken zeigt sie wieder.</td></tr>
+          <tr><td>€ · $ · ₿</td><td>zeigt die Beträge in Euro, US-Dollar oder Bitcoin zum aktuellen Kurs. Ein weiterer Klick auf ₿ wechselt zu Satoshis (1 Bitcoin = 100.000.000 sats) und zurück. Der Knopf merkt sich die zuletzt gewählte Einheit. Kurs und Quelle stehen unter den Kacheln.</td></tr>
+        </tbody>
+      </table></div>
+      <div class="note"><strong>Nur Anzeige</strong><span>Rechnungen, Zahlungen, Buchungen, DATEV und alle Ausdrucke bleiben immer in Euro. Der Umschalter ändert nur, wie die Zahlen auf der Übersicht angezeigt werden.</span></div>
+      <p>Die Kurse kommen von der Europäischen Zentralbank (US-Dollar, Referenzkurs des letzten Bankarbeitstags) und von der Börse Bitstamp (Bitcoin, aktueller Kurs).</p>
+      <div class="note"><strong>Internet</strong><span>Für die Kurse fragt der Kuenta-Rechner die EZB und Bitstamp ab, höchstens alle drei Stunden. Dabei werden keine Daten aus Kuenta übertragen. Die Kurse speichert Kuenta zwischen. Ohne Internet gilt der zuletzt geladene Stand. Wurden noch nie Kurse geladen, bleibt die Anzeige in Euro.</span></div>
+
+      <h3>Farben</h3>
+      <p>Unter <span class="path">Einstellungen → Vorgabewerte → Darstellung</span> stellen Sie zwei Dinge ein:</p>
+      <ul>
+        <li><strong>Farbschema:</strong> hell, dunkel oder automatisch wie im Betriebssystem.</li>
+        <li><strong>Farbe:</strong> Blau (Standard), Grün, Graphit oder Bordeaux. Jede Farbe gibt es hell und dunkel.</li>
+      </ul>
+      <p>Beides gilt nur für den jeweiligen Arbeitsplatz bzw. Browser. So lassen sich z. B. die Kasse, das Tablet in der Werkstatt oder ein Demo-Mandant auf einen Blick unterscheiden.</p>
+
+      <h3>Sprache</h3>
+      <p>Kuenta gibt es auf Deutsch, Englisch und Spanisch. Es gibt zwei Einstellungen:</p>
+      <ul>
+        <li><strong>Sprache der Oberfläche:</strong> im Menü <span class="path">Kuenta → Sprache / Language</span>, auf der Anmeldeseite oder unter <span class="path">Einstellungen → Vorgabewerte</span>. Sie gilt nur für den jeweiligen Arbeitsplatz. Zahlen erscheinen auf Englisch als 1,234.50.</li>
+        <li><strong>Sprache der Belege:</strong> unter <span class="path">Einstellungen → Vorgabewerte</span>. Sie gilt für den ganzen Mandanten und betrifft PDF-Belege, den Druck, Mahnungen und die Vorlagen für E-Mails und Erinnerungen.</li>
+      </ul>
+      <p>Was Sie selbst eingeben, bleibt, wie es ist: Artikeltexte, Kundennamen und eigene Textvorlagen werden nicht übersetzt. Gesetzliche Hinweise wie § 19 UStG erscheinen übersetzt, es gilt aber weiter das deutsche Recht. Die E-Rechnung (XRechnung) bleibt deutsch.</p>
+    </section>
+
+    <section id="module">
+      <h2>Bereiche und Funktionen</h2>
+      <div class="modules">
+        <div class="module"><h3>Stammdaten</h3><div class="where">Kunden · Fahrzeuge · Artikel · Arbeitswerte · Lieferanten · Reifen</div>
+          <ul><li>Kunden mit Fahrzeugen, Vorgangshistorie, Dokumenten, Konditionen, E-Rechnungs-Einstellungen und Leitweg-ID</li><li>Auslandskunden mit Netto-Rechnung</li><li>Fahrzeuge mit KBA-Suche über HSN/TSN, Terminen, Halter, Fotos</li><li>Artikel mit Preisgruppen und Lager, Arbeitswerte mit Stundenverrechnungssätzen</li><li>Reifeneinlagerung mit Einlagerungsbeleg</li></ul></div>
+        <div class="module"><h3>Verkauf</h3><div class="where">Angebote · Aufträge · Lieferscheine · Rechnungen · Korrekturen</div>
+          <ul><li>Positionen mit Artikeln, Arbeitswerten, Texten, Zwischensummen, KET, MTZ, Rabatt, durchlaufenden Posten</li><li>Weiterführen (Angebot → Auftrag → Rechnung), Kopieren, Archiv</li><li>Anzahlungs-, Abschlags- und Schlussrechnung, Sammelrechnung</li><li>Rechnungskorrektur, Gutschrift, Storno</li><li>Stapeldruck, PDF, E-Mail-Versand</li><li>Warenkörbe aus Teilekatalogen (CSV/DATANORM)</li></ul></div>
+        <div class="module"><h3>Kasse</h3><div class="where">Verkauf → Kasse</div>
+          <ul><li>Scanner-Eingabe und Schnelltasten, Bar mit Rückgeld, EC, Kreditkarte</li><li>Aufträge und Rechnungen an der Kasse bezahlen</li><li>Ein-/Auszahlungen, Bon-Storno, Z-Bon mit Zählprotokoll</li><li>Cloud-TSE fiskaly SIGN DE mit QR-Code, DSFinV-K-Export, EC-Terminal über ZVT</li></ul></div>
+        <div class="module"><h3>Einkauf</h3><div class="where">Eingangsrechnung · Lager · Lagerbewegung · Inventur</div>
+          <ul><li>Eingangsrechnungen mit Lagerbuchung, EK-Aktualisierung, Zahlung und FIBU-Buchung</li><li>Eingehende E-Rechnungen (XRechnung, ZUGFeRD) einlesen, Lieferant wird angelegt</li><li>Lagerbestände mit Mindestbestand, Schnellerfassung per Scanner</li><li>Inventur mit Zählliste und Buchung</li></ul></div>
+        <div class="module"><h3>Büro</h3><div class="where">Terminplaner · Aufgaben · Briefe · Zeiterfassung · Stempeluhr</div>
+          <ul><li>Terminplaner, Aufgaben, Briefe</li><li>Zeiterfassung mit Zeitkonto, Abwesenheit, Monatsabschluss, Stundenzettel, Feiertagen je Bundesland</li><li>Stempeluhr: Kommen/Gehen, Pause, Auftrag, Anwesenheitsliste</li></ul></div>
+        <div class="module"><h3>Fahrzeughandel</h3><div class="where">Fahrzeuglager · Kaufverträge · Verkaufsstatistik</div>
+          <ul><li>Neu- und Gebrauchtwagen mit Ausstattung und Pkw-EnVKV-Angaben</li><li>Kalkulation, Differenzbesteuerung nach § 25a UStG, Preisschild</li><li>Inzahlungnahme, Kaufverträge mit Rechnungserstellung</li></ul></div>
+        <div class="module"><h3>Finanzen</h3><div class="where">Kassenbuch · Zahlungen · OP · Rechnungsliste · Mahnungen · FIBU</div>
+          <ul><li>Zahlungen und Offene Posten</li><li>Mahnwesen in 4 Stufen, als PDF oder per E-Mail</li><li>Kassenbuch, DATEV-Export, GoBD-Datenexport</li></ul></div>
+        <div class="module"><h3>Auswertung</h3><div class="where">Fahrzeugtermine · Umsatz · Serienbriefe · Leistungsgrad</div>
+          <ul><li>HU/AU- und Wartungstermine mit Erinnerungsschreiben</li><li>Umsatz und Roherlöse</li><li>Serienbriefe, Leistungsgrad je Auftrag und Mitarbeiter</li></ul></div>
+      </div>
+      <h3>System</h3>
+      <ul>
+        <li><strong>Mandanten:</strong> mehrere Betriebe oder Demodaten getrennt führen, <span class="path">Kuenta → Mandant wechseln</span>.</li>
+        <li><strong>Benutzer und Rechte:</strong> je Benutzer festlegen, welche Bereiche angezeigt, erstellt, bearbeitet oder gelöscht werden dürfen und ob Einkaufspreise sichtbar sind.</li>
+        <li><strong>Protokolle:</strong> Änderungsprotokoll und E-Mail-Versandprotokoll.</li>
+      </ul>
+    </section>
+
+    <section id="erechnung">
+      <h2>E-Rechnung</h2>
+      <p>Kuenta erzeugt E-Rechnungen nach EN 16931 und liest eingehende E-Rechnungen ein.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Format</th><th>Beschreibung</th></tr></thead>
+        <tbody>
+          <tr><td>XRechnung 3.0 (CII)</td><td>reine XML-Datei, z. B. für Behörden</td></tr>
+          <tr><td>XRechnung 3.0 (UBL)</td><td>reine XML-Datei in UBL-Syntax</td></tr>
+          <tr><td>ZUGFeRD 2.3 / Factur-X</td><td>PDF/A-3 mit eingebetteter XRechnung, lesbar für Mensch und Software</td></tr>
+        </tbody>
+      </table></div>
+      <p>Welches Format ein Kunde bekommt, steht in seinen E-Rechnungs-Einstellungen. Es wird beim E-Mail-Versand automatisch vorgeschlagen. Unterstützte Steuerfälle: Reverse Charge, innergemeinschaftliche Lieferung, Ausfuhr, Kleinunternehmer, Differenzbesteuerung. Geprüft mit dem Mustang-Validator.</p>
+      <p>Eingehende E-Rechnungen lesen Sie unter <span class="path">Einkauf → Eingangsrechnung</span> ein. Zum Anschauen einer XRechnung dient <span class="path">Einkauf → E-Rechnung visualisieren</span>.</p>
+    </section>
+
+    <section id="datev">
+      <h2>DATEV-Export für den Steuerberater</h2>
+      <p class="lead">Kuenta bucht Rechnungen, Zahlungen, Eingangsrechnungen und Kassenumsätze automatisch und exportiert sie als DATEV-Dateien. Ihr Steuerberater liest sie direkt in DATEV ein.</p>
+      <h3>Einmal einrichten</h3>
+      <p>Unter <span class="path">Einstellungen → FIBU</span>. Die Werte bekommen Sie von Ihrem Steuerberater.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Einstellung</th><th>Bedeutung</th></tr></thead>
+        <tbody>
+          <tr><td>Beraternummer, Mandantennummer</td><td>Ihre Nummern in der DATEV-Kanzlei</td></tr>
+          <tr><td>Sachkontenlänge</td><td>meist 4. Bestimmt auch die Personenkonten (siehe unten)</td></tr>
+          <tr><td>Wirtschaftsjahr beginnt im Monat</td><td>1 = Kalenderjahr. Bei abweichendem Wirtschaftsjahr den Startmonat, z. B. 7 für 01.07.–30.06.</td></tr>
+          <tr><td>Sammeldebitor</td><td>Konto für Kunden ohne eigenes Debitorenkonto (Standard 10000)</td></tr>
+          <tr><td>Sammelkreditor</td><td>unter <span class="path">Einstellungen → Einkauf / Handel</span> (Standard 70000)</td></tr>
+          <tr><td>BU-Schlüssel mitgeben</td><td>nur einschalten, wenn Ihr Steuerberater Erlös- und Aufwandskonten <em>ohne</em> Automatikfunktion nutzt. Dann bekommen Erlöse den Umsatzsteuer-Schlüssel (19 %: 3, 7 %: 2) und Eingangsrechnungen den Vorsteuer-Schlüssel (19 %: 9, 7 %: 8).</td></tr>
+          <tr><td>Konten</td><td>Kasse, Bank und Erlöskonten (Vorgabe SKR03). Bei SKR04 bitte mit dem Steuerberater abstimmen und anpassen.</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Personenkonten (Debitoren und Kreditoren)</h3>
+      <p>Personenkonten haben eine Stelle mehr als die Sachkonten. Bei Sachkontenlänge 4 gilt:</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Art</th><th>Bereich</th><th>Woher die Nummer kommt</th></tr></thead>
+        <tbody>
+          <tr><td>Debitoren (Kunden)</td><td>10000–69999</td><td>Debitoren-Nr. beim Kunden, sonst Kundennummer, sonst Sammeldebitor</td></tr>
+          <tr><td>Kreditoren (Lieferanten)</td><td>70000–99999</td><td>Kreditoren-Nr. beim Lieferanten, sonst Lieferantennummer, sonst Sammelkreditor</td></tr>
+        </tbody>
+      </table></div>
+      <p>Eine Nummer außerhalb des Bereichs, z. B. Lieferant Nr. 3 aus einem KFZ-Faktura-Import, wird nicht verwendet, denn sie wäre ein Sachkonto. Die Buchung geht dann auf das Sammelkonto. Soll der Kunde ein eigenes Konto bekommen, tragen Sie beim Kunden die <strong>Debitoren-Nr.</strong> bzw. beim Lieferanten die <strong>Kreditoren-Nr.</strong> ein.</p>
+      <h3>Monatlicher Ablauf</h3>
+      <ol class="steps">
+        <li><div><strong>Zeitraum wählen</strong><span><span class="path">Finanzen → FIBU-Export</span>, z. B. den Vormonat. Die Liste zeigt alle noch nicht exportierten Buchungen.</span></div></li>
+        <li><div><strong>Debitoren/Kreditoren exportieren</strong><span>Die Datei <code>EXTF_Debitoren_Kreditoren_….csv</code> enthält Name, Anschrift, Land und USt-IdNr. aller im Zeitraum bebuchten Kunden und Lieferanten. So sieht der Steuerberater Namen statt nur Kontonummern.</span></div></li>
+        <li><div><strong>DATEV-Export erstellen</strong><span>Die Datei <code>EXTF_Buchungsstapel_….csv</code> enthält die Buchungen. Kuenta markiert sie als exportiert, damit sie beim nächsten Mal nicht doppelt kommen. „Vorschau-Export“ erzeugt dieselbe Datei ohne Markierung.</span></div></li>
+        <li><div><strong>An den Steuerberater senden</strong><span>Beide Dateien. Er liest zuerst die Debitoren/Kreditoren ein, dann den Buchungsstapel.</span></div></li>
+      </ol>
+      <div class="note warn"><strong>Bitte beachten</strong>
+        <span>Ein Export darf nur ein Wirtschaftsjahr umfassen. Dezember und Januar exportieren Sie getrennt. Kuenta weist darauf hin.</span>
+        <span>Die Rechnungen als PDF gehen nicht mit. Die Belege bekommt der Steuerberater weiterhin getrennt.</span>
+        <span>Lassen Sie Ihren Steuerberater beim ersten Mal beide Dateien testweise einlesen (Buchungsstapel und Debitoren/Kreditoren) und die Konten prüfen.</span>
+        <span>Bereits gespeicherte Buchungen behalten ihre Konten. Wurde früher für einen Kunden oder Lieferanten mit kurzer Nummer (unter 10000 bzw. 70000) gebucht, kann die Buchung auf einem Sachkonto liegen. Der Export erkennt das nicht, weil z. B. „3“ ein gültiges Sachkonto ist. Tragen Sie bei solchen Kunden und Lieferanten eine Debitoren- bzw. Kreditoren-Nr. ein und lassen Sie ältere Buchungen vom Steuerberater prüfen.</span></div>
+      <p>Die Dateien sind im Zeichensatz Windows-1252 gespeichert, wie DATEV ihn erwartet. Umlaute kommen dadurch richtig an.</p>
+    </section>
+
+    <section id="email">
+      <h2>E-Mail-Versand</h2>
+      <p>Rechnungen, Angebote und Mahnungen versenden Sie über <strong>Weitere Funktionen / Rechtsklick → Per E-Mail senden</strong>. Empfänger, Betreff und Text sind vorausgefüllt, der Beleg wird als PDF, ZUGFeRD oder XRechnung angehängt. Weitere Dateien können Sie dazulegen.</p>
+      <p>Unter <span class="path">Einstellungen → E-Mail → Versandart</span> wählen Sie, wie Kuenta die Mail verschickt:</p>
+      <div class="compare">
+        <div><span class="tag">Versandart 1</span><h4>Direkt aus Kuenta (SMTP)</h4>
+          <p>Kuenta verschickt die Mail selbst über den Postausgangsserver Ihres Anbieters.</p>
+          <ul><li>funktioniert von jedem Gerät, auch vom Tablet</li><li>SMTP-Server, Port, Verschlüsselung, Benutzer und Passwort müssen eingetragen sein</li><li>die Mail erscheint <strong>nicht</strong> in Thunderbird unter „Gesendet“; nutzen Sie dafür das Versandprotokoll oder eine BCC-Kopie an sich selbst</li></ul></div>
+        <div><span class="tag">Versandart 2</span><h4>An Mailprogramm übergeben</h4>
+          <p>Kuenta öffnet in Thunderbird eine fertige Mail mit Anhang. Sie prüfen sie und klicken dort auf Senden.</p>
+          <ul><li>die Mail liegt danach in Thunderbird im Ordner „Gesendet“</li><li>keine SMTP-Daten in Kuenta nötig</li><li>ohne Thunderbird bekommt das Standard-Mailprogramm (z. B. Outlook) einen Entwurf</li><li>nur an dem PC möglich, auf dem Kuenta läuft</li></ul></div>
+      </div>
+      <h3>Thunderbird einrichten</h3>
+      <ol class="steps">
+        <li><div><strong>Versandart umstellen</strong><span><span class="path">Einstellungen → E-Mail → Versandart</span> auf „An Mailprogramm übergeben (z. B. Thunderbird)“.</span></div></li>
+        <li><div><strong>Fund prüfen</strong><span>Darunter zeigt Kuenta, ob Thunderbird gefunden wurde. Bei einer portablen oder ungewöhnlichen Installation tragen Sie den Pfad zur <code>thunderbird.exe</code> selbst ein.</span></div></li>
+        <li><div><strong>Testen</strong><span>„Einstellungen speichern &amp; Mailprogramm testen“ öffnet eine Testmail in Thunderbird.</span></div></li>
+      </ol>
+      <div class="note warn"><strong>Bitte beachten</strong>
+        <span>Die Rechnung gilt in Kuenta schon beim Übergeben als „per Mail versendet“, auch wenn Sie die Mail in Thunderbird nicht abschicken.</span>
+        <span>Kuenta hängt seine Signatur an. Hat Thunderbird auch eine, erscheinen beide. Leeren Sie eine davon.</span>
+        <span>Die übergebenen Anhänge liegen in <code>%APPDATA%\Kuenta\mail-ausgang</code> und werden nach 14 Tagen gelöscht.</span></div>
+      <h3>Vorlagen und Platzhalter</h3>
+      <p>Betreff und Text für Vorgänge und Mahnungen sowie die Signatur stellen Sie unter <span class="path">Einstellungen → E-Mail</span> ein. Diese Platzhalter werden ersetzt:</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Platzhalter</th><th>wird zu</th></tr></thead>
+        <tbody>
+          <tr><td><code>{Vorgang}</code></td><td>Art des Belegs, z. B. Rechnung</td></tr>
+          <tr><td><code>{Nummer}</code></td><td>Belegnummer</td></tr>
+          <tr><td><code>{Name}</code></td><td>Kundenname</td></tr>
+          <tr><td><code>{Anrede}</code></td><td>Anrede aus den Kundendaten</td></tr>
+          <tr><td><code>{Briefanrede}</code></td><td>„Sehr geehrter Herr …,“ / „Sehr geehrte Frau …,“ / „Sehr geehrte Damen und Herren,“</td></tr>
+          <tr><td><code>{Firma}</code></td><td>Ihr Firmenname</td></tr>
+          <tr><td><code>{Betrag}</code></td><td>Bruttobetrag, bei Mahnungen der offene Betrag</td></tr>
+          <tr><td><code>{Datum}</code></td><td>Belegdatum</td></tr>
+        </tbody>
+      </table></div>
+      <p>Jeder Versand steht im <strong>Versandprotokoll</strong> (<span class="path">Einstellungen → E-Mail → Protokoll anzeigen</span>) mit Zeit, Empfänger, Betreff, Anhängen und Status, z. B. „gesendet“ oder „an Thunderbird übergeben“.</p>
+    </section>
+
+    <section id="erinnerungen">
+      <h2>Erinnerungen per E-Mail und SMS</h2>
+      <p class="lead">An HU, Inspektion und andere Fahrzeugtermine erinnert Kuenta per Brief, E-Mail oder SMS. Jede Erinnerung wird protokolliert, damit kein Kunde sie doppelt bekommt.</p>
+      <h3>So geht's</h3>
+      <ol class="steps">
+        <li><div><strong>Liste aufrufen</strong><span><span class="path">Auswertung → Fahrzeugtermine</span>, Termin (z. B. HU) und Zeitraum wählen. Die Spalte „zuletzt erinnert“ zeigt, wer schon eine Erinnerung bekommen hat und auf welchem Weg.</span></div></li>
+        <li><div><strong>Weg wählen</strong><span>„Erinnerungsschreiben“ druckt Briefe, „Per E-Mail erinnern“ und „Per SMS erinnern“ verschicken an alle passenden Fahrzeuge der Liste.</span></div></li>
+        <li><div><strong>Bestätigen</strong><span>Kuenta nennt die Anzahl. Bereits erinnerte Fahrzeuge werden standardmäßig übersprungen. Danach zeigt eine Zusammenfassung, was gesendet, übersprungen oder fehlgeschlagen ist.</span></div></li>
+      </ol>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Wird übersprungen, wenn …</th><th>Abhilfe</th></tr></thead>
+        <tbody>
+          <tr><td>keine E-Mail-Adresse bzw. keine Mobilnummer</td><td>beim Kunden eintragen. Für SMS zählt das Feld „Mobil“, sonst „Telefon“, wenn dort eine Mobilnummer steht. Festnetznummern können keine SMS empfangen.</td></tr>
+          <tr><td>der Kunde „Keine Erinnerungen per E-Mail/SMS“ hat</td><td>Häkchen beim Kunden unter „Kontakt“. Briefe bekommt er weiterhin.</td></tr>
+          <tr><td>das Fahrzeug keinen Halter hat</td><td>Fahrzeug einem Kunden zuordnen</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Texte</h3>
+      <p>Unter <span class="path">Einstellungen → Erinnerungen &amp; SMS</span> stehen Betreff und Text der E-Mail und der Text der SMS. Platzhalter: <code>{Briefanrede}</code> <code>{Anrede}</code> <code>{Name}</code> <code>{Vorname}</code> <code>{Kennzeichen}</code> <code>{Fahrzeug}</code> <code>{Termin}</code> <code>{Terminart}</code> <code>{Firma}</code> <code>{Telefon}</code>. Eine SMS hat 160 Zeichen. Längere Texte gehen in mehreren Teilen raus und kosten entsprechend mehr.</p>
+      <p>E-Mails gehen über die Versandart im Reiter „E-Mail“. Beim direkten Versand (SMTP) verschickt Kuenta alle auf einmal. Bei „An Mailprogramm übergeben“ öffnet sich für jede Erinnerung ein Fenster, deshalb höchstens 20 auf einmal.</p>
+      <div class="note"><strong>SMS gehört zu Kuenta Pro</strong><span>Erinnerungen per Brief und E-Mail sind frei. Für den SMS-Versand brauchen Sie eine Pro-Lizenz, siehe <a href="#pro">Kuenta Pro</a>. Das Gateway können Sie vorher schon einrichten.</span></div>
+      <h3>SMS-Gateway: drei Möglichkeiten</h3>
+      <p>Kuenta verschickt SMS über ein Gateway. Unter <span class="path">Einstellungen → Erinnerungen &amp; SMS → Vorlage</span> gibt es für jede Möglichkeit eine Vorlage, die Sie nur noch anpassen. Mit „Einstellungen speichern &amp; Test-SMS senden“ prüfen Sie die Einrichtung.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Möglichkeit</th><th>Sie brauchen</th><th>Gut zu wissen</th></tr></thead>
+        <tbody>
+          <tr><td>Surfstick an einem anderen Rechner (Kuenta-SMS-Relais)</td><td>Rechner (z. B. Raspberry Pi), Surfstick mit Modem-Modus, SIM-Karte, das Programm <code>gammu</code></td><td>Das Relais liegt bei Kuenta im Ordner <code>sms-relais</code> mit eigener Anleitung. Laufende Kosten nur für die SIM-Karte.</td></tr>
+          <tr><td>Altes Android-Handy</td><td>Handy mit SIM-Karte und einer Gateway-App, z. B. „SMS Gateway for Android“</td><td>Kein zusätzlicher Rechner nötig. Das Handy muss im selben Netzwerk sein und eingeschaltet bleiben. Adresse und Zugangsdaten stehen in der App.</td></tr>
+          <tr><td>SMS-Anbieter im Internet</td><td>Kundenkonto, z. B. bei seven.io, und dessen API-Schlüssel</td><td>Keine Hardware. Kosten je SMS. Andere Anbieter lassen sich über die freien Felder (Adresse, Kopfzeilen, Inhalt) ebenfalls anbinden.</td></tr>
+        </tbody>
+      </table></div>
+      <div class="note warn"><strong>UMTS ist abgeschaltet</strong><span>In Deutschland haben alle Netzbetreiber UMTS (3G) 2021/2022 abgeschaltet. Ein reiner UMTS-Stick verschickt SMS nur noch über das alte GSM-Netz, solange es betrieben wird. Nehmen Sie besser einen LTE-Stick, der sich als Modem anmelden kann. Datenvolumen braucht er für SMS nicht.</span></div>
+      <div class="note"><strong>Einwilligung</strong><span>Erinnerungen per E-Mail oder SMS sind Werbung im Sinne des Wettbewerbsrechts. Schreiben Sie nur Kunden an, die dem zugestimmt haben, und vermerken Sie Abmeldungen sofort mit dem Häkchen „Keine Erinnerungen“. Im Zweifel fragen Sie Ihren Rechtsberater.</span></div>
+      <p>Alle Erinnerungen stehen im <strong>Erinnerungsprotokoll</strong> (<span class="path">Einstellungen → Erinnerungen &amp; SMS</span>) mit Zeit, Fahrzeug, Weg, Empfänger und Status. E-Mails stehen zusätzlich im E-Mail-Versandprotokoll.</p>
+    </section>
+
+    <section id="krypto">
+      <h2>Krypto-Zahlung: Bitcoin, Lightning, USDT</h2>
+      <p class="lead">Kunden können Rechnungen mit Bitcoin, Lightning oder USDT bezahlen. Kuenta nutzt dafür einen eigenen <strong>BTCPay Server</strong>. Das ist kostenlose Open-Source-Software, die kein Geld verwahrt: Die Zahlungen gehen direkt in Ihr eigenes Wallet. Die Funktion ist in Kuenta kostenlos enthalten.</p>
+      <h3>Einmal einrichten</h3>
+      <ol class="steps">
+        <li><div><strong>BTCPay Server bereitstellen</strong><span>Der Server muss aus dem Internet erreichbar sein, damit Kunden bezahlen können. Üblich ist ein gemieteter Server mit dem offiziellen Docker-Setup (docs.btcpayserver.org) oder ein Anbieter, der BTCPay betreibt. Legen Sie dort einen Store an und verbinden Sie Ihr Wallet. Für Lightning brauchen Sie einen Lightning-Knoten, für USDT das Liquid-Netz.</span></div></li>
+        <li><div><strong>API-Schlüssel anlegen</strong><span>In BTCPay unter <span class="path">Konto → API-Schlüssel</span>. Nötige Rechte: Payment Requests ansehen und ändern, Rechnungen ansehen, anlegen und ändern, Store-Einstellungen ansehen. Die Store-ID steht in den Store-Einstellungen.</span></div></li>
+        <li><div><strong>In Kuenta eintragen</strong><span><span class="path">Einstellungen → Krypto-Zahlung</span>: Krypto-Zahlungen einschalten, Adresse, Store-ID und API-Schlüssel eintragen, dann „Speichern &amp; Verbindung testen“. Kuenta zeigt die im Store aktiven Zahlungsarten an.</span></div></li>
+        <li><div><strong>Buchhaltung klären</strong><span>Zahlungseingänge bucht Kuenta auf das eingestellte FIBU-Konto, vorgegeben ist 1360 (Geldtransit, SKR03). Stimmen Sie das Konto mit Ihrem Steuerberater ab.</span></div></li>
+      </ol>
+      <h3>So läuft eine Zahlung</h3>
+      <ul>
+        <li>Rechnung öffnen, Reiter <span class="path">Zahlungen</span>, „Zahlungslink anlegen“. Kuenta legt bei BTCPay eine Zahlungsseite über den offenen Euro-Betrag an. Sie gilt 30 Tage (einstellbar).</li>
+        <li>QR-Code und Link stehen danach automatisch auf der PDF-Rechnung und in der E-Mail. In eigenen E-Mail-Vorlagen setzt <code>{Zahlungslink}</code> den Link ein.</li>
+        <li>Der Kunde zahlt den Euro-Betrag in Bitcoin, Lightning oder USDT, umgerechnet zum Kurs am Zahltag.</li>
+        <li>Kuenta fragt alle 2 Minuten bei BTCPay nach und bucht bezahlte Rechnungen automatisch, mit der Zahlungsart „Krypto (BTCPay)“. Mit „Zahlungseingang prüfen“ geht es sofort.</li>
+        <li>Ändert sich der offene Betrag, z. B. durch eine Teilzahlung per Überweisung, verschwindet der alte Link von der PDF. Legen Sie dann einen neuen an. Wird die Rechnung anders vollständig bezahlt, schließt Kuenta die Zahlungsseite bei BTCPay.</li>
+      </ul>
+      <p>Kuenta muss dafür nicht aus dem Internet erreichbar sein. Es fragt selbst bei BTCPay nach.</p>
+      <h3>An der Kasse</h3>
+      <ul>
+        <li>Ist die Krypto-Zahlung eingerichtet, zeigt die Kasse den Knopf <strong>„₿ Bitcoin / Lightning“</strong>. Auch „Auftrag bezahlen“ und „Rechnung bezahlen“ bieten dann „Krypto“ an.</li>
+        <li>Die Kasse zeigt einen QR-Code, zuerst für Lightning, auf Wunsch für Bitcoin oder USDT. Der Kunde scannt ihn mit seinem Wallet. Der Kurs steht 15 Minuten fest.</li>
+        <li>Sobald BTCPay die Zahlung meldet, schließt sich das Fenster und der Bon wird gedruckt. Bitcoin on-chain zählt schon, wenn die Zahlung im Netz ist, ohne auf eine Bestätigung zu warten. Lightning ist in Sekunden da.</li>
+        <li>Kuenta prüft die Zahlung vor dem Bon selbst bei BTCPay nach. Erst dann entstehen Rechnung und Bon. Jede Zahlung kann nur für einen Bon verwendet werden.</li>
+        <li><strong>Abbrechen:</strong> Kuenta setzt die Zahlung bei BTCPay auf ungültig. Dafür braucht der API-Schlüssel zusätzlich das Recht „Rechnungen ändern“. Ohne das Recht läuft die Zahlung nach 15 Minuten ab. Zahlt der Kunde trotzdem noch, zeigt die Kasse beim Öffnen einen Hinweis. Erstatten Sie den Betrag dann über BTCPay.</li>
+        <li><strong>Storno:</strong> Kuenta bucht die Rückzahlung. Das Geld erstatten Sie in BTCPay mit der Funktion „Erstatten“ (Refund) an der Rechnung, oder bar.</li>
+        <li>Krypto-Zahlungen sind unbar. Sie kommen nicht ins Kassenbuch, die TSE signiert sie als „unbar“, und im DSFinV-K-Export stehen sie als „Unbar / Krypto“.</li>
+      </ul>
+    </section>
+
+    <section id="pro">
+      <h2>Kuenta Pro</h2>
+      <p class="lead">Kuenta ist Open Source und kostenlos. Einige Zusatzfunktionen gibt es als Add-ons. Sie werden mit einem Lizenzschlüssel freigeschaltet und kosten je 10 €, einmalig. Bezahlt wird mit Bitcoin oder Tether (USDT).</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Add-on</th><th>seit</th><th>Preis</th></tr></thead>
+        <tbody><tr><td>SMS-Erinnerungen und SMS-Gateway</td><td>1.0.8</td><td>10 €</td></tr></tbody>
+      </table></div>
+      <p>Lizenzgeber ist der Open-Source-Entwickler DoctorD. Bestellung per E-Mail an <a href="mailto:heidepower@proton.me">heidepower@proton.me</a> mit Name der Werkstatt, Rechnungsanschrift und den gewünschten Add-ons. Nach Zahlungseingang kommt der Lizenzschlüssel per E-Mail. Wer später ein weiteres Add-on kauft, bekommt einen neuen Schlüssel mit allen seinen Add-ons, der den alten ersetzt.</p>
+      <p>Add-ons ohne Lizenz erkennen Sie am Schloss 🔒. Ein Klick darauf erklärt, wie Sie die Lizenz bekommen.</p>
+      <h3>Lizenz einspielen</h3>
+      <ol class="steps">
+        <li><div><strong>Schlüssel kopieren</strong><span>Sie erhalten nach der Zahlung einen Schlüssel, der mit <code>KUENTA1.</code> beginnt.</span></div></li>
+        <li><div><strong>Einfügen</strong><span><span class="path">Einstellungen → Lizenz</span>, Schlüssel vollständig einfügen, „Lizenz einspielen“.</span></div></li>
+        <li><div><strong>Fertig</strong><span>Kuenta zeigt, für wen die Lizenz gilt und bis wann. Ein Neustart ist nicht nötig.</span></div></li>
+      </ol>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Frage</th><th>Antwort</th></tr></thead>
+        <tbody>
+          <tr><td>Braucht Kuenta dafür Internet?</td><td>Nein. Der Schlüssel ist digital signiert und wird auf dem Rechner geprüft.</td></tr>
+          <tr><td>Für wie viele Arbeitsplätze?</td><td>Für die ganze Installation mit allen Mandanten. Die anderen Arbeitsplätze arbeiten im <a href="#netzwerk">Netzwerkbetrieb</a> mit.</td></tr>
+          <tr><td>Wo liegt die Lizenz?</td><td>Als <code>lizenz.key</code> im Datenordner. Updates ändern sie nicht. Beim Umzug auf einen neuen Rechner den Schlüssel neu einspielen.</td></tr>
+          <tr><td>Läuft die Lizenz ab?</td><td>Nein, Add-ons sind einmal bezahlt und unbefristet.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="netzwerk">
+      <h2>Netzwerkbetrieb</h2>
+      <p>Damit Tablets und weitere Arbeitsplätze Kuenta nutzen können, starten Sie auf dem Werkstatt-PC <span class="path">Startmenü → Kuenta im Netzwerk</span> (Linux/macOS: <code>kuenta --netzwerk</code>).</p>
+      <ol>
+        <li>Das Konsolenfenster zeigt die Adresse für die anderen Geräte, z. B. <code>http://192.168.1.20:3700</code>.</li>
+        <li>Diese Adresse auf dem Tablet im Browser öffnen.</li>
+        <li>Fragt Windows nach einer Firewall-Freigabe, für „Private Netzwerke“ zulassen.</li>
+      </ol>
+      <div class="note warn"><strong>Pflicht im Netzwerk</strong><span>Schalten Sie die Anmeldung ein (<span class="path">Einstellungen → Vorgabewerte</span>) und legen Sie Benutzer an. Sonst kann jedes Gerät im Netzwerk Kuenta ohne Passwort öffnen.</span></div>
+      <p>Die Übergabe an Thunderbird funktioniert nur am Werkstatt-PC selbst. Von anderen Geräten aus nutzen Sie den direkten Versand per SMTP.</p>
+    </section>
+
+    <section id="sicherung">
+      <h2>Datensicherung und Datenordner</h2>
+      <p>Die Daten liegen nie im Programmordner, sondern im Benutzerprofil. Updates und Deinstallation lassen sie unangetastet.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>System</th><th>Datenordner</th></tr></thead>
+        <tbody>
+          <tr><td>Windows</td><td><code>%APPDATA%\Kuenta</code> (z. B. <code>C:\Users\&lt;Name&gt;\AppData\Roaming\Kuenta</code>)</td></tr>
+          <tr><td>macOS</td><td><code>~/Library/Application Support/Kuenta</code></td></tr>
+          <tr><td>Linux</td><td><code>~/.local/share/kuenta</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>Im Datenordner liegen unter anderem die Datenbank <code>kuenta.db</code>, Dokumente und Bilder (<code>dateien</code>), automatische Sicherungen (<code>sicherungen</code>), Sicherheitskopien vor Importen (<code>sicherheitskopien</code>) und die Anhänge für das Mailprogramm (<code>mail-ausgang</code>).</p>
+      <h3>Sichern</h3>
+      <ul>
+        <li><strong>Von Hand:</strong> <span class="path">Kuenta → Daten sichern</span> erzeugt eine <code>*.kuenta</code>-Datei mit Datenbank und Dokumenten. Mit Passwort wird sie AES-256-verschlüsselt.</li>
+        <li><strong>Automatisch:</strong> Kuenta sichert täglich in den Ordner <code>sicherungen</code>. Ordner und Anzahl der aufbewahrten Sicherungen (Standard 14) stellen Sie auf derselben Seite ein.</li>
+        <li><strong>Ganzer Ordner:</strong> Alternativ den kompletten Datenordner kopieren, während Kuenta beendet ist.</li>
+      </ul>
+      <div class="note"><strong>Empfehlung</strong><span>Legen Sie den Sicherungsordner auf ein anderes Laufwerk, ein NAS oder einen USB-Stick. Eine Sicherung auf derselben Festplatte hilft nicht, wenn diese ausfällt.</span></div>
+      <div class="note warn"><strong>Datenordner nicht aufs Netzlaufwerk</strong><span>Sicherungen gehören aufs NAS, der Datenordner selbst nicht. Kuenta arbeitet ständig in seiner Datenbank. Über eine Netzwerkfreigabe kann sie dabei beschädigt werden, z. B. bei einer kurzen Netzwerkstörung. Liegt der Datenordner auf einem Netzlaufwerk, warnt Kuenta beim Start. Für mehrere Arbeitsplätze nutzen Sie den <a href="#netzwerk">Netzwerkbetrieb</a>: Ein Rechner hält die Daten, alle anderen arbeiten im Browser.</span></div>
+    </section>
+
+    <section id="update">
+      <h2>Update und Ausrollen</h2>
+      <p>Für ein Update führen Sie einfach den neuen Installer aus. Er erledigt alles selbst:</p>
+      <ol class="steps">
+        <li><div><strong>Laufendes Kuenta finden</strong><span>Der Installer sucht Kuenta-Prozesse aus dem Programmordner, auch das Konsolenfenster.</span></div></li>
+        <li><div><strong>Sauber beenden</strong><span>Kuenta wird gebeten, sich zu beenden, und schließt dabei die Datenbank ordentlich. Reagiert es nicht, wird es hart beendet.</span></div></li>
+        <li><div><strong>Update einspielen</strong><span>Programmdateien werden ersetzt. Die Daten im Benutzerprofil bleiben unverändert.</span></div></li>
+        <li><div><strong>Wieder starten</strong><span>Kuenta startet im selben Modus wie vorher (lokal oder im Netzwerk). Im Browser öffnet sich ein neuer Tab.</span></div></li>
+      </ol>
+      <h3>Ohne Rückfragen ausrollen</h3>
+      <p>Für Skripte oder Softwareverteilung:</p>
+      <div class="codeblock"><pre><code>Kuenta-Setup-1.1.0.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART</code></pre></div>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Schalter</th><th>Wirkung</th></tr></thead>
+        <tbody>
+          <tr><td><code>/VERYSILENT</code></td><td>keine Fenster</td></tr>
+          <tr><td><code>/SUPPRESSMSGBOXES</code></td><td>keine Rückfragen</td></tr>
+          <tr><td><code>/NORESTART</code></td><td>Windows nicht neu starten</td></tr>
+          <tr><td><code>/ALLUSERS</code> · <code>/CURRENTUSER</code></td><td>für alle Benutzer bzw. nur für den aktuellen installieren (Standard: wie bei der ersten Installation)</td></tr>
+          <tr><td><code>/NOSTART</code></td><td>Kuenta nach dem Update nicht wieder starten</td></tr>
+          <tr><td><code>/LOG="C:\Temp\kuenta-setup.log"</code></td><td>Protokoll der Installation schreiben</td></tr>
+        </tbody>
+      </table></div>
+      <div class="note"><strong>Update von Version 1.0.0</strong><span>Version 1.0.0 kennt das saubere Beenden noch nicht. Beim ersten Update davon wird Kuenta deshalb hart beendet. Die Daten nehmen dabei keinen Schaden.</span></div>
+      <div class="note warn"><strong>Systemkonto</strong><span>Läuft die Installation unter dem Systemkonto (typisch bei Softwareverteilung), wird Kuenta beendet, aber nicht wieder gestartet. Es liefe sonst im falschen Benutzerprofil mit leeren Daten. Die Benutzer starten Kuenta danach wie gewohnt über das Startmenü.</span></div>
+      <p><strong>Linux / macOS:</strong> neue Version holen (<code>git pull</code> oder Archiv) und <code>./installer/unix/install.sh</code> erneut ausführen.</p>
+    </section>
+
+    <section id="deinstallation">
+      <h2>Deinstallation</h2>
+      <ul>
+        <li><strong>Windows:</strong> <span class="path">Einstellungen → Apps → Kuenta</span> oder Startmenü <span class="path">Kuenta deinstallieren</span>. Ein laufendes Kuenta wird vorher beendet, die Firewall-Regel entfernt.</li>
+        <li><strong>Linux / macOS:</strong> <code>./installer/unix/install.sh --uninstall</code></li>
+      </ul>
+      <p>Der Datenordner bleibt in jedem Fall erhalten. Wer die Daten wirklich entfernen will, löscht ihn von Hand, am besten nach einer letzten Sicherung.</p>
+    </section>
+
+    <section id="beachten">
+      <h2>Wichtig zu beachten</h2>
+      <p>Alle Hinweise aus diesem Handbuch auf einen Blick. Ausführlich steht jeder Punkt im verlinkten Kapitel.</p>
+      <div class="modules">
+        <div class="module"><h3>Daten und Sicherung</h3><div class="where"><a href="#sicherung">Datensicherung</a> · <a href="#datenuebernahme">Daten übernehmen</a></div>
+          <ul>
+            <li>Den Datenordner nie auf ein Netzlaufwerk oder NAS legen. Kuenta warnt beim Start.</li>
+            <li>Sicherungen dagegen auf ein anderes Laufwerk, ein NAS oder einen USB-Stick.</li>
+            <li>Ein KFZ-Faktura-Import ersetzt Kunden, Rechnungen usw. durch den Stand der Sicherung. Kuenta-eigene Daten bleiben erhalten.</li>
+            <li>Nicht dauerhaft parallel in KFZ-Faktura und Kuenta arbeiten. Rechnungen aus Kuenta, auch die der Kasse, überschreibt der nächste Import.</li>
+            <li>Vor jedem Import legt Kuenta eine Sicherheitskopie an.</li>
+          </ul></div>
+        <div class="module"><h3>Netzwerk und Container</h3><div class="where"><a href="#netzwerk">Netzwerkbetrieb</a> · <a href="#installation">Installation</a></div>
+          <ul>
+            <li>Im Netzwerkbetrieb und im Container sofort die Anmeldung einschalten und Benutzer anlegen.</li>
+            <li>Für mehrere Arbeitsplätze den Netzwerkbetrieb nutzen. Eine externe Datenbank gibt es nicht.</li>
+            <li>Für Dollar- und Bitcoin-Kurse auf der Übersicht braucht der Kuenta-Rechner Internet (EZB, Bitstamp). Die Kurse sind nur Anzeige, Rechnungen bleiben in Euro.</li>
+            <li>Im Container gibt es kein Mailprogramm. Dort per SMTP versenden.</li>
+            <li>Das Container-Image wurde bisher nicht in einer echten Docker- oder Podman-Umgebung gebaut. Beim ersten Einsatz bitte prüfen.</li>
+          </ul></div>
+        <div class="module"><h3>E-Mail</h3><div class="where"><a href="#email">E-Mail-Versand</a></div>
+          <ul>
+            <li>Die Übergabe an Thunderbird funktioniert nur an dem PC, auf dem Kuenta läuft.</li>
+            <li>Die Rechnung gilt schon beim Übergeben als „per Mail versendet“, auch wenn die Mail in Thunderbird nicht abgeschickt wird.</li>
+            <li>Hat Thunderbird eine eigene Signatur, erscheinen zwei Signaturen. Eine davon leeren.</li>
+            <li>Übergebene Anhänge liegen in <code>mail-ausgang</code> und werden nach 14 Tagen gelöscht.</li>
+            <li>Beim direkten Versand per SMTP erscheint die Mail nicht in Thunderbird. Dafür gibt es das Versandprotokoll oder eine BCC-Kopie.</li>
+            <li>Erinnerungen per E-Mail oder SMS nur an Kunden, die zugestimmt haben. Abmeldungen beim Kunden mit „Keine Erinnerungen“ vermerken.</li>
+            <li>SMS-Versand braucht eine Kuenta-Pro-Lizenz. Lizenzschlüssel aufbewahren, beim Rechnerwechsel neu einspielen.</li>
+            <li>Für SMS einen LTE-Stick statt UMTS-Stick nehmen. Beim Tarif prüfen, ob Massenversand erlaubt ist.</li>
+          </ul></div>
+        <div class="module"><h3>DATEV</h3><div class="where"><a href="#datev">DATEV-Export</a></div>
+          <ul>
+            <li>Beim ersten Mal beide Dateien vom Steuerberater testweise einlesen lassen.</li>
+            <li>Je Wirtschaftsjahr getrennt exportieren.</li>
+            <li>Belege (PDF) gehen nicht mit und müssen weiterhin getrennt an den Steuerberater.</li>
+            <li>Ältere Buchungen für Kunden oder Lieferanten mit kurzer Nummer prüfen lassen.</li>
+            <li>BU-Schlüssel nur einschalten, wenn der Steuerberater Konten ohne Automatikfunktion nutzt.</li>
+            <li>Bei SKR04 die Konten mit dem Steuerberater abstimmen.</li>
+          </ul></div>
+        <div class="module"><h3>Update und Installation</h3><div class="where"><a href="#update">Update</a> · <a href="#deinstallation">Deinstallation</a></div>
+          <ul>
+            <li>Der Installer beendet ein laufendes Kuenta und startet es danach wieder. Im Browser öffnet sich ein neuer Tab.</li>
+            <li>Unter dem Systemkonto (Softwareverteilung) wird Kuenta nicht wieder gestartet.</li>
+            <li>Das erste Update von Version 1.0.0 beendet Kuenta hart. Die Daten bleiben unbeschädigt.</li>
+            <li>Updates und Deinstallation lassen den Datenordner unangetastet. Jeder Windows-Benutzer hat seinen eigenen.</li>
+          </ul></div>
+        <div class="module"><h3>Kasse und Recht</h3><div class="where"><a href="#grenzen">Hinweise und Grenzen</a></div>
+          <ul>
+            <li>TSE vor dem Echtbetrieb mit fiskaly-Testzugang prüfen und die Kasse beim Finanzamt melden.</li>
+            <li>EC-Terminal und DSFinV-K vor dem Einsatz bzw. vor einer Prüfung kontrollieren.</li>
+            <li>Kuenta ist auf Deutschland ausgelegt. Andere Länder (z. B. Spanien mit VeriFactu) werden nicht unterstützt.</li>
+            <li>Kaufverträge sind Muster und ersetzen keine Rechtsberatung.</li>
+          </ul></div>
+      </div>
+    </section>
+
+    <section id="probleme">
+      <h2>Häufige Fragen und Probleme</h2>
+      <dl class="faq">
+        <div><dt>Beim Start erscheint „Kuenta läuft bereits auf Port 3700“.</dt><dd>Kuenta ist schon gestartet, z. B. in einem anderen Konsolenfenster. Der Browser öffnet die laufende Kuenta, das neue Fenster schließt sich von selbst.</dd></div>
+        <div><dt>„Node.js wurde nicht gefunden“.</dt><dd>Tritt nur ohne Installer auf. Node.js LTS von nodejs.org installieren oder den Windows-Installer verwenden, der Node.js mitbringt.</dd></div>
+        <div><dt>Das Tablet erreicht Kuenta nicht.</dt><dd>Kuenta muss über „Kuenta im Netzwerk“ gestartet sein. Prüfen Sie die im Konsolenfenster angezeigte Adresse und die Firewall-Freigabe für private Netzwerke. Tablet und PC müssen im selben Netzwerk sein.</dd></div>
+        <div><dt>„Thunderbird nicht gefunden“.</dt><dd>Tragen Sie unter <span class="path">Einstellungen → E-Mail</span> den Pfad zur <code>thunderbird.exe</code> ein, z. B. <code>C:\Program Files\Mozilla Thunderbird\thunderbird.exe</code>.</dd></div>
+        <div><dt>„Das Mailprogramm kann nur an dem Rechner geöffnet werden, auf dem Kuenta läuft“.</dt><dd>Sie arbeiten an einem anderen Gerät im Netzwerk. Versenden Sie dort per SMTP oder öffnen Sie die Mail am Werkstatt-PC.</dd></div>
+        <div><dt>„Es ist kein Mailserver eingerichtet“.</dt><dd>Die Versandart steht auf SMTP, aber die Serverdaten fehlen. Tragen Sie sie unter <span class="path">Einstellungen → E-Mail</span> ein oder stellen Sie auf „An Mailprogramm übergeben“ um.</dd></div>
+        <div><dt>Gedruckte Rechnungen lassen sich nicht mehr ändern.</dt><dd>Die GoBD-Sperre ist aktiv (<span class="path">Einstellungen → Vorgabewerte</span>). Änderungen erfolgen dann über eine Rechnungskorrektur.</dd></div>
+        <div><dt>DATEV-Export: „Der Zeitraum geht über das Wirtschaftsjahr hinaus“.</dt><dd>DATEV nimmt nur Buchungen aus einem Wirtschaftsjahr an. Exportieren Sie getrennt, z. B. bis 31.12. und ab 01.01. Bei abweichendem Wirtschaftsjahr den Startmonat unter <span class="path">Einstellungen → FIBU</span> eintragen.</dd></div>
+        <div><dt>DATEV-Export: „Ungültige Konten für DATEV“.</dt><dd>Eine Buchung hat ein Konto mit zu vielen Stellen oder ohne Nummer. Prüfen Sie die genannten Belege und die Konten unter <span class="path">Einstellungen → FIBU</span>, vor allem die Sachkontenlänge.</dd></div>
+        <div><dt>Die Daten sind nach dem Update weg.</dt><dd>Updates fassen den Datenordner nicht an. Prüfen Sie, ob Kuenta unter einem anderen Windows-Benutzer läuft. Jeder Benutzer hat seinen eigenen Datenordner.</dd></div>
+      </dl>
+    </section>
+
+    <section id="rechnungsnummern">
+      <h2>Rechnungsnummern</h2>
+      <p>Rechnungsnummern laufen fortlaufend, wie in KFZ-Faktura. Kuenta vergibt die Nummer beim Speichern selbst: zuletzt vergebene Nummer plus 1. Das Feld „Rechnung-Nr.“ ist deshalb gesperrt. Bei einer neuen Rechnung zeigt es nur einen Vorschlag. Speichert ein anderer Arbeitsplatz vorher eine Rechnung, bekommt Ihre Rechnung die nächste freie Nummer.</p>
+      <ul>
+        <li><strong>Eigene Nummernkreise:</strong> Rechnungen und Rechnungskorrekturen (auch Stornos und Gutschriften) zählen getrennt. Die Einstellungen stehen unter <span class="path">Einstellungen → Nummernkreise</span>.</li>
+        <li><strong>Nach dem Import aus KFZ-Faktura</strong> zählt Kuenta bei der zuletzt vergebenen Nummer weiter.</li>
+        <li><strong>Kein Neustart zum Jahreswechsel:</strong> Die Nummern zählen einfach weiter. Eine neue Datenbank beginnt bei Jahr + 0001, z. B. 20260001.</li>
+      </ul>
+      <h3>Wie Lücken entstehen können</h3>
+      <ul>
+        <li><strong>Ungedruckte Rechnung gelöscht:</strong> Die Nummer wird nicht noch einmal vergeben. Notieren Sie den Grund, damit Sie die Lücke bei einer Prüfung erklären können. Besser: Rechnung nicht löschen, sondern stornieren.</li>
+        <li><strong>Nummernkreis von Hand erhöht:</strong> Wer unter <span class="path">Einstellungen → Nummernkreise</span> eine höhere Zahl einträgt, überspringt die Nummern dazwischen.</li>
+      </ul>
+      <p>Gedruckte oder versendete Rechnungen lassen sich nicht löschen, nur stornieren. Die Stornorechnung bekommt eine Nummer aus dem Kreis der Rechnungskorrekturen.</p>
+    </section>
+
+    <section id="grenzen">
+      <h2>Hinweise und Grenzen</h2>
+      <ul>
+        <li><strong>TSE:</strong> Unterstützt wird die Cloud-TSE von fiskaly (SIGN DE). Vor dem Echtbetrieb mit fiskaly-Testzugang prüfen und die Kasse beim Finanzamt melden. USB-TSE und die österreichische RKSV werden nicht unterstützt.</li>
+        <li><strong>EC-Terminal:</strong> ZVT über TCP/IP ist gegen ein simuliertes Terminal getestet, nicht gegen ein echtes Gerät.</li>
+        <li><strong>DSFinV-K:</strong> Vor einer Prüfung mit dem DSFinV-K-Prüfwerkzeug kontrollieren.</li>
+        <li><strong>Teilekataloge:</strong> Live-Anbindungen an TecDoc, DAT oder Elekat brauchen Herstellerlizenzen und sind nicht enthalten. Übernommen werden Warenkörbe als CSV/DATANORM.</li>
+        <li><strong>Kaufvertrag:</strong> Die Vertragstexte sind ein Muster und ersetzen keine Rechtsberatung.</li>
+        <li><strong>DATEV:</strong> Buchungsstapel und Debitoren/Kreditoren folgen dem DATEV-Format, wurden aber nicht in einem DATEV-Programm gegengeprüft. Belege (PDF) und eine Anbindung an DATEV Unternehmen online sind nicht enthalten.</li>
+        <li><strong>Krypto-Zahlung:</strong> Getestet gegen einen nachgebauten BTCPay Server, noch nicht gegen einen echten. USDT geht nur über das Liquid-Netz, wie es BTCPay anbietet. USDT auf Tron oder Ethereum wird nicht unterstützt.</li>
+        <li><strong>Container:</strong> Das Image wurde bisher nur außerhalb einer echten Docker- oder Podman-Umgebung geprüft.</li>
+        <li><strong>Datenbank:</strong> Kuenta nutzt eine eingebaute Datenbank (SQLite). Eine externe Datenbank wie PostgreSQL wird nicht unterstützt. Mehrere Arbeitsplätze arbeiten über den Netzwerkbetrieb.</li>
+        <li><strong>Länder:</strong> Steuer, E-Rechnung, Kasse und DATEV sind auf Deutschland ausgelegt. Sprachen außer Deutsch und länderspezifische Pflichten, z. B. VeriFactu in Spanien, gibt es nicht.</li>
+      </ul>
+    </section>
+
+    <section id="technik">
+      <h2>Für Administratoren</h2>
+      <h3>Umgebungsvariablen</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Variable</th><th>Standard</th><th>Bedeutung</th></tr></thead>
+        <tbody>
+          <tr><td><code>PORT</code></td><td><code>3700</code></td><td>Port des Servers</td></tr>
+          <tr><td><code>HOST</code></td><td><code>127.0.0.1</code></td><td><code>0.0.0.0</code> gibt Kuenta im Netzwerk frei</td></tr>
+          <tr><td><code>KUENTA_DATA</code></td><td>Benutzerprofil</td><td>anderer Datenordner auf einem lokalen Laufwerk, z. B. einer zweiten Festplatte. Nicht auf ein Netzlaufwerk oder NAS legen (siehe <a href="#sicherung">Datensicherung</a>).</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Entwicklung und Installer</h3>
+      <div class="codeblock"><pre><code>npm test                    # automatische Tests
+npm run server              # Server ohne Browser starten
+npm run installer:windows   # Windows-Installer bauen</code></pre></div>
+      <p>Für den Installer werden Windows, <a href="https://jrsoftware.org/isdl.php">Inno Setup 6</a> und Internetzugang gebraucht (Node.js wird von nodejs.org geladen und per SHA-256 geprüft). Das Ergebnis liegt in <code>build\Kuenta-Setup-&lt;Version&gt;.exe</code>, die Version kommt aus <code>package.json</code>.</p>
+      <p>Aufbau: <code>server/</code> (Server, Geschäftslogik, Import, E-Rechnung, PDF/A, E-Mail, Kasse, Sicherung), <code>public/</code> (Oberfläche), <code>installer/</code> (Windows-Installer, Linux/macOS-Skript). Die Datenbank ist SQLite mit den Tabellen- und Spaltennamen von KFZ-Faktura. Kunden- und Firmendaten gehören nie ins Repository.</p>
+    </section>
+  </main>
+
+  <footer>Kuenta 1.1.0 · © 2026 DoctorD · Open Source unter der GNU AGPL 3.0, Pro-Funktionen mit Lizenz · Schrift in den Belegen: Liberation Sans (SIL Open Font License) · QR-Code: qrcode-generator (MIT)</footer>
+</div>
+
+<script>
+(function () {
+  var sections = Array.prototype.slice.call(document.querySelectorAll('main section[id]'));
+  var toc = document.getElementById('toc'), tocM = document.getElementById('toc-m');
+  sections.forEach(function (s, i) {
+    var h = s.querySelector('h2');
+    var title = h.textContent.trim();
+    var no = document.createElement('span'); no.className = 'no'; no.textContent = String(i + 1).padStart(2, '0');
+    h.insertBefore(no, h.firstChild);
+    [toc, tocM].forEach(function (list) {
+      var li = document.createElement('li'), a = document.createElement('a');
+      a.href = '#' + s.id; a.textContent = title; li.appendChild(a); list.appendChild(li);
+    });
+  });
+  tocM.addEventListener('click', function (e) { if (e.target.tagName === 'A') tocM.closest('details').open = false; });
+
+  var links = toc.querySelectorAll('a');
+  function mark() {
+    var cur = sections[0].id;
+    for (var i = 0; i < sections.length; i++) if (sections[i].getBoundingClientRect().top < 140) cur = sections[i].id;
+    links.forEach(function (a) { a.classList.toggle('active', a.getAttribute('href') === '#' + cur); });
+  }
+  window.addEventListener('scroll', mark, { passive: true }); mark();
+
+  document.querySelectorAll('.codeblock').forEach(function (b) {
+    var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'copy'; btn.textContent = 'Kopieren';
+    btn.addEventListener('click', function () {
+      var text = b.querySelector('code').textContent;
+      var done = function () { btn.textContent = 'Kopiert'; setTimeout(function () { btn.textContent = 'Kopieren'; }, 1500); };
+      var fallback = function () { var r = document.createRange(); r.selectNodeContents(b.querySelector('code')); var s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Markiert – Strg+C'; };
+      try { navigator.clipboard.writeText(text).then(done, fallback); } catch (e) { fallback(); }
+    });
+    b.appendChild(btn);
+  });
+})();
+</script>
