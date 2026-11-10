@@ -167,12 +167,12 @@ Im Kuenta-Ordner (dort liegt das `Dockerfile`):
 
 ```sh
 # Podman
-podman build -t kuenta:1.6.1 .
-podman run -d --name kuenta --restart unless-stopped -p 3700:3700 -v kuenta-daten:/data kuenta:1.6.1
+podman build -t kuenta:1.7.0 .
+podman run -d --name kuenta --restart unless-stopped -p 3700:3700 -v kuenta-daten:/data kuenta:1.7.0
 
 # Docker
-docker build -t kuenta:1.6.1 .
-docker run -d --name kuenta --restart unless-stopped -p 3700:3700 -v kuenta-daten:/data kuenta:1.6.1
+docker build -t kuenta:1.7.0 .
+docker run -d --name kuenta --restart unless-stopped -p 3700:3700 -v kuenta-daten:/data kuenta:1.7.0
 ```
 
 Oder mit Compose (Datei `compose.yaml` liegt bei):
@@ -210,9 +210,9 @@ podman start kuenta          # wieder starten
 **Update:** neue Version holen, Image neu bauen und den Container neu anlegen. Die Daten im Volume bleiben erhalten:
 
 ```sh
-podman build -t kuenta:1.6.1 .
+podman build -t kuenta:1.7.0 .
 podman rm -f kuenta
-podman run -d --name kuenta --restart unless-stopped -p 3700:3700 -v kuenta-daten:/data kuenta:1.6.1
+podman run -d --name kuenta --restart unless-stopped -p 3700:3700 -v kuenta-daten:/data kuenta:1.7.0
 ```
 
 Mit Compose: `docker compose up -d --build`.
@@ -221,7 +221,7 @@ Mit Compose: `docker compose up -d --build`.
 
 ```ini
 [Container]
-Image=localhost/kuenta:1.6.1
+Image=localhost/kuenta:1.7.0
 ContainerName=kuenta
 PublishPort=3700:3700
 Volume=kuenta-daten:/data
