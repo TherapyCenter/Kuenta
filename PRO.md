@@ -6,7 +6,7 @@ Kuenta is open source (GNU AGPL 3.0) and fully usable free of charge: invoices, 
 cash register, DATEV, KFZ-Faktura import, reminders by letter and email, and everything else.
 
 Some extra features are available as **add-ons**. They are unlocked with a license key.
-The licensor is the open source developer **DoctorD**. Buying an add-on funds further development.
+The licensor is the open source developer **Doc**. Buying an add-on funds further development.
 
 ## Add-ons
 

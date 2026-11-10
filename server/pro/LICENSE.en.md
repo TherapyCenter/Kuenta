@@ -3,9 +3,9 @@
 This is a translation for information only. The binding version is the German original in
 [LICENSE.md](LICENSE.md). If the two differ, the German version applies.
 
-Copyright © 2026 DoctorD (heidepower@proton.me). All rights reserved.
+Copyright © 2026 Doc (heidepower@proton.me). All rights reserved.
 
-The publisher and licensor is the open source developer DoctorD. License keys are issued
+The publisher and licensor is the open source developer Doc. License keys are issued
 exclusively by him.
 
 This license applies to all files in the folder `server/pro/` ("Pro code"). The rest of the

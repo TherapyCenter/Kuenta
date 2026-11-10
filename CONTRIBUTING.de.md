@@ -10,7 +10,7 @@ Kuenta steht unter der GNU AGPL 3.0. Der Ordner `server/pro/` steht unter der
 [Kuenta-Pro-Lizenz](server/pro/LICENSE.md).
 
 Mit einem Pull Request bestätigen Sie, dass Sie den Beitrag selbst geschrieben haben bzw.
-weitergeben dürfen, und dass der Herausgeber DoctorD ihn
+weitergeben dürfen, und dass der Herausgeber Doc ihn
 
 - unter der AGPL 3.0 veröffentlicht und
 - zusätzlich unter anderen Lizenzbedingungen verwenden darf, auch zusammen mit Kuenta Pro.

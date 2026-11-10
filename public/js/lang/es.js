@@ -126,7 +126,7 @@
   "{Vorgang} Nr. {Nummer} – {Firma}": "{Vorgang} n.º {Nummer} – {Firma}",
   "{Vorgang} zu Rechnung Nr. {Nummer}": "{Vorgang} de la factura n.º {Nummer}",
   "% berechnen": "calcular %",
-  "© 2026 DoctorD · Open Source unter der GNU AGPL 3.0. ": "© 2026 DoctorD · Código abierto bajo la GNU AGPL 3.0. ",
+  "© 2026 Doc · Open Source unter der GNU AGPL 3.0. ": "© 2026 Doc · Código abierto bajo la GNU AGPL 3.0. ",
   "↩ Bon stornieren": "↩ Anular tique",
   "⌛ Abgelaufen – bitte neu starten": "⌛ Caducado: vuelva a empezar",
   "⏳ Zahlung erkannt, wird bestätigt …": "⏳ Pago detectado, confirmando …",

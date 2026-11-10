@@ -2,9 +2,9 @@
 
 Englische Übersetzung zur Information: [LICENSE.en.md](LICENSE.en.md). Verbindlich ist diese deutsche Fassung.
 
-Copyright © 2026 DoctorD (heidepower@proton.me). Alle Rechte vorbehalten.
+Copyright © 2026 Doc (heidepower@proton.me). Alle Rechte vorbehalten.
 
-Herausgeber und Lizenzgeber ist der Open-Source-Entwickler DoctorD. Lizenzschlüssel stellt
+Herausgeber und Lizenzgeber ist der Open-Source-Entwickler Doc. Lizenzschlüssel stellt
 ausschließlich er aus.
 
 Diese Lizenz gilt für alle Dateien im Ordner `server/pro/` („Pro-Code“). Der übrige Quellcode

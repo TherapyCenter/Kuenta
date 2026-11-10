@@ -126,7 +126,7 @@
   "{Vorgang} Nr. {Nummer} – {Firma}": "{Vorgang} no. {Nummer} – {Firma}",
   "{Vorgang} zu Rechnung Nr. {Nummer}": "{Vorgang} for invoice no. {Nummer}",
   "% berechnen": "calculate %",
-  "© 2026 DoctorD · Open Source unter der GNU AGPL 3.0. ": "© 2026 DoctorD · Open source under the GNU AGPL 3.0. ",
+  "© 2026 Doc · Open Source unter der GNU AGPL 3.0. ": "© 2026 Doc · Open source under the GNU AGPL 3.0. ",
   "↩ Bon stornieren": "↩ Void receipt",
   "⌛ Abgelaufen – bitte neu starten": "⌛ Expired – please start again",
   "⏳ Zahlung erkannt, wird bestätigt …": "⏳ Payment detected, being confirmed …",

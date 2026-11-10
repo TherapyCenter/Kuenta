@@ -197,7 +197,7 @@ const App = {
     Win.open({ title: 'Über Kuenta', width: 480, content: h('div', { style: { lineHeight: 1.6 } }, h('h2', { style: { margin: '0 0 6px', color: 'var(--accent)' } }, 'Kuenta ' + this.session.version),
       h('p', null, 'Werkstatt-Faktura für Kfz-Betriebe als plattformunabhängige Webanwendung (Windows, macOS, Linux, Tablet).'),
       h('p', null, 'Kompatibel mit Datensicherungen von KFZ-Faktura (*.kfz, DB1.bak). E-Rechnung nach EN 16931 (XRechnung CII/UBL).'),
-      h('p', null, '© 2026 DoctorD · Open Source unter der GNU AGPL 3.0. ', (this.session.pro || []).length ? 'Kuenta Pro ist freigeschaltet.' : 'Pro-Funktionen (z. B. SMS) mit Lizenzschlüssel.')) });
+      h('p', null, '© 2026 Doc · Open Source unter der GNU AGPL 3.0. ', (this.session.pro || []).length ? 'Kuenta Pro ist freigeschaltet.' : 'Pro-Funktionen (z. B. SMS) mit Lizenzschlüssel.')) });
   },
 };
 window.App = App;

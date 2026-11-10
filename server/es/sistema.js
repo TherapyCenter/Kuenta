@@ -11,7 +11,7 @@ function productor() {
   let idOtro = null;
   if (env.KUENTA_SIF_IDOTRO) { const [pais, tipo, id] = env.KUENTA_SIF_IDOTRO.split(':'); idOtro = { pais, tipo, id }; }
   return {
-    nombreRazon: env.KUENTA_SIF_NOMBRE || 'DoctorD',
+    nombreRazon: env.KUENTA_SIF_NOMBRE || 'Doc',
     nif: env.KUENTA_SIF_NIF || '',
     idOtro: idOtro || null,
     nombreSistema: 'Kuenta',

@@ -6,7 +6,7 @@ Kuenta ist Open Source (GNU AGPL 3.0) und in vollem Umfang kostenlos nutzbar: Re
 E-Rechnung, Kasse, DATEV, KFZ-Faktura-Import, Erinnerungen per Brief und E-Mail und alles andere.
 
 Einige Zusatzfunktionen gibt es als **Add-ons**. Sie werden mit einem Lizenzschlüssel
-freigeschaltet. Lizenzgeber ist der Open-Source-Entwickler **DoctorD**. Mit dem Kauf
+freigeschaltet. Lizenzgeber ist der Open-Source-Entwickler **Doc**. Mit dem Kauf
 finanzieren Sie die Weiterentwicklung.
 
 ## Add-ons

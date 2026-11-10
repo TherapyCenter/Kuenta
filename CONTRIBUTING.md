@@ -10,7 +10,7 @@ Kuenta is licensed under the GNU AGPL 3.0. The folder `server/pro/` is under the
 [Kuenta Pro license](server/pro/LICENSE.en.md) (English translation; the [German original](server/pro/LICENSE.md) is binding).
 
 By opening a pull request you confirm that you wrote the contribution yourself or are allowed
-to pass it on, and that the publisher DoctorD may
+to pass it on, and that the publisher Doc may
 
 - publish it under the AGPL 3.0 and
 - also use it under other license terms, including together with Kuenta Pro.
