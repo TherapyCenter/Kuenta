@@ -22,7 +22,7 @@ Nach der Installation ist der Datenbestand leer. Firmendaten unter *Einstellunge
 
 Die Daten liegen im Benutzerprofil, nicht im Programmordner: Windows `%APPDATA%\Kuenta`, macOS `~/Library/Application Support/Kuenta`, Linux `~/.local/share/kuenta`.
 
-Umgebungsvariablen: `PORT` (Standard 3700), `HOST` (Standard 127.0.0.1), `KUENTA_DATA` (anderes Datenverzeichnis, nur auf einem lokalen Laufwerk – nicht auf einem Netzlaufwerk/NAS, siehe INSTALL.de.md).
+Umgebungsvariablen: `PORT` (Standard 3700), `HOST` (Standard 127.0.0.1), `KUENTA_LANG` (`de`, `en` oder `es`: Konsole und neue Installationen, Standard: Systemsprache), `KUENTA_DATA` (anderes Datenverzeichnis, nur auf einem lokalen Laufwerk – nicht auf einem Netzlaufwerk/NAS, siehe INSTALL.de.md).
 
 ## Daten aus KFZ-Faktura übernehmen
 

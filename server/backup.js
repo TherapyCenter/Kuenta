@@ -129,7 +129,7 @@ function autoBackup() {
     for (const f of all.slice(0, Math.max(0, all.length - keep))) fs.unlinkSync(path.join(dir, f));
     L.setSw('sicherung.letzte', L.now());
     return file;
-  } catch (e) { console.error('Automatische Sicherung fehlgeschlagen:', e.message); return null; }
+  } catch (e) { console.error(require('./i18n').C('Automatische Sicherung fehlgeschlagen:'), e.message); return null; }
 }
 
 // GoBD / GDPdU data carrier export: CSV per table + index.xml

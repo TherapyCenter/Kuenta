@@ -6,12 +6,20 @@
 // Orders come from a BTCPay "Point of Sale" app. The item IDs of the app are the
 // Kuenta feature names (e.g. "sms", "pro"). Different IDs can be mapped in shop.json under
 // "artikel". The BTCPay form asks for the workshop name and email.
+//
+// Language of the license emails: "sprache" in shop.json (de, en, es; default de). An order can
+// override it with a BTCPay form field "sprache" or "language". Console output follows the system.
 const fs = require('fs');
 const path = require('path');
+const I18N = require('../../public/js/i18n');
+I18N.add('en', require('../../public/js/lang/en'));
+I18N.add('es', require('../../public/js/lang/es'));
+const { C } = require('../../server/i18n');
 
 const VORLAGE = {
   btcpay: { url: 'https://pay.example.de', storeId: 'STORE-ID', apiKey: 'API-SCHLÜSSEL (nur Recht: Rechnungen ansehen)' },
   smtp: { host: 'smtp.example.de', port: 587, secure: 'starttls', user: 'benutzer', pass: 'passwort', from: 'lizenz@example.de', fromName: 'Kuenta Pro', bcc: '' },
+  sprache: 'de',
   artikel: { sms: 'sms', pro: 'pro' },
   bekannteFunktionen: ['sms', 'pro'],
 };
@@ -21,9 +29,9 @@ function dateien(home) {
 }
 function ladeConfig(home) {
   const f = dateien(home).config;
-  if (!fs.existsSync(f)) throw new Error(`Keine Shop-Einstellungen. Zuerst "shop einrichten" ausführen und ${f} ausfüllen.`);
+  if (!fs.existsSync(f)) throw new Error(C(`Keine Shop-Einstellungen. Zuerst "shop einrichten" ausführen und ${f} ausfüllen.`));
   const c = JSON.parse(fs.readFileSync(f, 'utf8'));
-  if (!c.btcpay || !c.btcpay.url || !c.btcpay.storeId || !c.btcpay.apiKey || /example|STORE-ID|API-SCHL/.test(JSON.stringify(c.btcpay))) throw new Error(`Bitte in ${f} Adresse, Store-ID und API-Schlüssel des BTCPay Servers eintragen.`);
+  if (!c.btcpay || !c.btcpay.url || !c.btcpay.storeId || !c.btcpay.apiKey || /example|STORE-ID|API-SCHL/.test(JSON.stringify(c.btcpay))) throw new Error(C(`Bitte in ${f} Adresse, Store-ID und API-Schlüssel des BTCPay Servers eintragen.`));
   c.btcpay.url = c.btcpay.url.replace(/\/+$/, '');
   c.artikel = { ...VORLAGE.artikel, ...(c.artikel || {}) };
   c.bekannteFunktionen = c.bekannteFunktionen || VORLAGE.bekannteFunktionen;
@@ -48,9 +56,9 @@ function speichereStand(home, st) {
 async function btcpay(c, pfad) {
   let res;
   try { res = await fetch(c.btcpay.url + '/api/v1' + pfad, { headers: { Authorization: 'token ' + c.btcpay.apiKey }, signal: AbortSignal.timeout(20000) }); }
-  catch (e) { throw new Error(`BTCPay Server nicht erreichbar (${c.btcpay.url}): ${e.cause ? e.cause.code || e.cause.message : e.message}`); }
+  catch (e) { throw new Error(C(`BTCPay Server nicht erreichbar (${c.btcpay.url}): ${e.cause ? e.cause.code || e.cause.message : e.message}`)); }
   const text = await res.text();
-  if (!res.ok) throw new Error(`BTCPay meldet Fehler ${res.status}${res.status === 401 ? ' (API-Schlüssel ungültig)' : res.status === 403 ? ' (dem API-Schlüssel fehlt das Recht „Rechnungen ansehen“)' : ''}: ${text.slice(0, 200)}`);
+  if (!res.ok) throw new Error(C(`BTCPay meldet Fehler ${res.status}${res.status === 401 ? ' (API-Schlüssel ungültig)' : res.status === 403 ? ' (dem API-Schlüssel fehlt das Recht „Rechnungen ansehen“)' : ''}: ${text.slice(0, 200)}`));
   return text ? JSON.parse(text) : null;
 }
 
@@ -107,19 +115,26 @@ function csvFelder(zeile) {
   out.push(cur); return out;
 }
 
-function mailText(daten, key, rechnungId) {
-  const fn = daten.funktionen.includes('pro') ? 'Kuenta Pro (alle Add-ons, auch künftige)' : daten.funktionen.join(', ');
+// Language of the email: order (form field) before shop.json, German by default
+function mailSprache(c, meta) {
+  const l = String(meta.sprache || meta.language || meta.lang || c.sprache || 'de').toLowerCase().slice(0, 2);
+  return I18N.LANGS[l] ? l : 'de';
+}
+
+function mailText(daten, key, rechnungId, lang = 'de') {
+  const t = (k, v) => I18N.t(k, v, lang);
+  const fn = daten.funktionen.includes('pro') ? t('Kuenta Pro (alle Add-ons, auch künftige)') : daten.funktionen.join(', ');
   return [
-    'Guten Tag,', '',
-    `vielen Dank für Ihren Kauf. Hier ist Ihr Lizenzschlüssel für Kuenta (${fn}), lizenziert für „${daten.kunde}“:`, '',
+    t('Guten Tag,'), '',
+    t('vielen Dank für Ihren Kauf. Hier ist Ihr Lizenzschlüssel für Kuenta ({fn}), lizenziert für „{kunde}“:', { fn, kunde: daten.kunde }), '',
     key, '',
-    'So spielen Sie ihn ein:',
-    '1. In Kuenta Einstellungen → Lizenz öffnen.',
-    '2. Den Schlüssel vollständig in das Feld einfügen (oder die angehängte Datei öffnen und den Inhalt kopieren).',
-    '3. „Lizenz einspielen“ klicken. Kuenta muss dafür nicht ins Internet.', '',
-    'Der Schlüssel gilt unbefristet für eine Installation mit allen Mandanten. Bitte bewahren Sie diese E-Mail auf.', '',
-    `Lizenz-Nr. ${daten.id} · Zahlung ${rechnungId}`, '',
-    'Mit freundlichen Grüßen', 'Kuenta Pro',
+    t('So spielen Sie ihn ein:'),
+    t('1. In Kuenta Einstellungen → Lizenz öffnen.'),
+    t('2. Den Schlüssel vollständig in das Feld einfügen (oder die angehängte Datei öffnen und den Inhalt kopieren).'),
+    t('3. „Lizenz einspielen“ klicken. Kuenta muss dafür nicht ins Internet.'), '',
+    t('Der Schlüssel gilt unbefristet für eine Installation mit allen Mandanten. Bitte bewahren Sie diese E-Mail auf.'), '',
+    t('Lizenz-Nr. {id} · Zahlung {zahlung}', { id: daten.id, zahlung: rechnungId }), '',
+    t('Mit freundlichen Grüßen'), 'Kuenta Pro',
   ].join('\n');
 }
 
@@ -131,7 +146,7 @@ async function abholen({ home, erzeugen, senden, probe = false, log = console.lo
     // first run: only orders from now on, do not deliver old payments afterwards
     st = { seit: Math.floor(Date.now() / 1000) - 3600, erledigt: {} };
     if (!probe) speichereStand(home, st);
-    log(`Erster Lauf: Bestellungen ab ${new Date(st.seit * 1000).toLocaleString('de-DE')} werden beliefert.`);
+    log(C(`Erster Lauf: Bestellungen ab ${new Date(st.seit * 1000).toLocaleString()} werden beliefert.`));
   }
   const rechnungen = await bezahlteRechnungen(c, st.seit);
   const ergebnis = { neu: 0, versendet: 0, offen: [], fehler: [] };
@@ -144,7 +159,7 @@ async function abholen({ home, erzeugen, senden, probe = false, log = console.lo
     if (!funktionen.length) { if (!probe) { st.erledigt[inv.id] = { status: 'kein Add-on', artikel }; speichereStand(home, st); } continue; }
     const kunde = kundeAus(meta);
     if (!kunde.email || !kunde.name) {
-      const grund = `Rechnung ${inv.id}: ${!kunde.email ? 'E-Mail-Adresse' : 'Name der Werkstatt'} fehlt. Bitte von Hand ausstellen (BTCPay-Formular prüfen).`;
+      const grund = C(!kunde.email ? `Rechnung ${inv.id}: E-Mail-Adresse fehlt. Bitte von Hand ausstellen (BTCPay-Formular prüfen).` : `Rechnung ${inv.id}: Name der Werkstatt fehlt. Bitte von Hand ausstellen (BTCPay-Formular prüfen).`);
       ergebnis.offen.push(grund);
       if (!probe && !alt) { st.erledigt[inv.id] = { status: 'unvollständig', artikel, kunde }; speichereStand(home, st); log(grund); }
       continue;
@@ -154,28 +169,28 @@ async function abholen({ home, erzeugen, senden, probe = false, log = console.lo
     if (!lizenz) {
       const alle = [...new Set([...bisherigeFunktionen(home, kunde.email), ...funktionen])];
       const fn = alle.includes('pro') ? ['pro'] : alle;
-      if (probe) { log(`[Probe] ${inv.id}: würde Lizenz für „${kunde.name}“ <${kunde.email}> ausstellen: ${fn.join(', ')}`); ergebnis.neu++; continue; }
+      if (probe) { log(C(`[Probe] ${inv.id}: würde Lizenz für „${kunde.name}“ <${kunde.email}> ausstellen: ${fn.join(', ')}`)); ergebnis.neu++; continue; }
       lizenz = erzeugen({ kunde: kunde.name, funktionen: fn.join(','), email: kunde.email, zahlung: `BTCPay ${inv.id} · ${inv.amount || ''} ${inv.currency || ''}`.trim() });
       st.erledigt[inv.id] = { status: 'ausgestellt', daten: lizenz.daten, key: lizenz.key, email: kunde.email, zeit: new Date().toISOString() };
       speichereStand(home, st);
       ergebnis.neu++;
-      log(`Lizenz ${lizenz.daten.id} für „${kunde.name}“ ausgestellt (${lizenz.daten.funktionen.join(', ')}).`);
+      log(C(`Lizenz ${lizenz.daten.id} für „${kunde.name}“ ausgestellt (${lizenz.daten.funktionen.join(', ')}).`));
     }
-    if (probe) { log(`[Probe] ${inv.id}: würde Lizenz ${lizenz.daten.id} erneut an ${kunde.email} senden.`); continue; }
+    if (probe) { log(C(`[Probe] ${inv.id}: würde Lizenz ${lizenz.daten.id} erneut an ${kunde.email} senden.`)); continue; }
     try {
       await senden({
-        to: kunde.email, subject: 'Ihr Kuenta-Lizenzschlüssel', text: mailText(lizenz.daten, lizenz.key, inv.id),
+        to: kunde.email, subject: I18N.t('Ihr Kuenta-Lizenzschlüssel', null, mailSprache(c, meta)), text: mailText(lizenz.daten, lizenz.key, inv.id, mailSprache(c, meta)),
         attachments: [{ filename: 'kuenta-lizenz.txt', content: Buffer.from(lizenz.key + '\r\n', 'utf8'), contentType: 'text/plain' }],
       }, c.smtp);
       st.erledigt[inv.id] = { ...st.erledigt[inv.id], status: 'versendet', versendet: new Date().toISOString() };
       speichereStand(home, st);
       ergebnis.versendet++;
-      log(`  → per E-Mail an ${kunde.email} geschickt.`);
+      log('  → ' + C(`per E-Mail an ${kunde.email} geschickt.`));
     } catch (e) {
       st.erledigt[inv.id] = { ...st.erledigt[inv.id], status: 'nicht versendet', fehler: e.message };
       speichereStand(home, st);
-      ergebnis.fehler.push(`Rechnung ${inv.id}: E-Mail an ${kunde.email} fehlgeschlagen (${e.message}). Wird beim nächsten Lauf erneut versucht.`);
-      log(`  → E-Mail fehlgeschlagen: ${e.message}`);
+      ergebnis.fehler.push(C(`Rechnung ${inv.id}: E-Mail an ${kunde.email} fehlgeschlagen (${e.message}). Wird beim nächsten Lauf erneut versucht.`));
+      log('  → ' + C(`E-Mail fehlgeschlagen: ${e.message}`));
     }
   }
   return ergebnis;
@@ -184,7 +199,7 @@ async function abholen({ home, erzeugen, senden, probe = false, log = console.lo
 // hide an order that was handled by hand (e.g. incomplete details)
 function erledigt(home, rechnungId, notiz = 'von Hand erledigt') {
   const st = ladeStand(home);
-  if (!st) throw new Error('Der Shop ist noch nicht gelaufen.');
+  if (!st) throw new Error(C('Der Shop ist noch nicht gelaufen.'));
   st.erledigt[rechnungId] = { ...(st.erledigt[rechnungId] || {}), status: 'versendet', notiz, zeit: new Date().toISOString() };
   speichereStand(home, st);
 }
@@ -195,4 +210,4 @@ async function test(home) {
   return { ok: true, rechnungen: Array.isArray(liste) ? liste.length : 0 };
 }
 
-module.exports = { abholen, einrichten, erledigt, test, artikelAus, kundeAus, bisherigeFunktionen, VORLAGE };
+module.exports = { abholen, einrichten, erledigt, test, artikelAus, kundeAus, bisherigeFunktionen, mailText, mailSprache, VORLAGE };

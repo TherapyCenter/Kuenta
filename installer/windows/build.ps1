@@ -28,16 +28,16 @@ $nodeName = "node-v$NodeVersion-win-x64"
 $zip = Join-Path $cache "$nodeName.zip"
 $base = "https://nodejs.org/dist/v$NodeVersion"
 if (-not (Test-Path $zip)) {
-  Write-Host "Lade $nodeName.zip ..."
+  Write-Host "Downloading $nodeName.zip ..."
   Invoke-WebRequest "$base/$nodeName.zip" -OutFile $zip -UseBasicParsing
 }
 $sums = (Invoke-WebRequest "$base/SHASUMS256.txt" -UseBasicParsing).Content
 $line = ($sums -split "`n") | Where-Object { $_ -match "\s$nodeName\.zip$" }
-if (-not $line) { throw "Keine Prüfsumme für $nodeName.zip gefunden." }
+if (-not $line) { throw "No checksum found for $nodeName.zip." }
 $expected = ($line -split '\s+')[0].ToLower()
 $actual = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLower()
-if ($expected -ne $actual) { Remove-Item $zip; throw "Prüfsumme von $nodeName.zip stimmt nicht – Download gelöscht, bitte erneut starten." }
-Write-Host "Prüfsumme Node.js ok."
+if ($expected -ne $actual) { Remove-Item $zip; throw "Checksum of $nodeName.zip does not match – download deleted, please run again." }
+Write-Host "Node.js checksum ok."
 
 # --- assemble the files ---
 if (Test-Path $stage) { Remove-Item -Recurse -Force $stage }
@@ -57,7 +57,7 @@ New-Item -ItemType Directory -Force $nodeDir | Out-Null
 Copy-Item (Join-Path $tmp "$nodeName\node.exe") $nodeDir
 Copy-Item (Join-Path $tmp "$nodeName\LICENSE") (Join-Path $nodeDir 'LICENSE.txt')
 Remove-Item -Recurse -Force $tmp
-Write-Host "Dateien bereit in $stage"
+Write-Host "Files ready in $stage"
 if ($NurStage) { return }
 
 # --- Inno Setup ---
@@ -70,7 +70,7 @@ if (-not $Iscc) {
   $Iscc = $cands | Where-Object { Test-Path $_ } | Select-Object -First 1
   if (-not $Iscc) { $c = Get-Command iscc -ErrorAction SilentlyContinue; if ($c) { $Iscc = $c.Source } }
 }
-if (-not $Iscc) { throw 'Inno Setup 6 (ISCC.exe) nicht gefunden. Bitte installieren: https://jrsoftware.org/isdl.php  (oder -Iscc <Pfad> angeben)' }
+if (-not $Iscc) { throw 'Inno Setup 6 (ISCC.exe) not found. Please install it: https://jrsoftware.org/isdl.php  (or pass -Iscc <path>)' }
 & $Iscc "/DAppVersion=$version" "/DStageDir=$stage" "/DOutDir=$build" (Join-Path $PSScriptRoot 'kuenta.iss')
-if ($LASTEXITCODE -ne 0) { throw "Inno Setup meldet Fehler ($LASTEXITCODE)." }
-Write-Host "`nFertig: $build\Kuenta-Setup-$version.exe"
+if ($LASTEXITCODE -ne 0) { throw "Inno Setup reports an error ($LASTEXITCODE)." }
+Write-Host "`nDone: $build\Kuenta-Setup-$version.exe"

@@ -13,7 +13,7 @@ Handbook: **[English](docs/handbook-en.html)** · **[Español](docs/handbook-es.
 
 | System | Installation | Start |
 |---|---|---|
-| Windows | `Kuenta-Setup-<version>.exe` (Node.js included) | Start menu → *Kuenta* or *Kuenta im Netzwerk* (network) |
+| Windows | `Kuenta-Setup-<version>.exe` (Node.js included) | Start menu → *Kuenta* or *Kuenta (network)* |
 | Linux / macOS | Node.js 22.13 or later, then `./installer/unix/install.sh` | `kuenta` (network: `kuenta --netzwerk`) |
 | Container (Docker/Podman) | `podman build -t kuenta:1.1.0 .` or `docker compose up -d --build` | `http://<computer>:3700` (data in the volume `/data`) |
 | Without installation | Node.js 22.13 or later | `Kuenta starten.bat`, `./kuenta.sh` or `node server/index.js --open` |
@@ -24,7 +24,7 @@ After installation the database is empty. Enter your company details under *Sett
 
 The data lives in the user profile, not in the program folder: Windows `%APPDATA%\Kuenta`, macOS `~/Library/Application Support/Kuenta`, Linux `~/.local/share/kuenta`.
 
-Environment variables: `PORT` (default 3700), `HOST` (default 127.0.0.1), `KUENTA_DATA` (different data folder, on a local drive only – not on a network drive/NAS, see INSTALL.md).
+Environment variables: `PORT` (default 3700), `HOST` (default 127.0.0.1), `KUENTA_LANG` (`de`, `en` or `es`: console and new installations, default: system language), `KUENTA_DATA` (different data folder, on a local drive only – not on a network drive/NAS, see INSTALL.md).
 
 ## Taking over data from KFZ-Faktura
 

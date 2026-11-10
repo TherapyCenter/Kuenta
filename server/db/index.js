@@ -206,6 +206,8 @@ function seed(d) {
   ins('INSERT INTO LAENDERCODES (LANDID, ISO3166, BEZEICHNUNG) VALUES (?,?,?)', [[1, 'DE', 'Deutschland'], [2, 'AT', 'Österreich'], [3, 'CH', 'Schweiz'], [4, 'NL', 'Niederlande'], [5, 'FR', 'Frankreich'], [6, 'PL', 'Polen'], [7, 'IT', 'Italien'], [8, 'BE', 'Belgien'], [9, 'LU', 'Luxemburg'], [10, 'DK', 'Dänemark'], [11, 'CZ', 'Tschechien'], [12, 'ES', 'Spanien']]);
   ins('INSERT INTO INDIVIDUELLEFELDER (ID, AKTIVE, BEZEICHNUNG) VALUES (?,?,?)', [[1, 0, 'Termin1'], [2, 0, 'Termin2'], [3, 0, 'Termin3'], [4, 0, 'Fahrzeugdaten1'], [5, 0, 'Fahrzeugdaten2'], [6, 0, 'Fahrzeugdaten3'], [7, 0, 'Fahrzeugdaten4'], [8, 0, 'Fahrzeugdaten5']]);
   ins('INSERT INTO WARENGRUPPEN (GRUPPENID, BEZEICHNUNG, ROOTID) VALUES (?,?,?)', [[1, 'Allgemein', 0]]);
+  // new installations start in the language of the operating system (existing ones stay German)
+  ins('INSERT OR REPLACE INTO SW_EINSTELLUNGEN (SCHLUESSEL, WERT) VALUES (?,?)', [['ui.sprache', require('../i18n').systemLang()]]);
   d.exec('COMMIT');
 }
 

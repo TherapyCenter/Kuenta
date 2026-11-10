@@ -74,7 +74,7 @@ Licenses only go out while your PC is running. That is intentional, because the 
 stays offline this way. If needed, mention it in the shop text ("The key usually arrives
 within a few hours").
 
-The emails with the key are currently in German.
+The emails with the key are sent in German, English or Spanish: set `"sprache": "de"`, `"en"` or `"es"` in `shop.json` (default German). If the BTCPay form has a field `sprache` or `language`, the customer's choice wins for that order. The console output of the tool follows the system language (`KUENTA_LANG=de|en|es`).
 
 ### Invoices for your customers
 

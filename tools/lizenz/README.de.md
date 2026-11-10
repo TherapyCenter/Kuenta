@@ -72,6 +72,8 @@ Pfade anpassen):
 schtasks /Create /TN "Kuenta Lizenz-Shop" /SC MINUTE /MO 15 /TR "\"C:\Program Files\nodejs\node.exe\" \"C:\Users\admin\claude\Kuenta\tools\lizenz\lizenz-werkzeug.js\" shop"
 ```
 
+Die E-Mails mit dem Schlüssel gehen auf Deutsch, Englisch oder Spanisch raus: in `shop.json` `"sprache": "de"`, `"en"` oder `"es"` eintragen (Standard Deutsch). Hat das BTCPay-Formular ein Feld `sprache` oder `language`, gilt für diese Bestellung die Wahl des Kunden. Die Ausgaben des Werkzeugs richten sich nach der Systemsprache (`KUENTA_LANG=de|en|es`).
+
 Lizenzen gehen nur raus, wenn Ihr PC läuft. Das ist gewollt, denn der private Schlüssel bleibt so
 offline. Bei Bedarf weisen Sie im Shop-Text darauf hin („Schlüssel kommt in der Regel innerhalb
 weniger Stunden“).

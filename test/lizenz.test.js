@@ -10,6 +10,7 @@ const { execFileSync } = require('child_process');
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'kuenta-lizenz-'));
 process.env.KUENTA_DATA = path.join(tmp, 'daten');
+process.env.KUENTA_LANG = 'de';   // the tool output is checked in German
 
 const LIZENZ = require('../server/lizenz');
 const ECHT = fs.readFileSync(path.join(__dirname, '..', 'server', 'lizenz.js'), 'utf8').match(/let OEFFENTLICH = '([^']+)'/)[1];

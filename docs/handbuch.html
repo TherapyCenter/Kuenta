@@ -210,7 +210,7 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
         <li><div><strong>Optionen auswählen.</strong><span>Desktop-Verknüpfung und, für den Netzwerkbetrieb, die Firewall-Freigabe (nur bei Installation für alle Benutzer).</span></div></li>
         <li><div><strong>Starten:</strong><span>Startmenü <span class="path">Kuenta</span>. Es öffnen sich das Konsolenfenster und der Browser mit <code>http://127.0.0.1:3700</code>.</span></div></li>
       </ol>
-      <p>Im Startmenü gibt es drei Einträge: <strong>Kuenta</strong> (nur dieser PC), <strong>Kuenta im Netzwerk</strong> (für Tablets und weitere Arbeitsplätze) und <strong>Kuenta deinstallieren</strong>.</p>
+      <p>Der Installer spricht Deutsch, Englisch oder Spanisch und richtet sich nach der Sprache von Windows. Im Startmenü gibt es drei Einträge: <strong>Kuenta</strong> (nur dieser PC), <strong>Kuenta im Netzwerk</strong> (für Tablets und weitere Arbeitsplätze) und <strong>Kuenta deinstallieren</strong>.</p>
 
       <h3>Linux</h3>
       <p>Voraussetzung ist Node.js ab Version 22.13. Prüfen Sie mit <code>node -v</code>.</p>
@@ -815,6 +815,7 @@ docker compose up -d --build</code></pre></div>
           <tr><td><code>PORT</code></td><td><code>3700</code></td><td>Port des Servers</td></tr>
           <tr><td><code>HOST</code></td><td><code>127.0.0.1</code></td><td><code>0.0.0.0</code> gibt Kuenta im Netzwerk frei</td></tr>
           <tr><td><code>KUENTA_DATA</code></td><td>Benutzerprofil</td><td>anderer Datenordner auf einem lokalen Laufwerk, z. B. einer zweiten Festplatte. Nicht auf ein Netzlaufwerk oder NAS legen (siehe <a href="#sicherung">Datensicherung</a>).</td></tr>
+          <tr><td><code>KUENTA_LANG</code></td><td>Sprache von Windows</td><td><code>de</code>, <code>en</code> oder <code>es</code>: Sprache des Konsolenfensters und neuer Installationen. Bestehende Installationen bleiben auf Deutsch, bis Sie die Sprache umstellen.</td></tr>
         </tbody>
       </table></div>
       <h3>Entwicklung und Installer</h3>

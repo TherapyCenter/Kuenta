@@ -46,6 +46,8 @@ const App = {
     this.setTheme(Pref.get('theme', 'auto'), false);
     this.setFarbe(Pref.get('farbe', 'blau'), false);
     try { this.session = await api('/api/session', { noLogin: true }); } catch (e) { showError(e); return; }
+    // no language chosen on this workstation yet: use the default of the installation
+    if (Pref.get('lang', null) == null && I18N.LANGS[this.session.sprache] && this.session.sprache !== I18N.lang) { this.setLang(this.session.sprache); return; }
     if (this.session.loginRequired && !this.session.user) return this.showLogin();
     await LK.load();
     await this.loadSettings();

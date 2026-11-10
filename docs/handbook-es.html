@@ -212,8 +212,8 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
         <li><div><strong>Elija las opciones.</strong><span>Acceso directo en el escritorio y, para el modo red, la regla del cortafuegos (solo en la instalación para todos los usuarios).</span></div></li>
         <li><div><strong>Iniciar:</strong><span>menú Inicio <span class="path">Kuenta</span>. Se abren la ventana de consola y el navegador con <code>http://127.0.0.1:3700</code>.</span></div></li>
       </ol>
-      <p>El menú Inicio tiene tres entradas: <strong>Kuenta</strong> (solo este PC), <strong>Kuenta im Netzwerk</strong> (para tabletas y otros puestos) y <strong>Kuenta deinstallieren</strong> (desinstalar).</p>
-      <p>Para poner Kuenta en español, use el menú <span class="path">Kuenta → Sprache / Language</span> o el selector de idioma de la página de inicio de sesión.</p>
+      <p>El instalador está en español, inglés o alemán y elige el idioma de Windows. El menú Inicio tiene tres entradas: <strong>Kuenta</strong> (solo este PC), <strong>Kuenta (red)</strong> (para tabletas y otros puestos) y <strong>Desinstalar Kuenta</strong>. Con el instalador en alemán se llaman <em>Kuenta</em>, <em>Kuenta im Netzwerk</em> y <em>Kuenta deinstallieren</em>.</p>
+      <p>Una instalación nueva arranca en el idioma de Windows (español, alemán o, si no, inglés). La ventana de consola usa el mismo idioma. Para cambiar la interfaz, use el menú <span class="path">Kuenta → Sprache / Language</span> o el selector de idioma de la página de inicio de sesión.</p>
 
       <h3>Linux</h3>
       <p>Se necesita Node.js 22.13 o posterior. Compruébelo con <code>node -v</code>.</p>
@@ -637,7 +637,7 @@ docker compose up -d --build</code></pre></div>
 
     <section id="netzwerk">
       <h2>Modo red</h2>
-      <p>Para que las tabletas y otros puestos puedan usar Kuenta, inicie en el PC del taller <span class="path">Menú Inicio → Kuenta im Netzwerk</span> (Linux/macOS: <code>kuenta --netzwerk</code>).</p>
+      <p>Para que las tabletas y otros puestos puedan usar Kuenta, inicie en el PC del taller <span class="path">Menú Inicio → Kuenta (red)</span> (Linux/macOS: <code>kuenta --netzwerk</code>).</p>
       <ol>
         <li>La ventana de consola muestra la dirección para los demás dispositivos, p. ej. <code>http://192.168.1.20:3700</code>.</li>
         <li>Abra esa dirección en el navegador de la tableta.</li>
@@ -700,7 +700,7 @@ docker compose up -d --build</code></pre></div>
     <section id="deinstallation">
       <h2>Desinstalación</h2>
       <ul>
-        <li><strong>Windows:</strong> <span class="path">Configuración → Aplicaciones → Kuenta</span> o menú Inicio <span class="path">Kuenta deinstallieren</span>. Antes se detiene un Kuenta en marcha y se elimina la regla del cortafuegos.</li>
+        <li><strong>Windows:</strong> <span class="path">Configuración → Aplicaciones → Kuenta</span> o menú Inicio <span class="path">Desinstalar Kuenta</span>. Antes se detiene un Kuenta en marcha y se elimina la regla del cortafuegos.</li>
         <li><strong>Linux / macOS:</strong> <code>./installer/unix/install.sh --uninstall</code></li>
       </ul>
       <p>La carpeta de datos se conserva en cualquier caso. Si de verdad quiere eliminar los datos, bórrela a mano, mejor después de una última copia.</p>
@@ -766,9 +766,9 @@ docker compose up -d --build</code></pre></div>
     <section id="probleme">
       <h2>Preguntas y problemas frecuentes</h2>
       <dl class="faq">
-        <div><dt>Al iniciar aparece «Kuenta läuft bereits auf Port 3700» (ya se está ejecutando en el puerto 3700).</dt><dd>Kuenta ya está en marcha, p. ej. en otra ventana de consola. El navegador abre el Kuenta en marcha y la nueva ventana se cierra sola.</dd></div>
-        <div><dt>«Node.js wurde nicht gefunden» (no se encontró Node.js).</dt><dd>Solo ocurre sin el instalador. Instale Node.js LTS desde nodejs.org o use el instalador de Windows, que incluye Node.js.</dd></div>
-        <div><dt>La tableta no accede a Kuenta.</dt><dd>Kuenta debe haberse iniciado con «Kuenta im Netzwerk». Compruebe la dirección que muestra la ventana de consola y el permiso del cortafuegos para redes privadas. Tableta y PC deben estar en la misma red.</dd></div>
+        <div><dt>Al iniciar aparece «Kuenta ya se está ejecutando en el puerto 3700».</dt><dd>Kuenta ya está en marcha, p. ej. en otra ventana de consola. El navegador abre el Kuenta en marcha y la nueva ventana se cierra sola.</dd></div>
+        <div><dt>«No se encontró Node.js».</dt><dd>Solo ocurre sin el instalador. Instale Node.js LTS desde nodejs.org o use el instalador de Windows, que incluye Node.js.</dd></div>
+        <div><dt>La tableta no accede a Kuenta.</dt><dd>Kuenta debe haberse iniciado con «Kuenta (red)» («Kuenta im Netzwerk» con el instalador en alemán). Compruebe la dirección que muestra la ventana de consola y el permiso del cortafuegos para redes privadas. Tableta y PC deben estar en la misma red.</dd></div>
         <div><dt>«No se encontró Thunderbird».</dt><dd>Indique la ruta de <code>thunderbird.exe</code> en <span class="path">Ajustes → Correo electrónico</span>, p. ej. <code>C:\Program Files\Mozilla Thunderbird\thunderbird.exe</code>.</dd></div>
         <div><dt>«El programa de correo solo puede abrirse en el ordenador donde se ejecuta Kuenta».</dt><dd>Está trabajando en otro dispositivo de la red. Envíe allí por SMTP o abra el correo en el PC del taller.</dd></div>
         <div><dt>«No se ha configurado ningún servidor de correo».</dt><dd>El modo de envío es SMTP, pero faltan los datos del servidor. Indíquelos en <span class="path">Ajustes → Correo electrónico</span> o cambie a «Pasar al programa de correo».</dd></div>
@@ -776,7 +776,7 @@ docker compose up -d --build</code></pre></div>
         <div><dt>Exportación DATEV: «El período sobrepasa el ejercicio».</dt><dd>DATEV solo acepta asientos de un ejercicio. Exporte por separado, p. ej. hasta el 31.12 y desde el 01.01. Para un ejercicio distinto, indique el mes de inicio en <span class="path">Ajustes → Contabilidad</span>.</dd></div>
         <div><dt>Exportación DATEV: «Cuentas no válidas para DATEV».</dt><dd>Un asiento tiene una cuenta con demasiados dígitos o sin número. Revise los documentos indicados y las cuentas en <span class="path">Ajustes → Contabilidad</span>, sobre todo la longitud de las cuentas.</dd></div>
         <div><dt>Los datos han desaparecido tras la actualización.</dt><dd>Las actualizaciones no tocan la carpeta de datos. Compruebe si Kuenta se ejecuta con otro usuario de Windows. Cada usuario tiene su propia carpeta de datos.</dd></div>
-        <div><dt>Una parte de la pantalla sigue en alemán.</dt><dd>Puede que algunos textos aún no estén traducidos. Los mensajes de la ventana de consola y del instalador solo están en alemán. Comunique las traducciones que falten, véase <code>CONTRIBUTING.md</code>.</dd></div>
+        <div><dt>Una parte de la pantalla sigue en alemán.</dt><dd>Puede que algunos textos aún no estén traducidos. Comunique las traducciones que falten, véase <code>CONTRIBUTING.md</code>.</dd></div>
       </dl>
     </section>
 
@@ -808,7 +808,7 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Pago con criptomonedas:</strong> probado con un BTCPay Server simulado, aún no con uno real. USDT solo funciona mediante la red Liquid, como lo ofrece BTCPay. No se admite USDT en Tron ni en Ethereum.</li>
         <li><strong>Contenedor:</strong> la imagen solo se ha comprobado fuera de un entorno Docker o Podman real.</li>
         <li><strong>Base de datos:</strong> Kuenta usa una base de datos integrada (SQLite). No se admiten bases de datos externas como PostgreSQL. Varios puestos trabajan mediante el modo red.</li>
-        <li><strong>Países e idiomas:</strong> impuestos, factura electrónica, caja y DATEV están pensados para Alemania. La interfaz existe en alemán, inglés y español, pero no las obligaciones específicas de otros países, p. ej. VeriFactu o TicketBAI en España. La factura electrónica, la exportación DATEV, los mensajes de consola y el instalador siguen en alemán.</li>
+        <li><strong>Países e idiomas:</strong> impuestos, factura electrónica, caja y DATEV están pensados para Alemania. La interfaz existe en alemán, inglés y español, pero no las obligaciones específicas de otros países, p. ej. VeriFactu o TicketBAI en España. La factura electrónica y la exportación DATEV siguen en alemán.</li>
       </ul>
     </section>
 
@@ -821,6 +821,7 @@ docker compose up -d --build</code></pre></div>
           <tr><td><code>PORT</code></td><td><code>3700</code></td><td>puerto del servidor</td></tr>
           <tr><td><code>HOST</code></td><td><code>127.0.0.1</code></td><td><code>0.0.0.0</code> comparte Kuenta en la red</td></tr>
           <tr><td><code>KUENTA_DATA</code></td><td>perfil de usuario</td><td>otra carpeta de datos en una unidad local, p. ej. un segundo disco. No la ponga en una unidad de red ni en un NAS (véase <a href="#sicherung">Copias de seguridad</a>).</td></tr>
+          <tr><td><code>KUENTA_LANG</code></td><td>idioma de Windows</td><td><code>de</code>, <code>en</code> o <code>es</code>: idioma de la ventana de consola y de las instalaciones nuevas</td></tr>
         </tbody>
       </table></div>
       <h3>Desarrollo e instalador</h3>

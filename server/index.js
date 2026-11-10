@@ -8,6 +8,7 @@ const os = require('os');
 
 const dbm = require('./db');
 const L = require('./lib');
+const { C, systemLang } = require('./i18n');
 const G = require('./api/generic');
 const VG = require('./api/vorgang');
 const FI = require('./api/finanzen');
@@ -106,7 +107,7 @@ function route(method, pattern, handler, opts = {}) {
 let datenWarnung = null;
 
 // session
-route('GET', '/api/session', (ctx) => ({ warnung: datenWarnung, loginRequired: loginRequired(), user: ctx.user ? { name: ctx.user.name, id: ctx.user.id, denied: [...ctx.user.denied] } : null, version: pkg.version, pro: require('./lizenz').status().funktionen, firma: L.firma().FIRMENNAME, mandant: dbm.current(), mandanten: dbm.listMandanten() }), { public: true });
+route('GET', '/api/session', (ctx) => ({ warnung: datenWarnung, loginRequired: loginRequired(), user: ctx.user ? { name: ctx.user.name, id: ctx.user.id, denied: [...ctx.user.denied] } : null, version: pkg.version, pro: require('./lizenz').status().funktionen, firma: L.firma().FIRMENNAME, mandant: dbm.current(), mandanten: dbm.listMandanten(), sprache: L.sw('ui.sprache', null) }), { public: true });
 route('POST', '/api/login', async (ctx) => {
   const b = await json(ctx.req);
   const u = L.db().prepare('SELECT * FROM BENUTZER WHERE LOGINBENUTZEN=1 AND ulower(BENUTZER)=?').get(String(b.user || '').toLowerCase());
@@ -386,7 +387,7 @@ function lanAddresses() {
 
 // stop the server and close the databases properly
 function beenden(grund) {
-  console.log(`\n  Kuenta wird beendet (${grund}) …`);
+  console.log('\n  ' + C(`Kuenta wird beendet (${grund}) …`));
   try { server.close(); } catch { /* ignore */ }
   try { dbm.closeAll(); } catch { /* ignore */ }
   process.exit(0);
@@ -398,23 +399,23 @@ if (require.main === module) {
   const browser = url => { const cmd = process.platform === 'win32' ? `start "" "${url}"` : process.platform === 'darwin' ? `open "${url}"` : `xdg-open "${url}"`; require('child_process').exec(cmd); };
   server.on('error', e => {
     if (e.code === 'EADDRINUSE') {
-      console.log(`
-  Kuenta läuft bereits auf Port ${PORT}.`);
+      console.log('\n  ' + C(`Kuenta läuft bereits auf Port ${PORT}.`));
       if (process.argv.includes('--open')) browser(`http://localhost:${PORT}`);
       setTimeout(() => process.exit(0), 1500);
     } else { console.error(e); process.exit(1); }
   });
   server.listen(PORT, HOST, () => {
     const url = `http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`;
-    console.log(`\n  Kuenta ${pkg.version} läuft:  ${url}`);
-    if (HOST === '0.0.0.0') for (const ip of lanAddresses()) console.log(`  Im Netzwerk erreichbar:      http://${ip}:${PORT}`);
-    console.log(`  Datenverzeichnis:            ${dbm.DATA_DIR}\n`);
+    // labels padded to the same width in every language
+    const rows = [[C(`Kuenta ${pkg.version} läuft:`), url], ...(HOST === '0.0.0.0' ? lanAddresses().map(ip => [C('Im Netzwerk erreichbar:'), `http://${ip}:${PORT}`]) : []), [C('Datenverzeichnis:'), dbm.DATA_DIR]];
+    const w = Math.max(...rows.map(r => r[0].length)) + 2;
+    console.log('\n' + rows.map(([l, v]) => '  ' + l.padEnd(w) + v).join('\n') + '\n');
     if (process.argv.includes('--open')) {
       const cmd = process.platform === 'win32' ? `start "" "${url}"` : process.platform === 'darwin' ? `open "${url}"` : `xdg-open "${url}"`;
       require('child_process').exec(cmd);
     }
   });
-  require('./datenordner').warnung(dbm.ROOT).then(w => { datenWarnung = w; if (w) console.log(`\n  ACHTUNG: ${w}\n`); });
+  require('./datenordner').warnung(dbm.ROOT).then(w => { datenWarnung = w; if (w) console.log(`\n  ${C('ACHTUNG')}: ${C(w)}\n`); });
   // daily automatic backup
   const alleSichern = () => { for (const m of dbm.listMandanten()) dbm.runAs(m.id, () => BK.autoBackup()); };
   setTimeout(alleSichern, 15000);

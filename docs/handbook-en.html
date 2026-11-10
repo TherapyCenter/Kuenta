@@ -212,8 +212,8 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
         <li><div><strong>Choose options.</strong><span>Desktop shortcut and, for network mode, the firewall rule (only when installing for all users).</span></div></li>
         <li><div><strong>Start:</strong><span>Start menu <span class="path">Kuenta</span>. The console window opens, and the browser opens <code>http://127.0.0.1:3700</code>.</span></div></li>
       </ol>
-      <p>The start menu has three entries: <strong>Kuenta</strong> (this PC only), <strong>Kuenta im Netzwerk</strong> (for tablets and other workstations) and <strong>Kuenta deinstallieren</strong> (uninstall).</p>
-      <p>To switch Kuenta to English, use the menu <span class="path">Kuenta → Sprache / Language</span> or the language box on the login page.</p>
+      <p>The installer speaks English, German or Spanish and picks the language of Windows. The start menu has three entries: <strong>Kuenta</strong> (this PC only), <strong>Kuenta (network)</strong> (for tablets and other workstations) and <strong>Uninstall Kuenta</strong>. With the German installer they are called <em>Kuenta</em>, <em>Kuenta im Netzwerk</em> and <em>Kuenta deinstallieren</em>.</p>
+      <p>A new installation starts in the language of Windows (German, Spanish, otherwise English). The console window uses the same language. To switch the user interface, use the menu <span class="path">Kuenta → Sprache / Language</span> or the language box on the login page.</p>
 
       <h3>Linux</h3>
       <p>Node.js version 22.13 or later is required. Check with <code>node -v</code>.</p>
@@ -637,7 +637,7 @@ docker compose up -d --build</code></pre></div>
 
     <section id="netzwerk">
       <h2>Network mode</h2>
-      <p>So that tablets and other workstations can use Kuenta, start <span class="path">Start menu → Kuenta im Netzwerk</span> on the workshop PC (Linux/macOS: <code>kuenta --netzwerk</code>).</p>
+      <p>So that tablets and other workstations can use Kuenta, start <span class="path">Start menu → Kuenta (network)</span> on the workshop PC (Linux/macOS: <code>kuenta --netzwerk</code>).</p>
       <ol>
         <li>The console window shows the address for the other devices, e.g. <code>http://192.168.1.20:3700</code>.</li>
         <li>Open this address in the browser on the tablet.</li>
@@ -700,7 +700,7 @@ docker compose up -d --build</code></pre></div>
     <section id="deinstallation">
       <h2>Uninstalling</h2>
       <ul>
-        <li><strong>Windows:</strong> <span class="path">Settings → Apps → Kuenta</span> or start menu <span class="path">Kuenta deinstallieren</span>. A running Kuenta is stopped first and the firewall rule removed.</li>
+        <li><strong>Windows:</strong> <span class="path">Settings → Apps → Kuenta</span> or start menu <span class="path">Uninstall Kuenta</span>. A running Kuenta is stopped first and the firewall rule removed.</li>
         <li><strong>Linux / macOS:</strong> <code>./installer/unix/install.sh --uninstall</code></li>
       </ul>
       <p>The data folder is kept in any case. If you really want to remove the data, delete it by hand, preferably after a last backup.</p>
@@ -766,9 +766,9 @@ docker compose up -d --build</code></pre></div>
     <section id="probleme">
       <h2>Frequent questions and problems</h2>
       <dl class="faq">
-        <div><dt>At start "Kuenta läuft bereits auf Port 3700" (already running on port 3700) appears.</dt><dd>Kuenta is already running, e.g. in another console window. The browser opens the running Kuenta, and the new window closes by itself.</dd></div>
-        <div><dt>"Node.js wurde nicht gefunden" (Node.js not found).</dt><dd>Only happens without the installer. Install Node.js LTS from nodejs.org or use the Windows installer, which includes Node.js.</dd></div>
-        <div><dt>The tablet cannot reach Kuenta.</dt><dd>Kuenta must have been started via "Kuenta im Netzwerk". Check the address shown in the console window and the firewall permission for private networks. Tablet and PC must be in the same network.</dd></div>
+        <div><dt>At start "Kuenta is already running on port 3700" appears.</dt><dd>Kuenta is already running, e.g. in another console window. The browser opens the running Kuenta, and the new window closes by itself.</dd></div>
+        <div><dt>"Node.js was not found".</dt><dd>Only happens without the installer. Install Node.js LTS from nodejs.org or use the Windows installer, which includes Node.js.</dd></div>
+        <div><dt>The tablet cannot reach Kuenta.</dt><dd>Kuenta must have been started via "Kuenta (network)" ("Kuenta im Netzwerk" with the German installer). Check the address shown in the console window and the firewall permission for private networks. Tablet and PC must be in the same network.</dd></div>
         <div><dt>"Thunderbird not found".</dt><dd>Enter the path to <code>thunderbird.exe</code> under <span class="path">Settings → Email</span>, e.g. <code>C:\Program Files\Mozilla Thunderbird\thunderbird.exe</code>.</dd></div>
         <div><dt>"The mail program can only be opened on the computer Kuenta runs on".</dt><dd>You are working on another device in the network. Send via SMTP there or open the mail on the workshop PC.</dd></div>
         <div><dt>"No mail server has been set up".</dt><dd>The sending method is SMTP, but the server details are missing. Enter them under <span class="path">Settings → Email</span> or switch to "Hand over to mail program".</dd></div>
@@ -776,7 +776,7 @@ docker compose up -d --build</code></pre></div>
         <div><dt>DATEV export: "The period goes beyond the fiscal year".</dt><dd>DATEV only accepts bookings from one fiscal year. Export separately, e.g. up to 31.12. and from 01.01. For a different fiscal year enter the start month under <span class="path">Settings → Accounting</span>.</dd></div>
         <div><dt>DATEV export: "Invalid accounts for DATEV".</dt><dd>A booking has an account with too many digits or without a number. Check the documents listed and the accounts under <span class="path">Settings → Accounting</span>, especially the account length.</dd></div>
         <div><dt>The data is gone after the update.</dt><dd>Updates do not touch the data folder. Check whether Kuenta runs under a different Windows user. Each user has their own data folder.</dd></div>
-        <div><dt>Part of the screen is still in German.</dt><dd>A few texts may not be translated yet. Messages from the console window and the installer are German only. Please report missing translations, see <code>CONTRIBUTING.md</code>.</dd></div>
+        <div><dt>Part of the screen is still in German.</dt><dd>A few texts may not be translated yet. Please report missing translations, see <code>CONTRIBUTING.md</code>.</dd></div>
       </dl>
     </section>
 
@@ -808,7 +808,7 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Crypto payment:</strong> tested against a simulated BTCPay Server, not yet against a real one. USDT only works via the Liquid network, as offered by BTCPay. USDT on Tron or Ethereum is not supported.</li>
         <li><strong>Container:</strong> the image has so far only been checked outside a real Docker or Podman environment.</li>
         <li><strong>Database:</strong> Kuenta uses a built-in database (SQLite). An external database such as PostgreSQL is not supported. Several workstations work via network mode.</li>
-        <li><strong>Countries and languages:</strong> tax, e-invoicing, register and DATEV are designed for Germany. The interface is available in German, English and Spanish, but country-specific obligations of other countries, e.g. VeriFactu in Spain, are not. The e-invoice, DATEV export, console messages and the installer stay German.</li>
+        <li><strong>Countries and languages:</strong> tax, e-invoicing, register and DATEV are designed for Germany. The interface is available in German, English and Spanish, but country-specific obligations of other countries, e.g. VeriFactu in Spain, are not. The e-invoice and the DATEV export stay German.</li>
       </ul>
     </section>
 
@@ -821,6 +821,7 @@ docker compose up -d --build</code></pre></div>
           <tr><td><code>PORT</code></td><td><code>3700</code></td><td>port of the server</td></tr>
           <tr><td><code>HOST</code></td><td><code>127.0.0.1</code></td><td><code>0.0.0.0</code> shares Kuenta in the network</td></tr>
           <tr><td><code>KUENTA_DATA</code></td><td>user profile</td><td>a different data folder on a local drive, e.g. a second hard disk. Do not put it on a network drive or NAS (see <a href="#sicherung">Backup</a>).</td></tr>
+          <tr><td><code>KUENTA_LANG</code></td><td>language of Windows</td><td><code>de</code>, <code>en</code> or <code>es</code>: language of the console window and of new installations</td></tr>
         </tbody>
       </table></div>
       <h3>Development and installer</h3>

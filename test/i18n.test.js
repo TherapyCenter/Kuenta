@@ -93,3 +93,26 @@ test('PDF invoice in English and Spanish', () => {
     L.setSw('beleg.sprache', 'de');
   });
 });
+
+test('system language for console and new installations', () => {
+  const { systemLang, C } = require('../server/i18n');
+  const alt = process.env.KUENTA_LANG;
+  try {
+    process.env.KUENTA_LANG = 'es';
+    assert.strictEqual(systemLang(), 'es');
+    assert.strictEqual(C('Kuenta läuft bereits auf Port 3700.'), 'Kuenta ya se está ejecutando en el puerto 3700.');
+    process.env.KUENTA_LANG = 'en';
+    assert.strictEqual(C('Datenverzeichnis:'), 'Data folder:');
+  } finally { if (alt === undefined) delete process.env.KUENTA_LANG; else process.env.KUENTA_LANG = alt; }
+});
+
+test('license email in the language of shop.json or of the order', () => {
+  const SHOP = require('../tools/lizenz/shop');
+  assert.strictEqual(SHOP.mailSprache({ sprache: 'en' }, {}), 'en');
+  assert.strictEqual(SHOP.mailSprache({ sprache: 'en' }, { language: 'es' }), 'es');
+  assert.strictEqual(SHOP.mailSprache({}, {}), 'de');
+  const text = SHOP.mailText({ funktionen: ['pro'], kunde: 'Garage Smith', id: 'x1' }, 'KUENTA1.k', 'INV1', 'en');
+  assert.match(text, /^Hello,/);
+  assert.match(text, /Kuenta \(Kuenta Pro \(all add-ons, including future ones\)\), licensed to "Garage Smith"/);
+  assert.match(text, /License no\. x1 · payment INV1/);
+});

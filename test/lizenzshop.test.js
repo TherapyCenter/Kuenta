@@ -10,6 +10,7 @@ const crypto = require('crypto');
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'kuenta-shop-'));
 process.env.KUENTA_LIZENZ_HOME = tmp;
+process.env.KUENTA_LANG = 'de';   // messages are checked in German
 process.env.KUENTA_DATA = path.join(tmp, 'daten');
 
 const { privateKey, publicKey } = crypto.generateKeyPairSync('ed25519');
