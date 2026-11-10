@@ -73,6 +73,12 @@ test('Rechnung → Zahlung → Storno → E-Rechnung → Sicherung', () => {
   assert.strictEqual(kr.kopf.GBRUTTO, -155);
   assert.strictEqual(kr.offen, -55); // the part paid in cash has to be refunded
   assert.match(ER.create(st.id, 'cii').xml, /<ram:TypeCode>381<\/ram:TypeCode>/);
+  // intra-community supply: XRechnung needs the full delivery address (BR-DE-10, BR-DE-11)
+  const eu = G.saveRec('kunden', null, { NAME: 'Autohaus Huber GmbH', ART: 1, USTID: 'ATU13585627', STRASSE: 'Hauptstraße 1', PLZ: '4020', ORT: 'Linz', LAND: 'AT', EMAIL: 'office@example.at' });
+  const ti = VG.template('rechnung', { kunid: eu.KUNID }); delete ti.kopf._kunde;
+  const ig = VG.save('rechnung', { kopf: { ...ti.kopf, STEUERART: 'IG_LIEFERUNG' }, pos: [{ POSART: 'A', BEZEICHNUNG: 'Ersatzteil', MENGE: 1, VK: 80, MWST: 61 }] }).kopf.RECHNUNGID;
+  assert.match(ER.create(ig, 'cii').xml, /<ram:ShipToTradeParty><ram:Name>Autohaus Huber GmbH<\/ram:Name><ram:PostalTradeAddress><ram:PostcodeCode>4020<\/ram:PostcodeCode><ram:LineOne>Hauptstraße 1<\/ram:LineOne><ram:CityName>Linz<\/ram:CityName><ram:CountryID>AT<\/ram:CountryID>/);
+  assert.match(ER.create(ig, 'ubl').xml, /<cac:DeliveryLocation><cac:Address><cbc:StreetName>Hauptstraße 1<\/cbc:StreetName><cbc:CityName>Linz<\/cbc:CityName><cbc:PostalZone>4020<\/cbc:PostalZone>/);
   assert.throws(() => VG.remove('rechnung', id), /Zahlungen|stornieren/);
   // backup with password
   const b = BK.createBackup({ password: 'sicher123' });
