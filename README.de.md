@@ -13,7 +13,7 @@ Handbuch: **[Deutsch](docs/handbuch.html)** · **[English](docs/handbook-en.html
 |---|---|---|
 | Windows | `Kuenta-Setup-<Version>.exe` (Node.js ist enthalten) | Startmenü → *Kuenta* bzw. *Kuenta im Netzwerk* |
 | Linux / macOS | Node.js ab 22.13, dann `./installer/unix/install.sh` | `kuenta` (Netzwerk: `kuenta --netzwerk`) |
-| Container (Docker/Podman) | fertiges Image `ghcr.io/therapycenter/kuenta:1.8.1` oder `podman build -t kuenta:1.8.1 .` bzw. `docker compose up -d --build` | `http://<Rechner>:3700` (Daten im Volume `/data`) |
+| Container (Docker/Podman) | fertiges Image `ghcr.io/therapycenter/kuenta:1.8.2` oder `podman build -t kuenta:1.8.2 .` bzw. `docker compose up -d --build` | `http://<Rechner>:3700` (Daten im Volume `/data`) |
 | Umbrel | App Store → ⋯ → *Community App Stores* → `https://github.com/TherapyCenter/umbrel-app-store` → Kuenta installieren | `http://umbrel.local:3700` |
 | ohne Installation | Node.js ab 22.13 | `Kuenta starten.bat` bzw. `./kuenta.sh` oder `node server/index.js --open` |
 
