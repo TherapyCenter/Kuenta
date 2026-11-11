@@ -1,6 +1,6 @@
-// Translation of the user interface (German, English, Spanish). Shared by server and browser.
+// Translation of the user interface (German, English, Spanish, French, Italian, Dutch). Shared by server and browser.
 //
-// The German text is the key: the code keeps writing German, and lang/en.js and lang/es.js map
+// The German text is the key: the code keeps writing German, and lang/en.js, es.js, fr.js, it.js and nl.js map
 // German text to the translation. Missing entries simply stay German, so nothing breaks.
 //
 // tr() works on finished strings, so most call sites need no change at all:
@@ -14,8 +14,8 @@
   if (typeof module === 'object' && module.exports) module.exports = factory();
   else root.I18N = factory();
 })(typeof self !== 'undefined' ? self : this, function () {
-  // doc: only for customer documents (no translation of the user interface)
-  const LANGS = { de: { name: 'Deutsch', locale: 'de-DE' }, en: { name: 'English', locale: 'en-GB' }, es: { name: 'Español', locale: 'es-ES' }, it: { name: 'Italiano', locale: 'it-IT', doc: true }, nl: { name: 'Nederlands', locale: 'nl-NL', doc: true }, fr: { name: 'Français', locale: 'fr-FR', doc: true } };
+  // doc: true would offer a language only for customer documents, not for the user interface
+  const LANGS = { de: { name: 'Deutsch', locale: 'de-DE' }, en: { name: 'English', locale: 'en-GB' }, es: { name: 'Español', locale: 'es-ES' }, fr: { name: 'Français', locale: 'fr-FR' }, it: { name: 'Italiano', locale: 'it-IT' }, nl: { name: 'Nederlands', locale: 'nl-NL' } };
   const UI_LANGS = Object.fromEntries(Object.entries(LANGS).filter(([, l]) => !l.doc));
   const DICT = { en: {}, es: {}, it: {}, nl: {}, fr: {} };
   const compiled = {};   // per language: { patterns, prefixes, suffixes, cache }

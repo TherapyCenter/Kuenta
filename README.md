@@ -4,7 +4,7 @@
 
 Kuenta is cross-platform invoicing and point-of-sale software for car workshops. It runs in the browser on Windows, macOS, Linux and tablets and takes over the complete data of **KFZ-Faktura**, a widely used German workshop program (backup `*.kfz`, `DB1.bak` or directly from the program folder). Screens and workflow follow KFZ-Faktura: menu bar, navigation, quick bar, overview tables with search bar and letter bar, "More functions" and right-click menus, input forms with tabs.
 
-The user interface is available in **German, English and Spanish**. Tax rules, e-invoicing, the cash register (TSE) and the DATEV export are designed for Germany.
+The user interface is available in **German, English, Spanish, French, Italian and Dutch**. Tax rules, e-invoicing, the cash register (TSE) and the DATEV export are designed for Germany.
 
 ## Installation and start
 
@@ -25,7 +25,7 @@ After installation the database is empty. Enter your company details under *Sett
 
 The data lives in the user profile, not in the program folder: Windows `%APPDATA%\Kuenta`, macOS `~/Library/Application Support/Kuenta`, Linux `~/.local/share/kuenta`.
 
-Environment variables: `PORT` (default 3700), `HOST` (default 127.0.0.1), `KUENTA_LANG` (`de`, `en` or `es`: console and new installations, default: system language), `KUENTA_DATA` (different data folder, on a local drive only – not on a network drive/NAS, see INSTALL.md).
+Environment variables: `PORT` (default 3700), `HOST` (default 127.0.0.1), `KUENTA_LANG` (`de`, `en`, `es`, `fr`, `it` or `nl`: console and new installations, default: system language), `KUENTA_DATA` (different data folder, on a local drive only – not on a network drive/NAS, see INSTALL.md).
 
 ## Taking over data from KFZ-Faktura
 
@@ -55,7 +55,7 @@ Technology: Kuenta reads the Firebird backup format (gbak, versions 5–10) itse
 - **Reports:** vehicle due dates with reminders by letter, **email and SMS** (log against double sending, opt-out per customer; SMS is a Pro feature, see below; SMS via a freely configurable HTTP gateway: provider, Android phone or the Kuenta SMS relay with a USB modem in `installer/sms-relais`), revenue/gross profit, mail merge, performance rate per order and employee.
 - **Interfaces / data import:** import assistant for customers, vehicles, articles, labour items and suppliers from CSV with field mapping and templates, DATANORM 4/5.
 - **System:** multiple companies (several businesses/demo data, selectable per workstation), users and permissions, change log, email sending log, backup (`*.kuenta`, optionally AES-256), daily automatic backup, overview with eye icon (hide amounts) and display in €, $, £, ₿ or sats (display only, rates from the ECB and Bitstamp; invoices stay in euros), light/dark mode and four colour schemes (blue, green, graphite, bordeaux) per workstation.
-- **Languages:** user interface in German, English or Spanish (per workstation, menu *Kuenta → Sprache / Language*). Documents (PDF, printing, email templates) in a separate document language per company (*Settings → Defaults*).
+- **Languages:** user interface in German, English, Spanish, French, Italian or Dutch (per workstation, menu *Kuenta → Sprache / Language*). Documents (PDF, printing, email templates) in a separate document language per company (*Settings → Defaults*).
 - **Tax system per company:** Germany, Spain, the United Kingdom, the United States, France, Austria, Switzerland, Italy, the Netherlands, Belgium or Luxembourg (*Settings → Tax / dunning / register → Tax system*).
 - **French tax system (tab *France*):** VAT 20/10/5.5 %, check of SIREN/SIRET, mandatory notes (legal form, capital, RCS, APE, nature of operations, late payment penalties, € 40 recovery fee), franchise en base, printed invoices locked; Factur-X EN 16931 and submission to Chorus Pro; cash register with a signed, chained journal, grand totals, closures, duplicates and event log (basis for NF525), FEC export; French as document language.
 - **Austrian tax system (tab *Österreich*):** VAT 20/10/13 %, UID check (ATU…), invoice requirements of § 11 UStG (customer UID above € 10,000 gross) and § 14 UGB, small business exemption, cash accounting; cash register security regulation RKSV (signed receipts with QR code, AES-encrypted turnover counter, start, monthly, yearly, collective and closing receipts, failure of the signature device, DEP export; A-Trust a.sign RK online or a local test key); VAT return (UVA) with Kennzahlen and XML for FinanzOnline; e-invoices in ebInterface 6.1 for e-rechnung.gv.at.

@@ -412,7 +412,7 @@ docker compose up -d --build</code></pre></div>
       <p>Ambos solo se aplican al puesto o navegador actual. Así se distinguen de un vistazo, p. ej., la caja, la tableta del taller o una empresa de prueba.</p>
 
       <h3>Idioma</h3>
-      <p>La interfaz está disponible en alemán, inglés y español, los documentos también en italiano, neerlandés y francés. Hay dos ajustes:</p>
+      <p>La interfaz y los documentos están disponibles en alemán, inglés, español, francés, italiano y neerlandés. Hay dos ajustes:</p>
       <ul>
         <li><strong>Idioma de la interfaz:</strong> en el menú <span class="path">Kuenta → Sprache / Language</span>, en la página de inicio de sesión o en <span class="path">Ajustes → Valores predeterminados</span>. Solo se aplica al puesto actual. En español, los números aparecen como 1.234,50 y las fechas como 31/12/2026.</li>
         <li><strong>Idioma de los documentos:</strong> en <span class="path">Ajustes → Valores predeterminados</span>. Se aplica a toda la empresa y afecta a los documentos PDF, la impresión, las reclamaciones y las plantillas de correos y recordatorios. Puede elegir alemán, inglés, español, italiano, neerlandés y francés.</li>
@@ -575,7 +575,7 @@ docker compose up -d --build</code></pre></div>
 
     <section id="italien">
       <h2>Italia: IVA y factura electrónica</h2>
-      <p>Elija “Italia” en <span class="path">Ajustes → Impuestos / reclamaciones / caja → Sistema fiscal</span>, guarde y recargue. La configuración está en la pestaña <span class="path">Italia</span>. Para documentos en italiano elija el idioma de documentos “Italiano” (la interfaz sigue en alemán, inglés o español).</p>
+      <p>Elija “Italia” en <span class="path">Ajustes → Impuestos / reclamaciones / caja → Sistema fiscal</span>, guarde y recargue. La configuración está en la pestaña <span class="path">Italia</span>. Para documentos en italiano elija el idioma de documentos “Italiano”.</p>
       <ul>
         <li><strong>Datos de la empresa:</strong> partita IVA (11 cifras) en NIF-IVA, codice fiscale en Número fiscal (vacío = igual que la partita IVA). Provincia, REA, capital social, socio único y liquidación en la pestaña Italia.</li>
         <li><strong>Clientes:</strong> partita IVA en NIF-IVA; codice fiscale, código de destinatario SdI (7 caracteres, administraciones 6) o PEC y split payment en <span class="path">Impuestos y contabilidad</span>. Indique la población con la provincia, p. ej. “Torino (TO)”.</li>
@@ -973,7 +973,7 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Pago con criptomonedas:</strong> probado con un BTCPay Server simulado, aún no con uno real. USDT solo funciona mediante la red Liquid, como lo ofrece BTCPay. No se admite USDT en Tron ni en Ethereum.</li>
         <li><strong>Contenedor:</strong> la imagen solo se ha comprobado fuera de un entorno Docker o Podman real.</li>
         <li><strong>Base de datos:</strong> Kuenta usa una base de datos integrada (SQLite). No se admiten bases de datos externas como PostgreSQL. Varios puestos trabajan mediante el modo red.</li>
-        <li><strong>Países e idiomas:</strong> Alemania, España, el Reino Unido y Estados Unidos (se cambia por empresa). En España no se soportan TicketBAI, Navarra, IGIC ni el REBU en VERI*FACTU. La interfaz existe en alemán, inglés y español.</li>
+        <li><strong>Países e idiomas:</strong> Alemania, España, el Reino Unido y Estados Unidos (se cambia por empresa). En España no se soportan TicketBAI, Navarra, IGIC ni el REBU en VERI*FACTU. La interfaz existe en alemán, inglés, español, francés, italiano y neerlandés.</li>
       </ul>
     </section>
 
@@ -986,7 +986,7 @@ docker compose up -d --build</code></pre></div>
           <tr><td><code>PORT</code></td><td><code>3700</code></td><td>puerto del servidor</td></tr>
           <tr><td><code>HOST</code></td><td><code>127.0.0.1</code></td><td><code>0.0.0.0</code> comparte Kuenta en la red</td></tr>
           <tr><td><code>KUENTA_DATA</code></td><td>perfil de usuario</td><td>otra carpeta de datos en una unidad local, p. ej. un segundo disco. No la ponga en una unidad de red ni en un NAS (véase <a href="#sicherung">Copias de seguridad</a>).</td></tr>
-          <tr><td><code>KUENTA_LANG</code></td><td>idioma de Windows</td><td><code>de</code>, <code>en</code> o <code>es</code>: idioma de la ventana de consola y de las instalaciones nuevas</td></tr>
+          <tr><td><code>KUENTA_LANG</code></td><td>idioma de Windows</td><td><code>de</code>, <code>en</code>, <code>es</code>, <code>fr</code>, <code>it</code> o <code>nl</code>: idioma de la ventana de consola y de las instalaciones nuevas</td></tr>
         </tbody>
       </table></div>
       <h3>Desarrollo e instalador</h3>

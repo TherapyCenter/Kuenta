@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 'use strict';
-// Lists texts in the code that have no English or Spanish translation yet.
+// Lists texts in the code that have no translation yet (English, Spanish, French, Italian, Dutch).
 //
 //   node tools/i18n/missing.js            all source files of the user interface and the server
-//   node tools/i18n/missing.js en         only check English (default: en and es)
+//   node tools/i18n/missing.js en         only check English (default: all languages)
 //
-// The German text is the key. Add missing entries to public/js/lang/en.js and es.js, e.g.
+// The German text is the key. Add missing entries to public/js/lang/en.js, es.js, fr.js, it.js and nl.js, e.g.
 //   "Neuer Kunde": "New customer",
 // Values in template strings become {0}, {1} …; the translation must contain the same placeholders.
 // The list also contains technical strings (CSS classes, keys, file names); simply ignore those.
@@ -14,7 +14,7 @@ const path = require('path');
 const I18N = require('../../public/js/i18n');
 
 const ROOT = path.join(__dirname, '..', '..');
-const langs = process.argv[2] ? [process.argv[2]] : ['en', 'es'];
+const langs = process.argv[2] ? [process.argv[2]] : ['en', 'es', 'fr', 'it', 'nl'];
 for (const l of langs) I18N.add(l, require(`../../public/js/lang/${l}`));
 
 // String literals of a JavaScript file; ${…} in template strings becomes {0}, {1} …

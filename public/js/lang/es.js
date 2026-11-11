@@ -2619,6 +2619,7 @@
   "davon nicht steuerpflichtig": "de ello no sujeto",
   "inkl. Sales Tax": "impuesto incluido",
   "Britisches Pfund": "Libra esterlina",
+  "Schweizer Franken": "Franco suizo",
   "Anzeige in {0}: 1 {1} = {2} ({3}, Stand {4}{5}). Nur Anzeige – Rechnungen und Buchungen bleiben in {6}.": "Mostrado en {0}: 1 {1} = {2} ({3}, a {4}{5}). Solo visualización: facturas y asientos siguen en {6}.",
   "Kein {0}-Kurs verfügbar{1} – die Beträge werden in {2} angezeigt.": "No hay tipo de cambio de {0}{1}: los importes se muestran en {2}.",
 });

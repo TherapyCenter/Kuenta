@@ -4,7 +4,7 @@
 
 Kuenta is a web application: a small server runs on the workshop PC, and you use it in the browser (also from tablets and other workstations in the network). After installation the database is **empty** – enter your own company details under *Settings* and bring in existing data by import (see [Taking over data](#taking-over-data)).
 
-The installer, the console window and a new installation follow the language of the operating system (German, Spanish, otherwise English; choose with the environment variable `KUENTA_LANG=de|en|es`). To switch the user interface later, use the menu *Kuenta → Sprache / Language* or the language box on the login page.
+The installer, the console window and a new installation follow the language of the operating system (the installer: German, Spanish, otherwise English; console and new installation also French, Italian and Dutch; choose with the environment variable `KUENTA_LANG=de|en|es|fr|it|nl`). To switch the user interface later, use the menu *Kuenta → Sprache / Language* or the language box on the login page.
 
 **Where is the data?** Never in the program folder, always in the user profile. Updates leave it untouched; when uninstalling you decide whether to keep it.
 

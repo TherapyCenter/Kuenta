@@ -4,22 +4,22 @@
 const I18N = require('../public/js/i18n');
 I18N.add('en', require('../public/js/lang/en'));
 I18N.add('es', require('../public/js/lang/es'));
-I18N.add('it', require('../public/js/lang/it')); // documents only
-I18N.add('nl', require('../public/js/lang/nl')); // documents only
-I18N.add('fr', require('../public/js/lang/fr')); // documents only
+I18N.add('it', require('../public/js/lang/it'));
+I18N.add('nl', require('../public/js/lang/nl'));
+I18N.add('fr', require('../public/js/lang/fr'));
 
 function docLang() {
   try { return require('./lib').sw('beleg.sprache', 'de') || 'de'; } catch { return 'de'; }
 }
 // Language of the console and of new installations: KUENTA_LANG, otherwise the operating system
-// (German or Spanish system → German or Spanish, anything else → English)
+// (German, Spanish, French, Italian or Dutch system → that language, anything else → English)
 function systemLang() {
   const set = String(process.env.KUENTA_LANG || '').toLowerCase().slice(0, 2);
   if (I18N.UI_LANGS[set]) return set;
   let loc = '';
   try { loc = Intl.DateTimeFormat().resolvedOptions().locale || ''; } catch { /* ignore */ }
   loc = (process.env.LC_ALL || process.env.LC_MESSAGES || process.env.LANG || loc).toLowerCase();
-  return loc.startsWith('de') ? 'de' : loc.startsWith('es') ? 'es' : 'en';
+  return ['de', 'es', 'fr', 'it', 'nl'].find(l => loc.startsWith(l)) || 'en';
 }
 // Console output in the system language
 const C = s => I18N.tr(s, systemLang());

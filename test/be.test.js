@@ -24,8 +24,10 @@ test('enterprise number', () => {
   assert.ok(!NIF.beNr('BE2123456749').ok, 'starts with 0 or 1');
 });
 
-test('French is a document language only', () => {
-  assert.ok(I18N.LANGS.fr && !I18N.UI_LANGS.fr);
+test('French is a language for the user interface and documents', () => {
+  assert.ok(I18N.LANGS.fr && I18N.UI_LANGS.fr);
+  assert.strictEqual(I18N.tr('💾 Einstellungen speichern', 'fr'), '💾 Enregistrer les paramètres');
+  assert.strictEqual(I18N.tr('Auftrag', 'fr'), 'Ordre de réparation', 'document wording wins');
   assert.strictEqual(I18N.tr('Rechnung Nr. 5', 'fr'), 'Facture n° 5');
   assert.strictEqual(I18N.tr('Summe netto', 'fr'), 'Total HT');
 });

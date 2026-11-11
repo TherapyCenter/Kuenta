@@ -26,8 +26,10 @@ test('partita IVA and codice fiscale', () => {
   assert.ok(NIF.itCf('06363391001').ok, 'companies: 11 digits');
 });
 
-test('Italian is a document language only', () => {
-  assert.ok(I18N.LANGS.it && !I18N.UI_LANGS.it);
+test('Italian is a language for the user interface and documents', () => {
+  assert.ok(I18N.LANGS.it && I18N.UI_LANGS.it);
+  assert.strictEqual(I18N.tr('💾 Einstellungen speichern', 'it'), '💾 Salva impostazioni');
+  assert.strictEqual(I18N.tr('Auftrag', 'it'), 'Ordine di lavoro', 'document wording wins');
   assert.strictEqual(I18N.tr('Rechnung', 'it'), 'Fattura');
   assert.strictEqual(I18N.tr('zzgl. 22 % IVA auf 100,00 €', 'it'), 'IVA 22 % su 100,00 €');
   assert.strictEqual(I18N.tr('Seite 1 von 2', 'it'), 'Pagina 1 di 2');

@@ -412,7 +412,7 @@ docker compose up -d --build</code></pre></div>
       <p>Both apply only to the current workstation or browser. This way the register, the tablet in the workshop or a demo company can be told apart at a glance.</p>
 
       <h3>Language</h3>
-      <p>The user interface is available in German, English and Spanish, documents also in Italian, Dutch and French. There are two settings:</p>
+      <p>The user interface and documents are available in German, English, Spanish, French, Italian and Dutch. There are two settings:</p>
       <ul>
         <li><strong>Language of the user interface:</strong> in the menu <span class="path">Kuenta → Sprache / Language</span>, on the login page or under <span class="path">Settings → Defaults</span>. It applies only to the current workstation. In English, numbers appear as 1,234.50 and dates as 31/12/2026.</li>
         <li><strong>Language of documents:</strong> under <span class="path">Settings → Defaults</span>. It applies to the whole company and affects PDF documents, printing, dunning letters and the templates for emails and reminders. You can choose German, English, Spanish, Italian, Dutch and French.</li>
@@ -575,7 +575,7 @@ docker compose up -d --build</code></pre></div>
 
     <section id="italien">
       <h2>Italy: VAT and electronic invoices</h2>
-      <p>Choose “Italia” under <span class="path">Settings → Tax / dunning / register → Tax system</span>, save and reload. The settings are on the tab <span class="path">Italia</span>. For Italian documents choose the document language “Italiano” (the user interface stays German, English or Spanish).</p>
+      <p>Choose “Italia” under <span class="path">Settings → Tax / dunning / register → Tax system</span>, save and reload. The settings are on the tab <span class="path">Italia</span>. For Italian documents choose the document language “Italiano”.</p>
       <ul>
         <li><strong>Company data:</strong> partita IVA (11 digits) into VAT ID, codice fiscale into Tax number (empty = same as partita IVA). Province, REA, share capital, single shareholder and liquidation on the tab Italia.</li>
         <li><strong>Customers:</strong> partita IVA into VAT ID; codice fiscale, SdI recipient code (7 characters, public bodies 6) or PEC and split payment under <span class="path">Tax & accounting</span>. Enter the town with the province, e.g. “Torino (TO)”.</li>
@@ -973,7 +973,7 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Crypto payment:</strong> tested against a simulated BTCPay Server, not yet against a real one. USDT only works via the Liquid network, as offered by BTCPay. USDT on Tron or Ethereum is not supported.</li>
         <li><strong>Container:</strong> the image has so far only been checked outside a real Docker or Podman environment.</li>
         <li><strong>Database:</strong> Kuenta uses a built-in database (SQLite). An external database such as PostgreSQL is not supported. Several workstations work via network mode.</li>
-        <li><strong>Countries and languages:</strong> Germany, Spain, the United Kingdom and the United States (switchable per company). Not supported in Spain: TicketBAI, Navarre, IGIC and REBU in VERI*FACTU; in the UK: Northern Ireland EU trade. The interface is available in German, English and Spanish.</li>
+        <li><strong>Countries and languages:</strong> Germany, Spain, the United Kingdom and the United States (switchable per company). Not supported in Spain: TicketBAI, Navarre, IGIC and REBU in VERI*FACTU; in the UK: Northern Ireland EU trade. The interface is available in German, English, Spanish, French, Italian and Dutch.</li>
       </ul>
     </section>
 
@@ -986,7 +986,7 @@ docker compose up -d --build</code></pre></div>
           <tr><td><code>PORT</code></td><td><code>3700</code></td><td>port of the server</td></tr>
           <tr><td><code>HOST</code></td><td><code>127.0.0.1</code></td><td><code>0.0.0.0</code> shares Kuenta in the network</td></tr>
           <tr><td><code>KUENTA_DATA</code></td><td>user profile</td><td>a different data folder on a local drive, e.g. a second hard disk. Do not put it on a network drive or NAS (see <a href="#sicherung">Backup</a>).</td></tr>
-          <tr><td><code>KUENTA_LANG</code></td><td>language of Windows</td><td><code>de</code>, <code>en</code> or <code>es</code>: language of the console window and of new installations</td></tr>
+          <tr><td><code>KUENTA_LANG</code></td><td>language of Windows</td><td><code>de</code>, <code>en</code>, <code>es</code>, <code>fr</code>, <code>it</code> or <code>nl</code>: language of the console window and of new installations</td></tr>
         </tbody>
       </table></div>
       <h3>Development and installer</h3>

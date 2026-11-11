@@ -26,8 +26,10 @@ test('btw-id and KvK number', () => {
   assert.ok(!NIF.nlKvk('1234567').ok);
 });
 
-test('Dutch is a document language only', () => {
-  assert.ok(I18N.LANGS.nl && !I18N.UI_LANGS.nl);
+test('Dutch is a language for the user interface and documents', () => {
+  assert.ok(I18N.LANGS.nl && I18N.UI_LANGS.nl);
+  assert.strictEqual(I18N.tr('💾 Einstellungen speichern', 'nl'), '💾 Instellingen opslaan');
+  assert.strictEqual(I18N.tr('Auftrag', 'nl'), 'Werkorder', 'document wording wins');
   assert.strictEqual(I18N.tr('Rechnung Nr. 7', 'nl'), 'Factuur nr. 7');
   assert.strictEqual(I18N.tr('zzgl. 21 % btw auf 100,00 €', 'nl'), '21 % btw over 100,00 €');
 });
