@@ -63,9 +63,17 @@ const Anzeige = {
     const w = this.w();
     const auge = h('button', { class: 'btn sm icon', title: this.verborgen() ? 'Beträge anzeigen' : 'Beträge ausblenden', 'aria-label': this.verborgen() ? 'Beträge anzeigen' : 'Beträge ausblenden',
       onclick: () => { Pref.set('betraegeVerbergen', !this.verborgen()); onChange(); } }, this.verborgen() ? '🙈' : '👁');
-    const setze = k => { Pref.set('anzeigeWaehrung', k); if (k === 'BTC' || k === 'SATS') Pref.set('btcEinheit', k); onChange(); };
-    const knoepfe = [['EUR', '€'], ['USD', '$'], ['GBP', '£'], ['CHF', 'CHF']].map(([k, l]) => h('button', {
-      class: 'btn sm' + (k === w ? ' primary' : ''), title: `Anzeige in ${this.NAMEN[k]}`, onclick: () => setze(k) }, l));
+    const setze = k => { Pref.set('anzeigeWaehrung', k); Pref.set(k === 'BTC' || k === 'SATS' ? 'btcEinheit' : 'fiatEinheit', k); onChange(); };
+    // One button for fiat: the first click shows the last used currency, every further click moves on to the next one
+    const FIAT = ['EUR', 'USD', 'GBP', 'CHF'];
+    const ZEICHEN = { EUR: '€', USD: '$', GBP: '£', CHF: 'CHF' };
+    const fiatAktiv = FIAT.includes(w);
+    const fiat = fiatAktiv ? w : (FIAT.includes(Pref.get('fiatEinheit', null)) ? Pref.get('fiatEinheit') : this.basis());
+    const naechste = FIAT[(FIAT.indexOf(fiat) + 1) % FIAT.length];
+    const knoepfe = [h('button', {
+      class: 'btn sm' + (fiatAktiv ? ' primary' : ''), style: { minWidth: '42px' },
+      title: fiatAktiv ? `Anzeige in ${this.NAMEN[w]} – noch einmal klicken für ${this.NAMEN[naechste]}` : `Anzeige in ${this.NAMEN[fiat]}`,
+      onclick: () => setze(fiatAktiv ? naechste : fiat) }, ZEICHEN[fiat])];
     // One button for Bitcoin: the first click shows the last used unit, every further click toggles between ₿ and sats
     const btcAktiv = w === 'BTC' || w === 'SATS';
     const einheit = btcAktiv ? w : Pref.get('btcEinheit', 'BTC');
