@@ -129,7 +129,7 @@ function fahrzeugtermine(q) {
   let datumExpr = `f.${feld}`;
   if (feld === 'KLIMA') datumExpr = "date(f.KLIMA, '+2 years')";
   const rows = d.prepare(`SELECT f.FAHR_ID, f.KENNZEICHEN, f.MARKE, f.MODELL, f.FZIDENTNR, f.KM, ${datumExpr} TERMIN,
-      k.KUNID, k.NUMMER, k.ANREDE, k.NAME, k.VORNAME, k.ZUSATZ, k.STRASSE, k.PLZ, k.ORT, k.TELEFON, k.MOBIL, k.EMAIL, k.LAND, k.KEINEERINNERUNG,
+      k.KUNID, k.NUMMER, k.ANREDE, k.NAME, k.VORNAME, k.ZUSATZ, k.STRASSE, k.PLZ, k.ORT, k.TELEFON, k.MOBIL, k.EMAIL, k.LAND, k.KEINEERINNERUNG, k.TELEGRAM_CHATID,
       (SELECT e.ZEIT || ' · ' || e.KANAL FROM SW_ERINNERUNGEN e WHERE e.FAHRID=f.FAHR_ID AND e.ART=? AND e.TERMIN=${datumExpr} AND e.STATUS<>'Fehler' ORDER BY e.ZEIT DESC LIMIT 1) ERINNERT
     FROM FAHRZEUGE f LEFT JOIN KUNDEN_FAHRZEUGE kf ON kf.FAHRID=f.FAHR_ID LEFT JOIN KUNDEN k ON k.KUNID=kf.KUNID
     WHERE ${datumExpr} BETWEEN ? AND ? GROUP BY f.FAHR_ID ORDER BY TERMIN, f.KENNZEICHEN`).all(feld, von, bis);

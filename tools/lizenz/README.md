@@ -24,8 +24,9 @@ cannot create licenses itself.
 
 1. In the store, create an app of type **Point of Sale**, display "Product list" or "Cart".
 2. Create one item per add-on. **The item ID must be the KuentaPOS feature name:**
-   `sms` (SMS add-on, $20), optionally `pro` (all add-ons). Map different IDs in
-   `shop.json` under `artikel`, e.g. `"sms-addon": "sms"`.
+   `sms` (SMS add-on, $20), `whatsapp` (WhatsApp Business, $20), `telegram` (Telegram, $20),
+   optionally `pro` (all add-ons). Map different IDs in `shop.json` under `artikel`, e.g. `"sms-addon": "sms"`.
+   If your `shop.json` lists `bekannteFunktionen` itself, add `whatsapp` and `telegram` there.
 3. Under *Forms*, create a form with the fields **`buyerName`** (label "Workshop name",
    required) and **`buyerEmail`** (email, required) and assign it to the app.
 4. Under *Account → API keys*, create a key with only the right **"View invoices"**

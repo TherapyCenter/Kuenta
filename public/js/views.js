@@ -412,17 +412,18 @@ Views.termine = async (main) => {
     const text = `{Briefanrede}\n\nfür Ihr Fahrzeug {Fahrzeug} mit dem Kennzeichen {Kennzeichen} steht am {Termin} die ${data.bezeichnung} an.\n\nGerne übernehmen wir das für Sie. Vereinbaren Sie einfach telefonisch einen Termin mit uns.\n\nMit freundlichen Grüßen`;
     Views.serienbriefDialog(empf, betreff, text, { onDruck: () => api('/api/erinnerung/brief', { method: 'POST', body: { feld, von, bis, fahrids: empf.map(r => r.FAHR_ID) } }).then(load).catch(() => {}) });
   };
-  // Reminder by email or SMS to the vehicles in the list
+  // Reminder by email, SMS, WhatsApp or Telegram to the vehicles in the list
   const erinnern = async (kanal) => {
-    const name = kanal === 'email' ? 'E-Mail' : 'SMS';
-    const hatAdresse = r => kanal === 'email' ? /\S+@\S+\.\S+/.test(r.EMAIL || '') : !!(r.MOBIL || r.TELEFON);
+    const name = { email: 'E-Mail', sms: 'SMS', whatsapp: 'WhatsApp', telegram: 'Telegram' }[kanal];
+    const hatAdresse = r => kanal === 'telegram' ? !!r.TELEGRAM_CHATID : kanal === 'email' ? /\S+@\S+\.\S+/.test(r.EMAIL || '') : !!(r.MOBIL || r.TELEFON);
     const ueberspringen = h('input', { type: 'checkbox', checked: true });
     const kandidaten = () => data.rows.filter(r => r.KUNID && Number(r.KEINEERINNERUNG) !== 1 && hatAdresse(r) && !(ueberspringen.checked && r.ERINNERT));
     const zahl = h('b'); const upd = () => { zahl.textContent = String(kandidaten().length); }; ueberspringen.addEventListener('change', upd); upd();
     const content = h('div', { style: { display: 'grid', gap: '8px', lineHeight: 1.5 } },
       h('div', null, `Erinnerung „${data.bezeichnung}“ per ${name} an `, zahl, ` von ${data.rows.length} Fahrzeugen der Liste.`),
       h('label', { class: 'fld chk' }, ueberspringen, h('span', null, 'bereits erinnerte Fahrzeuge überspringen')),
-      h('div', { class: 'hint' }, `Fahrzeuge ohne ${kanal === 'email' ? 'E-Mail-Adresse' : 'Mobilnummer'} und Kunden mit „Keine Erinnerungen“ werden übersprungen. Den Text stellen Sie unter Einstellungen → Erinnerungen & SMS ein.`));
+      h('div', { class: 'hint' }, kanal === 'whatsapp' ? 'Fahrzeuge ohne Mobilnummer und Kunden mit „Keine Erinnerungen“ werden übersprungen. WhatsApp verschickt die bei Meta freigegebene Vorlage (Einstellungen → WhatsApp & Telegram).'
+        : `Fahrzeuge ohne ${{ email: 'E-Mail-Adresse', telegram: 'Telegram-Verbindung' }[kanal] || 'Mobilnummer'} und Kunden mit „Keine Erinnerungen“ werden übersprungen. Den Text stellen Sie unter Einstellungen → Erinnerungen & SMS ein.`));
     if (!(await dialog(`Per ${name} erinnern`, content, [{ label: 'Senden', cls: 'primary', value: true }, { label: 'Abbrechen', value: false }], { width: 560 }))) return;
     const ids = kandidaten().map(r => r.FAHR_ID);
     if (!ids.length) { toast('Keine passenden Fahrzeuge in der Liste.'); return; }
@@ -430,8 +431,8 @@ Views.termine = async (main) => {
     try {
       const r = await api('/api/erinnerung/senden', { method: 'POST', body: { feld, von, bis, fahrids: ids, kanal } });
       const z = [`${r.gesendet} Erinnerung${r.gesendet === 1 ? '' : 'en'} per ${name} ${kanal === 'email' && App.setting('mail.versand', 'smtp') === 'programm' ? 'an das Mailprogramm übergeben' : 'gesendet'}.`];
-      if (r.uebersprungen.length) z.push('', `Übersprungen (${r.uebersprungen.length}):`, ...r.uebersprungen.map(u => `• ${u.kennzeichen || '?'}: ${u.grund}`));
-      if (r.fehler.length) z.push('', `Fehler (${r.fehler.length}):`, ...r.fehler.map(u => `• ${u.kennzeichen || '?'}: ${u.fehler}`));
+      if (r.uebersprungen.length) z.push('', `Übersprungen (${r.uebersprungen.length}):`, ...r.uebersprungen.map(u => `• ${u.kennzeichen || '?'}: ${T(u.grund)}`));
+      if (r.fehler.length) z.push('', `Fehler (${r.fehler.length}):`, ...r.fehler.map(u => `• ${u.kennzeichen || '?'}: ${T(u.fehler)}`));
       if (r.abgebrochen) z.push('', 'Der Versand wurde abgebrochen, weil der Server bzw. das Gateway nicht erreichbar war.');
       await alertDlg(z.join('\n'), `Erinnerung per ${name}`);
     } catch (e) { showError(e); }
@@ -445,7 +446,9 @@ Views.termine = async (main) => {
       h('button', { class: 'btn', onclick: brief }, '✉️ Erinnerungsschreiben'),
       h('button', { class: 'btn', onclick: () => erinnern('email') }, '📧 Per E-Mail erinnern'),
       App.pro('sms') ? h('button', { class: 'btn primary', onclick: () => erinnern('sms') }, '📱 Per SMS erinnern')
-        : h('button', { class: 'btn', title: 'Funktion von KuentaPOS Pro', onclick: () => App.proHinweis('sms') }, '🔒 Per SMS erinnern (Pro)')));
+        : h('button', { class: 'btn', title: 'Funktion von KuentaPOS Pro', onclick: () => App.proHinweis('sms') }, '🔒 Per SMS erinnern (Pro)'),
+      App.pro('whatsapp') ? h('button', { class: 'btn', onclick: () => erinnern('whatsapp') }, '🟢 Per WhatsApp erinnern') : null,
+      App.pro('telegram') ? h('button', { class: 'btn', onclick: () => erinnern('telegram') }, '✈️ Per Telegram erinnern') : null));
   await load();
 };
 
@@ -712,7 +715,7 @@ Views.einstellungen = async (main) => {
       Win.open({ title: 'Erinnerungsprotokoll', width: 900, height: 560, content: miniGrid([{ f: 'ZEIT', l: 'Zeit', w: 140 }, { f: 'KENNZEICHEN', l: 'Kennzeichen', w: 110 }, { f: 'ART', l: 'Termin', w: 90 }, { f: 'TERMIN', l: 'fällig', w: 90, t: 'date' }, { f: 'KANAL', l: 'Weg', w: 60 }, { f: 'AN', l: 'An', w: 190 }, { f: 'STATUS', l: 'Status', w: 90 }, { f: 'FEHLER', l: 'Fehler', w: 260 }], rows).el });
     };
     p.append(h('div', { class: 'groups' },
-      grp('Erinnerungen an Fahrzeugtermine', fld('Betreff der E-Mail', betreff), fld('Text der E-Mail', text), fld('Text der SMS', sms), zaehler,
+      grp('Erinnerungen an Fahrzeugtermine', fld('Betreff der E-Mail', betreff), fld('Text der E-Mail', text), fld('Text der SMS (auch für Erinnerungen per Telegram)', sms), zaehler,
         h('div', { class: 'fld hint' }, 'Platzhalter: {Briefanrede} {Anrede} {Name} {Vorname} {Kennzeichen} {Fahrzeug} {Termin} {Terminart} {Firma} {Telefon}. Feld leeren = Vorgabe. E-Mails gehen über die Versandart im Reiter „E-Mail“.'),
         h('div', { class: 'fld' }, h('button', { class: 'btn', onclick: protokoll }, '📋 Erinnerungsprotokoll'))),
       grp('SMS-Gateway', ...(App.pro('sms') ? [] : [h('div', { class: 'fld note info' }, 'SMS-Versand ist eine Funktion von KuentaPOS Pro. Sie können das Gateway schon einrichten, senden lassen sich SMS erst mit Lizenz (Reiter „Lizenz“).')]), fld('Vorlage', vorlage), fld('Methode', methode, true), fld('Format', format, true), fld('Adresse (URL)', url),
@@ -720,6 +723,50 @@ Views.einstellungen = async (main) => {
         fld('Benutzer (Basic-Anmeldung)', benutzer, true), fld('Passwort', passwort, true), fld('Absender (höchstens 11 Zeichen, falls unterstützt)', absender),
         h('div', { class: 'fld hint' }, 'Platzhalter für das Gateway: {nummer} (+4917…), {nummer_ohne_plus}, {text}, {absender}. Sie werden automatisch passend kodiert.'),
         h('div', { class: 'fld' }, h('button', { class: 'btn', onclick: testen }, '📱 Einstellungen speichern & Test-SMS senden')))));
+  });
+  addTab('WhatsApp & Telegram', p => {
+    const textfeld = (k, rows) => { const t = h('textarea', { rows }, s.sw[k] || ''); t.addEventListener('change', () => { changes.sw[k] = t.value; }); return t; };
+    const fertig = textfeld('nachricht.fertig', 4); const beleg = textfeld('nachricht.beleg', 2);
+    api('/api/nachricht/vorlagen').then(v => { if (!fertig.value) fertig.value = v.fertig; if (!beleg.value) beleg.value = v.beleg; }).catch(() => {});
+    const speichern = () => api('/api/einstellungen', { method: 'PUT', body: changes });
+    const waTest = async () => {
+      try {
+        await speichern();
+        const an = await promptDlg('Test-Nachricht per WhatsApp senden an (Mobilnummer)', ''); if (!an) return;
+        const r = await api('/api/whatsapp/test', { method: 'POST', body: { an } });
+        toast(`WhatsApp-Testnachricht an ${r.an} gesendet`, 'ok');
+      } catch (e) { showError(e); }
+    };
+    const tgTest = async () => {
+      try { await speichern(); const r = await api('/api/telegram/test', { method: 'POST' }); toast(`Telegram-Bot @${r.bot.username} ist erreichbar`, 'ok'); } catch (e) { showError(e); }
+    };
+    const protokoll = async () => {
+      const rows = await api('/api/nachricht/protokoll');
+      Win.open({ title: 'Nachrichtenprotokoll', width: 960, height: 560, content: miniGrid([{ f: 'ZEIT', l: 'Zeit', w: 140 }, { f: 'KANAL', l: 'Weg', w: 80 }, { f: 'ART', l: 'Art', w: 70 }, { f: 'KUNDE', l: 'Kunde', w: 160 }, { f: 'AN', l: 'An', w: 150 }, { f: 'TEXT', l: 'Inhalt', w: 260 }, { f: 'STATUS', l: 'Status', w: 80 }, { f: 'FEHLER', l: 'Fehler', w: 240 }], rows).el });
+    };
+    const ohneLizenz = f => App.pro(f) ? [] : [h('div', { class: 'fld note info' }, `${f === 'whatsapp' ? 'WhatsApp Business' : 'Telegram'} ist ein Add-on von KuentaPOS Pro (20 $). Sie können es schon einrichten, senden lässt es sich erst mit Lizenz (Reiter „Lizenz“).`)];
+    p.append(h('div', { class: 'groups' },
+      grp('WhatsApp Business', ...ohneLizenz('whatsapp'),
+        h('div', { class: 'fld hint' }, 'Benötigt wird ein WhatsApp-Business-Konto bei Meta mit der WhatsApp Cloud API (developers.facebook.com). Dort finden Sie die Telefonnummer-ID und erstellen einen dauerhaften Zugriffstoken für einen System-Benutzer.'),
+        si('whatsapp.nummerid', 'Telefonnummer-ID (Phone number ID)', '', true), si('whatsapp.version', 'API-Version', 'v21.0', true),
+        si('whatsapp.token', 'Zugriffstoken', '', false, 'password'),
+        si('whatsapp.sprache', 'Sprache der Vorlagen (z. B. de, en_US; leer = Belegsprache)', '', true),
+        si('whatsapp.vorlage.erinnerung', 'Vorlage für Erinnerungen', 'fahrzeugtermin', true),
+        si('whatsapp.vorlage.beleg', 'Vorlage für Belege', 'beleg', true),
+        si('whatsapp.vorlage.fertig', 'Vorlage „Fahrzeug fertig“', 'fahrzeug_fertig', true),
+        h('div', { class: 'fld hint' }, 'Nachrichten, die Sie an Kunden schicken, müssen bei WhatsApp Vorlagen sein, die Meta freigegeben hat. Legen Sie die drei Vorlagen im WhatsApp Manager an. KuentaPOS füllt die Variablen in dieser Reihenfolge:'),
+        h('div', { class: 'fld hint' }, 'Erinnerung: 1 Name, 2 Terminart, 3 Kennzeichen, 4 Termin, 5 Firma, 6 Telefon'),
+        h('div', { class: 'fld hint' }, 'Beleg: Kopfzeile vom Typ „Dokument“ (das PDF), 1 Name, 2 Belegart, 3 Nummer, 4 Firma'),
+        h('div', { class: 'fld hint' }, 'Fahrzeug fertig: 1 Name, 2 Kennzeichen, 3 Firma, 4 Telefon'),
+        h('div', { class: 'fld' }, h('button', { class: 'btn', onclick: waTest }, '🟢 Einstellungen speichern & Testnachricht senden')),
+        h('div', { class: 'fld hint' }, 'Die Testnachricht ist die Vorlage „hello_world“, die es in jedem WhatsApp-Business-Konto gibt.')),
+      grp('Telegram', ...ohneLizenz('telegram'),
+        h('div', { class: 'fld hint' }, 'In Telegram @BotFather öffnen, /newbot senden, einen Namen vergeben und den Token hier eintragen. Kunden verbinden sich einmalig über den Link oder QR-Code, den KuentaPOS beim Senden anzeigt. Danach gehen Erinnerungen, Belege und Fertigmeldungen an ihren Telegram-Chat.'),
+        si('telegram.token', 'Bot-Token (von @BotFather)', '', false, 'password'),
+        h('div', { class: 'fld' }, h('button', { class: 'btn', onclick: tgTest }, '✈️ Einstellungen speichern & Bot prüfen'))),
+      grp('Texte für Telegram und SMS', fld('Nachricht „Fahrzeug fertig“', fertig), fld('Begleittext zu Belegen', beleg),
+        h('div', { class: 'fld hint' }, 'Platzhalter: {Name} {Kennzeichen} {Firma} {Telefon}, bei Belegen zusätzlich {Vorgang} {Nummer} {Betrag}. Feld leeren = Vorgabe. Erinnerungen per Telegram verwenden den SMS-Text aus dem Reiter „Erinnerungen & SMS“.'),
+        h('div', { class: 'fld' }, h('button', { class: 'btn', onclick: protokoll }, '📋 Nachrichtenprotokoll')))));
   });
   addTab('Lizenz', p => {
     const box = h('div', { class: 'groups' });

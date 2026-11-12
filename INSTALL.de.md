@@ -167,12 +167,12 @@ Im KuentaPOS-Ordner (dort liegt das `Dockerfile`):
 
 ```sh
 # Podman
-podman build -t kuentapos:1.8.4 .
-podman run -d --name kuentapos --restart unless-stopped -p 3700:3700 -v kuentapos-daten:/data kuentapos:1.8.4
+podman build -t kuentapos:1.9.0 .
+podman run -d --name kuentapos --restart unless-stopped -p 3700:3700 -v kuentapos-daten:/data kuentapos:1.9.0
 
 # Docker
-docker build -t kuentapos:1.8.4 .
-docker run -d --name kuentapos --restart unless-stopped -p 3700:3700 -v kuentapos-daten:/data kuentapos:1.8.4
+docker build -t kuentapos:1.9.0 .
+docker run -d --name kuentapos --restart unless-stopped -p 3700:3700 -v kuentapos-daten:/data kuentapos:1.9.0
 ```
 
 Oder mit Compose (Datei `compose.yaml` liegt bei):
@@ -210,9 +210,9 @@ podman start kuentapos          # wieder starten
 **Update:** neue Version holen, Image neu bauen und den Container neu anlegen. Die Daten im Volume bleiben erhalten:
 
 ```sh
-podman build -t kuentapos:1.8.4 .
+podman build -t kuentapos:1.9.0 .
 podman rm -f kuentapos
-podman run -d --name kuentapos --restart unless-stopped -p 3700:3700 -v kuentapos-daten:/data kuentapos:1.8.4
+podman run -d --name kuentapos --restart unless-stopped -p 3700:3700 -v kuentapos-daten:/data kuentapos:1.9.0
 ```
 
 Mit Compose: `docker compose up -d --build`.
@@ -223,7 +223,7 @@ Mit Compose: `docker compose up -d --build`.
 
 ```ini
 [Container]
-Image=localhost/kuentapos:1.8.4
+Image=localhost/kuentapos:1.9.0
 ContainerName=kuentapos
 PublishPort=3700:3700
 Volume=kuentapos-daten:/data

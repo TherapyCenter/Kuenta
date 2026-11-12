@@ -63,6 +63,7 @@ const Vorgang = {
       ...(v.table === 'RECHNUNGEN' && Vorgang.land() === 'DE' ? [{ label: 'ZUGFeRD-PDF herunterladen', icon: '🧾', onClick: () => Vorgang.zugferd(id) }] : []),
       ...(v.table === 'RECHNUNGEN' && Vorgang.land() === 'FR' ? [{ label: 'Factur-X-PDF herunterladen', icon: '🧾', onClick: () => Vorgang.zugferd(id) }] : []),
       { label: 'Per E-Mail senden', icon: '✉️', onClick: () => Mail.dialog('vorgang', typ, id).then(reload) },
+      ...Nachricht.menuEintraege(typ, id),
       '-',
     ];
     if (typ === 'auftrag') items.push({ label: 'Anzahlung / Abschlag…', icon: '💰', onClick: () => Anzahlung.dialog(id).then(reload) });
@@ -942,10 +943,12 @@ class VorgangWindow {
         { label: 'PDF herunterladen', icon: '📄', onClick: () => this.withSaved(async () => { await Vorgang.pdf(this.typ, this.id); this.reloadEs(); }) },
         ...(isRe && Vorgang.land() === 'FR' ? [{ label: 'Factur-X-PDF', icon: '🧾', onClick: () => this.withSaved(() => Vorgang.zugferd(this.id)) }] : []),
         ...(isRe && Vorgang.land() === 'DE' ? [{ label: 'ZUGFeRD-PDF (mit XRechnung)', icon: '🧾', onClick: () => this.withSaved(() => Vorgang.zugferd(this.id)) }] : []),
-        { label: 'Per E-Mail senden…', icon: '✉️', onClick: () => this.withSaved(async () => { await Mail.dialog('vorgang', this.typ, this.id); }) }]);
+        { label: 'Per E-Mail senden…', icon: '✉️', onClick: () => this.withSaved(async () => { await Mail.dialog('vorgang', this.typ, this.id); }) },
+        ...Nachricht.menuEintraege(this.typ, () => this.id, f => this.withSaved(f))]);
       m.style.transform = 'translateY(-100%)';
     } }, h('span', { class: 'ico' }, '✉️'), 'PDF / E-Mail ▾'));
     if (this.typ === 'auftrag') items.push(h('button', { class: 'btn', onclick: () => this.withSaved(() => Anzahlung.dialog(this.id)) }, h('span', { class: 'ico' }, '💰'), 'Anzahlung'));
+    if (this.typ === 'auftrag' && ['whatsapp', 'telegram', 'sms'].some(k => App.pro(k))) items.push(h('button', { class: 'btn', onclick: () => this.withSaved(() => Nachricht.fertig(this.id)) }, h('span', { class: 'ico' }, '🔔'), 'Fertig melden'));
     if (isRe && Vorgang.es()) { this.esBox = h('span', { class: 'es-status' }); items.push(this.esBox); this.drawEs(); }
     items.push('|',
       { label: 'Speichern', icon: '💾', title: 'Speichern (Strg+S)', onClick: () => this.save(false) },

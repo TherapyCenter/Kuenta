@@ -100,6 +100,28 @@ module.exports = function register(route, { json, readBody }) {
       return { ok: true, anhaenge: entry.anhaenge, programm };
     } catch (e) { MAIL.log({ ...entry, status: 'Fehler', fehler: e.message }); throw e; }
   });
+  // ---------- WhatsApp Business / Telegram (Pro add-ons): documents, "vehicle ready", tests ----------
+  const NR = require('./nachrichten');
+  const benutzer = ctx => ctx.user && ctx.user.name;
+  route('GET', '/api/nachricht/kanaele', () => NR.kanaele());
+  route('GET', '/api/nachricht/vorlagen', () => ({ ...NR.vorlagen(), whatsapp: require('./pro/whatsapp').PARAMETER }));
+  route('GET', '/api/nachricht/protokoll', () => NR.liste());
+  route('GET', '/api/nachricht/fertig/:id', (ctx) => NR.fertigVorschau(Number(ctx.p.id)));
+  route('POST', '/api/nachricht/fertig', async (ctx) => { const b = await json(ctx.req); return NR.fertigSenden({ auftragid: Number(b.id), kanal: b.kanal, an: b.an, text: b.text, benutzer: benutzer(ctx) }); });
+  route('GET', '/api/nachricht/beleg/:typ/:id', (ctx) => NR.belegVorschau(ctx.p.typ, Number(ctx.p.id)));
+  route('POST', '/api/nachricht/beleg', async (ctx) => {
+    const b = await json(ctx.req);
+    if (!V[b.typ]) throw new L.HttpError(400, 'Unbekannte Belegart.');
+    const p = vorgangPdf(b.typ, b.id);
+    return NR.belegSenden({ typ: b.typ, id: Number(b.id), kanal: b.kanal, an: b.an, text: b.text, benutzer: benutzer(ctx), pdf: { buf: p.buf, name: fname(p.name) } });
+  });
+  route('POST', '/api/whatsapp/test', async (ctx) => { const b = await json(ctx.req); return require('./pro/whatsapp').test(b.an); });
+  route('POST', '/api/telegram/test', async () => ({ ok: true, bot: await require('./pro/telegram').bot() }));
+  route('GET', '/api/telegram/link/:kunid', (ctx) => require('./pro/telegram').link(Number(ctx.p.kunid)));
+  route('DELETE', '/api/telegram/link/:kunid', (ctx) => require('./pro/telegram').trennen(Number(ctx.p.kunid)));
+  // fetch right away (the dialog waits for the customer to press "Start")
+  route('POST', '/api/telegram/abholen/:kunid', async (ctx) => { await require('./pro/telegram').abholen(); return NR.empfaenger(NR.kunde(Number(ctx.p.kunid))); });
+
   route('POST', '/api/mail/test', async (ctx) => { const b = await json(ctx.req); await MAIL.send({ to: b.to, subject: 'Testnachricht von KuentaPOS', text: 'Der E-Mail-Versand aus KuentaPOS funktioniert.' }); return { ok: true }; });
   route('POST', '/api/mail/programm-test', async (ctx) => {
     await json(ctx.req);

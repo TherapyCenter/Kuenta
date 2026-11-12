@@ -156,7 +156,7 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
     <div class="kicker">Invoicing &amp; POS for auto repair shops · Bedienung, Einrichtung, Betrieb</div>
     <h1>KuentaPOS Handbuch</h1>
     <p>Alles, was Sie für Installation, Einrichtung, die tägliche Arbeit, den E-Mail-Versand, Updates und die Datensicherung von KuentaPOS wissen müssen.</p>
-    <div class="meta"><span>Version <b>1.8.4</b></span><span>Stand <b>November 2026</b></span><span>Windows · macOS · Linux · Tablet</span><span><a href="handbook-en.html" hreflang="en">English</a> · <a href="handbook-es.html" hreflang="es">Español</a></span></div>
+    <div class="meta"><span>Version <b>1.9.0</b></span><span>Stand <b>November 2026</b></span><span>Windows · macOS · Linux · Tablet</span><span><a href="handbook-en.html" hreflang="en">English</a> · <a href="handbook-es.html" hreflang="es">Español</a></span></div>
   </header>
 
   <nav class="toc" aria-label="Inhalt">
@@ -205,7 +205,7 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
 
       <h3>Windows 10 / 11 (64 Bit)</h3>
       <ol class="steps">
-        <li><div><strong><code>KuentaPOS-Setup-1.8.4.exe</code> ausführen.</strong><span>Node.js ist im Installer enthalten, es muss nichts weiter installiert werden.</span></div></li>
+        <li><div><strong><code>KuentaPOS-Setup-1.9.0.exe</code> ausführen.</strong><span>Node.js ist im Installer enthalten, es muss nichts weiter installiert werden.</span></div></li>
         <li><div><strong>Installationsart wählen.</strong><span><em>Für alle Benutzer</em> (Standard, braucht Administratorrechte) installiert nach <code>C:\Programme\KuentaPOS</code>. <em>Nur für mich</em> kommt ohne Administratorrechte aus und installiert ins Benutzerprofil.</span></div></li>
         <li><div><strong>Optionen auswählen.</strong><span>Desktop-Verknüpfung und, für den Netzwerkbetrieb, die Firewall-Freigabe (nur bei Installation für alle Benutzer).</span></div></li>
         <li><div><strong>Starten:</strong><span>Startmenü <span class="path">KuentaPOS</span>. Es öffnen sich das Konsolenfenster und der Browser mit <code>http://127.0.0.1:3700</code>.</span></div></li>
@@ -260,9 +260,9 @@ loginctl enable-linger "$USER"</code></pre></div>
       <h3>Container (Docker / Podman)</h3>
       <p>Für Linux-Server, NAS-Systeme, Raspberry Pi oder Macs läuft KuentaPOS auch im Container. Das Image bringt Node.js mit und läuft auf x86_64 und ARM64. Im KuentaPOS-Ordner liegen dafür ein <code>Dockerfile</code> und eine <code>compose.yaml</code>.</p>
       <div class="codeblock"><pre><code># Podman (bei Docker: podman durch docker ersetzen)
-podman build -t kuentapos:1.8.4 .
+podman build -t kuentapos:1.9.0 .
 podman run -d --name kuentapos --restart unless-stopped \
-  -p 3700:3700 -v kuentapos-daten:/data kuentapos:1.8.4
+  -p 3700:3700 -v kuentapos-daten:/data kuentapos:1.9.0
 
 # oder mit Compose
 docker compose up -d --build</code></pre></div>
@@ -312,6 +312,7 @@ docker compose up -d --build</code></pre></div>
           <tr><td>E-Mail</td><td>Versandart, Thunderbird-Pfad, SMTP-Server, Vorlagen, Signatur, Versandprotokoll</td></tr>
           <tr><td>Lizenz</td><td>KuentaPOS-Pro-Lizenzschlüssel einspielen oder entfernen, Stand der Lizenz (siehe <a href="#pro">KuentaPOS Pro</a>)</td></tr>
           <tr><td>Erinnerungen &amp; SMS</td><td>Texte der Termin-Erinnerungen per E-Mail und SMS, SMS-Gateway mit Vorlagen und Test, Erinnerungsprotokoll (siehe <a href="#erinnerungen">Erinnerungen</a>)</td></tr>
+          <tr><td>WhatsApp &amp; Telegram</td><td>Zugang zur WhatsApp Cloud API und Namen der Vorlagen, Telegram-Bot, Texte für „Fahrzeug fertig“ und Belege, Nachrichtenprotokoll (siehe <a href="#messenger">WhatsApp und Telegram</a>)</td></tr>
           <tr><td>Kasse</td><td>TSE (fiskaly), EC-Terminal (ZVT), Schnelltasten, Barverkaufskunde</td></tr>
           <tr><td>Zeiterfassung</td><td>Vorgaben zur Zeiterfassung, Bundesland für die Feiertage</td></tr>
           <tr><td>Einkauf / Handel</td><td>Gegenkonto für Eingangsrechnungen, Kreditor, Erlöskonten Fahrzeugverkauf (Regelbesteuerung und § 25a)</td></tr>
@@ -736,6 +737,44 @@ docker compose up -d --build</code></pre></div>
       <p>Alle Erinnerungen stehen im <strong>Erinnerungsprotokoll</strong> (<span class="path">Einstellungen → Erinnerungen &amp; SMS</span>) mit Zeit, Fahrzeug, Weg, Empfänger und Status. E-Mails stehen zusätzlich im E-Mail-Versandprotokoll.</p>
     </section>
 
+    <section id="messenger">
+      <h2>WhatsApp Business und Telegram</h2>
+      <p class="lead">Mit den Add-ons WhatsApp Business und Telegram schicken Sie Kunden Erinnerungen an Fahrzeugtermine, Belege als PDF und die Nachricht „Fahrzeug fertig“ direkt aufs Handy. Jedes Add-on kostet einmalig 20 $ und lässt sich einzeln kaufen, siehe <a href="#pro">KuentaPOS Pro</a>.</p>
+      <h3>Was geht wo?</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Funktion</th><th>Wo</th></tr></thead>
+        <tbody>
+          <tr><td>Erinnerung an HU, Inspektion …</td><td><span class="path">Auswertung → Fahrzeugtermine</span> → „Per WhatsApp erinnern“ bzw. „Per Telegram erinnern“</td></tr>
+          <tr><td>Beleg als PDF (Angebot, Auftrag, Lieferschein, Rechnung …)</td><td>im Beleg unter „PDF / E-Mail“ oder im Kontextmenü der Liste → „Per WhatsApp senden…“ bzw. „Per Telegram senden…“</td></tr>
+          <tr><td>Fahrzeug fertig</td><td>im Auftrag der Knopf „Fertig melden“. Mit dem SMS-Add-on geht das auch per SMS.</td></tr>
+        </tbody>
+      </table></div>
+      <p>Alle Nachrichten stehen im <strong>Nachrichtenprotokoll</strong> (<span class="path">Einstellungen → WhatsApp &amp; Telegram</span>), Erinnerungen zusätzlich im Erinnerungsprotokoll.</p>
+      <h3>WhatsApp Business einrichten</h3>
+      <ol class="steps">
+        <li><div><strong>Konto bei Meta</strong><span>Sie brauchen ein WhatsApp-Business-Konto mit der WhatsApp Cloud API (developers.facebook.com) und eine eigene Telefonnummer dafür. Die normale WhatsApp-Business-App auf dem Handy reicht nicht.</span></div></li>
+        <li><div><strong>Zugangsdaten eintragen</strong><span>Telefonnummer-ID und einen dauerhaften Zugriffstoken (System-Benutzer) unter <span class="path">Einstellungen → WhatsApp &amp; Telegram</span> eintragen. „Testnachricht senden“ verschickt die Vorlage „hello_world“.</span></div></li>
+        <li><div><strong>Vorlagen anlegen</strong><span>Nachrichten an Kunden müssen bei WhatsApp von Meta freigegebene Vorlagen sein. Legen Sie im WhatsApp Manager drei Vorlagen an und tragen Sie ihre Namen ein (Vorgabe: <code>fahrzeugtermin</code>, <code>beleg</code>, <code>fahrzeug_fertig</code>).</span></div></li>
+      </ol>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Vorlage</th><th>Variablen in dieser Reihenfolge</th></tr></thead>
+        <tbody>
+          <tr><td>Erinnerung</td><td>1 Name, 2 Terminart, 3 Kennzeichen, 4 Termin, 5 Firma, 6 Telefon</td></tr>
+          <tr><td>Beleg</td><td>Kopfzeile vom Typ „Dokument“ (das PDF), 1 Name, 2 Belegart, 3 Nummer, 4 Firma</td></tr>
+          <tr><td>Fahrzeug fertig</td><td>1 Name, 2 Kennzeichen, 3 Firma, 4 Telefon</td></tr>
+        </tbody>
+      </table></div>
+      <p>WhatsApp geht an die Mobilnummer des Kunden (Feld „Mobil“, sonst „Telefon“, wenn dort eine Mobilnummer steht). Meta berechnet Nachrichten nach Vorlage je nach Land und Art.</p>
+      <h3>Telegram einrichten</h3>
+      <ol class="steps">
+        <li><div><strong>Bot anlegen</strong><span>In Telegram <code>@BotFather</code> öffnen, <code>/newbot</code> senden, einen Namen vergeben. Den Token unter <span class="path">Einstellungen → WhatsApp &amp; Telegram</span> eintragen und „Bot prüfen“ klicken.</span></div></li>
+        <li><div><strong>Kunden verbinden</strong><span>Ein Bot kann keine Telefonnummer anschreiben. Beim ersten Senden zeigt KuentaPOS einen QR-Code und einen Link. Der Kunde scannt ihn und drückt in Telegram auf „Start“, dann ist er verbunden. Im Kundenstamm steht unter „Kontakt“, mit wem.</span></div></li>
+        <li><div><strong>Abmelden</strong><span>Schreibt der Kunde <code>/stop</code> an den Bot, bekommt er keine Nachrichten mehr.</span></div></li>
+      </ol>
+      <p>Die Texte für „Fahrzeug fertig“ und den Begleittext zu Belegen stellen Sie unter <span class="path">Einstellungen → WhatsApp &amp; Telegram</span> ein. Erinnerungen per Telegram verwenden den SMS-Text. KuentaPOS fragt den Bot alle 20 Sekunden nach neuen Nachrichten, dafür braucht er nur Internet, keine öffentliche Adresse.</p>
+      <div class="note"><strong>Einwilligung</strong><span>Auch für WhatsApp und Telegram gilt: Erinnerungen sind Werbung. Schreiben Sie nur Kunden an, die zugestimmt haben. Das Häkchen „Keine Erinnerungen“ beim Kunden gilt für alle Wege.</span></div>
+    </section>
+
     <section id="krypto">
       <h2>Krypto-Zahlung: Bitcoin, Lightning, USDT</h2>
       <p class="lead">Kunden können Rechnungen mit Bitcoin, Lightning oder USDT bezahlen. KuentaPOS nutzt dafür einen eigenen <strong>BTCPay Server</strong>. Das ist kostenlose Open-Source-Software, die kein Geld verwahrt: Die Zahlungen gehen direkt in Ihr eigenes Wallet. Die Funktion ist in KuentaPOS kostenlos enthalten.</p>
@@ -838,7 +877,7 @@ docker compose up -d --build</code></pre></div>
       </ol>
       <h3>Ohne Rückfragen ausrollen</h3>
       <p>Für Skripte oder Softwareverteilung:</p>
-      <div class="codeblock"><pre><code>KuentaPOS-Setup-1.8.4.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART</code></pre></div>
+      <div class="codeblock"><pre><code>KuentaPOS-Setup-1.9.0.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART</code></pre></div>
       <div class="tablewrap"><table>
         <thead><tr><th>Schalter</th><th>Wirkung</th></tr></thead>
         <tbody>
@@ -992,7 +1031,7 @@ npm run installer:windows   # Windows-Installer bauen</code></pre></div>
     </section>
   </main>
 
-  <footer>KuentaPOS 1.8.4 · © 2026 Doc · Open Source unter der GNU AGPL 3.0, Pro-Funktionen mit Lizenz · Schrift in den Belegen: Liberation Sans (SIL Open Font License) · QR-Code: qrcode-generator (MIT)</footer>
+  <footer>KuentaPOS 1.9.0 · © 2026 Doc · Open Source unter der GNU AGPL 3.0, Pro-Funktionen mit Lizenz · Schrift in den Belegen: Liberation Sans (SIL Open Font License) · QR-Code: qrcode-generator (MIT)</footer>
 </div>
 
 <script>

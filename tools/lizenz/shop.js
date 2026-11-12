@@ -20,8 +20,8 @@ const VORLAGE = {
   btcpay: { url: 'https://pay.example.de', storeId: 'STORE-ID', apiKey: 'API-SCHLÜSSEL (nur Recht: Rechnungen ansehen)' },
   smtp: { host: 'smtp.example.de', port: 587, secure: 'starttls', user: 'benutzer', pass: 'passwort', from: 'lizenz@example.de', fromName: 'KuentaPOS Pro', bcc: '' },
   sprache: 'de',
-  artikel: { sms: 'sms', pro: 'pro' },
-  bekannteFunktionen: ['sms', 'pro'],
+  artikel: { sms: 'sms', whatsapp: 'whatsapp', telegram: 'telegram', pro: 'pro' },
+  bekannteFunktionen: ['sms', 'whatsapp', 'telegram', 'pro'],
 };
 
 function dateien(home) {

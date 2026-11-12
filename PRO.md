@@ -13,6 +13,8 @@ The licensor is the open source developer **Doc**. Buying an add-on funds furthe
 | Add-on | since | Price |
 |---|---|---|
 | **SMS:** SMS reminders of the HU (German MOT), service and other due dates, SMS gateway (provider, Android phone, USB modem via the KuentaPOS SMS relay) | 1.0.8 | $20 |
+| **WhatsApp Business:** reminders of due dates, documents (quotes, orders, invoices …) as PDF and the message "vehicle ready" via the WhatsApp Cloud API of Meta, with your own WhatsApp Business account and approved templates | 1.9.0 | $20 |
+| **Telegram:** reminders, documents as PDF and "vehicle ready" via your own Telegram bot; customers connect once by QR code or link | 1.9.0 | $20 |
 
 The price is per add-on, one-off and unlimited, for one installation with all companies.
 Payment is made with Bitcoin or Tether at the euro rate on the day of payment.

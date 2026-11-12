@@ -24,8 +24,10 @@ nur einen API-Schlüssel mit Leserecht und kann selbst keine Lizenzen erzeugen.
 
 1. Im Store eine App vom Typ **Point of Sale** anlegen, Darstellung „Produktliste“ oder „Warenkorb“.
 2. Je Add-on einen Artikel anlegen. **Die Artikel-ID muss der KuentaPOS-Funktionsname sein:**
-   `sms` (SMS-Add-on, 20 US-Dollar), optional `pro` (alle Add-ons). Abweichende IDs ordnen Sie in
-   `shop.json` unter `artikel` zu, z. B. `"sms-addon": "sms"`.
+   `sms` (SMS-Add-on, 20 US-Dollar), `whatsapp` (WhatsApp Business, 20 US-Dollar), `telegram` (Telegram,
+   20 US-Dollar), optional `pro` (alle Add-ons). Abweichende IDs ordnen Sie in `shop.json` unter `artikel` zu,
+   z. B. `"sms-addon": "sms"`. Steht in Ihrer `shop.json` eine eigene Liste `bekannteFunktionen`, ergänzen Sie dort
+   `whatsapp` und `telegram`.
 3. Unter *Formulare* ein Formular mit den Feldern **`buyerName`** (Beschriftung „Name der
    Werkstatt“, Pflicht) und **`buyerEmail`** (E-Mail, Pflicht) anlegen und der App zuweisen.
 4. Unter *Konto → API-Schlüssel* einen Schlüssel nur mit dem Recht **„Rechnungen ansehen“**

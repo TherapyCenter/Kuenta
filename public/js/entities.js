@@ -74,6 +74,7 @@
           { f: 'FAX', l: 'Fax' },
           { f: 'EMAIL', l: 'E-Mail', t: 'email' },
           { f: 'INTERNETSEITE', l: 'Internetseite' },
+          { f: 'TELEGRAM_NAME', l: 'Telegram (verbunden mit)', ro: true },
           { f: 'KEINEERINNERUNG', l: 'Keine Erinnerungen per E-Mail/SMS', t: 'bool' },
         ] },
         { title: 'Anmerkung', fields: [

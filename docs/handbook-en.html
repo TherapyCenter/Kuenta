@@ -156,7 +156,7 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
     <div class="kicker">Invoicing &amp; POS for auto repair shops · use, setup, operation</div>
     <h1>KuentaPOS Handbook</h1>
     <p>Everything you need to know about installing and setting up KuentaPOS, daily work, sending email, updates and backups.</p>
-    <div class="meta"><span>Version <b>1.8.4</b></span><span>As of <b>November 2026</b></span><span>Windows · macOS · Linux · Tablet</span><span><a href="handbuch.html" hreflang="de">Deutsch</a> · <a href="handbook-es.html" hreflang="es">Español</a></span></div>
+    <div class="meta"><span>Version <b>1.9.0</b></span><span>As of <b>November 2026</b></span><span>Windows · macOS · Linux · Tablet</span><span><a href="handbuch.html" hreflang="de">Deutsch</a> · <a href="handbook-es.html" hreflang="es">Español</a></span></div>
   </header>
 
   <nav class="toc" aria-label="Contents">
@@ -207,7 +207,7 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
 
       <h3>Windows 10 / 11 (64 bit)</h3>
       <ol class="steps">
-        <li><div><strong>Run <code>KuentaPOS-Setup-1.8.4.exe</code>.</strong><span>Node.js is included in the installer, nothing else needs to be installed.</span></div></li>
+        <li><div><strong>Run <code>KuentaPOS-Setup-1.9.0.exe</code>.</strong><span>Node.js is included in the installer, nothing else needs to be installed.</span></div></li>
         <li><div><strong>Choose the installation type.</strong><span><em>For all users</em> (default, needs administrator rights) installs to <code>C:\Program Files\KuentaPOS</code>. <em>Only for me</em> needs no administrator rights and installs into the user profile.</span></div></li>
         <li><div><strong>Choose options.</strong><span>Desktop shortcut and, for network mode, the firewall rule (only when installing for all users).</span></div></li>
         <li><div><strong>Start:</strong><span>Start menu <span class="path">KuentaPOS</span>. The console window opens, and the browser opens <code>http://127.0.0.1:3700</code>.</span></div></li>
@@ -263,9 +263,9 @@ loginctl enable-linger "$USER"</code></pre></div>
       <h3>Container (Docker / Podman)</h3>
       <p>For Linux servers, NAS systems, Raspberry Pi or Macs, KuentaPOS also runs in a container. The image includes Node.js and runs on x86_64 and ARM64. The KuentaPOS folder contains a <code>Dockerfile</code> and a <code>compose.yaml</code> for this.</p>
       <div class="codeblock"><pre><code># Podman (for Docker replace podman with docker)
-podman build -t kuentapos:1.8.4 .
+podman build -t kuentapos:1.9.0 .
 podman run -d --name kuentapos --restart unless-stopped \
-  -p 3700:3700 -v kuentapos-daten:/data kuentapos:1.8.4
+  -p 3700:3700 -v kuentapos-daten:/data kuentapos:1.9.0
 
 # or with Compose
 docker compose up -d --build</code></pre></div>
@@ -316,6 +316,7 @@ docker compose up -d --build</code></pre></div>
           <tr><td>Email</td><td>sending method, Thunderbird path, SMTP server, templates, signature, sending log</td></tr>
           <tr><td>License</td><td>install or remove the KuentaPOS Pro license key, license status (see <a href="#pro">KuentaPOS Pro</a>)</td></tr>
           <tr><td>Reminders &amp; SMS</td><td>texts of due date reminders by email and SMS, SMS gateway with templates and test, reminder log (see <a href="#erinnerungen">Reminders</a>)</td></tr>
+          <tr><td>WhatsApp &amp; Telegram</td><td>access to the WhatsApp Cloud API and template names, Telegram bot, texts for "vehicle ready" and documents, message log (see <a href="#messenger">WhatsApp and Telegram</a>)</td></tr>
           <tr><td>Cash register</td><td>TSE (fiskaly), card terminal (ZVT), quick keys, cash sale customer</td></tr>
           <tr><td>Time tracking</td><td>time tracking defaults, federal state for public holidays</td></tr>
           <tr><td>Purchasing / trading</td><td>contra account for incoming invoices, creditor, revenue accounts for vehicle sales (standard taxation and § 25a)</td></tr>
@@ -741,6 +742,44 @@ docker compose up -d --build</code></pre></div>
       <p>All reminders are listed in the <strong>reminder log</strong> (<span class="path">Settings → Reminders &amp; SMS</span>) with time, vehicle, channel, recipient and status. Emails are also listed in the email sending log.</p>
     </section>
 
+    <section id="messenger">
+      <h2>WhatsApp Business and Telegram</h2>
+      <p class="lead">With the WhatsApp Business and Telegram add-ons you send customers reminders of vehicle due dates, documents as PDF and the message "vehicle ready" straight to their phone. Each add-on costs $20 once and can be bought on its own, see <a href="#pro">KuentaPOS Pro</a>.</p>
+      <h3>What is where?</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Function</th><th>Where</th></tr></thead>
+        <tbody>
+          <tr><td>Reminder of HU, service …</td><td><span class="path">Reports → Vehicle due dates</span> → "Remind by WhatsApp" or "Remind by Telegram"</td></tr>
+          <tr><td>Document as PDF (quote, order, delivery note, invoice …)</td><td>in the document under "PDF / email" or in the context menu of the list → "Send by WhatsApp…" or "Send by Telegram…"</td></tr>
+          <tr><td>Vehicle ready</td><td>the button "Report ready" in the order. With the SMS add-on this works by SMS too.</td></tr>
+        </tbody>
+      </table></div>
+      <p>All messages are listed in the <strong>message log</strong> (<span class="path">Settings → WhatsApp &amp; Telegram</span>), reminders also in the reminder log.</p>
+      <h3>Setting up WhatsApp Business</h3>
+      <ol class="steps">
+        <li><div><strong>Account at Meta</strong><span>You need a WhatsApp Business account with the WhatsApp Cloud API (developers.facebook.com) and a phone number of its own. The normal WhatsApp Business app on the phone is not enough.</span></div></li>
+        <li><div><strong>Enter the access data</strong><span>Enter the phone number ID and a permanent access token (system user) under <span class="path">Settings → WhatsApp &amp; Telegram</span>. "Send test message" sends the template "hello_world".</span></div></li>
+        <li><div><strong>Create templates</strong><span>On WhatsApp, messages to customers must be templates approved by Meta. Create three templates in WhatsApp Manager and enter their names (default: <code>fahrzeugtermin</code>, <code>beleg</code>, <code>fahrzeug_fertig</code>).</span></div></li>
+      </ol>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Template</th><th>Variables in this order</th></tr></thead>
+        <tbody>
+          <tr><td>Reminder</td><td>1 name, 2 kind of appointment, 3 licence plate, 4 date, 5 company, 6 phone</td></tr>
+          <tr><td>Document</td><td>header of type "Document" (the PDF), 1 name, 2 kind of document, 3 number, 4 company</td></tr>
+          <tr><td>Vehicle ready</td><td>1 name, 2 licence plate, 3 company, 4 phone</td></tr>
+        </tbody>
+      </table></div>
+      <p>WhatsApp goes to the customer's mobile number (field "Mobile", otherwise "Phone" if it holds a mobile number). Meta charges template messages depending on country and category.</p>
+      <h3>Setting up Telegram</h3>
+      <ol class="steps">
+        <li><div><strong>Create a bot</strong><span>In Telegram open <code>@BotFather</code>, send <code>/newbot</code> and choose a name. Enter the token under <span class="path">Settings → WhatsApp &amp; Telegram</span> and click "Check bot".</span></div></li>
+        <li><div><strong>Connect customers</strong><span>A bot cannot write to a phone number. The first time you send, KuentaPOS shows a QR code and a link. The customer scans it and presses "Start" in Telegram, and is connected. The customer record shows under "Contact" with whom.</span></div></li>
+        <li><div><strong>Unsubscribe</strong><span>If the customer writes <code>/stop</code> to the bot, they receive no more messages.</span></div></li>
+      </ol>
+      <p>Set the texts for "vehicle ready" and the accompanying text for documents under <span class="path">Settings → WhatsApp &amp; Telegram</span>. Reminders by Telegram use the SMS text. KuentaPOS asks the bot for new messages every 20 seconds; it only needs internet access, no public address.</p>
+      <div class="note"><strong>Consent</strong><span>For WhatsApp and Telegram too, reminders are advertising. Only write to customers who have agreed. The "No reminders" tick on the customer applies to all channels.</span></div>
+    </section>
+
     <section id="krypto">
       <h2>Crypto payment: Bitcoin, Lightning, USDT</h2>
       <p class="lead">Customers can pay invoices with Bitcoin, Lightning or USDT. KuentaPOS uses your own <strong>BTCPay Server</strong> for this. It is free open source software that holds no money: payments go directly into your own wallet. The feature is included in KuentaPOS free of charge.</p>
@@ -843,7 +882,7 @@ docker compose up -d --build</code></pre></div>
       </ol>
       <h3>Rolling out without questions</h3>
       <p>For scripts or software distribution:</p>
-      <div class="codeblock"><pre><code>KuentaPOS-Setup-1.8.4.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART</code></pre></div>
+      <div class="codeblock"><pre><code>KuentaPOS-Setup-1.9.0.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART</code></pre></div>
       <div class="tablewrap"><table>
         <thead><tr><th>Switch</th><th>Effect</th></tr></thead>
         <tbody>
@@ -998,7 +1037,7 @@ npm run installer:windows   # build the Windows installer</code></pre></div>
     </section>
   </main>
 
-  <footer>KuentaPOS 1.8.4 · © 2026 Doc · Open source under the GNU AGPL 3.0, Pro features with a license · Font in documents: Liberation Sans (SIL Open Font License) · QR code: qrcode-generator (MIT)</footer>
+  <footer>KuentaPOS 1.9.0 · © 2026 Doc · Open source under the GNU AGPL 3.0, Pro features with a license · Font in documents: Liberation Sans (SIL Open Font License) · QR code: qrcode-generator (MIT)</footer>
 </div>
 
 <script>

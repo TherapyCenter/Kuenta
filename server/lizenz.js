@@ -21,6 +21,8 @@ let OEFFENTLICH = '0_vANdSqd8_PZimMSyXqoPQ89OJAU3uD18pBgGEriG0';
 // Pro features. A license with "pro" unlocks all of them, including ones added later.
 const FUNKTIONEN = {
   sms: 'SMS-Erinnerungen und SMS-Gateway',
+  whatsapp: 'WhatsApp Business: Erinnerungen, Belege und Fertigmeldungen',
+  telegram: 'Telegram: Erinnerungen, Belege und Fertigmeldungen',
 };
 
 // Purchase information shown in KuentaPOS (to be adjusted by the publisher before release)

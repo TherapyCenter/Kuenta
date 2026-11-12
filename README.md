@@ -15,7 +15,7 @@ Handbook: **[English](docs/handbook-en.html)** · **[Español](docs/handbook-es.
 |---|---|---|
 | Windows | `KuentaPOS-Setup-<version>.exe` (Node.js included) | Start menu → *KuentaPOS* or *KuentaPOS (network)* |
 | Linux / macOS | Node.js 22.13 or later, then `./installer/unix/install.sh` | `kuentapos` (network: `kuentapos --netzwerk`) |
-| Container (Docker/Podman) | ready-made image `ghcr.io/therapycenter/kuentapos:1.8.4` or `podman build -t kuentapos:1.8.4 .` or `docker compose up -d --build` | `http://<computer>:3700` (data in the volume `/data`) |
+| Container (Docker/Podman) | ready-made image `ghcr.io/therapycenter/kuentapos:1.9.0` or `podman build -t kuentapos:1.9.0 .` or `docker compose up -d --build` | `http://<computer>:3700` (data in the volume `/data`) |
 | Umbrel | App Store → ⋯ → *Community App Stores* → `https://github.com/TherapyCenter/umbrel-app-store` → install KuentaPOS | `http://umbrel.local:3700` |
 | Without installation | Node.js 22.13 or later | `KuentaPOS starten.bat`, `./kuentapos.sh` or `node server/index.js --open` |
 
@@ -53,6 +53,7 @@ Technology: KuentaPOS reads the Firebird backup format (gbak, versions 5–10) i
 - **E-invoice:** XRechnung 3.0 (EN 16931) in CII and UBL, **ZUGFeRD 2.3 / Factur-X as PDF/A-3** with embedded XRechnung, tax cases reverse charge, intra-community supply, export, small business, margin scheme. Checked with the Mustang validator (PDF/A and EN 16931/XRechnung Schematron).
 - **Finance:** payments, open items, invoice list, dunning (4 levels, PDF, email), cash book, **DATEV export** (booking batch and debtors/creditors in DATEV format, Windows-1252, checks of fiscal year and account ranges, different fiscal year, collective debtor/creditor), GoBD data export.
 - **Reports:** vehicle due dates with reminders by letter, **email and SMS** (log against double sending, opt-out per customer; SMS is a Pro feature, see below; SMS via a freely configurable HTTP gateway: provider, Android phone or the KuentaPOS SMS relay with a USB modem in `installer/sms-relais`), revenue/gross profit, mail merge, performance rate per order and employee.
+- **WhatsApp Business and Telegram** (Pro add-ons, $20 each): reminders of due dates, documents as PDF and the message "vehicle ready" straight to the customer's phone; WhatsApp via the WhatsApp Cloud API of Meta with approved templates, Telegram via your own bot (customers connect once by QR code).
 - **Interfaces / data import:** import assistant for customers, vehicles, articles, labour items and suppliers from CSV with field mapping and templates, DATANORM 4/5.
 - **System:** multiple companies (several businesses/demo data, selectable per workstation), users and permissions, change log, email sending log, backup (`*.kuentapos`, optionally AES-256), daily automatic backup, overview with eye icon (hide amounts) and display in €, $, £, ₿ or sats (display only, rates from the ECB and Bitstamp; invoices stay in euros), light/dark mode and four colour schemes (blue, green, graphite, bordeaux) per workstation.
 - **Languages:** user interface in German, English, Spanish, French, Italian or Dutch (per workstation, menu *KuentaPOS → Sprache / Language*). Documents (PDF, printing, email templates) in a separate document language per company (*Settings → Defaults*).

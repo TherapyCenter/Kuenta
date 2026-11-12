@@ -14,6 +14,8 @@ finanzieren Sie die Weiterentwicklung.
 | Add-on | seit | Preis |
 |---|---|---|
 | **SMS:** SMS-Erinnerungen an HU, Inspektion und andere Termine, SMS-Gateway (Anbieter, Android-Handy, Surfstick über das KuentaPOS-SMS-Relais) | 1.0.8 | 20 $ |
+| **WhatsApp Business:** Erinnerungen an Termine, Belege (Angebote, Aufträge, Rechnungen …) als PDF und die Nachricht „Fahrzeug fertig“ über die WhatsApp Cloud API von Meta, mit Ihrem eigenen WhatsApp-Business-Konto und freigegebenen Vorlagen | 1.9.0 | 20 $ |
+| **Telegram:** Erinnerungen, Belege als PDF und „Fahrzeug fertig“ über Ihren eigenen Telegram-Bot; Kunden verbinden sich einmalig per QR-Code oder Link | 1.9.0 | 20 $ |
 
 Der Preis gilt je Add-on, einmalig und unbefristet, für eine Installation mit allen Mandanten.
 Bezahlt wird mit Bitcoin oder Tether zum Euro-Kurs am Zahltag.

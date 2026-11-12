@@ -35,6 +35,103 @@ const Mail = {
   },
 };
 
+// ================= WhatsApp Business / Telegram / SMS (Pro add-ons) =================
+const Nachricht = {
+  NAME: { whatsapp: 'WhatsApp', telegram: 'Telegram', sms: 'SMS' },
+  ICON: { whatsapp: '🟢', telegram: '✈️', sms: '📱' },
+  // channels with a license (in this order)
+  lizenziert(kanaele, ohne = []) { return ['whatsapp', 'telegram', 'sms'].filter(k => !ohne.includes(k) && kanaele[k] && kanaele[k].lizenz); },
+
+  // Telegram: show link and QR code until the customer has pressed "Start" in the bot
+  async telegramVerbinden(kunid, kunde) {
+    let l;
+    try { l = await api('/api/telegram/link/' + kunid); } catch (e) { showError(e); return false; }
+    const qr = h('div', { style: { width: '220px', height: '220px', margin: '0 auto' } });
+    try { const q = qrcode(0, 'M'); q.addData(l.link); q.make(); qr.innerHTML = q.createSvgTag({ cellSize: 5, margin: 2 }).replace('<svg ', '<svg style="width:220px;height:220px" '); } catch { /* link only */ }
+    const status = h('div', { class: 'note info', style: { textAlign: 'center' } }, 'Warte darauf, dass der Kunde im Bot „Start“ drückt …');
+    const c = h('div', { style: { display: 'grid', gap: '10px', lineHeight: 1.5 } },
+      h('div', null, `Der Kunde ${kunde || ''} scannt den QR-Code mit dem Handy (oder öffnet den Link) und drückt in Telegram auf „Start“. Danach kann KuentaPOS ihm Nachrichten schicken.`),
+      qr,
+      h('div', { class: 'inline', style: { justifyContent: 'center' } }, h('code', { style: { userSelect: 'all' } }, l.link),
+        h('button', { class: 'btn sm', onclick: () => navigator.clipboard.writeText(l.link).then(() => toast('Link kopiert', 'ok')).catch(() => {}) }, 'Kopieren')),
+      status);
+    let verbunden = false;
+    const t = setInterval(async () => {
+      if (!document.body.contains(c)) { clearInterval(t); return; }
+      try {
+        const e = await api('/api/telegram/abholen/' + kunid, { method: 'POST' });
+        if (e.telegram) { verbunden = true; clearInterval(t); status.className = 'note ok'; status.textContent = T(`Verbunden mit ${e.telegram}.`); setTimeout(() => { const b = c.closest('.win'); if (b) b.querySelector('.btn.primary').click(); }, 1200); }
+      } catch (e) { clearInterval(t); status.className = 'note err'; status.textContent = T(e.message); }
+    }, 3000);
+    await dialog(`Mit Telegram verbinden (@${l.bot})`, c, [{ label: 'Schließen', cls: 'primary', value: true }], { width: 520 });
+    clearInterval(t);
+    return verbunden;
+  },
+
+  // recipient field for a channel: mobile number (WhatsApp, SMS) or the Telegram connection
+  empfaengerFeld(kanal, d, kunid, kunde) {
+    if (kanal !== 'telegram') return { el: fld2('Mobilnummer', h('input', { type: 'tel', value: d.empfaenger.whatsapp || '', style: { width: '100%' } })), wert: el => el.querySelector('input').value };
+    const box = h('div', { class: 'inline' });
+    const zeige = () => {
+      box.innerHTML = '';
+      box.append(h('span', { class: 'badge ' + (d.empfaenger.telegram ? 'ok' : 'warn') }, d.empfaenger.telegram ? T(`verbunden mit ${d.empfaenger.telegram}`) : T('nicht verbunden')),
+        kunid ? h('button', { class: 'btn sm', onclick: async () => { if (await Nachricht.telegramVerbinden(kunid, kunde)) { const e = await api('/api/telegram/abholen/' + kunid, { method: 'POST' }).catch(() => null); if (e) d.empfaenger = e; zeige(); } } }, d.empfaenger.telegram ? 'Neu verbinden …' : 'Mit Telegram verbinden …') : null);
+    };
+    zeige();
+    return { el: fld2('Telegram', box), wert: () => '' };
+  },
+
+  // dialog for one message; art = 'fertig' | 'beleg'
+  async senden({ art, titel, info, d, kanaele, kanal, body }) {
+    if (!kanaele.length) { App.proHinweis('whatsapp', 'WhatsApp Business und Telegram sind Add-ons von KuentaPOS Pro (je 20 $). Mit einem davon oder dem SMS-Add-on können Sie Kunden direkt benachrichtigen.'); return; }
+    const wahl = h('select', null, kanaele.map(k => h('option', { value: k }, Nachricht.NAME[k] + (d.kanaele[k].eingerichtet ? '' : T(' (nicht eingerichtet)')))));
+    wahl.value = kanal && kanaele.includes(kanal) ? kanal : kanaele.find(k => d.kanaele[k].eingerichtet) || kanaele[0];
+    const text = h('textarea', { rows: 5, style: { width: '100%' } }, d.text);
+    const empf = h('div'); const textFld = fld2(art === 'beleg' ? 'Begleittext' : 'Nachricht', text);
+    const waHinweis = h('div', { class: 'fld hint' });
+    let feld;
+    const upd = () => {
+      const k = wahl.value;
+      feld = Nachricht.empfaengerFeld(k, d, d.kunid, d.kunde); empf.innerHTML = ''; empf.append(feld.el);
+      textFld.style.display = k === 'whatsapp' ? 'none' : '';
+      waHinweis.style.display = k === 'whatsapp' ? '' : 'none';
+      waHinweis.textContent = T(art === 'beleg' ? `WhatsApp verschickt die bei Meta freigegebene Vorlage „${d.vorlage}“ mit dem PDF dieses Belegs.` : `WhatsApp verschickt die bei Meta freigegebene Vorlage „${d.vorlage}“ mit den Daten dieses Auftrags.`);
+    };
+    wahl.addEventListener('change', upd);
+    const content = h('div', { class: 'fgrid' }, h('div', { class: 'fld note info' }, info), kanaele.length > 1 ? fld2('Senden per', wahl) : null, empf, textFld, waHinweis);
+    upd();
+    const ok = await dialog(titel, content, [{ label: 'Senden', cls: 'primary', value: true }, { label: 'Abbrechen', value: false }], { width: 560 });
+    if (!ok) return;
+    try {
+      const r = await api(art === 'beleg' ? '/api/nachricht/beleg' : '/api/nachricht/fertig', { method: 'POST', body: { ...body, kanal: wahl.value, an: feld.wert(empf), text: text.value } });
+      toast(`Per ${Nachricht.NAME[r.kanal]} gesendet an ${r.an}`, 'ok');
+      return r;
+    } catch (e) { showError(e); }
+  },
+
+  async fertig(auftragid) {
+    let d; try { d = await api('/api/nachricht/fertig/' + auftragid); } catch (e) { showError(e); return; }
+    if (!d.kunid) { toast('Der Auftrag hat keinen Kunden.', 'err'); return; }
+    return Nachricht.senden({ art: 'fertig', titel: 'Fahrzeug fertig melden', info: `Auftrag ${d.auftrag} · ${d.kunde}${d.kennzeichen ? ' · ' + d.kennzeichen : ''}`, d, kanaele: Nachricht.lizenziert(d.kanaele), body: { id: auftragid } });
+  },
+
+  async beleg(typ, id, kanal) {
+    let d; try { d = await api(`/api/nachricht/beleg/${typ}/${id}`); } catch (e) { showError(e); return; }
+    if (!d.kunid) { toast('Der Beleg hat keinen Kunden.', 'err'); return; }
+    const r = await Nachricht.senden({ art: 'beleg', titel: `Per ${Nachricht.NAME[kanal]} senden`, info: `${d.vorgang} Nr. ${d.nummer} · ${d.kunde} · als PDF`, d, kanaele: [kanal], kanal, body: { typ, id } });
+    if (r && ENT.V[typ]) App.refresh(ENT.V[typ].ent);
+    return r;
+  },
+
+  // menu entries for a document (only the licensed channels); id may be a function (new document: id exists after saving)
+  menuEintraege(typ, id, withSaved = f => f()) {
+    const nr = () => (typeof id === 'function' ? id() : id);
+    const items = ['whatsapp', 'telegram'].filter(k => App.pro(k)).map(k => ({ label: `Per ${Nachricht.NAME[k]} senden…`, icon: Nachricht.ICON[k], onClick: () => withSaved(() => Nachricht.beleg(typ, nr(), k)) }));
+    if (typ === 'auftrag' && ['whatsapp', 'telegram', 'sms'].some(k => App.pro(k))) items.push({ label: 'Fahrzeug fertig melden…', icon: '🔔', onClick: () => withSaved(() => Nachricht.fertig(nr())) });
+    return items;
+  },
+};
+
 // ================= Down payment / partial invoice =================
 const Anzahlung = {
   async dialog(auftragid) {

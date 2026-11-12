@@ -101,6 +101,8 @@ function saveRec(name, id, data, user) {
     if (k === e.pk || !cols.has(k)) continue;
     vals[k] = v === '' ? null : v;
   }
+  // the Telegram connection is only set by the bot, never by the customer form
+  if (e.table === 'KUNDEN') for (const k of ['TELEGRAM_CHATID', 'TELEGRAM_NAME', 'TELEGRAM_CODE']) delete vals[k];
   if (e.table === 'BENUTZER') {
     if (vals.PASSWORT) vals.PASSWORT = hashPassword(vals.PASSWORT); else delete vals.PASSWORT;
   }

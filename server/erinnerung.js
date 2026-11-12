@@ -1,8 +1,10 @@
 'use strict';
-// Reminders of vehicle due dates (HU, service, …) by email and SMS, with a log against double sending
+// Reminders of vehicle due dates (HU, service, …) by email, SMS, WhatsApp and Telegram, with a log against double sending
 const L = require('./lib');
 const MAIL = require('./mail');
 const SMS = require('./pro/sms');
+const WA = require('./pro/whatsapp');
+const TG = require('./pro/telegram');
 const LIZENZ = require('./lizenz');
 const { D, Dt, docLang } = require('./i18n');
 
@@ -24,13 +26,16 @@ function briefanrede(a, name) {
 }
 const datum = iso => iso ? [String(iso).slice(8, 10), String(iso).slice(5, 7), String(iso).slice(0, 4)].join(docLang() === 'de' ? '.' : '/') : '';
 
-function platzhalter(text, r, feld, bezeichnung) {
+function werte(r, feld, bezeichnung) {
   const f = L.firma();
-  const w = {
+  return {
     Briefanrede: briefanrede(r.ANREDE, r.NAME || ''), Anrede: D(r.ANREDE || ''), Name: r.NAME || '', Vorname: r.VORNAME || '',
     Kennzeichen: r.KENNZEICHEN || '', Fahrzeug: [r.MARKE, r.MODELL].filter(Boolean).join(' '), Termin: datum(r.TERMIN),
     Terminart: D(TERMINART[feld] || bezeichnung || ''), Firma: f.FIRMENNAME || '', Telefon: f.TELEFON || '',
   };
+}
+function platzhalter(text, r, feld, bezeichnung) {
+  const w = werte(r, feld, bezeichnung);
   return String(text || '').replace(/\{(\w+)\}/g, (m, k) => w[k] ?? m);
 }
 
@@ -48,6 +53,7 @@ function empfaenger(r, kanal) {
   if (Number(r.KEINEERINNERUNG) === 1) return { grund: 'möchte keine Erinnerungen' };
   if (!r.KUNID) return { grund: 'kein Halter' };
   if (kanal === 'email') return /\S+@\S+\.\S+/.test(r.EMAIL || '') ? { an: String(r.EMAIL).trim() } : { grund: 'keine E-Mail-Adresse' };
+  if (kanal === 'telegram') return r.TELEGRAM_CHATID ? { an: String(r.TELEGRAM_CHATID) } : { grund: 'nicht mit Telegram verbunden' };
   const n = SMS.mobilnummer(r.MOBIL, r.TELEFON);
   return n ? { an: n } : { grund: 'keine Mobilnummer' };
 }
@@ -55,8 +61,8 @@ function empfaenger(r, kanal) {
 // Sending to the selected vehicles of the due date list
 async function senden({ feld, von, bis, fahrids, kanal, user, offenAm }) {
   const FI = require('./api/finanzen');
-  if (!['email', 'sms'].includes(kanal)) throw new L.HttpError(400, 'Unbekannter Versandweg.');
-  if (kanal === 'sms') LIZENZ.brauche('sms');
+  if (!['email', 'sms', 'whatsapp', 'telegram'].includes(kanal)) throw new L.HttpError(400, 'Unbekannter Versandweg.');
+  if (kanal !== 'email') LIZENZ.brauche(kanal);
   const liste = FI.fahrzeugtermine({ feld, von, bis });
   const ids = new Set((fahrids || []).map(Number));
   const rows = liste.rows.filter(r => ids.has(Number(r.FAHR_ID)));
@@ -64,6 +70,8 @@ async function senden({ feld, von, bis, fahrids, kanal, user, offenAm }) {
   const v = vorlagen();
   const viaProgramm = kanal === 'email' && L.sw('mail.versand', 'smtp') === 'programm';
   if (kanal === 'sms' && !SMS.einstellungen().url) throw new L.HttpError(400, 'Es ist kein SMS-Gateway eingerichtet (Einstellungen → Erinnerungen & SMS).');
+  if (kanal === 'whatsapp' && !WA.eingerichtet()) throw new L.HttpError(400, 'WhatsApp Business ist nicht eingerichtet (Einstellungen → WhatsApp & Telegram).');
+  if (kanal === 'telegram' && !TG.eingerichtet()) throw new L.HttpError(400, 'Telegram ist nicht eingerichtet (Einstellungen → WhatsApp & Telegram).');
   if (viaProgramm) {
     const MC = require('./mailclient');
     if (!offenAm || !MC.isLocalRequest(offenAm)) throw new L.HttpError(400, 'Das Mailprogramm kann nur an dem Rechner geöffnet werden, auf dem KuentaPOS läuft. Für Sammel-Erinnerungen bitte den direkten Versand (SMTP) wählen.');
@@ -80,6 +88,10 @@ async function senden({ feld, von, bis, fahrids, kanal, user, offenAm }) {
         const mail = { to: e.an, subject: platzhalter(v.betreff, r, liste.feld, liste.bezeichnung), text: platzhalter(v.text, r, liste.feld, liste.bezeichnung) };
         if (viaProgramm) require('./mailclient').open(mail); else await MAIL.send(mail);
         MAIL.log({ to: e.an, subject: mail.subject, bezug: 'ERINNERUNG', bezugId: r.FAHR_ID, status: viaProgramm ? 'an Mailprogramm übergeben' : 'gesendet', user });
+      } else if (kanal === 'whatsapp') {
+        await WA.erinnerung(e.an, werte(r, liste.feld, liste.bezeichnung));
+      } else if (kanal === 'telegram') {
+        await TG.nachricht(e.an, platzhalter(v.sms, r, liste.feld, liste.bezeichnung));
       } else {
         await SMS.senden(e.an, platzhalter(v.sms, r, liste.feld, liste.bezeichnung));
       }
@@ -90,7 +102,7 @@ async function senden({ feld, von, bis, fahrids, kanal, user, offenAm }) {
       out.fehler.push({ kennzeichen: r.KENNZEICHEN, fehler: err.message });
       if (kanal === 'email' && !viaProgramm) MAIL.log({ to: e.an, subject: platzhalter(v.betreff, r, liste.feld, liste.bezeichnung), bezug: 'ERINNERUNG', bezugId: r.FAHR_ID, status: 'Fehler', fehler: err.message, user });
       // gateway/server completely unreachable: do not wait again for every recipient
-      if (/nicht erreichbar|kein Mailserver|Keine Verbindung|Verbindung zu/.test(err.message)) { out.abgebrochen = true; break; }
+      if (/nicht erreichbar|kein Mailserver|Keine Verbindung|Verbindung zu|lehnt den Bot-Token ab/.test(err.message)) { out.abgebrochen = true; break; }
     }
   }
   return out;

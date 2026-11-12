@@ -444,6 +444,11 @@ if (require.main === module) {
   const btcPruefen = () => { for (const m of dbm.listMandanten()) dbm.runAs(m.id, () => require('./btcpay').pruefen().catch(e => console.warn('BTCPay:', e.message))); };
   setTimeout(btcPruefen, 20000);
   setInterval(btcPruefen, 2 * 60 * 1000);
+  // Telegram add-on: fetch new messages of the bot (customers connecting with /start) every 20 seconds
+  const tgFehler = new Map(); // warn only when the error of a tenant changes
+  const tgAbholen = () => { for (const m of dbm.listMandanten()) dbm.runAs(m.id, () => require('./pro/telegram').abholen().then(() => tgFehler.delete(m.id)).catch(e => { if (tgFehler.get(m.id) !== e.message) console.warn('Telegram:', e.message); tgFehler.set(m.id, e.message); })); };
+  setTimeout(tgAbholen, 10000);
+  setInterval(tgAbholen, 20 * 1000);
   // France: start of the software is a technical event of the cash register
   for (const m of dbm.listMandanten()) dbm.runAs(m.id, () => { try { require('./fr/caisse').jet('DEMARRAGE', { mode: process.env.HOST === '0.0.0.0' ? 'reseau' : 'local' }); } catch (e) { console.warn('NF525:', e.message); } });
   // Spain: send pending VERI*FACTU records (the module itself respects the waiting time of the AEAT)
