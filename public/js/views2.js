@@ -351,8 +351,8 @@ Views.stempeluhr = async (main) => {
   };
   const aktion = async (a, l, mitAuftrag) => {
     const r = await nummernblock(l, mitAuftrag); if (!r || !r.pnr) return;
-    try { const res = await api('/api/zeit/stempeln', { method: 'POST', body: { PERSONALNR: r.pnr, AKTION: a, AUFTRAGNR: r.anr } }); meldung.className = 'note ok'; meldung.textContent = res.meldung; loadListe(); }
-    catch (e) { meldung.className = 'note err'; meldung.textContent = e.message; }
+    try { const res = await api('/api/zeit/stempeln', { method: 'POST', body: { PERSONALNR: r.pnr, AKTION: a, AUFTRAGNR: r.anr } }); meldung.className = 'note ok'; meldung.textContent = T(res.meldung); loadListe(); }
+    catch (e) { meldung.className = 'note err'; meldung.textContent = T(e.message); }
     setTimeout(() => { meldung.className = 'note info'; meldung.textContent = T('Bitte Aktion wählen und Personalnummer eingeben.'); }, 8000);
   };
   const big = (l, a, color, mitAuftrag) => h('button', { class: 'btn', style: { height: '86px', fontSize: '20px', fontWeight: 700, background: color, color: '#fff', borderColor: 'transparent' }, onclick: () => aktion(a, l, mitAuftrag) }, l);
