@@ -1,5 +1,5 @@
 'use strict';
-// Kuenta backup (*.kuenta): ZIP with database + files, optionally AES-256-GCM encrypted.
+// KuentaPOS backup (*.kuentapos): ZIP with database + files, optionally AES-256-GCM encrypted.
 // Backups of the predecessor versions "KFZ-Faktotum" (*.kft) and "Schraubwerk" (*.swb) can still be read.
 const fs = require('fs');
 const path = require('path');
@@ -53,14 +53,14 @@ function decrypt(buf, password) {
 
 function createBackup({ password, ohneDateien } = {}) {
   const files = [];
-  const meta = { app: 'Kuenta', version: VERSION, erstellt: new Date().toISOString(), firma: L.firma().FIRMENNAME || '' };
+  const meta = { app: 'KuentaPOS', version: VERSION, erstellt: new Date().toISOString(), firma: L.firma().FIRMENNAME || '' };
   files.push({ name: 'kuenta.json', data: Buffer.from(JSON.stringify(meta, null, 2)) });
   files.push({ name: 'db/kuenta.db', data: snapshotDb() });
   if (!ohneDateien) for (const f of walk(dbm.FILES_DIR, dbm.FILES_DIR, [])) files.push({ name: 'dateien/' + f.rel, data: fs.readFileSync(f.abs) });
   let out = writeZip(files);
   if (password) out = encrypt(out, password);
   const stamp = new Date().toISOString().slice(0, 16).replace(/[-:]/g, '').replace('T', '_');
-  return { buffer: out, filename: `Kuenta-Sicherung_${stamp}.kuenta` };
+  return { buffer: out, filename: `KuentaPOS-Sicherung_${stamp}.kuentapos` };
 }
 
 function inspectBackup(buf) {
@@ -68,7 +68,7 @@ function inspectBackup(buf) {
   if (isZip(buf)) {
     const z = readZip(buf);
     const m = findEntry(z, META_NAMES);
-    if (!m) return { error: 'Keine Kuenta-Sicherung' };
+    if (!m) return { error: 'Keine KuentaPOS-Sicherung' };
     return { encrypted: false, meta: JSON.parse(z.read(m).toString('utf8')) };
   }
   return { error: 'Unbekanntes Dateiformat' };
@@ -82,7 +82,7 @@ function restoreBackup(buf, opts = {}) {
 }
 function restoreBackupIntern(buf, { password } = {}) {
   if (buf.subarray(0, 8).equals(MAGIC)) buf = decrypt(buf, password);
-  if (!isZip(buf)) throw new Error('Keine gültige Kuenta-Sicherung (*.kuenta).');
+  if (!isZip(buf)) throw new Error('Keine gültige KuentaPOS-Sicherung (*.kuentapos).');
   const z = readZip(buf);
   const metaE = findEntry(z, META_NAMES);
   const dbE = findEntry(z, DB_NAMES);
@@ -126,12 +126,12 @@ function autoBackup() {
     const dir = L.sw('sicherung.pfad') || path.join(dbm.DATA_DIR, 'sicherungen');
     fs.mkdirSync(dir, { recursive: true });
     const today = L.today().replace(/-/g, '');
-    if (fs.readdirSync(dir).some(f => f.includes(`_${today}_`) && f.endsWith('.kuenta'))) return null;
+    if (fs.readdirSync(dir).some(f => f.includes(`_${today}_`) && /\.kuenta(pos)?$/.test(f))) return null;
     const b = createBackup({});
     const file = path.join(dir, b.filename);
     fs.writeFileSync(file, b.buffer);
     const keep = Number(L.sw('sicherung.anzahl', '14')) || 14;
-    const all = fs.readdirSync(dir).filter(f => /^Kuenta-Sicherung_.*\.kuenta$/.test(f)).sort();
+    const all = fs.readdirSync(dir).filter(f => /^Kuenta(POS)?-Sicherung_.*\.kuenta(pos)?$/.test(f)).sort();
     for (const f of all.slice(0, Math.max(0, all.length - keep))) fs.unlinkSync(path.join(dir, f));
     L.setSw('sicherung.letzte', L.now());
     return file;
@@ -161,7 +161,7 @@ function gobdExport(von, bis) {
     xmlT.push(`  <Table><URL>${tb.t}.csv</URL><Name>${tb.l}</Name><DecimalSymbol>,</DecimalSymbol><DigitGroupingSymbol>.</DigitGroupingSymbol><VariableLength><ColumnDelimiter>;</ColumnDelimiter><TextEncapsulator>"</TextEncapsulator>\n${cols.map(c => `    <VariableColumn><Name>${c}</Name><AlphaNumeric/></VariableColumn>`).join('\n')}\n  </VariableLength></Table>`);
   }
   const f = L.firma();
-  const xml = `<?xml version="1.0" encoding="ISO-8859-1"?>\n<!DOCTYPE DataSet SYSTEM "gdpdu-01-08-2002.dtd">\n<DataSet><Version>1.0</Version><DataSupplier><Name>${(f.FIRMENNAME || '').replace(/&/g, '&amp;')}</Name><Location>${(f.ORT || '').replace(/&/g, '&amp;')}</Location><Comment>Kuenta GoBD-Export ${von} bis ${bis}</Comment></DataSupplier>\n<Media><Name>Datenexport</Name>\n${xmlT.join('\n')}\n</Media></DataSet>\n`;
+  const xml = `<?xml version="1.0" encoding="ISO-8859-1"?>\n<!DOCTYPE DataSet SYSTEM "gdpdu-01-08-2002.dtd">\n<DataSet><Version>1.0</Version><DataSupplier><Name>${(f.FIRMENNAME || '').replace(/&/g, '&amp;')}</Name><Location>${(f.ORT || '').replace(/&/g, '&amp;')}</Location><Comment>KuentaPOS GoBD-Export ${von} bis ${bis}</Comment></DataSupplier>\n<Media><Name>Datenexport</Name>\n${xmlT.join('\n')}\n</Media></DataSet>\n`;
   files.push({ name: 'index.xml', data: Buffer.from(xml, 'latin1') });
   return { buffer: writeZip(files), filename: `GoBD-Export_${von}_${bis}.zip` };
 }

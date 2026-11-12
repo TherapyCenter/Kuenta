@@ -32,7 +32,7 @@ function create(rid) {
   const kundeName = [k.KUNNAME, k.KUNVORNAME].filter(Boolean).join(Number(k.KUNART) === 1 ? ' ' : ', ');
   const o = [];
   o.push('<?xml version="1.0" encoding="UTF-8"?>');
-  o.push(`<Invoice xmlns="${NS}" GeneratingSystem="Kuenta ${x(pkg.version)}" DocumentType="${credit ? 'CreditMemo' : 'Invoice'}" InvoiceCurrency="EUR" DocumentTitle="${x((credit ? 'Gutschrift ' : 'Rechnung ') + k.RECHNUNGNUMMER)}" Language="de">`);
+  o.push(`<Invoice xmlns="${NS}" GeneratingSystem="KuentaPOS ${x(pkg.version)}" DocumentType="${credit ? 'CreditMemo' : 'Invoice'}" InvoiceCurrency="EUR" DocumentTitle="${x((credit ? 'Gutschrift ' : 'Rechnung ') + k.RECHNUNGNUMMER)}" Language="de">`);
   o.push(`<InvoiceNumber>${x(k.RECHNUNGNUMMER)}</InvoiceNumber><InvoiceDate>${x(String(k.DATUM).slice(0, 10))}</InvoiceDate>`);
   // credit memo: the invoice it corrects
   if (b.orig) o.push(`<RelatedDocument><InvoiceNumber>${x(b.orig.RECHNUNGNUMMER)}</InvoiceNumber><InvoiceDate>${x(String(b.orig.DATUM).slice(0, 10))}</InvoiceDate><DocumentType>Invoice</DocumentType></RelatedDocument>`);

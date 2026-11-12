@@ -8,8 +8,8 @@ const path = require('path');
 const net = require('net');
 const zlib = require('zlib');
 
-const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'kuenta-mod-'));
-process.env.KUENTA_DATA = tmp;
+const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'kuentapos-mod-'));
+process.env.KUENTAPOS_DATA = tmp;
 
 const dbm = require('../server/db');
 const L = require('../server/lib');
@@ -314,11 +314,11 @@ test('E-Mail: Übergabe an das Mailprogramm (Thunderbird-Aufruf und Entwurf)', (
   assert.ok(!MC.isLocalRequest({ socket: { remoteAddress: '203.0.113.9' } }));
 });
 
-test('KFZ-Import: Kuenta-eigene Daten bleiben erhalten', () => {
+test('KFZ-Import: KuentaPOS-eigene Daten bleiben erhalten', () => {
   const { DatabaseSync } = require('node:sqlite');
   const KFZ = require('../server/import/kfz');
   const d = dbm.get();
-  // create the "last import" state and Kuenta's own data
+  // create the "last import" state and KuentaPOS's own data
   d.prepare("INSERT OR REPLACE INTO SW_EINSTELLUNGEN (SCHLUESSEL, WERT) VALUES ('import.datum', ?)").run(new Date(Date.now() - 3600e3).toISOString());
   L.setSw('mail.versand', 'programm');
   d.prepare("INSERT INTO SW_TERMINE (BEGINN, TITEL) VALUES ('2026-11-10 08:00', 'Ölwechsel Testkunde')").run();
@@ -331,7 +331,7 @@ test('KFZ-Import: Kuenta-eigene Daten bleiben erhalten', () => {
   assert.ok(v.ersetzt.some(e => e.tabelle === 'KUNDEN'), 'geänderter Kunde wird gemeldet');
   assert.ok(v.bleibt.some(e => e.tabelle === 'SW_TERMINE'));
 
-  // simulate a "fresh import": empty database with a customer from the backup (without Kuenta columns) and a document from the backup
+  // simulate a "fresh import": empty database with a customer from the backup (without KuentaPOS columns) and a document from the backup
   const tmpDb = path.join(tmp, 'import-test.db');
   const n = new DatabaseSync(tmpDb);
   dbm.initSchema(n);
@@ -341,13 +341,13 @@ test('KFZ-Import: Kuenta-eigene Daten bleiben erhalten', () => {
   n.prepare("INSERT INTO SW_EINSTELLUNGEN (SCHLUESSEL, WERT) VALUES ('import.datum', 'neu')").run();
   n.close();
   const own = { KUNDEN: ['LEITWEGID', 'ERECHNUNG', 'EMAILRECHNUNG', 'AKTIV'], FIRMENDATEN: ['HANDELSREGISTER'] };
-  const r = KFZ.keepKuentaData(tmpDb, own);
+  const r = KFZ.keepKuentaPOSData(tmpDb, own);
   assert.ok(r.tabellen.SW_TERMINE >= 1);
 
   const c = new DatabaseSync(tmpDb);
   const k = c.prepare('SELECT NAME, ERECHNUNG, LEITWEGID FROM KUNDEN WHERE KUNID=?').get(kunid);
   assert.strictEqual(k.NAME, 'Kunde aus KFZ-Faktura');        // master data from the backup
-  assert.strictEqual(k.ERECHNUNG, 3);                          // Kuenta field kept
+  assert.strictEqual(k.ERECHNUNG, 3);                          // KuentaPOS field kept
   assert.strictEqual(k.LEITWEGID, '991-12345-67');
   assert.strictEqual(c.prepare('SELECT FIRMENNAME, HANDELSREGISTER FROM FIRMENDATEN').get().HANDELSREGISTER, 'HRB 4711');
   assert.strictEqual(c.prepare("SELECT WERT FROM SW_EINSTELLUNGEN WHERE SCHLUESSEL='mail.versand'").get().WERT, 'programm');
@@ -361,8 +361,8 @@ test('KFZ-Import: Kuenta-eigene Daten bleiben erhalten', () => {
 test('Datenordner auf Netzlaufwerk wird erkannt', async () => {
   const D = require('../server/datenordner');
   const m = [{ mount: '/', type: 'ext4' }, { mount: '/mnt/nas', type: 'cifs' }];
-  assert.strictEqual(D.typAusMounts('/mnt/nas/kuenta', m), 'cifs');
-  assert.strictEqual(D.typAusMounts('/mnt/nasx/kuenta', m), 'ext4');
-  if (process.platform === 'win32') assert.strictEqual(await D.istNetzlaufwerk(String.raw`\\nas\freigabe\kuenta`), true);
+  assert.strictEqual(D.typAusMounts('/mnt/nas/kuentapos', m), 'cifs');
+  assert.strictEqual(D.typAusMounts('/mnt/nasx/kuentapos', m), 'ext4');
+  if (process.platform === 'win32') assert.strictEqual(await D.istNetzlaufwerk(String.raw`\\nas\freigabe\kuentapos`), true);
   assert.strictEqual(await D.warnung(tmp), null);
 });

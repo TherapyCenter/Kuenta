@@ -2,15 +2,15 @@
 
 [English](README.md) · **Deutsch**
 
-Das Lizenzwerkzeug stellt Kuenta-Pro-Lizenzen aus. Es braucht den privaten Schlüssel
-`~/.kuenta-lizenz/privat.pem`. Der darf **nie** ins Repository oder auf einen Server.
+Das Lizenzwerkzeug stellt KuentaPOS-Pro-Lizenzen aus. Es braucht den privaten Schlüssel
+`~/.kuentapos-lizenz/privat.pem`. Der darf **nie** ins Repository oder auf einen Server.
 
 ```
 node tools/lizenz/lizenz-werkzeug.js ausstellen --kunde "Werkstatt Muster" --funktionen sms --email kunde@example.de
 node tools/lizenz/lizenz-werkzeug.js pruefen <Schlüssel>
 ```
 
-Alle ausgestellten Lizenzen stehen in `~/.kuenta-lizenz/ausgestellt.csv`.
+Alle ausgestellten Lizenzen stehen in `~/.kuentapos-lizenz/ausgestellt.csv`.
 **Sichern Sie `privat.pem` und `ausgestellt.csv`**, z. B. auf einem verschlüsselten USB-Stick.
 
 ## Lizenz-Shop über BTCPay Server
@@ -23,7 +23,7 @@ nur einen API-Schlüssel mit Leserecht und kann selbst keine Lizenzen erzeugen.
 ### 1. Shop in BTCPay anlegen
 
 1. Im Store eine App vom Typ **Point of Sale** anlegen, Darstellung „Produktliste“ oder „Warenkorb“.
-2. Je Add-on einen Artikel anlegen. **Die Artikel-ID muss der Kuenta-Funktionsname sein:**
+2. Je Add-on einen Artikel anlegen. **Die Artikel-ID muss der KuentaPOS-Funktionsname sein:**
    `sms` (SMS-Add-on, 20 US-Dollar), optional `pro` (alle Add-ons). Abweichende IDs ordnen Sie in
    `shop.json` unter `artikel` zu, z. B. `"sms-addon": "sms"`.
 3. Unter *Formulare* ein Formular mit den Feldern **`buyerName`** (Beschriftung „Name der
@@ -37,7 +37,7 @@ nur einen API-Schlüssel mit Leserecht und kann selbst keine Lizenzen erzeugen.
 node tools/lizenz/lizenz-werkzeug.js shop einrichten
 ```
 
-Das legt `~/.kuenta-lizenz/shop.json` an. Tragen Sie dort ein:
+Das legt `~/.kuentapos-lizenz/shop.json` an. Tragen Sie dort ein:
 - `btcpay.url`, `btcpay.storeId`, `btcpay.apiKey`
 - `smtp`: Mailserver für den Versand der Schlüssel (`secure`: `starttls`, `ssl` oder `none`)
 
@@ -58,7 +58,7 @@ node tools/lizenz/lizenz-werkzeug.js shop
 
 - Beim **ersten Lauf** merkt sich das Werkzeug den Zeitpunkt. Ältere Zahlungen werden nicht
   nachträglich beliefert.
-- Jede Bestellung wird **nur einmal** beliefert. Der Stand liegt in `~/.kuenta-lizenz/shop-stand.json`.
+- Jede Bestellung wird **nur einmal** beliefert. Der Stand liegt in `~/.kuentapos-lizenz/shop-stand.json`.
 - Kauft jemand mit derselben E-Mail-Adresse ein weiteres Add-on, enthält der neue Schlüssel
   **alle** Add-ons dieser Adresse.
 - Schlägt die E-Mail fehl, bleibt der Schlüssel erhalten und wird beim nächsten Lauf erneut verschickt.
@@ -69,10 +69,10 @@ Unter Windows alle 15 Minuten automatisch (einmal in einer Eingabeaufforderung a
 Pfade anpassen):
 
 ```
-schtasks /Create /TN "Kuenta Lizenz-Shop" /SC MINUTE /MO 15 /TR "\"C:\Program Files\nodejs\node.exe\" \"C:\Users\admin\claude\Kuenta\tools\lizenz\lizenz-werkzeug.js\" shop"
+schtasks /Create /TN "KuentaPOS Lizenz-Shop" /SC MINUTE /MO 15 /TR "\"C:\Program Files\nodejs\node.exe\" \"C:\Users\admin\claude\KuentaPOS\tools\lizenz\lizenz-werkzeug.js\" shop"
 ```
 
-Die E-Mails mit dem Schlüssel gehen auf Deutsch, Englisch oder Spanisch raus: in `shop.json` `"sprache": "de"`, `"en"` oder `"es"` eintragen (Standard Deutsch). Hat das BTCPay-Formular ein Feld `sprache` oder `language`, gilt für diese Bestellung die Wahl des Kunden. Die Ausgaben des Werkzeugs richten sich nach der Systemsprache (`KUENTA_LANG=de|en|es`).
+Die E-Mails mit dem Schlüssel gehen auf Deutsch, Englisch oder Spanisch raus: in `shop.json` `"sprache": "de"`, `"en"` oder `"es"` eintragen (Standard Deutsch). Hat das BTCPay-Formular ein Feld `sprache` oder `language`, gilt für diese Bestellung die Wahl des Kunden. Die Ausgaben des Werkzeugs richten sich nach der Systemsprache (`KUENTAPOS_LANG=de|en|es`).
 
 Lizenzen gehen nur raus, wenn Ihr PC läuft. Das ist gewollt, denn der private Schlüssel bleibt so
 offline. Bei Bedarf weisen Sie im Shop-Text darauf hin („Schlüssel kommt in der Regel innerhalb

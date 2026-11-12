@@ -1,31 +1,33 @@
 #!/usr/bin/env node
 'use strict';
-// Kuenta SMS relay: runs on the computer with the USB modem (SIM card) and sends SMS for Kuenta.
-// Kuenta sends POST /sms with {"nummer":"+4917…","text":"…"} and the header "X-Token: <token>".
+// KuentaPOS SMS relay: runs on the computer with the USB modem (SIM card) and sends SMS for KuentaPOS.
+// KuentaPOS sends POST /sms with {"nummer":"+4917…","text":"…"} and the header "X-Token: <token>".
 // Sending via gammu (https://wammu.eu/gammu/), which supports most USB modems.
 //
-//   KUENTA_SMS_TOKEN=secret node kuenta-sms-relais.js
+//   KUENTAPOS_SMS_TOKEN=secret node kuentapos-sms-relais.js
 //
 // Environment variables:
-//   KUENTA_SMS_TOKEN    Required. Same value as in Kuenta (header X-Token).
+//   KUENTAPOS_SMS_TOKEN    Required. Same value as in KuentaPOS (header X-Token).
 //   PORT                Default 3790
 //   HOST                Default 0.0.0.0 (all network interfaces)
-//   KUENTA_SMS_BEFEHL   Default "gammu". With a running gammu-smsd: "gammu-smsd-inject".
-//   KUENTA_SMS_GAMMURC  optional: path to the gammu configuration (passed as -c)
-//   KUENTA_LANG         optional: language of the console output (de, en, es; default: system)
+//   KUENTAPOS_SMS_BEFEHL   Default "gammu". With a running gammu-smsd: "gammu-smsd-inject".
+//   KUENTAPOS_SMS_GAMMURC  optional: path to the gammu configuration (passed as -c)
+//   KUENTAPOS_LANG         optional: language of the console output (de, en, es; default: system)
+// up to version 1.8.2: KUENTA_* instead of KUENTAPOS_* (still accepted)
+for (const [k, v] of Object.entries(process.env)) if (k.startsWith('KUENTA_') && process.env['KUENTAPOS_' + k.slice(7)] === undefined) process.env['KUENTAPOS_' + k.slice(7)] = v;
 const http = require('http');
 const crypto = require('crypto');
 const { execFile } = require('child_process');
 
 // Console output in the system language. The relay often runs alone on another computer,
-// so it carries its own small table instead of Kuenta's language files.
+// so it carries its own small table instead of KuentaPOS's language files.
 const TEXTE = {
-  en: { fehltToken: 'KUENTA_SMS_TOKEN is missing.', beispiel: 'Example: KUENTA_SMS_TOKEN=secret node kuenta-sms-relais.js', laeuft: 'Kuenta SMS relay running on {0}  (POST /sms, GET /status)', gesendet: 'SMS to {0} sent ({1} characters)', fehler: 'SMS to {0} failed: {1}' },
-  de: { fehltToken: 'KUENTA_SMS_TOKEN fehlt.', beispiel: 'Beispiel: KUENTA_SMS_TOKEN=geheim node kuenta-sms-relais.js', laeuft: 'Kuenta-SMS-Relais läuft auf {0}  (POST /sms, GET /status)', gesendet: 'SMS an {0} gesendet ({1} Zeichen)', fehler: 'SMS an {0} fehlgeschlagen: {1}' },
-  es: { fehltToken: 'Falta KUENTA_SMS_TOKEN.', beispiel: 'Ejemplo: KUENTA_SMS_TOKEN=secreto node kuenta-sms-relais.js', laeuft: 'Relé SMS de Kuenta en marcha en {0}  (POST /sms, GET /status)', gesendet: 'SMS a {0} enviado ({1} caracteres)', fehler: 'SMS a {0} fallido: {1}' },
+  en: { fehltToken: 'KUENTAPOS_SMS_TOKEN is missing.', beispiel: 'Example: KUENTAPOS_SMS_TOKEN=secret node kuentapos-sms-relais.js', laeuft: 'KuentaPOS SMS relay running on {0}  (POST /sms, GET /status)', gesendet: 'SMS to {0} sent ({1} characters)', fehler: 'SMS to {0} failed: {1}' },
+  de: { fehltToken: 'KUENTAPOS_SMS_TOKEN fehlt.', beispiel: 'Beispiel: KUENTAPOS_SMS_TOKEN=geheim node kuentapos-sms-relais.js', laeuft: 'KuentaPOS-SMS-Relais läuft auf {0}  (POST /sms, GET /status)', gesendet: 'SMS an {0} gesendet ({1} Zeichen)', fehler: 'SMS an {0} fehlgeschlagen: {1}' },
+  es: { fehltToken: 'Falta KUENTAPOS_SMS_TOKEN.', beispiel: 'Ejemplo: KUENTAPOS_SMS_TOKEN=secreto node kuentapos-sms-relais.js', laeuft: 'Relé SMS de KuentaPOS en marcha en {0}  (POST /sms, GET /status)', gesendet: 'SMS a {0} enviado ({1} caracteres)', fehler: 'SMS a {0} fallido: {1}' },
 };
 function sprache() {
-  const set = String(process.env.KUENTA_LANG || '').toLowerCase().slice(0, 2);
+  const set = String(process.env.KUENTAPOS_LANG || '').toLowerCase().slice(0, 2);
   if (TEXTE[set]) return set;
   let loc = '';
   try { loc = Intl.DateTimeFormat().resolvedOptions().locale || ''; } catch { /* ignore */ }
@@ -54,7 +56,7 @@ function erstelleServer({ token, befehl = 'gammu', vorArgs = [], gammurc = '', l
   let warteschlange = Promise.resolve();   // the modem can only send one SMS at a time
   const antwort = (res, status, obj) => { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(obj)); };
   return http.createServer((req, res) => {
-    if (req.method === 'GET' && req.url === '/status') return antwort(res, 200, { ok: true, dienst: 'kuenta-sms-relais' });
+    if (req.method === 'GET' && req.url === '/status') return antwort(res, 200, { ok: true, dienst: 'kuentapos-sms-relais' });
     if (req.method !== 'POST' || req.url !== '/sms') return antwort(res, 404, { fehler: 'Unbekannte Adresse. Erwartet: POST /sms' });
     const t = Buffer.from(String(req.headers['x-token'] || ''));
     if (t.length !== tokenBuf.length || !crypto.timingSafeEqual(t, tokenBuf)) return antwort(res, 401, { fehler: 'Token falsch' });
@@ -80,7 +82,7 @@ function erstelleServer({ token, befehl = 'gammu', vorArgs = [], gammurc = '', l
 if (require.main === module) {
   const port = Number(process.env.PORT || 3790), host = process.env.HOST || '0.0.0.0';
   let srv;
-  try { srv = erstelleServer({ token: process.env.KUENTA_SMS_TOKEN, befehl: process.env.KUENTA_SMS_BEFEHL || 'gammu', gammurc: process.env.KUENTA_SMS_GAMMURC || '' }); }
+  try { srv = erstelleServer({ token: process.env.KUENTAPOS_SMS_TOKEN, befehl: process.env.KUENTAPOS_SMS_BEFEHL || 'gammu', gammurc: process.env.KUENTAPOS_SMS_GAMMURC || '' }); }
   catch (e) { console.error(e.message + ' ' + L('beispiel')); process.exit(1); }
   srv.listen(port, host, () => console.log(L('laeuft', `http://${host}:${port}`)));
   for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => { srv.close(); process.exit(0); });

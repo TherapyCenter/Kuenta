@@ -7,9 +7,9 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-process.env.KUENTA_DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'kuenta-es-'));
-process.env.KUENTA_SIF_NIF = 'A39200019';
-process.env.KUENTA_LANG = 'de';
+process.env.KUENTAPOS_DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'kuentapos-es-'));
+process.env.KUENTAPOS_SIF_NIF = 'A39200019';
+process.env.KUENTAPOS_LANG = 'de';
 const L = require('../server/lib');
 const dbm = require('../server/db');
 const VG = require('../server/api/vorgang');

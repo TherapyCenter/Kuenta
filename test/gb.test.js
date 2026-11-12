@@ -7,10 +7,10 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-process.env.KUENTA_DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'kuenta-gb-'));
-process.env.KUENTA_LANG = 'de';
-process.env.KUENTA_HMRC_CLIENT_ID = 'test-client';
-process.env.KUENTA_HMRC_CLIENT_SECRET = 'test-secret';
+process.env.KUENTAPOS_DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'kuentapos-gb-'));
+process.env.KUENTAPOS_LANG = 'de';
+process.env.KUENTAPOS_HMRC_CLIENT_ID = 'test-client';
+process.env.KUENTAPOS_HMRC_CLIENT_SECRET = 'test-secret';
 const L = require('../server/lib');
 const dbm = require('../server/db');
 const VG = require('../server/api/vorgang');
@@ -139,7 +139,7 @@ test('HMRC: connect, obligations, submit with fraud prevention headers, token re
   assert.strictEqual(h['Gov-Client-Screens'], 'width=1920&height=1080&scaling-factor=1.25&colour-depth=24');
   assert.strictEqual(h['Gov-Client-Window-Size'], 'width=1400&height=900');
   assert.match(h['Gov-Client-User-Agent'], /^os-family=.+&os-version=.+/);
-  assert.match(h['Gov-Vendor-Version'], /^Kuenta=\d/);
+  assert.match(h['Gov-Vendor-Version'], /^KuentaPOS=\d/);
   assert.match(h['Gov-Client-Local-IPs-Timestamp'], /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/);
 
   await assert.rejects(() => HM.enviar({ periodKey: '18A1', start: Q.von, end: Q.bis }), /bestätigen/);

@@ -192,7 +192,7 @@ const Vorgang = {
       { label: 'Chorus-Pro-Status abrufen', onClick: () => wrap(async () => { try { const r = await api(`/api/fr/chorus/cr/${id}`); alertDlg(`${T('Fluss')} ${r.flux}: ${r.statut}`, 'Chorus Pro'); } catch (e) { showError(e); } }) },
     ];
   },
-  // Before an invoice leaves Kuenta (print, PDF) it is issued: VERI*FACTU record, then locked
+  // Before an invoice leaves KuentaPOS (print, PDF) it is issued: VERI*FACTU record, then locked
   async esEmitir(typ, id, d) {
     if (!Vorgang.es() || ENT.V[typ].table !== 'RECHNUNGEN' || (d && d.es && d.es.emitida)) return d || true;
     if (!(await confirmDlg('Die Rechnung wird jetzt ausgestellt und an VERI*FACTU gemeldet. Danach kann sie nicht mehr geändert werden, nur noch über eine Rechnungskorrektur.', { ok: 'Ausstellen' }))) return null;
@@ -368,9 +368,9 @@ class VorgangWindow {
     const anrede = this.inp('KUNANREDE'); anrede.setAttribute('list', 'dl-anrede');
     const nrInp = this.inp(v.nr, { int: true, num: true, onChange: () => { this.w.el.querySelector('.win-title .t').textContent = this.title(); } });
     if (v.table === 'RECHNUNGEN') {
-      // Sequential number, assigned by Kuenta itself when saving
+      // Sequential number, assigned by KuentaPOS itself when saving
       nrInp.readOnly = true; nrInp.tabIndex = -1;
-      nrInp.title = T(this.id ? 'Die Rechnungsnummer ist fest vergeben.' : 'Vorschlag. Die endgültige Nummer vergibt Kuenta beim Speichern fortlaufend.');
+      nrInp.title = T(this.id ? 'Die Rechnungsnummer ist fest vergeben.' : 'Vorschlag. Die endgültige Nummer vergibt KuentaPOS beim Speichern fortlaufend.');
     }
     const left = h('div', { class: 'vg-box' },
       row2(`${v.title}-Nr.:`, nrInp, 'Datum:', this.inp('DATUM', { t: 'date' })),
@@ -894,7 +894,7 @@ class VorgangWindow {
     } else if (d.offen > 0.004) {
       box.append(h('div', { class: 'inline' },
         h('button', { class: 'btn primary', onclick: () => anlegen(false) }, '₿ Zahlungslink über ' + fmt.money(d.offen) + ' anlegen'),
-        h('span', { class: 'hint' }, 'Der Kunde zahlt den Euro-Betrag in Bitcoin, Lightning oder USDT, umgerechnet zum Kurs am Zahltag. Bezahlte Rechnungen bucht Kuenta automatisch.')));
+        h('span', { class: 'hint' }, 'Der Kunde zahlt den Euro-Betrag in Bitcoin, Lightning oder USDT, umgerechnet zum Kurs am Zahltag. Bezahlte Rechnungen bucht KuentaPOS automatisch.')));
     } else box.append(h('div', { class: 'hint' }, 'Die Rechnung ist bezahlt.'));
     const alt = st.eintraege.filter(e => e !== aktuell);
     if (alt.length) box.append(h('div', { class: 'hint', style: { marginTop: '6px' } }, 'Frühere Links: ' + alt.map(e => `${fmt.date(e.angelegt)} ${fmt.money(e.betrag)} – ${e.status}${e.methode ? ' (' + e.methode + ')' : ''}`).join(' · ')));

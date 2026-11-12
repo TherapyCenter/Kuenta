@@ -2,7 +2,7 @@
 // FatturaPA 1.2.2 (fattura elettronica) for the Sistema di Interscambio (SdI): FPR12 for businesses and consumers,
 // FPA12 for public bodies (6-character codice ufficio). Credit notes as TD04 with the invoice they correct.
 // The file is named IT<codice fiscale>_<progressivo>.xml and is sent to the SdI by the user (portal "Fatture e
-// Corrispettivi", PEC or an intermediary); Kuenta does not transmit it itself.
+// Corrispettivi", PEC or an intermediary); KuentaPOS does not transmit it itself.
 // Only characters of Basic Latin and Latin-1 are allowed in the file.
 const L = require('../lib');
 const NIF = require('../../public/js/nif.js');

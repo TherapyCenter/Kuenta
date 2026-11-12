@@ -1,4 +1,4 @@
-﻿; Kuenta – Windows installer (Inno Setup 6)
+﻿; KuentaPOS – Windows installer (Inno Setup 6)
 ; Do not compile directly, use build.ps1 (it prepares build\stage and sets the version).
 
 #ifndef AppVersion
@@ -13,13 +13,13 @@
 
 ; name, id and data folder can be overridden for a separate test build (build.ps1 never does)
 #ifndef AppName
-  #define AppName "Kuenta"
+  #define AppName "KuentaPOS"
 #endif
 #ifndef AppGuid
   #define AppGuid "6E0B7C2A-3F1D-4B9E-9C55-2A7F4D8E1B63"
 #endif
 #ifndef DataName
-  #define DataName "Kuenta"
+  #define DataName "KuentaPOS"
 #endif
 
 [Setup]
@@ -27,10 +27,12 @@ AppId={{{#AppGuid}}
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} {#AppVersion}
-AppPublisher=Kuenta
+AppPublisher=KuentaPOS
 DefaultDirName={autopf}\{#AppName}
 DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
+; up to version 1.8.2 the start menu folder was called Kuenta: use the new name (the old folder is removed below)
+UsePreviousGroup=no
 ; Default: for all users (admin). "Only for me" can be chosen in the dialog (no admin rights).
 PrivilegesRequired=admin
 PrivilegesRequiredOverridesAllowed=dialog
@@ -39,12 +41,12 @@ ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0
 OutputDir={#OutDir}
 OutputBaseFilename={#AppName}-Setup-{#AppVersion}
-SetupIconFile=kuenta.ico
-UninstallDisplayIcon={app}\kuenta.ico
+SetupIconFile=kuentapos.ico
+UninstallDisplayIcon={app}\kuentapos.ico
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
-; stop-kuenta.ps1 stops a running Kuenta itself (see [Code]); the Windows Restart Manager
+; stop-kuentapos.ps1 stops a running KuentaPOS itself (see [Code]); the Windows Restart Manager
 ; does not detect the console window reliably and is therefore not used.
 CloseApplications=no
 RestartApplications=no
@@ -65,64 +67,64 @@ es.TaskDesktop=Crear un acceso directo en el &escritorio
 en.GroupShortcuts=Additional shortcuts:
 de.GroupShortcuts=Zusätzliche Verknüpfungen:
 es.GroupShortcuts=Accesos directos adicionales:
-en.TaskFirewall=Network mode: allow Kuenta in the Windows firewall (for tablets / other workstations)
-de.TaskFirewall=Netzwerkbetrieb: Windows-Firewall für Kuenta freigeben (für Tablets / weitere Arbeitsplätze)
-es.TaskFirewall=Modo red: permitir Kuenta en el cortafuegos de Windows (para tabletas / otros puestos)
+en.TaskFirewall=Network mode: allow KuentaPOS in the Windows firewall (for tablets / other workstations)
+de.TaskFirewall=Netzwerkbetrieb: Windows-Firewall für KuentaPOS freigeben (für Tablets / weitere Arbeitsplätze)
+es.TaskFirewall=Modo red: permitir KuentaPOS en el cortafuegos de Windows (para tabletas / otros puestos)
 en.GroupNetwork=Network:
 de.GroupNetwork=Netzwerk:
 es.GroupNetwork=Red:
-en.IconNetwork=Kuenta (network)
-de.IconNetwork=Kuenta im Netzwerk
-es.IconNetwork=Kuenta (red)
-en.IconUninstall=Uninstall Kuenta
-de.IconUninstall=Kuenta deinstallieren
-es.IconUninstall=Desinstalar Kuenta
-en.CommentStart=Start Kuenta
-de.CommentStart=Kuenta starten
-es.CommentStart=Iniciar Kuenta
-en.CommentNetwork=Share Kuenta with other devices in the network
-de.CommentNetwork=Kuenta für andere Geräte im Netzwerk freigeben
-es.CommentNetwork=Compartir Kuenta con otros dispositivos de la red
-en.RunNow=Start Kuenta now
-en.MaintTitle=Kuenta is already installed
+en.IconNetwork=KuentaPOS (network)
+de.IconNetwork=KuentaPOS im Netzwerk
+es.IconNetwork=KuentaPOS (red)
+en.IconUninstall=Uninstall KuentaPOS
+de.IconUninstall=KuentaPOS deinstallieren
+es.IconUninstall=Desinstalar KuentaPOS
+en.CommentStart=Start KuentaPOS
+de.CommentStart=KuentaPOS starten
+es.CommentStart=Iniciar KuentaPOS
+en.CommentNetwork=Share KuentaPOS with other devices in the network
+de.CommentNetwork=KuentaPOS für andere Geräte im Netzwerk freigeben
+es.CommentNetwork=Compartir KuentaPOS con otros dispositivos de la red
+en.RunNow=Start KuentaPOS now
+en.MaintTitle=KuentaPOS is already installed
 en.MaintSub=Version %1 is installed on this computer.
 en.MaintWhat=What would you like to do?
-en.MaintUpdate=Install Kuenta {#AppVersion} (replaces version %1, your data is kept)
-en.MaintRemove=Uninstall Kuenta (you can choose whether to keep your data)
-en.MaintNoUninst=The uninstaller of the installed version was not found. Please remove Kuenta under Settings → Apps.
-en.DelDataAsk=Also delete your Kuenta data?%n%nFolder: %1%n%nIt contains customers, vehicles, invoices, cash register data and backups. Tax law usually requires you to keep invoices and cash register data for up to 10 years.%n%nNo = keep the data (recommended, e.g. for a later reinstallation).
+en.MaintUpdate=Install KuentaPOS {#AppVersion} (replaces version %1, your data is kept)
+en.MaintRemove=Uninstall KuentaPOS (you can choose whether to keep your data)
+en.MaintNoUninst=The uninstaller of the installed version was not found. Please remove KuentaPOS under Settings → Apps.
+en.DelDataAsk=Also delete your KuentaPOS data?%n%nFolder: %1%n%nIt contains customers, vehicles, invoices, cash register data and backups. Tax law usually requires you to keep invoices and cash register data for up to 10 years.%n%nNo = keep the data (recommended, e.g. for a later reinstallation).
 en.DelDataBackup=Save a copy of all data as a ZIP file on the desktop before deleting?%n%nYes = save a copy, then delete (recommended)%nNo = delete without a copy
 en.DelDataNoBackup=The data will be deleted for good, without a copy. Continue?
 en.DelDataBackupFailed=The copy could not be saved. Your data was NOT deleted.%n%nFolder: %1
-en.DelDataDone=Your Kuenta data has been deleted.
+en.DelDataDone=Your KuentaPOS data has been deleted.
 en.DelDataCopy=Copy of the data: %1
 en.DelDataFailed=Some files could not be deleted. Please remove the folder by hand: %1
-de.RunNow=Kuenta jetzt starten
-de.MaintTitle=Kuenta ist bereits installiert
+de.RunNow=KuentaPOS jetzt starten
+de.MaintTitle=KuentaPOS ist bereits installiert
 de.MaintSub=Auf diesem Computer ist Version %1 installiert.
 de.MaintWhat=Was möchten Sie tun?
-de.MaintUpdate=Kuenta {#AppVersion} installieren (ersetzt Version %1, Ihre Daten bleiben erhalten)
-de.MaintRemove=Kuenta deinstallieren (Sie entscheiden, ob Ihre Daten erhalten bleiben)
-de.MaintNoUninst=Das Deinstallationsprogramm der installierten Version wurde nicht gefunden. Bitte Kuenta unter Einstellungen → Apps entfernen.
-de.DelDataAsk=Sollen auch Ihre Kuenta-Daten gelöscht werden?%n%nOrdner: %1%n%nDarin liegen Kunden, Fahrzeuge, Rechnungen, Kassendaten und Sicherungen. Rechnungen und Kassendaten müssen Sie nach Steuerrecht in der Regel bis zu 10 Jahre aufbewahren.%n%nNein = Daten behalten (empfohlen, z. B. für eine spätere Neuinstallation).
+de.MaintUpdate=KuentaPOS {#AppVersion} installieren (ersetzt Version %1, Ihre Daten bleiben erhalten)
+de.MaintRemove=KuentaPOS deinstallieren (Sie entscheiden, ob Ihre Daten erhalten bleiben)
+de.MaintNoUninst=Das Deinstallationsprogramm der installierten Version wurde nicht gefunden. Bitte KuentaPOS unter Einstellungen → Apps entfernen.
+de.DelDataAsk=Sollen auch Ihre KuentaPOS-Daten gelöscht werden?%n%nOrdner: %1%n%nDarin liegen Kunden, Fahrzeuge, Rechnungen, Kassendaten und Sicherungen. Rechnungen und Kassendaten müssen Sie nach Steuerrecht in der Regel bis zu 10 Jahre aufbewahren.%n%nNein = Daten behalten (empfohlen, z. B. für eine spätere Neuinstallation).
 de.DelDataBackup=Vor dem Löschen eine Kopie aller Daten als ZIP-Datei auf dem Desktop speichern?%n%nJa = Kopie speichern und dann löschen (empfohlen)%nNein = ohne Kopie löschen
 de.DelDataNoBackup=Die Daten werden ohne Kopie endgültig gelöscht. Wirklich fortfahren?
 de.DelDataBackupFailed=Die Kopie konnte nicht gespeichert werden. Ihre Daten wurden NICHT gelöscht.%n%nOrdner: %1
-de.DelDataDone=Ihre Kuenta-Daten wurden gelöscht.
+de.DelDataDone=Ihre KuentaPOS-Daten wurden gelöscht.
 de.DelDataCopy=Kopie der Daten: %1
 de.DelDataFailed=Einige Dateien konnten nicht gelöscht werden. Bitte den Ordner von Hand entfernen: %1
-es.RunNow=Iniciar Kuenta ahora
-es.MaintTitle=Kuenta ya está instalado
+es.RunNow=Iniciar KuentaPOS ahora
+es.MaintTitle=KuentaPOS ya está instalado
 es.MaintSub=En este ordenador está instalada la versión %1.
 es.MaintWhat=¿Qué desea hacer?
-es.MaintUpdate=Instalar Kuenta {#AppVersion} (sustituye la versión %1, sus datos se conservan)
-es.MaintRemove=Desinstalar Kuenta (puede elegir si conserva sus datos)
-es.MaintNoUninst=No se encontró el desinstalador de la versión instalada. Elimine Kuenta en Configuración → Aplicaciones.
-es.DelDataAsk=¿Borrar también sus datos de Kuenta?%n%nCarpeta: %1%n%nContiene clientes, vehículos, facturas, datos de caja y copias de seguridad. La legislación fiscal suele exigir conservar facturas y datos de caja hasta 10 años.%n%nNo = conservar los datos (recomendado, p. ej. para reinstalar más tarde).
+es.MaintUpdate=Instalar KuentaPOS {#AppVersion} (sustituye la versión %1, sus datos se conservan)
+es.MaintRemove=Desinstalar KuentaPOS (puede elegir si conserva sus datos)
+es.MaintNoUninst=No se encontró el desinstalador de la versión instalada. Elimine KuentaPOS en Configuración → Aplicaciones.
+es.DelDataAsk=¿Borrar también sus datos de KuentaPOS?%n%nCarpeta: %1%n%nContiene clientes, vehículos, facturas, datos de caja y copias de seguridad. La legislación fiscal suele exigir conservar facturas y datos de caja hasta 10 años.%n%nNo = conservar los datos (recomendado, p. ej. para reinstalar más tarde).
 es.DelDataBackup=¿Guardar antes una copia de todos los datos como archivo ZIP en el escritorio?%n%nSí = guardar una copia y luego borrar (recomendado)%nNo = borrar sin copia
 es.DelDataNoBackup=Los datos se borrarán definitivamente, sin copia. ¿Continuar?
 es.DelDataBackupFailed=No se pudo guardar la copia. Sus datos NO se han borrado.%n%nCarpeta: %1
-es.DelDataDone=Sus datos de Kuenta se han borrado.
+es.DelDataDone=Sus datos de KuentaPOS se han borrado.
 es.DelDataCopy=Copia de los datos: %1
 es.DelDataFailed=Algunos archivos no se pudieron borrar. Elimine la carpeta a mano: %1
 
@@ -132,43 +134,52 @@ Name: "firewall"; Description: "{cm:TaskFirewall}"; GroupDescription: "{cm:Group
 
 [Files]
 Source: "{#StageDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "kuenta.ico"; DestDir: "{app}"; Flags: ignoreversion
-Source: "stop-kuenta.ps1"; DestDir: "{app}"; Flags: ignoreversion
-Source: "stop-kuenta.ps1"; Flags: dontcopy
+Source: "kuentapos.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "stop-kuentapos.ps1"; DestDir: "{app}"; Flags: ignoreversion
+Source: "stop-kuentapos.ps1"; Flags: dontcopy
 
 [InstallDelete]
-; remove program files of earlier versions (user data lives in the user profile under AppData\Roaming\Kuenta and is kept)
+; remove program files of earlier versions (user data lives in the user profile under AppData\Roaming\KuentaPOS and is kept)
 Type: filesandordirs; Name: "{app}\server"
 Type: filesandordirs; Name: "{app}\public"
 Type: filesandordirs; Name: "{app}\docs"
 Type: filesandordirs; Name: "{app}\node"
 Type: filesandordirs; Name: "{app}\sms-relais"
+; files and shortcuts under the old name Kuenta (up to version 1.8.2)
+Type: files; Name: "{app}\Kuenta starten.bat"
+Type: files; Name: "{app}\Kuenta im Netzwerk starten.bat"
+Type: files; Name: "{app}\kuenta.ico"
+Type: files; Name: "{app}\stop-kuenta.ps1"
+Type: files; Name: "{autodesktop}\Kuenta.lnk"
+Type: filesandordirs; Name: "{autoprograms}\Kuenta"
 
 [Icons]
-Name: "{group}\Kuenta"; Filename: "{app}\Kuenta starten.bat"; WorkingDir: "{app}"; IconFilename: "{app}\kuenta.ico"; Comment: "{cm:CommentStart}"
-Name: "{group}\{cm:IconNetwork}"; Filename: "{app}\Kuenta im Netzwerk starten.bat"; WorkingDir: "{app}"; IconFilename: "{app}\kuenta.ico"; Comment: "{cm:CommentNetwork}"
+Name: "{group}\KuentaPOS"; Filename: "{app}\KuentaPOS starten.bat"; WorkingDir: "{app}"; IconFilename: "{app}\kuentapos.ico"; Comment: "{cm:CommentStart}"
+Name: "{group}\{cm:IconNetwork}"; Filename: "{app}\KuentaPOS im Netzwerk starten.bat"; WorkingDir: "{app}"; IconFilename: "{app}\kuentapos.ico"; Comment: "{cm:CommentNetwork}"
 Name: "{group}\{cm:IconUninstall}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\{#AppName}"; Filename: "{app}\Kuenta starten.bat"; WorkingDir: "{app}"; IconFilename: "{app}\kuenta.ico"; Tasks: desktopicon
+Name: "{autodesktop}\{#AppName}"; Filename: "{app}\KuentaPOS starten.bat"; WorkingDir: "{app}"; IconFilename: "{app}\kuentapos.ico"; Tasks: desktopicon
 
 [Run]
-Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Kuenta"""; Flags: runhidden; Tasks: firewall
-Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""Kuenta"" dir=in action=allow program=""{app}\node\node.exe"" enable=yes profile=private,domain"; Flags: runhidden; Tasks: firewall
-Filename: "{app}\Kuenta starten.bat"; WorkingDir: "{app}"; Description: "{cm:RunNow}"; Flags: postinstall nowait skipifsilent shellexec runasoriginaluser; Check: NichtNeuStarten
-; Kuenta was running before the update: start it again the way it ran (also for silent installs)
-Filename: "{app}\Kuenta starten.bat"; WorkingDir: "{app}"; Flags: nowait shellexec runasoriginaluser; Check: NeuStarten(1)
-Filename: "{app}\Kuenta im Netzwerk starten.bat"; WorkingDir: "{app}"; Flags: nowait shellexec runasoriginaluser; Check: NeuStarten(2)
+; firewall rule under the old name Kuenta (up to version 1.8.2)
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Kuenta"""; Flags: runhidden; Check: IsAdminInstallMode
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""KuentaPOS"""; Flags: runhidden; Tasks: firewall
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""KuentaPOS"" dir=in action=allow program=""{app}\node\node.exe"" enable=yes profile=private,domain"; Flags: runhidden; Tasks: firewall
+Filename: "{app}\KuentaPOS starten.bat"; WorkingDir: "{app}"; Description: "{cm:RunNow}"; Flags: postinstall nowait skipifsilent shellexec runasoriginaluser; Check: NichtNeuStarten
+; KuentaPOS was running before the update: start it again the way it ran (also for silent installs)
+Filename: "{app}\KuentaPOS starten.bat"; WorkingDir: "{app}"; Flags: nowait shellexec runasoriginaluser; Check: NeuStarten(1)
+Filename: "{app}\KuentaPOS im Netzwerk starten.bat"; WorkingDir: "{app}"; Flags: nowait shellexec runasoriginaluser; Check: NeuStarten(2)
 
 [UninstallRun]
-Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Kuenta"""; Flags: runhidden; RunOnceId: "DelFirewall"; Check: IsAdminInstallMode
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""KuentaPOS"""; Flags: runhidden; RunOnceId: "DelFirewall"; Check: IsAdminInstallMode
 
 [Messages]
-en.FinishedLabel=Kuenta has been installed.%n%nYour data is stored in the user profile (AppData\Roaming\Kuenta) and is kept during updates. When uninstalling you can choose whether to keep it. To take over existing data after the start, use "Kuenta → Import data from KFZ-Faktura" or "Restore data". The language can be changed in Kuenta under "Kuenta → Sprache / Language".
-es.FinishedLabel=Kuenta se ha instalado.%n%nSus datos se guardan en el perfil de usuario (AppData\Roaming\Kuenta) y se conservan en las actualizaciones. Al desinstalar puede elegir si los conserva. Para importar datos existentes tras el inicio, use «Kuenta → Importar datos de KFZ-Faktura» o «Restaurar datos». El idioma se cambia en Kuenta en «Kuenta → Sprache / Language».
-de.FinishedLabel=Kuenta wurde installiert.%n%nIhre Daten werden im Benutzerprofil gespeichert (AppData\Roaming\Kuenta) und bleiben bei Updates erhalten. Bei der Deinstallation entscheiden Sie, ob sie erhalten bleiben. Vorhandene Daten übernehmen Sie nach dem Start über „Kuenta → Daten aus KFZ-Faktura importieren“ oder „Daten wiederherstellen“.
+en.FinishedLabel=KuentaPOS has been installed.%n%nYour data is stored in the user profile (AppData\Roaming\KuentaPOS) and is kept during updates. When uninstalling you can choose whether to keep it. To take over existing data after the start, use "KuentaPOS → Import data from KFZ-Faktura" or "Restore data". The language can be changed in KuentaPOS under "KuentaPOS → Sprache / Language".
+es.FinishedLabel=KuentaPOS se ha instalado.%n%nSus datos se guardan en el perfil de usuario (AppData\Roaming\KuentaPOS) y se conservan en las actualizaciones. Al desinstalar puede elegir si los conserva. Para importar datos existentes tras el inicio, use «KuentaPOS → Importar datos de KFZ-Faktura» o «Restaurar datos». El idioma se cambia en KuentaPOS en «KuentaPOS → Sprache / Language».
+de.FinishedLabel=KuentaPOS wurde installiert.%n%nIhre Daten werden im Benutzerprofil gespeichert (AppData\Roaming\KuentaPOS) und bleiben bei Updates erhalten. Bei der Deinstallation entscheiden Sie, ob sie erhalten bleiben. Vorhandene Daten übernehmen Sie nach dem Start über „KuentaPOS → Daten aus KFZ-Faktura importieren“ oder „Daten wiederherstellen“.
 
 [Code]
 var
-  KuentaLief: Integer; { 0 = not running, 1 = running locally, 2 = running in network mode }
+  KuentaPOSLief: Integer; { 0 = not running, 1 = running locally, 2 = running in network mode }
   Wartung: TInputOptionWizardPage; { installed already: update or uninstall }
   AltUninst, AltVersion: String;
   Beenden: Boolean;
@@ -231,7 +242,7 @@ begin
   end;
 end;
 
-function StopKuenta(Script, AppDir: String): Integer;
+function StopKuentaPOS(Script, AppDir: String): Integer;
 var
   Rc: Integer;
 begin
@@ -242,20 +253,20 @@ begin
     if (Rc = 1) or (Rc = 2) then Result := Rc;
 end;
 
-{ Before copying: stop a running Kuenta from the program folder }
+{ Before copying: stop a running KuentaPOS from the program folder }
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 begin
   Result := '';
-  KuentaLief := 0;
+  KuentaPOSLief := 0;
   if DirExists(ExpandConstant('{app}')) then
   begin
-    ExtractTemporaryFile('stop-kuenta.ps1');
-    KuentaLief := StopKuenta(ExpandConstant('{tmp}\stop-kuenta.ps1'), ExpandConstant('{app}'));
-    if KuentaLief > 0 then Log('Running Kuenta was stopped (mode ' + IntToStr(KuentaLief) + ').');
+    ExtractTemporaryFile('stop-kuentapos.ps1');
+    KuentaPOSLief := StopKuentaPOS(ExpandConstant('{tmp}\stop-kuentapos.ps1'), ExpandConstant('{app}'));
+    if KuentaPOSLief > 0 then Log('Running KuentaPOS was stopped (mode ' + IntToStr(KuentaPOSLief) + ').');
   end;
 end;
 
-{ Do not restart with /NOSTART or when deployed as the system account (Kuenta would otherwise run in the wrong user profile) }
+{ Do not restart with /NOSTART or when deployed as the system account (KuentaPOS would otherwise run in the wrong user profile) }
 function NeustartErlaubt: Boolean;
 var
   U: String;
@@ -266,25 +277,29 @@ end;
 
 function NeuStarten(Modus: Integer): Boolean;
 begin
-  Result := (KuentaLief = Modus) and NeustartErlaubt;
+  Result := (KuentaPOSLief = Modus) and NeustartErlaubt;
 end;
 
 function NichtNeuStarten: Boolean;
 begin
-  Result := not ((KuentaLief > 0) and NeustartErlaubt);
+  Result := not ((KuentaPOSLief > 0) and NeustartErlaubt);
 end;
 
 { ---------- uninstall: optionally delete the data, after a copy on the desktop ---------- }
-{ data folder of Kuenta: KUENTA_DATA, otherwise AppData\Roaming\Kuenta of the current user (as server/db/index.js) }
+{ data folder of KuentaPOS: KUENTAPOS_DATA, otherwise AppData\Roaming\KuentaPOS of the current user (as server/db/index.js) }
 function DatenOrdner: String;
 begin
-  Result := GetEnv('KUENTA_DATA');
+  Result := GetEnv('KUENTAPOS_DATA');
+  if Result = '' then Result := GetEnv('KUENTA_DATA');
   if Result = '' then Result := ExpandConstant('{userappdata}\{#DataName}');
+  { up to version 1.8.2 the folder was called Kuenta: it is used if only that one exists }
+  if (CompareText(Result, ExpandConstant('{userappdata}\{#DataName}')) = 0) and not DirExists(Result) and DirExists(ExpandConstant('{userappdata}\Kuenta')) then
+    Result := ExpandConstant('{userappdata}\Kuenta');
   Result := RemoveBackslashUnlessRoot(Result);
 end;
 
-{ only a folder that really holds Kuenta data is ever deleted (never a drive or the user profile) }
-function SindKuentaDaten(Dir: String): Boolean;
+{ only a folder that really holds KuentaPOS data is ever deleted (never a drive or the user profile) }
+function SindKuentaPOSDaten(Dir: String): Boolean;
 begin
   Result := (Length(Dir) > 8) and DirExists(Dir) and (FileExists(Dir + '\kuenta.db') or FileExists(Dir + '\mandanten.json'))
     and (CompareText(Dir, RemoveBackslashUnlessRoot(GetEnv('USERPROFILE'))) <> 0) and (CompareText(Dir, RemoveBackslashUnlessRoot(ExpandConstant('{userappdata}'))) <> 0);
@@ -313,7 +328,7 @@ var
   Kopie: Boolean;
 begin
   Dir := DatenOrdner;
-  if not SindKuentaDaten(Dir) then exit;
+  if not SindKuentaPOSDaten(Dir) then exit;
   Tail := Uppercase(GetCmdTail);
   if UninstallSilent then
   begin
@@ -357,7 +372,7 @@ end;
 { Stop it before uninstalling as well; afterwards ask about the data }
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
-  if (CurUninstallStep = usUninstall) and FileExists(ExpandConstant('{app}\stop-kuenta.ps1')) then
-    StopKuenta(ExpandConstant('{app}\stop-kuenta.ps1'), ExpandConstant('{app}'));
+  if (CurUninstallStep = usUninstall) and FileExists(ExpandConstant('{app}\stop-kuentapos.ps1')) then
+    StopKuentaPOS(ExpandConstant('{app}\stop-kuentapos.ps1'), ExpandConstant('{app}'));
   if CurUninstallStep = usPostUninstall then DatenEntfernen;
 end;

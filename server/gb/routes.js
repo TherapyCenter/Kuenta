@@ -11,7 +11,7 @@ module.exports = function register(route, { json }) {
   // browser data for the fraud prevention headers (screens, window size) and the signed-in user
   const ctxHm = ctx => {
     let client = {};
-    try { client = JSON.parse(decodeURIComponent(ctx.req.headers['x-kuenta-client'] || '')) || {}; } catch { /* none */ }
+    try { client = JSON.parse(decodeURIComponent((ctx.req.headers['x-kuentapos-client'] || ctx.req.headers['x-kuenta-client']) || '')) || {}; } catch { /* none */ }
     return { client, usuario: ctx.user && ctx.user.name };
   };
   route('GET', '/api/gb/estado', () => HM.estado());
@@ -21,8 +21,8 @@ module.exports = function register(route, { json }) {
   // HMRC sends the browser back here after signing in (the state identifies tenant and request)
   route('GET', '/api/gb/oauth/callback', async (ctx) => {
     let msg, ok = true;
-    try { await HM.callback(ctx.q); msg = 'Kuenta is now connected to HMRC. You can close this window.'; } catch (e) { ok = false; msg = e.message; }
-    return { _html: `<!doctype html><html><head><meta charset="utf-8"><title>Kuenta – HMRC</title></head><body style="font-family:sans-serif;padding:40px;max-width:640px">
+    try { await HM.callback(ctx.q); msg = 'KuentaPOS is now connected to HMRC. You can close this window.'; } catch (e) { ok = false; msg = e.message; }
+    return { _html: `<!doctype html><html><head><meta charset="utf-8"><title>KuentaPOS – HMRC</title></head><body style="font-family:sans-serif;padding:40px;max-width:640px">
       <h2>${ok ? '✅' : '❌'} HMRC</h2><p>${esc(msg)}</p><script>try { window.opener && window.opener.postMessage({ hmrc: ${ok} }, '*'); } catch (e) {} ${ok ? 'setTimeout(function(){ window.close(); }, 2500);' : ''}</script></body></html>` };
   }, { public: true });
   route('GET', '/api/gb/obligaciones', async (ctx) => { ctx.need('FIBU', 'anzeigen'); return HM.obligaciones(ctx.q, ctxHm(ctx)); });

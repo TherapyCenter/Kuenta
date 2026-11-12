@@ -20,7 +20,7 @@ const LuUI = {
         si('lu.matricule', 'Matricule (11 bis 13 Ziffern)', '', true), si('lu.ecdf.prefix', 'eCDF-Präfix (6 Zeichen)', '', true), si('lu.ecdf.interface', 'Interface', 'KUENTA', true),
         h('div', { class: 'fld hint' }, 'Die MwSt-Erklärung geht als XML-Datei über die Plattform eCDF. Das Präfix erhalten Sie bei der Anmeldung bei eCDF.')),
       grp('Facturation électronique (Peppol)',
-        h('div', { class: 'fld hint' }, 'Rechnungen an öffentliche Auftraggeber gehen als E-Rechnung über Peppol (BIS Billing 3.0). Kuenta erzeugt die XML-Datei (Rechnung → E-Rechnung (Peppol)); senden Sie sie über Ihren Peppol-Dienstleister.'))));
+        h('div', { class: 'fld hint' }, 'Rechnungen an öffentliche Auftraggeber gehen als E-Rechnung über Peppol (BIS Billing 3.0). KuentaPOS erzeugt die XML-Datei (Rechnung → E-Rechnung (Peppol)); senden Sie sie über Ihren Peppol-Dienstleister.'))));
   },
 };
 
@@ -43,7 +43,7 @@ Views.luTva = async (main) => {
       out.append(miniGrid([{ f: 'feld', l: 'Feld', w: 80 }, { f: 'text', l: 'Bezeichnung', w: 460 }, { f: 'betrag', l: 'Betrag', w: 150, t: 'money' }], rows).el,
         h('div', { class: 'note ' + (r.saldo < 0 ? 'ok' : 'info'), style: { marginTop: '8px' } }, r.saldo < 0 ? `${T('Guthaben (Feld 105)')}: ${fmt.money(-r.saldo)}` : `${T('Zu zahlen (Feld 105)')}: ${fmt.money(r.saldo)}`),
         h('div', { class: 'hint' }, `${{ mois: T('monatlich'), trimestre: T('vierteljährlich'), annee: T('Jahreserklärung') }[r.periode]} · ${r.rechnungen} ${T('Rechnungen')}, ${r.eingang} ${T('Eingangsrechnungen')}${r.durchlaufend ? ` · ${T('Auslagen (nicht in der Erklärung)')}: ${fmt.money(r.durchlaufend)}` : ''}`),
-        r.periode === 'annee' ? h('div', { class: 'note info' }, T('Jahreserklärung: Kuenta füllt die Abschnitte I bis IV. Die weiteren Teile des Formulars (u. a. Anhänge zu den Betriebsausgaben) ergänzen Sie bzw. Ihr Buchhalter auf der Plattform eCDF.')) : '');
+        r.periode === 'annee' ? h('div', { class: 'note info' }, T('Jahreserklärung: KuentaPOS füllt die Abschnitte I bis IV. Die weiteren Teile des Formulars (u. a. Anhänge zu den Betriebsausgaben) ergänzen Sie bzw. Ihr Buchhalter auf der Plattform eCDF.')) : '');
   };
   const berechnen = async () => { try { zeigen(await api('/api/lu/tva?' + qs({ von, bis }))); } catch (e) { showError(e); } };
   const berechnenJahr = async () => { try { zeigen(await api('/api/lu/tva?' + qs({ jahr: jahr.value }))); } catch (e) { showError(e); } };
@@ -72,7 +72,7 @@ Views.luTva = async (main) => {
         h('div', { class: 'searchbar' },
           h('button', { class: 'btn', onclick: zm }, '📋 ' + T('Für den Zeitraum oben anzeigen')),
           h('button', { class: 'btn', onclick: () => downloadUrl('/api/lu/zm/xml?' + qs({ von, bis }), 'eCDF.xml') }, '⬇ ' + T('XML für eCDF'))),
-        h('div', { class: 'hint' }, 'Innergemeinschaftliche Lieferungen (TVA_LICM / LICT) und Dienstleistungen an Unternehmen in anderen EU-Ländern (TVA_PSIM / PSIT) je Kunde, monatlich oder vierteljährlich wie die MwSt-Erklärung. Korrekturen früherer Zeiträume trägt Kuenta nicht ein.'),
+        h('div', { class: 'hint' }, 'Innergemeinschaftliche Lieferungen (TVA_LICM / LICT) und Dienstleistungen an Unternehmen in anderen EU-Ländern (TVA_PSIM / PSIT) je Kunde, monatlich oder vierteljährlich wie die MwSt-Erklärung. Korrekturen früherer Zeiträume trägt KuentaPOS nicht ein.'),
         zmOut)));
   berechnen();
 };

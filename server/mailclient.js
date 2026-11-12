@@ -1,4 +1,5 @@
 'use strict';
+require('./env'); // accept old KUENTA_* variables
 // Hands an email over to the mail program on this computer (e.g. Thunderbird).
 // The mail is opened there and sent by the user, so afterwards it is in the
 // "Sent" folder of the mail program.
@@ -73,7 +74,7 @@ function openFile(p) {
   else spawn(process.platform === 'darwin' ? 'open' : 'xdg-open', [p], { detached: true, stdio: 'ignore' }).unref();
 }
 
-// Does the request come from the Kuenta computer itself? Only there can the mail program open.
+// Does the request come from the KuentaPOS computer itself? Only there can the mail program open.
 function isLocalRequest(req) {
   const a = String((req && req.socket && req.socket.remoteAddress) || '').replace(/^::ffff:/, '');
   if (!a || a === '::1' || a.startsWith('127.')) return true;
@@ -82,7 +83,7 @@ function isLocalRequest(req) {
 
 // Opens a mail window with recipient, subject, text and attachments
 function open(mail) {
-  if (process.env.KUENTA_CONTAINER) throw new L.HttpError(400, 'Kuenta läuft in einem Container. Dort gibt es kein Mailprogramm – bitte unter Einstellungen → E-Mail den direkten Versand (SMTP) wählen.');
+  if (process.env.KUENTAPOS_CONTAINER) throw new L.HttpError(400, 'KuentaPOS läuft in einem Container. Dort gibt es kein Mailprogramm – bitte unter Einstellungen → E-Mail den direkten Versand (SMTP) wählen.');
   cleanup();
   const dir = path.join(OUT_DIR(), new Date().toISOString().replace(/[:.]/g, '-') + '_' + Math.random().toString(36).slice(2, 6));
   fs.mkdirSync(dir, { recursive: true });

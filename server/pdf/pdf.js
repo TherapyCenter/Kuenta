@@ -309,9 +309,9 @@ class PDFDoc {
     const xmp = `<?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?>
 <x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
 <rdf:Description rdf:about="" xmlns:pdfaid="http://www.aiim.org/pdfa/ns/id/"><pdfaid:part>3</pdfaid:part><pdfaid:conformance>B</pdfaid:conformance></rdf:Description>
-<rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title><rdf:Alt><rdf:li xml:lang="x-default">${xesc(title)}</rdf:li></rdf:Alt></dc:title><dc:creator><rdf:Seq><rdf:li>${xesc(this.opts.author || 'Kuenta')}</rdf:li></rdf:Seq></dc:creator></rdf:Description>
-<rdf:Description rdf:about="" xmlns:xmp="http://ns.adobe.com/xap/1.0/"><xmp:CreatorTool>Kuenta</xmp:CreatorTool><xmp:CreateDate>${iso}</xmp:CreateDate><xmp:ModifyDate>${iso}</xmp:ModifyDate></rdf:Description>
-<rdf:Description rdf:about="" xmlns:pdf="http://ns.adobe.com/pdf/1.3/"><pdf:Producer>Kuenta PDF</pdf:Producer></rdf:Description>
+<rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title><rdf:Alt><rdf:li xml:lang="x-default">${xesc(title)}</rdf:li></rdf:Alt></dc:title><dc:creator><rdf:Seq><rdf:li>${xesc(this.opts.author || 'KuentaPOS')}</rdf:li></rdf:Seq></dc:creator></rdf:Description>
+<rdf:Description rdf:about="" xmlns:xmp="http://ns.adobe.com/xap/1.0/"><xmp:CreatorTool>KuentaPOS</xmp:CreatorTool><xmp:CreateDate>${iso}</xmp:CreateDate><xmp:ModifyDate>${iso}</xmp:ModifyDate></rdf:Description>
+<rdf:Description rdf:about="" xmlns:pdf="http://ns.adobe.com/pdf/1.3/"><pdf:Producer>KuentaPOS PDF</pdf:Producer></rdf:Description>
 ${fx ? `<rdf:Description rdf:about="" xmlns:fx="urn:factur-x:pdfa:CrossIndustryDocument:invoice:1p0#"><fx:DocumentType>INVOICE</fx:DocumentType><fx:DocumentFileName>${fx.filename}</fx:DocumentFileName><fx:Version>1.0</fx:Version><fx:ConformanceLevel>${fx.level}</fx:ConformanceLevel></rdf:Description>
 <rdf:Description rdf:about="" xmlns:pdfaExtension="http://www.aiim.org/pdfa/ns/extension/" xmlns:pdfaSchema="http://www.aiim.org/pdfa/ns/schema#" xmlns:pdfaProperty="http://www.aiim.org/pdfa/ns/property#"><pdfaExtension:schemas><rdf:Bag><rdf:li rdf:parseType="Resource">
 <pdfaSchema:schema>Factur-X PDFA Extension Schema</pdfaSchema:schema><pdfaSchema:namespaceURI>urn:factur-x:pdfa:CrossIndustryDocument:invoice:1p0#</pdfaSchema:namespaceURI><pdfaSchema:prefix>fx</pdfaSchema:prefix>
@@ -329,7 +329,7 @@ ${fx ? `<rdf:Description rdf:about="" xmlns:fx="urn:factur-x:pdfa:CrossIndustryD
     let cat = `<< /Type /Catalog /Pages ${pagesId} 0 R /Metadata ${meta} 0 R /OutputIntents [${oi} 0 R] /Lang (de-DE)`;
     if (fsRefs.length) cat += ` /Names << /EmbeddedFiles << /Names [${fsRefs.map(f => `${pdfStr(f.name)} ${f.ref} 0 R`).join(' ')}] >> >> /AF [${fsRefs.map(f => f.ref + ' 0 R').join(' ')}]`;
     const catalog = add(cat + ' >>');
-    const info = add(`<< /Title ${pdfStr(title)} /Author ${pdfStr(this.opts.author || 'Kuenta')} /Creator (Kuenta) /Producer (Kuenta PDF) /CreationDate ${pdfStr(pdfDate(now))} /ModDate ${pdfStr(pdfDate(now))} >>`);
+    const info = add(`<< /Title ${pdfStr(title)} /Author ${pdfStr(this.opts.author || 'KuentaPOS')} /Creator (KuentaPOS) /Producer (KuentaPOS PDF) /CreationDate ${pdfStr(pdfDate(now))} /ModDate ${pdfStr(pdfDate(now))} >>`);
     // serialise
     const chunks = [Buffer.from('%PDF-1.7\n%\xe2\xe3\xcf\xd3\n', 'latin1')]; let pos = chunks[0].length; const xref = [];
     objs.forEach((o, i) => {

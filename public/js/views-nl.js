@@ -14,7 +14,7 @@ const NlUI = {
         si('nl.kvk', 'KvK-nummer (8 Ziffern)', '', true), si('nl.vestiging', 'Vestigingsnummer (optional)', '', true),
         h('div', { class: 'fld hint' }, 'KvK-Nummer und btw-id stehen in der Fußzeile jedes Belegs.')),
       grp('E-factuur (Peppol)',
-        h('div', { class: 'fld hint' }, 'Rechnungen an die öffentliche Hand (Rijksoverheid, Gemeinden) gehen als E-Rechnung im Format Peppol BIS Billing 3.0. Kuenta erzeugt die XML-Datei (Rechnung → E-factuur); senden Sie sie über Ihren Peppol-Dienstleister oder laden Sie sie im Leveranciersportaal hoch. Im Kunden die OIN (20 Ziffern) bzw. KvK-Nummer und die Referenz (Leitweg-ID-Feld oder Bestell-Nr. der Rechnung) eintragen.'))));
+        h('div', { class: 'fld hint' }, 'Rechnungen an die öffentliche Hand (Rijksoverheid, Gemeinden) gehen als E-Rechnung im Format Peppol BIS Billing 3.0. KuentaPOS erzeugt die XML-Datei (Rechnung → E-factuur); senden Sie sie über Ihren Peppol-Dienstleister oder laden Sie sie im Leveranciersportaal hoch. Im Kunden die OIN (20 Ziffern) bzw. KvK-Nummer und die Referenz (Leitweg-ID-Feld oder Bestell-Nr. der Rechnung) eintragen.'))));
   },
 };
 

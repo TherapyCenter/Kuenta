@@ -1,5 +1,6 @@
 'use strict';
-// Kuenta – Invoicing & POS for auto repair shops (web application)
+require('./env'); // accept old KUENTA_* variables
+// KuentaPOS – Invoicing & POS for auto repair shops (web application)
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -18,8 +19,8 @@ const KFZ = require('./import/kfz');
 const { E } = require('../public/js/entities.js');
 const pkg = require('../package.json');
 
-const PORT = Number(process.env.PORT || process.env.KUENTA_PORT || 3700);
-const HOST = process.env.HOST || process.env.KUENTA_HOST || '127.0.0.1';
+const PORT = Number(process.env.PORT || process.env.KUENTAPOS_PORT || 3700);
+const HOST = process.env.HOST || process.env.KUENTAPOS_HOST || '127.0.0.1';
 const PUBLIC = path.join(__dirname, '..', 'public');
 const DOCS = path.join(__dirname, '..', 'docs');   // handbooks (Help → Handbook)
 const MAX_BODY = 1024 * 1024 * 1024;
@@ -119,10 +120,10 @@ route('POST', '/api/login', async (ctx) => {
   return { ok: true };
 }, { public: true });
 // Clean shutdown for the installer (update/uninstall): only from this computer and only with
-// our own header, so a foreign web page in the browser cannot stop Kuenta.
+// our own header, so a foreign web page in the browser cannot stop KuentaPOS.
 route('POST', '/api/system/beenden', (ctx) => {
   const a = String(ctx.req.socket.remoteAddress || '').replace(/^::ffff:/, '');
-  if (!(a === '::1' || a.startsWith('127.')) || ctx.req.headers['x-kuenta-beenden'] !== '1') throw new L.HttpError(403, 'Nicht erlaubt.');
+  if (!(a === '::1' || a.startsWith('127.')) || (ctx.req.headers['x-kuentapos-beenden'] || ctx.req.headers['x-kuenta-beenden']) !== '1') throw new L.HttpError(403, 'Nicht erlaubt.');
   setTimeout(() => beenden('Installer'), 200);
   return { ok: true };
 }, { public: true });
@@ -217,8 +218,8 @@ route('GET', '/api/erinnerung/vorlagen', () => ({ ...require('./erinnerung').VOR
 route('POST', '/api/erinnerung/senden', async (ctx) => { const b = await json(ctx.req); return require('./erinnerung').senden({ ...b, user: ctx.user && ctx.user.name, offenAm: ctx.req }); });
 route('POST', '/api/erinnerung/brief', async (ctx) => { const b = await json(ctx.req); return require('./erinnerung').briefeProtokollieren({ ...b, user: ctx.user && ctx.user.name }); });
 route('GET', '/api/erinnerung/protokoll', () => L.db().prepare(`SELECT e.*, f.KENNZEICHEN FROM SW_ERINNERUNGEN e LEFT JOIN FAHRZEUGE f ON f.FAHR_ID=e.FAHRID ORDER BY e.ID DESC LIMIT 1000`).all());
-route('POST', '/api/sms/test', async (ctx) => { const b = await json(ctx.req); return require('./pro/sms').senden(b.an, b.text || 'Testnachricht von Kuenta: Der SMS-Versand funktioniert.'); });
-// Kuenta Pro license
+route('POST', '/api/sms/test', async (ctx) => { const b = await json(ctx.req); return require('./pro/sms').senden(b.an, b.text || 'Testnachricht von KuentaPOS: Der SMS-Versand funktioniert.'); });
+// KuentaPOS Pro license
 route('GET', '/api/lizenz', () => require('./lizenz').status());
 route('PUT', '/api/lizenz', async (ctx) => { ctx.need('Einstellungen', 'anzeigen'); const b = await json(ctx.req); try { return require('./lizenz').einspielen(b.schluessel); } catch (e) { throw e.status ? e : new L.HttpError(400, e.message); } });
 route('DELETE', '/api/lizenz', (ctx) => { ctx.need('Einstellungen', 'anzeigen'); return require('./lizenz').entfernen(); });
@@ -406,7 +407,7 @@ function lanAddresses() {
 
 // stop the server and close the databases properly
 function beenden(grund) {
-  console.log('\n  ' + C(`Kuenta wird beendet (${grund}) …`));
+  console.log('\n  ' + C(`KuentaPOS wird beendet (${grund}) …`));
   try { server.close(); } catch { /* ignore */ }
   try { dbm.closeAll(); } catch { /* ignore */ }
   process.exit(0);
@@ -418,7 +419,7 @@ if (require.main === module) {
   const browser = url => { const cmd = process.platform === 'win32' ? `start "" "${url}"` : process.platform === 'darwin' ? `open "${url}"` : `xdg-open "${url}"`; require('child_process').exec(cmd); };
   server.on('error', e => {
     if (e.code === 'EADDRINUSE') {
-      console.log('\n  ' + C(`Kuenta läuft bereits auf Port ${PORT}.`));
+      console.log('\n  ' + C(`KuentaPOS läuft bereits auf Port ${PORT}.`));
       if (process.argv.includes('--open')) browser(`http://localhost:${PORT}`);
       setTimeout(() => process.exit(0), 1500);
     } else { console.error(e); process.exit(1); }
@@ -426,7 +427,7 @@ if (require.main === module) {
   server.listen(PORT, HOST, () => {
     const url = `http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`;
     // labels padded to the same width in every language
-    const rows = [[C(`Kuenta ${pkg.version} läuft:`), url], ...(HOST === '0.0.0.0' ? lanAddresses().map(ip => [C('Im Netzwerk erreichbar:'), `http://${ip}:${PORT}`]) : []), [C('Datenverzeichnis:'), dbm.DATA_DIR]];
+    const rows = [[C(`KuentaPOS ${pkg.version} läuft:`), url], ...(HOST === '0.0.0.0' ? lanAddresses().map(ip => [C('Im Netzwerk erreichbar:'), `http://${ip}:${PORT}`]) : []), [C('Datenverzeichnis:'), dbm.DATA_DIR]];
     const w = Math.max(...rows.map(r => r[0].length)) + 2;
     console.log('\n' + rows.map(([l, v]) => '  ' + l.padEnd(w) + v).join('\n') + '\n');
     if (process.argv.includes('--open')) {

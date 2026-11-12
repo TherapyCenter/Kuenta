@@ -1,5 +1,5 @@
 'use strict';
-// Facturae 3.2.2: Spanish e-invoice for public administrations (FACe). Kuenta creates the XML without a
+// Facturae 3.2.2: Spanish e-invoice for public administrations (FACe). KuentaPOS creates the XML without a
 // signature; sign it with AutoFirma (XAdES) before uploading it to FACe.
 // DIR3 codes of the administration: customer field "Leitweg-ID" as "office/body/unit" (oficina contable /
 // órgano gestor / unidad tramitadora), e.g. L01280796/L01280796/L01280796.

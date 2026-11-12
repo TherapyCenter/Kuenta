@@ -355,7 +355,7 @@ Views.datenimport = async (main) => {
       mapBox.innerHTML = '';
       const kopf = vorschau.beispiel[0] || [];
       const opts = Array.from({ length: vorschau.spalten }, (_, i) => h('option', { value: i }, `Spalte ${i + 1}: ${String(kopf[i] ?? '').slice(0, 30)}`));
-      const tbl = h('table', { class: 'simple' }, h('thead', null, h('tr', null, h('th', null, 'Feld in Kuenta'), h('th', null, 'Spalte der Importdatei'))),
+      const tbl = h('table', { class: 'simple' }, h('thead', null, h('tr', null, h('th', null, 'Feld in KuentaPOS'), h('th', null, 'Spalte der Importdatei'))),
         h('tbody', null, meta.felder.map(f => { const s = h('select', null, h('option', { value: '' }, '– nicht importieren –'), opts.map(o => o.cloneNode(true))); sels[f.f] = s;
           const auto = kopf.findIndex(k => String(k).toLowerCase().replace(/[^a-zäöü]/g, '') === String(f.l).toLowerCase().replace(/[^a-zäöü]/g, '')); if (auto >= 0) s.value = auto;
           return h('tr', null, h('td', null, f.l, f.f === meta.schluessel ? h('span', { class: 'badge' }, 'Schlüssel') : null), h('td', null, s)); })));

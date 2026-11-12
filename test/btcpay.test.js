@@ -8,8 +8,8 @@ const path = require('path');
 const http = require('http');
 const zlib = require('zlib');
 
-const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'kuenta-btcpay-'));
-process.env.KUENTA_DATA = tmp;
+const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'kuentapos-btcpay-'));
+process.env.KUENTAPOS_DATA = tmp;
 
 const dbm = require('../server/db');
 const L = require('../server/lib');

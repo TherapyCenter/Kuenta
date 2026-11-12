@@ -1,8 +1,9 @@
 'use strict';
+require('../env'); // accept old KUENTA_* variables
 // Making Tax Digital for VAT: connection to the HMRC VAT (MTD) API.
-// - OAuth 2.0 (authorization code): the user signs in at HMRC once, Kuenta keeps the tokens (refresh token 18 months)
+// - OAuth 2.0 (authorization code): the user signs in at HMRC once, KuentaPOS keeps the tokens (refresh token 18 months)
 // - obligations (open and fulfilled periods), submitting the 9-box return, viewing submitted returns
-// - fraud prevention headers (connection method DESKTOP_APP_DIRECT: Kuenta runs on the user's own computer)
+// - fraud prevention headers (connection method DESKTOP_APP_DIRECT: KuentaPOS runs on the user's own computer)
 // The software is registered by its publisher in the HMRC Developer Hub (client ID and secret).
 // Tokens, app credentials and the device ID are kept in the data folder under "gb", outside backups.
 const fs = require('fs');
@@ -16,7 +17,7 @@ const pkg = require('../../package.json');
 
 const BASE = { sandbox: 'https://test-api.service.hmrc.gov.uk', production: 'https://api.service.hmrc.gov.uk' };
 const entorno = () => (L.sw('gb.mtd.entorno', 'sandbox') === 'production' ? 'production' : 'sandbox');
-const base = () => process.env.KUENTA_HMRC_URL || BASE[entorno()];
+const base = () => process.env.KUENTAPOS_HMRC_URL || BASE[entorno()];
 const ACCEPT = 'application/vnd.hmrc.1.0+json';
 
 // ---------- files ----------
@@ -27,7 +28,7 @@ const escribir = (f, o) => { fs.mkdirSync(dir(), { recursive: true }); fs.writeF
 // app credentials from the Developer Hub (per environment); environment variables take precedence
 function app() {
   const e = entorno(); const a = leer('app.json', {})[e] || {};
-  return { clientId: process.env.KUENTA_HMRC_CLIENT_ID || a.clientId || '', clientSecret: process.env.KUENTA_HMRC_CLIENT_SECRET || a.clientSecret || '' };
+  return { clientId: process.env.KUENTAPOS_HMRC_CLIENT_ID || a.clientId || '', clientSecret: process.env.KUENTAPOS_HMRC_CLIENT_SECRET || a.clientSecret || '' };
 }
 function guardarApp({ clientId, clientSecret }) {
   if (!clientId || !clientSecret) throw new L.HttpError(400, 'Bitte Client-ID und Client-Secret aus dem HMRC Developer Hub eintragen.');
@@ -69,7 +70,7 @@ async function callback(q) {
 }
 async function accessToken() {
   let t = leer(`token-${entorno()}.json`, null);
-  if (!t || !t.refresh_token) throw new L.HttpError(401, 'Kuenta ist nicht mit HMRC verbunden. Bitte unter Einstellungen → United Kingdom / MTD verbinden.');
+  if (!t || !t.refresh_token) throw new L.HttpError(401, 'KuentaPOS ist nicht mit HMRC verbunden. Bitte unter Einstellungen → United Kingdom / MTD verbinden.');
   if (Date.now() > t.expires_at - 60000) t = await token({ grant_type: 'refresh_token', refresh_token: t.refresh_token });
   return t.access_token;
 }
@@ -105,9 +106,9 @@ function cabeceras(client = {}, usuario) {
     'Gov-Client-MAC-Addresses': macs.map(enc).join(','),
     'Gov-Client-Screens': screens,
     'Gov-Client-Window-Size': `width=${Number(w.width) || 0}&height=${Number(w.height) || 0}`,
-    'Gov-Client-User-Agent': `os-family=${enc(os.type())}&os-version=${enc(os.release())}&device-manufacturer=${enc(process.env.KUENTA_DEVICE_MANUFACTURER || '')}&device-model=${enc(process.env.KUENTA_DEVICE_MODEL || os.hostname())}`,
-    'Gov-Vendor-Version': `Kuenta=${enc(pkg.version)}`,
-    'Gov-Vendor-Product-Name': 'Kuenta',
+    'Gov-Client-User-Agent': `os-family=${enc(os.type())}&os-version=${enc(os.release())}&device-manufacturer=${enc(process.env.KUENTAPOS_DEVICE_MANUFACTURER || '')}&device-model=${enc(process.env.KUENTAPOS_DEVICE_MODEL || os.hostname())}`,
+    'Gov-Vendor-Version': `KuentaPOS=${enc(pkg.version)}`,
+    'Gov-Vendor-Product-Name': 'KuentaPOS',
   };
   for (const k of Object.keys(h)) if (h[k] === '') delete h[k];
   return h;
@@ -145,7 +146,7 @@ async function obligaciones({ from, to, status } = {}, ctx = {}) {
   return (r.json && r.json.obligations) || [];
 }
 
-// submit the return of a period: the figures are calculated by Kuenta and confirmed by the user
+// submit the return of a period: the figures are calculated by KuentaPOS and confirmed by the user
 async function enviar({ periodKey, start, end, confirmado }, ctx = {}) {
   if (!confirmado) throw new L.HttpError(400, 'Bitte die Erklärung gegenüber HMRC bestätigen.');
   if (!periodKey) throw new L.HttpError(400, 'Zeitraum fehlt.');

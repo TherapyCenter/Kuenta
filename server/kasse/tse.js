@@ -33,7 +33,7 @@ async function einrichten({ adminPin }) {
   if (!adminPin || String(adminPin).length < 6) throw new L.HttpError(400, 'Die Admin-PIN muss mindestens 6 Zeichen lang sein.');
   token = null;
   const tssId = L.sw('tse.tssid', '') || crypto.randomUUID();
-  let tss = await call('PUT', `/tss/${tssId}`, { metadata: { kasse: 'Kuenta' } });
+  let tss = await call('PUT', `/tss/${tssId}`, { metadata: { kasse: 'KuentaPOS' } });
   L.setSw('tse.tssid', tssId);
   if (tss.admin_puk) L.setSw('tse.adminpuk', tss.admin_puk);
   if (tss.state === 'CREATED') tss = await call('PATCH', `/tss/${tssId}`, { state: 'UNINITIALIZED' });

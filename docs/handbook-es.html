@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="es">
 <meta charset="utf-8">
-<title>Manual de Kuenta</title>
+<title>Manual de KuentaPOS</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -154,9 +154,9 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
 <div class="shell">
   <header class="masthead">
     <div class="kicker">Invoicing &amp; POS for auto repair shops · uso, configuración, funcionamiento</div>
-    <h1>Manual de Kuenta</h1>
-    <p>Todo lo que necesita saber sobre la instalación y configuración de Kuenta, el trabajo diario, el envío de correos, las actualizaciones y las copias de seguridad.</p>
-    <div class="meta"><span>Versión <b>1.8.2</b></span><span>Fecha <b>noviembre de 2026</b></span><span>Windows · macOS · Linux · Tableta</span><span><a href="handbuch.html" hreflang="de">Deutsch</a> · <a href="handbook-en.html" hreflang="en">English</a></span></div>
+    <h1>Manual de KuentaPOS</h1>
+    <p>Todo lo que necesita saber sobre la instalación y configuración de KuentaPOS, el trabajo diario, el envío de correos, las actualizaciones y las copias de seguridad.</p>
+    <div class="meta"><span>Versión <b>1.8.3</b></span><span>Fecha <b>noviembre de 2026</b></span><span>Windows · macOS · Linux · Tableta</span><span><a href="handbuch.html" hreflang="de">Deutsch</a> · <a href="handbook-en.html" hreflang="en">English</a></span></div>
   </header>
 
   <nav class="toc" aria-label="Contenido">
@@ -167,20 +167,20 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
   <main>
     <details class="toc-mobile"><summary>Contenido</summary><ol id="toc-m"></ol></details>
 
-    <div class="note"><strong>Sobre esta traducción</strong><span>Kuenta está pensado para talleres en Alemania: impuestos, factura electrónica, caja (TSE) y DATEV siguen la legislación alemana. Este manual usa los nombres de menú de la interfaz en español. Se mantienen términos alemanes como HU (la ITV alemana), TSE o GoBD cuando se refieren a normas alemanas.</span></div>
+    <div class="note"><strong>Sobre esta traducción</strong><span>KuentaPOS está pensado para talleres en Alemania: impuestos, factura electrónica, caja (TSE) y DATEV siguen la legislación alemana. Este manual usa los nombres de menú de la interfaz en español. Se mantienen términos alemanes como HU (la ITV alemana), TSE o GoBD cuando se refieren a normas alemanas.</span></div>
 
     <section id="ueberblick">
-      <h2>¿Qué es Kuenta?</h2>
-      <p class="lead">Kuenta es un programa de facturación para talleres de automóviles. Con él se hacen presupuestos, órdenes de trabajo y facturas, se gestionan clientes y vehículos, se llevan la caja y el almacén y se crean facturas electrónicas.</p>
-      <p>Kuenta es una aplicación web: en el PC del taller funciona un pequeño programa en segundo plano (el servidor de Kuenta). Kuenta se usa en el navegador, en el mismo PC o en tabletas y otros puestos de la red. Las pantallas y el manejo se basan en <strong>KFZ-Faktura</strong>, cuyos datos Kuenta importa por completo.</p>
-      <div class="diagram" role="img" aria-label="Esquema: el PC del taller ejecuta el servidor de Kuenta y guarda los datos en el perfil de usuario. El navegador del mismo PC, las tabletas y otros puestos acceden a través de la red.">
+      <h2>¿Qué es KuentaPOS?</h2>
+      <p class="lead">KuentaPOS es un programa de facturación para talleres de automóviles. Con él se hacen presupuestos, órdenes de trabajo y facturas, se gestionan clientes y vehículos, se llevan la caja y el almacén y se crean facturas electrónicas.</p>
+      <p>KuentaPOS es una aplicación web: en el PC del taller funciona un pequeño programa en segundo plano (el servidor de KuentaPOS). KuentaPOS se usa en el navegador, en el mismo PC o en tabletas y otros puestos de la red. Las pantallas y el manejo se basan en <strong>KFZ-Faktura</strong>, cuyos datos KuentaPOS importa por completo.</p>
+      <div class="diagram" role="img" aria-label="Esquema: el PC del taller ejecuta el servidor de KuentaPOS y guarda los datos en el perfil de usuario. El navegador del mismo PC, las tabletas y otros puestos acceden a través de la red.">
         <svg viewBox="0 0 760 210" xmlns="http://www.w3.org/2000/svg">
           <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="arrow"/></marker></defs>
           <rect class="box main" x="250" y="20" width="260" height="110" rx="8"/>
           <text x="380" y="50" text-anchor="middle" font-weight="700" font-size="16">PC del taller</text>
-          <text x="380" y="74" text-anchor="middle" font-size="14">Servidor de Kuenta (ventana de consola)</text>
+          <text x="380" y="74" text-anchor="middle" font-size="14">Servidor de KuentaPOS (ventana de consola)</text>
           <text x="380" y="96" text-anchor="middle" class="sub">Dirección: http://127.0.0.1:3700</text>
-          <text x="380" y="116" text-anchor="middle" class="sub">Datos: %APPDATA%\Kuenta</text>
+          <text x="380" y="116" text-anchor="middle" class="sub">Datos: %APPDATA%\KuentaPOS</text>
           <rect class="box" x="20" y="45" width="170" height="60" rx="8"/>
           <text x="105" y="72" text-anchor="middle" font-weight="600" font-size="14">Navegador en el PC</text>
           <text x="105" y="92" text-anchor="middle" class="sub">siempre posible</text>
@@ -198,7 +198,7 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
           <path class="wire dash" d="M380 130 V148" marker-end="url(#ah)"/>
         </svg>
       </div>
-      <div class="note"><strong>Conviene saber</strong><span>La ventana de consola es el servidor de Kuenta. Debe permanecer abierta mientras se use Kuenta. Si se cierra, Kuenta se detiene.</span></div>
+      <div class="note"><strong>Conviene saber</strong><span>La ventana de consola es el servidor de KuentaPOS. Debe permanecer abierta mientras se use KuentaPOS. Si se cierra, KuentaPOS se detiene.</span></div>
     </section>
 
     <section id="installation">
@@ -207,13 +207,13 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
 
       <h3>Windows 10 / 11 (64 bits)</h3>
       <ol class="steps">
-        <li><div><strong>Ejecute <code>Kuenta-Setup-1.8.2.exe</code>.</strong><span>Node.js va incluido en el instalador; no hace falta instalar nada más.</span></div></li>
-        <li><div><strong>Elija el tipo de instalación.</strong><span><em>Para todos los usuarios</em> (predeterminado, requiere derechos de administrador) instala en <code>C:\Archivos de programa\Kuenta</code>. <em>Solo para mí</em> no requiere derechos de administrador e instala en el perfil de usuario.</span></div></li>
+        <li><div><strong>Ejecute <code>KuentaPOS-Setup-1.8.3.exe</code>.</strong><span>Node.js va incluido en el instalador; no hace falta instalar nada más.</span></div></li>
+        <li><div><strong>Elija el tipo de instalación.</strong><span><em>Para todos los usuarios</em> (predeterminado, requiere derechos de administrador) instala en <code>C:\Archivos de programa\KuentaPOS</code>. <em>Solo para mí</em> no requiere derechos de administrador e instala en el perfil de usuario.</span></div></li>
         <li><div><strong>Elija las opciones.</strong><span>Acceso directo en el escritorio y, para el modo red, la regla del cortafuegos (solo en la instalación para todos los usuarios).</span></div></li>
-        <li><div><strong>Iniciar:</strong><span>menú Inicio <span class="path">Kuenta</span>. Se abren la ventana de consola y el navegador con <code>http://127.0.0.1:3700</code>.</span></div></li>
+        <li><div><strong>Iniciar:</strong><span>menú Inicio <span class="path">KuentaPOS</span>. Se abren la ventana de consola y el navegador con <code>http://127.0.0.1:3700</code>.</span></div></li>
       </ol>
-      <p>El instalador está en español, inglés o alemán y elige el idioma de Windows. El menú Inicio tiene tres entradas: <strong>Kuenta</strong> (solo este PC), <strong>Kuenta (red)</strong> (para tabletas y otros puestos) y <strong>Desinstalar Kuenta</strong>. Con el instalador en alemán se llaman <em>Kuenta</em>, <em>Kuenta im Netzwerk</em> y <em>Kuenta deinstallieren</em>.</p>
-      <p>Una instalación nueva arranca en el idioma de Windows (español, alemán o, si no, inglés). La ventana de consola usa el mismo idioma. Para cambiar la interfaz, use el menú <span class="path">Kuenta → Sprache / Language</span> o el selector de idioma de la página de inicio de sesión.</p>
+      <p>El instalador está en español, inglés o alemán y elige el idioma de Windows. El menú Inicio tiene tres entradas: <strong>KuentaPOS</strong> (solo este PC), <strong>KuentaPOS (red)</strong> (para tabletas y otros puestos) y <strong>Desinstalar KuentaPOS</strong>. Con el instalador en alemán se llaman <em>KuentaPOS</em>, <em>KuentaPOS im Netzwerk</em> y <em>KuentaPOS deinstallieren</em>.</p>
+      <p>Una instalación nueva arranca en el idioma de Windows (español, alemán o, si no, inglés). La ventana de consola usa el mismo idioma. Para cambiar la interfaz, use el menú <span class="path">KuentaPOS → Sprache / Language</span> o el selector de idioma de la página de inicio de sesión.</p>
 
       <h3>Linux</h3>
       <p>Se necesita Node.js 22.13 o posterior. Compruébelo con <code>node -v</code>.</p>
@@ -227,69 +227,69 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
           <tr><td>sin root</td><td><a href="https://github.com/nvm-sh/nvm">nvm</a>: <code>nvm install 24</code></td></tr>
         </tbody>
       </table></div>
-      <div class="codeblock"><pre><code>git clone &lt;URL del repositorio&gt; kuenta     # o descomprimir el archivo
-cd kuenta
+      <div class="codeblock"><pre><code>git clone &lt;URL del repositorio&gt; kuentapos     # o descomprimir el archivo
+cd kuentapos
 ./installer/unix/install.sh</code></pre></div>
-      <p>El script instala sin root para el usuario actual: el programa en <code>~/.local/lib/kuenta</code>, el comando de inicio <code>~/.local/bin/kuenta</code> y una entrada en el menú de aplicaciones. Para otra ubicación: <code>PREFIX=/opt/kuenta ./installer/unix/install.sh</code>.</p>
-      <div class="codeblock"><pre><code>kuenta              # solo este ordenador
-kuenta --netzwerk   # compartir con tabletas / otros puestos</code></pre></div>
+      <p>El script instala sin root para el usuario actual: el programa en <code>~/.local/lib/kuentapos</code>, el comando de inicio <code>~/.local/bin/kuentapos</code> y una entrada en el menú de aplicaciones. Para otra ubicación: <code>PREFIX=/opt/kuentapos ./installer/unix/install.sh</code>.</p>
+      <div class="codeblock"><pre><code>kuentapos              # solo este ordenador
+kuentapos --netzwerk   # compartir con tabletas / otros puestos</code></pre></div>
       <p>Se detiene con <kbd>Ctrl</kbd>+<kbd>C</kbd> o cerrando el terminal.</p>
       <h4>Opcional: como servicio sin pantalla</h4>
       <div class="codeblock"><pre><code>mkdir -p ~/.config/systemd/user
-cat &gt; ~/.config/systemd/user/kuenta.service &lt;&lt;'EOF'
+cat &gt; ~/.config/systemd/user/kuentapos.service &lt;&lt;'EOF'
 [Unit]
-Description=Kuenta
+Description=KuentaPOS
 
 [Service]
 Environment=HOST=0.0.0.0
-ExecStart=/usr/bin/env node %h/.local/lib/kuenta/server/index.js
+ExecStart=/usr/bin/env node %h/.local/lib/kuentapos/server/index.js
 Restart=on-failure
 
 [Install]
 WantedBy=default.target
 EOF
 systemctl --user daemon-reload
-systemctl --user enable --now kuenta
+systemctl --user enable --now kuentapos
 loginctl enable-linger "$USER"</code></pre></div>
       <p>Si hay un cortafuegos activo, abra el puerto 3700/TCP, p. ej. <code>sudo ufw allow 3700/tcp</code>.</p>
 
       <h3>macOS</h3>
       <ol class="steps">
         <li><div><strong>Instalar Node.js</strong><span>Paquete de <a href="https://nodejs.org/es">nodejs.org</a> (LTS) o <code>brew install node@24</code>.</span></div></li>
-        <li><div><strong>Instalar Kuenta</strong><span>En el terminal, como en Linux: <code>./installer/unix/install.sh</code>. La app <em>Kuenta</em> queda en <code>~/Applications</code>.</span></div></li>
-        <li><div><strong>Iniciar</strong><span>Doble clic en <em>Kuenta</em> o <code>kuenta</code> en el terminal. La primera vez, macOS puede avisar de una app sin firmar: en el Finder, clic derecho → <em>Abrir</em>.</span></div></li>
+        <li><div><strong>Instalar KuentaPOS</strong><span>En el terminal, como en Linux: <code>./installer/unix/install.sh</code>. La app <em>KuentaPOS</em> queda en <code>~/Applications</code>.</span></div></li>
+        <li><div><strong>Iniciar</strong><span>Doble clic en <em>KuentaPOS</em> o <code>kuentapos</code> en el terminal. La primera vez, macOS puede avisar de una app sin firmar: en el Finder, clic derecho → <em>Abrir</em>.</span></div></li>
       </ol>
 
       <h3>Contenedor (Docker / Podman)</h3>
-      <p>Para servidores Linux, NAS, Raspberry Pi o Mac, Kuenta también funciona en un contenedor. La imagen incluye Node.js y funciona en x86_64 y ARM64. En la carpeta de Kuenta hay un <code>Dockerfile</code> y un <code>compose.yaml</code>.</p>
+      <p>Para servidores Linux, NAS, Raspberry Pi o Mac, KuentaPOS también funciona en un contenedor. La imagen incluye Node.js y funciona en x86_64 y ARM64. En la carpeta de KuentaPOS hay un <code>Dockerfile</code> y un <code>compose.yaml</code>.</p>
       <div class="codeblock"><pre><code># Podman (con Docker, sustituya podman por docker)
-podman build -t kuenta:1.8.2 .
-podman run -d --name kuenta --restart unless-stopped \
-  -p 3700:3700 -v kuenta-daten:/data kuenta:1.8.2
+podman build -t kuentapos:1.8.3 .
+podman run -d --name kuentapos --restart unless-stopped \
+  -p 3700:3700 -v kuentapos-daten:/data kuentapos:1.8.3
 
 # o con Compose
 docker compose up -d --build</code></pre></div>
       <p>Después abra <code>http://&lt;ordenador&gt;:3700</code> en el navegador.</p>
-      <div class="note warn"><strong>Active el inicio de sesión</strong><span>En el contenedor, Kuenta es accesible desde toda la red. Active el inicio de sesión justo después del primer arranque (<span class="path">Ajustes → Valores predeterminados</span>). Solo para este ordenador: <code>-p 127.0.0.1:3700:3700</code>.</span></div>
+      <div class="note warn"><strong>Active el inicio de sesión</strong><span>En el contenedor, KuentaPOS es accesible desde toda la red. Active el inicio de sesión justo después del primer arranque (<span class="path">Ajustes → Valores predeterminados</span>). Solo para este ordenador: <code>-p 127.0.0.1:3700:3700</code>.</span></div>
       <div class="tablewrap"><table>
         <thead><tr><th>Tema</th><th>En el contenedor</th></tr></thead>
         <tbody>
-          <tr><td>Datos</td><td>en el volumen <code>kuenta-daten</code> (<code>/data</code> dentro del contenedor). Se conservan al reconstruir el contenedor. Carpeta propia: <code>-v /srv/kuenta:/data</code>; debe pertenecer al UID 1000. Con Podman sin root, añada <code>:Z,U</code>.</td></tr>
-          <tr><td>Copias de seguridad</td><td>monte además una carpeta del NAS, p. ej. <code>-v /mnt/nas/kuenta-sicherungen:/sicherungen</code>, e indique <code>/sicherungen</code> como carpeta de copias en Kuenta.</td></tr>
+          <tr><td>Datos</td><td>en el volumen <code>kuentapos-daten</code> (<code>/data</code> dentro del contenedor). Se conservan al reconstruir el contenedor. Carpeta propia: <code>-v /srv/kuentapos:/data</code>; debe pertenecer al UID 1000. Con Podman sin root, añada <code>:Z,U</code>.</td></tr>
+          <tr><td>Copias de seguridad</td><td>monte además una carpeta del NAS, p. ej. <code>-v /mnt/nas/kuentapos-sicherungen:/sicherungen</code>, e indique <code>/sicherungen</code> como carpeta de copias en KuentaPOS.</td></tr>
           <tr><td>Zona horaria</td><td>predeterminada <code>Europe/Berlin</code>; se cambia con <code>-e TZ=Europe/Madrid</code>.</td></tr>
           <tr><td>Correo</td><td>solo envío directo por SMTP. En el contenedor no se puede pasar el correo a Thunderbird.</td></tr>
           <tr><td>Importación de KFZ-Faktura</td><td>suba la copia <code>*.kfz</code> o <code>DB1.bak</code>. La importación directa desde la carpeta del programa solo existe en Windows.</td></tr>
-          <tr><td>Detener</td><td><code>podman stop kuenta</code> cierra la base de datos correctamente.</td></tr>
-          <tr><td>Actualizar</td><td>construya la imagen con la nueva versión, elimine el contenedor con <code>podman rm -f kuenta</code> y créelo de nuevo con la imagen nueva. Los datos del volumen se conservan.</td></tr>
+          <tr><td>Detener</td><td><code>podman stop kuentapos</code> cierra la base de datos correctamente.</td></tr>
+          <tr><td>Actualizar</td><td>construya la imagen con la nueva versión, elimine el contenedor con <code>podman rm -f kuentapos</code> y créelo de nuevo con la imagen nueva. Los datos del volumen se conservan.</td></tr>
         </tbody>
       </table></div>
       <p>Inicio automático con Podman mediante un archivo Quadlet y más detalles: véase <code>INSTALL.md</code>, sección «Container».</p>
 
       <h3>Umbrel</h3>
-      <p>En un Umbrel (umbrelOS) abra la <strong>App Store</strong>, arriba a la derecha <strong>⋯ → Community App Stores</strong>, añada <code>https://github.com/TherapyCenter/umbrel-app-store</code>, abra la tienda <strong>TherapyCenter</strong> e instale <strong>Kuenta</strong>. Kuenta funciona entonces en <code>http://umbrel.local:3700</code>, protegido por el inicio de sesión de Umbrel. Los datos se guardan en el Umbrel y se conservan en las actualizaciones; guarde además una copia externa con <span class="path">Kuenta → Copia de seguridad</span>.</p>
+      <p>En un Umbrel (umbrelOS) abra la <strong>App Store</strong>, arriba a la derecha <strong>⋯ → Community App Stores</strong>, añada <code>https://github.com/TherapyCenter/umbrel-app-store</code>, abra la tienda <strong>TherapyCenter</strong> e instale <strong>KuentaPOS</strong>. KuentaPOS funciona entonces en <code>http://umbrel.local:3700</code>, protegido por el inicio de sesión de Umbrel. Los datos se guardan en el Umbrel y se conservan en las actualizaciones; guarde además una copia externa con <span class="path">KuentaPOS → Copia de seguridad</span>.</p>
 
       <h3>Sin instalación</h3>
-      <p>Con Node.js (22.13 o posterior) instalado, directamente desde la carpeta descomprimida: <code>Kuenta starten.bat</code> (Windows), <code>./kuenta.sh</code> (Linux/macOS) o <code>node server/index.js --open</code>.</p>
+      <p>Con Node.js (22.13 o posterior) instalado, directamente desde la carpeta descomprimida: <code>KuentaPOS starten.bat</code> (Windows), <code>./kuentapos.sh</code> (Linux/macOS) o <code>node server/index.js --open</code>.</p>
     </section>
 
     <section id="einrichtung">
@@ -314,7 +314,7 @@ docker compose up -d --build</code></pre></div>
           <tr><td>Pago con criptomonedas</td><td>BTCPay Server para Bitcoin, Lightning y USDT, validez de los enlaces de pago, cuenta contable (véase <a href="#krypto">Pago con criptomonedas</a>)</td></tr>
           <tr><td>Valores predeterminados</td><td>registro bruto/neto, recargo por piezas pequeñas, material de pintura, bloqueo GoBD, inicio de sesión, esquema de colores (claro/oscuro) y color, idioma de la interfaz y de los documentos</td></tr>
           <tr><td>Correo electrónico</td><td>modo de envío, ruta de Thunderbird, servidor SMTP, plantillas, firma, registro de envíos</td></tr>
-          <tr><td>Licencia</td><td>instalar o quitar la clave de licencia de Kuenta Pro, estado de la licencia (véase <a href="#pro">Kuenta Pro</a>)</td></tr>
+          <tr><td>Licencia</td><td>instalar o quitar la clave de licencia de KuentaPOS Pro, estado de la licencia (véase <a href="#pro">KuentaPOS Pro</a>)</td></tr>
           <tr><td>Recordatorios y SMS</td><td>textos de los recordatorios por correo y SMS, pasarela SMS con plantillas y prueba, registro de recordatorios (véase <a href="#erinnerungen">Recordatorios</a>)</td></tr>
           <tr><td>Caja</td><td>TSE (fiskaly), terminal de tarjetas (ZVT), teclas rápidas, cliente de venta al contado</td></tr>
           <tr><td>Control horario</td><td>ajustes del control horario, estado federado para los festivos</td></tr>
@@ -329,37 +329,37 @@ docker compose up -d --build</code></pre></div>
     <section id="datenuebernahme">
       <h2>Importar datos</h2>
       <div class="tablewrap"><table>
-        <thead><tr><th>Origen</th><th>Dónde en Kuenta</th></tr></thead>
+        <thead><tr><th>Origen</th><th>Dónde en KuentaPOS</th></tr></thead>
         <tbody>
-          <tr><td>KFZ-Faktura</td><td><span class="path">Kuenta → Importar datos de KFZ-Faktura</span></td></tr>
-          <tr><td>Copia de Kuenta <code>*.kuenta</code>, KFZ-Faktotum <code>*.kft</code>, Schraubwerk <code>*.swb</code></td><td><span class="path">Kuenta → Restaurar datos</span></td></tr>
-          <tr><td>CSV, DATANORM 4/5</td><td><span class="path">Kuenta → Importación de datos</span></td></tr>
+          <tr><td>KFZ-Faktura</td><td><span class="path">KuentaPOS → Importar datos de KFZ-Faktura</span></td></tr>
+          <tr><td>Copia de KuentaPOS <code>*.kuentapos</code>, KFZ-Faktotum <code>*.kft</code>, Schraubwerk <code>*.swb</code></td><td><span class="path">KuentaPOS → Restaurar datos</span></td></tr>
+          <tr><td>CSV, DATANORM 4/5</td><td><span class="path">KuentaPOS → Importación de datos</span></td></tr>
         </tbody>
       </table></div>
       <h3>Desde KFZ-Faktura</h3>
       <ol>
-        <li><strong>Copia <code>*.kfz</code>:</strong> en KFZ-Faktura use «Daten sichern» y suba el archivo en Kuenta (arrastrar y soltar). Se admiten copias protegidas con contraseña.</li>
+        <li><strong>Copia <code>*.kfz</code>:</strong> en KFZ-Faktura use «Daten sichern» y suba el archivo en KuentaPOS (arrastrar y soltar). Se admiten copias protegidas con contraseña.</li>
         <li><strong>Copia de la base de datos</strong> <code>DB1.bak</code> o <code>*.fbk</code>: súbala directamente.</li>
         <li><strong>Carpeta del programa</strong> (solo Windows), p. ej. <code>C:\KFZ-Faktura</code>. Cierre antes KFZ-Faktura. La base de datos original solo se copia, nunca se modifica.</li>
       </ol>
       <p>Se importan todas las tablas: clientes, vehículos, artículos, mano de obra, proveedores, almacenaje de neumáticos, todos los documentos, pagos, partidas pendientes, reclamaciones, libro de caja, asientos contables, bloques de texto, ajustes, series de numeración, códigos KBA y el directorio de códigos postales, además de documentos, imágenes y el logo de la empresa.</p>
       <h3>Nueva importación: qué se conserva y qué se sustituye</h3>
-      <p>Puede importar datos de KFZ-Faktura varias veces, p. ej. durante un período de transición. Antes de importar, Kuenta muestra un resumen:</p>
+      <p>Puede importar datos de KFZ-Faktura varias veces, p. ej. durante un período de transición. Antes de importar, KuentaPOS muestra un resumen:</p>
       <div class="compare">
-        <div><span class="tag">se conserva</span><h4>Datos que solo existen en Kuenta</h4>
-          <ul><li>ajustes: correo, caja, TSE, copias de seguridad, impresión</li><li>tiques y cierres de caja</li><li>control horario, citas, tareas, cartas</li><li>facturas de proveedor, compraventa de vehículos, contratos, anticipos</li><li>documentos subidos en Kuenta, registro de correo y de cambios</li><li>campos propios de Kuenta en los datos maestros, p. ej. formato de factura electrónica y Leitweg-ID del cliente, IBAN del proveedor, horas previstas de los empleados</li></ul></div>
+        <div><span class="tag">se conserva</span><h4>Datos que solo existen en KuentaPOS</h4>
+          <ul><li>ajustes: correo, caja, TSE, copias de seguridad, impresión</li><li>tiques y cierres de caja</li><li>control horario, citas, tareas, cartas</li><li>facturas de proveedor, compraventa de vehículos, contratos, anticipos</li><li>documentos subidos en KuentaPOS, registro de correo y de cambios</li><li>campos propios de KuentaPOS en los datos maestros, p. ej. formato de factura electrónica y Leitweg-ID del cliente, IBAN del proveedor, horas previstas de los empleados</li></ul></div>
         <div><span class="tag">se sustituye</span><h4>Datos de KFZ-Faktura</h4>
           <ul><li>clientes, vehículos, artículos, mano de obra, proveedores</li><li>presupuestos, órdenes, albaranes, facturas</li><li>pagos, libro de caja, series de numeración</li></ul>
-          <p>Antes, Kuenta indica cuántos de estos registros se han creado o modificado en Kuenta desde la última importación. Se sustituyen por el estado de la copia.</p></div>
+          <p>Antes, KuentaPOS indica cuántos de estos registros se han creado o modificado en KuentaPOS desde la última importación. Se sustituyen por el estado de la copia.</p></div>
       </div>
-      <p>Con la casilla «Conservar los datos propios de Kuenta» (predeterminada) ocurre lo descrito arriba. Sin ella, la importación sustituye todo por la copia.</p>
-      <div class="note ok"><strong>Copia de seguridad previa</strong><span>Antes de cada importación, Kuenta guarda una copia de los datos anteriores en la subcarpeta <code>sicherheitskopien</code> de la carpeta de datos.</span></div>
-      <div class="note warn"><strong>Trabajo en paralelo</strong><span>No trabaje a la vez en KFZ-Faktura y en Kuenta con las mismas facturas. Las facturas que cree en Kuenta (también las automáticas de la caja) se sobrescriben con la siguiente importación.</span></div>
+      <p>Con la casilla «Conservar los datos propios de KuentaPOS» (predeterminada) ocurre lo descrito arriba. Sin ella, la importación sustituye todo por la copia.</p>
+      <div class="note ok"><strong>Copia de seguridad previa</strong><span>Antes de cada importación, KuentaPOS guarda una copia de los datos anteriores en la subcarpeta <code>sicherheitskopien</code> de la carpeta de datos.</span></div>
+      <div class="note warn"><strong>Trabajo en paralelo</strong><span>No trabaje a la vez en KFZ-Faktura y en KuentaPOS con las mismas facturas. Las facturas que cree en KuentaPOS (también las automáticas de la caja) se sobrescriben con la siguiente importación.</span></div>
       <div class="note warn"><strong>Copias en 7-Zip</strong><span>Las versiones recientes de KFZ-Faktura comprimen el archivo <code>.kfz</code> en formato 7-Zip. En ese caso descomprímalo con 7-Zip y suba <code>db\DB1.bak</code>.</span></div>
       <h3>CSV y DATANORM</h3>
-      <p>El asistente de importación importa clientes, vehículos, artículos, mano de obra y proveedores desde archivos CSV. Las columnas se asignan a los campos de Kuenta y la asignación puede guardarse como plantilla. Los datos de artículos de mayoristas llegan mediante DATANORM 4/5.</p>
+      <p>El asistente de importación importa clientes, vehículos, artículos, mano de obra y proveedores desde archivos CSV. Las columnas se asignan a los campos de KuentaPOS y la asignación puede guardarse como plantilla. Los datos de artículos de mayoristas llegan mediante DATANORM 4/5.</p>
       <h3>Cambio a otro ordenador</h3>
-      <p>En el ordenador antiguo <span class="path">Kuenta → Copia de seguridad</span>, en el nuevo <span class="path">Kuenta → Restaurar datos</span>.</p>
+      <p>En el ordenador antiguo <span class="path">KuentaPOS → Copia de seguridad</span>, en el nuevo <span class="path">KuentaPOS → Restaurar datos</span>.</p>
     </section>
 
     <section id="bedienung">
@@ -367,7 +367,7 @@ docker compose up -d --build</code></pre></div>
       <div class="tablewrap"><table>
         <thead><tr><th>Elemento</th><th>Para qué</th></tr></thead>
         <tbody>
-          <tr><td>Barra de menús</td><td>Arriba: Kuenta, Datos maestros, Oficina, Compras, Ventas, Compraventa de vehículos, Finanzas, Informes. Aquí están también «Nueva factura», la impresión en lote, la copia de seguridad y la importación.</td></tr>
+          <tr><td>Barra de menús</td><td>Arriba: KuentaPOS, Datos maestros, Oficina, Compras, Ventas, Compraventa de vehículos, Finanzas, Informes. Aquí están también «Nueva factura», la impresión en lote, la copia de seguridad y la importación.</td></tr>
           <tr><td>Navegación</td><td>A la izquierda: todas las listas agrupadas por áreas.</td></tr>
           <tr><td>Barra rápida</td><td>Acciones frecuentes con un clic.</td></tr>
           <tr><td>Búsqueda</td><td>Arriba en la barra, accesible con <kbd>Ctrl</kbd>+<kbd>F</kbd>. Encuentra clientes, vehículos y documentos.</td></tr>
@@ -401,7 +401,7 @@ docker compose up -d --build</code></pre></div>
       </table></div>
       <div class="note"><strong>Solo visualización</strong><span>Facturas, pagos, asientos, DATEV y todas las impresiones siguen siempre en la moneda de la empresa (euros, libras en el Reino Unido, dólares en EE. UU., francos en Suiza). El interruptor solo cambia cómo se muestran las cifras en el resumen.</span></div>
       <p>Los tipos de cambio proceden del Banco Central Europeo (dólar, libra esterlina y franco suizo, tipo de referencia del último día hábil) y de la plataforma Bitstamp (bitcoin, tipo actual).</p>
-      <div class="note"><strong>Internet</strong><span>Para los tipos de cambio, el ordenador de Kuenta consulta al BCE y a Bitstamp como máximo cada tres horas. No se envía ningún dato de Kuenta. Kuenta guarda los tipos en caché. Sin internet se usan los últimos cargados. Si nunca se han cargado, la visualización sigue en euros.</span></div>
+      <div class="note"><strong>Internet</strong><span>Para los tipos de cambio, el ordenador de KuentaPOS consulta al BCE y a Bitstamp como máximo cada tres horas. No se envía ningún dato de KuentaPOS. KuentaPOS guarda los tipos en caché. Sin internet se usan los últimos cargados. Si nunca se han cargado, la visualización sigue en euros.</span></div>
 
       <h3>Colores</h3>
       <p>En <span class="path">Ajustes → Valores predeterminados → Apariencia</span> se configuran dos cosas:</p>
@@ -414,7 +414,7 @@ docker compose up -d --build</code></pre></div>
       <h3>Idioma</h3>
       <p>La interfaz y los documentos están disponibles en alemán, inglés, español, francés, italiano y neerlandés. Hay dos ajustes:</p>
       <ul>
-        <li><strong>Idioma de la interfaz:</strong> en el menú <span class="path">Kuenta → Sprache / Language</span>, en la página de inicio de sesión o en <span class="path">Ajustes → Valores predeterminados</span>. Solo se aplica al puesto actual. En español, los números aparecen como 1.234,50 y las fechas como 31/12/2026.</li>
+        <li><strong>Idioma de la interfaz:</strong> en el menú <span class="path">KuentaPOS → Sprache / Language</span>, en la página de inicio de sesión o en <span class="path">Ajustes → Valores predeterminados</span>. Solo se aplica al puesto actual. En español, los números aparecen como 1.234,50 y las fechas como 31/12/2026.</li>
         <li><strong>Idioma de los documentos:</strong> en <span class="path">Ajustes → Valores predeterminados</span>. Se aplica a toda la empresa y afecta a los documentos PDF, la impresión, las reclamaciones y las plantillas de correos y recordatorios. Puede elegir alemán, inglés, español, italiano, neerlandés y francés.</li>
       </ul>
       <p>Lo que usted introduce se queda tal cual: los textos de artículos, los nombres de clientes y sus propias plantillas no se traducen. Las indicaciones legales como el § 19 UStG aparecen traducidas, pero sigue aplicándose la legislación del sistema fiscal elegido; los textos legales de los demás países (Francia, Italia, Países Bajos, Bélgica) se imprimen en el idioma del país. La factura electrónica (XRechnung) sigue en alemán.</p>
@@ -442,7 +442,7 @@ docker compose up -d --build</code></pre></div>
       </div>
       <h3>Sistema</h3>
       <ul>
-        <li><strong>Empresas:</strong> llevar por separado varios negocios o datos de prueba, <span class="path">Kuenta → Cambiar de empresa</span>.</li>
+        <li><strong>Empresas:</strong> llevar por separado varios negocios o datos de prueba, <span class="path">KuentaPOS → Cambiar de empresa</span>.</li>
         <li><strong>Usuarios y permisos:</strong> definir por usuario qué áreas puede ver, crear, editar o eliminar y si ve los precios de compra.</li>
         <li><strong>Registros:</strong> registro de cambios y registro de envíos de correo.</li>
       </ul>
@@ -450,7 +450,7 @@ docker compose up -d --build</code></pre></div>
 
     <section id="erechnung">
       <h2>Factura electrónica</h2>
-      <p>Kuenta crea facturas electrónicas según la norma EN 16931 y lee las facturas electrónicas recibidas.</p>
+      <p>KuentaPOS crea facturas electrónicas según la norma EN 16931 y lee las facturas electrónicas recibidas.</p>
       <div class="tablewrap"><table>
         <thead><tr><th>Formato</th><th>Descripción</th></tr></thead>
         <tbody>
@@ -470,26 +470,26 @@ docker compose up -d --build</code></pre></div>
 
     <section id="spanien">
       <h2>España: IVA y VERI*FACTU</h2>
-      <p>Kuenta puede trabajar con la normativa fiscal española por empresa. Se activa en <span class="path">Ajustes → Impuestos / reclamaciones / caja → Sistema fiscal</span> (los ajustes están en la pestaña <span class="path">España / VERI*FACTU</span>); después guarde y vuelva a cargar el programa. Para documentos en español, ponga el idioma de los documentos en Español en <span class="path">Ajustes → Valores predeterminados → Idioma</span>. Las demás empresas, las facturas existentes, las copias de seguridad y la importación desde KFZ-Faktura no cambian.</p>
+      <p>KuentaPOS puede trabajar con la normativa fiscal española por empresa. Se activa en <span class="path">Ajustes → Impuestos / reclamaciones / caja → Sistema fiscal</span> (los ajustes están en la pestaña <span class="path">España / VERI*FACTU</span>); después guarde y vuelva a cargar el programa. Para documentos en español, ponga el idioma de los documentos en Español en <span class="path">Ajustes → Valores predeterminados → Idioma</span>. Las demás empresas, las facturas existentes, las copias de seguridad y la importación desde KFZ-Faktura no cambian.</p>
       <h3>Qué cambia</h3>
       <ul>
         <li><strong>IVA:</strong> 21 %, 10 % y 4 % (configurables), líneas exentas y suplidos (importes pagados por cuenta del cliente, p. ej. la tasa de la ITV; regístrelos como partida de paso).</li>
         <li><strong>Recargo de equivalencia:</strong> se activa en el cliente, en <span class="path">Impuestos y contabilidad</span>. El recargo (5,2 / 1,4 / 0,5 %) se añade automáticamente a la factura.</li>
         <li><strong>NIF:</strong> en el cliente, campo <em>NIF / NIF-IVA</em>. El NIF propio va en <span class="path">Datos de la empresa → Número fiscal</span>.</li>
         <li><strong>Numeración:</strong> serie + número correlativo, p. ej. F20260001; las rectificativas usan la serie R.</li>
-        <li><strong>Tipos de factura:</strong> los clientes con NIF reciben factura completa (F1), los demás factura simplificada (F2) hasta 400 €. Por encima, Kuenta pide el NIF.</li>
+        <li><strong>Tipos de factura:</strong> los clientes con NIF reciben factura completa (F1), los demás factura simplificada (F2) hasta 400 €. Por encima, KuentaPOS pide el NIF.</li>
         <li><strong>Caja:</strong> cada venta es una factura; el ticket muestra serie, número, NIF y el código QR. VERI*FACTU sustituye a la TSE alemana.</li>
         <li><strong>Contabilidad:</strong> en <span class="path">Finanzas → Exportación contable</span> están los libros de <em>facturas expedidas</em> y <em>recibidas</em> en CSV y un resumen para el <em>modelo 303</em>.</li>
         <li><strong>Factura electrónica para administraciones:</strong> Facturae 3.2.2. Introduzca los códigos DIR3 de la administración en el campo Leitweg-ID del cliente como <code>Oficina/Órgano/Unidad</code>. Firme el archivo con AutoFirma antes de subirlo a FACe.</li>
       </ul>
       <h3>VERI*FACTU</h3>
-      <p>Una factura queda <strong>expedida</strong> en cuanto sale de Kuenta: impresión, PDF, correo o caja. Kuenta lo pregunta antes. Se genera un registro con huella encadenada y su código QR se imprime en la parte superior de la factura. Kuenta envía el registro a la AEAT o, sin internet, más tarde automáticamente. A partir de ahí la factura queda bloqueada; solo se corrige con una factura rectificativa (anular factura). El estado aparece en la ventana de la factura, junto a los botones.</p>
+      <p>Una factura queda <strong>expedida</strong> en cuanto sale de KuentaPOS: impresión, PDF, correo o caja. KuentaPOS lo pregunta antes. Se genera un registro con huella encadenada y su código QR se imprime en la parte superior de la factura. KuentaPOS envía el registro a la AEAT o, sin internet, más tarde automáticamente. A partir de ahí la factura queda bloqueada; solo se corrige con una factura rectificativa (anular factura). El estado aparece en la ventana de la factura, junto a los botones.</p>
       <ol>
         <li>Guarde el certificado electrónico de la empresa (.p12 / .pfx) en <span class="path">Ajustes → España / VERI*FACTU</span> y <em>pruebe la conexión</em>.</li>
         <li>Expida algunas facturas en el entorno de <em>Pruebas</em> y compruebe que se aceptan. Mejor en una empresa de prueba aparte, porque las facturas de prueba también quedan bloqueadas.</li>
         <li>Cambie a <em>Producción</em>. A partir de ahora las facturas se registran en la AEAT.</li>
       </ol>
-      <p>El certificado, la cadena de huellas y una copia de todos los registros están en la carpeta de datos, en <code>verifactu</code>. Esta carpeta no forma parte de la copia de seguridad de Kuenta y se conserva al restaurar una copia, de modo que no se pierde ningún registro ni se repite ningún número ya remitido. Haga también copia de esa carpeta.</p>
+      <p>El certificado, la cadena de huellas y una copia de todos los registros están en la carpeta de datos, en <code>verifactu</code>. Esta carpeta no forma parte de la copia de seguridad de KuentaPOS y se conserva al restaurar una copia, de modo que no se pierde ningún registro ni se repite ningún número ya remitido. Haga también copia de esa carpeta.</p>
       <p>No soportado: TicketBAI (País Vasco), Navarra, IGIC (Canarias), régimen especial de bienes usados (REBU) en VERI*FACTU, la modalidad «No VERI*FACTU» y el SII.</p>
     </section>
 
@@ -520,11 +520,11 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Clientes exentos</strong> (reventa, gobierno, sin ánimo de lucro): en el cliente, en <span class="path">Impuestos y contabilidad</span>, con el número del certificado de exención.</li>
         <li><strong>Requisitos de la factura:</strong> número de registro del taller en el pie, estado de las piezas (nueva, usada, reconstruida) en la línea, odómetro a la entrada y a la salida, destino de las piezas sustituidas (pestaña <em>Otros</em>).</li>
         <li><strong>Suministros de taller y tasas:</strong> botones en la barra de líneas. Los suministros son un porcentaje de la mano de obra con un máximo; las tasas (residuos, neumáticos por unidad, core charge) son una lista en los ajustes.</li>
-        <li><strong>Autorización del presupuesto:</strong> registre cada autorización del cliente con importe, fecha, forma y persona en la pestaña <em>Otros</em>. Se imprime en la orden y la factura; si la factura la supera, Kuenta pregunta antes de imprimir. El presupuesto lleva el aviso y una línea de firma.</li>
+        <li><strong>Autorización del presupuesto:</strong> registre cada autorización del cliente con importe, fecha, forma y persona en la pestaña <em>Otros</em>. Se imprime en la orden y la factura; si la factura la supera, KuentaPOS pregunta antes de imprimir. El presupuesto lleva el aviso y una línea de firma.</li>
         <li><strong>Caja:</strong> precios sin impuesto; el sales tax se suma al total.</li>
         <li><strong>Contabilidad:</strong> <span class="path">Finanzas → Exportación contable</span> genera un CSV para importar facturas en QuickBooks Online (código TAX/NON).</li>
       </ul>
-      <p>Kuenta no determina los tipos automáticamente ni presenta declaraciones; de eso se encarga su asesor o QuickBooks.</p>
+      <p>KuentaPOS no determina los tipos automáticamente ni presenta declaraciones; de eso se encarga su asesor o QuickBooks.</p>
     </section>
 
     <section id="frankreich">
@@ -552,8 +552,8 @@ docker compose up -d --build</code></pre></div>
       <h3>Caja registradora (RKSV)</h3>
       <ol>
         <li>En la pestaña Österreich introduzca el identificador de la caja y elija el dispositivo de firma: A-Trust a.sign RK (usuario y contraseña de A-Trust) o el modo de prueba con clave local. El modo de prueba no cumple la RKSV.</li>
-        <li><em>Activar caja registradora</em>: Kuenta crea la clave AES y el recibo inicial. Registre el identificador y la clave AES en FinanzOnline y compruebe el recibo inicial con la app BMF-Belegcheck.</li>
-        <li>Cada venta y anulación en la caja recibe un recibo firmado con código QR. Al cambiar de mes Kuenta crea el recibo mensual y en diciembre el anual; compruebe y conserve el recibo anual.</li>
+        <li><em>Activar caja registradora</em>: KuentaPOS crea la clave AES y el recibo inicial. Registre el identificador y la clave AES en FinanzOnline y compruebe el recibo inicial con la app BMF-Belegcheck.</li>
+        <li>Cada venta y anulación en la caja recibe un recibo firmado con código QR. Al cambiar de mes KuentaPOS crea el recibo mensual y en diciembre el anual; compruebe y conserve el recibo anual.</li>
         <li>Si falla el dispositivo de firma, los recibos indican “Sicherheitseinrichtung ausgefallen” y después se crea un recibo colectivo. Comunique en FinanzOnline los fallos de más de 48 horas.</li>
       </ol>
       <p><span class="path">Finanzas → Exportación contable</span> (vista “Steuer (Österreich)”) muestra los recibos RKSV, comprueba encadenamiento, contador de ventas y firmas y exporta el protocolo de datos (DEP).</p>
@@ -580,7 +580,7 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Datos de la empresa:</strong> partita IVA (11 cifras) en NIF-IVA, codice fiscale en Número fiscal (vacío = igual que la partita IVA). Provincia, REA, capital social, socio único y liquidación en la pestaña Italia.</li>
         <li><strong>Clientes:</strong> partita IVA en NIF-IVA; codice fiscale, código de destinatario SdI (7 caracteres, administraciones 6) o PEC y split payment en <span class="path">Impuestos y contabilidad</span>. Indique la población con la provincia, p. ej. “Torino (TO)”.</li>
         <li><strong>Tipos:</strong> 22 %, 10 % y 4 % (código “AT-MwSt”, ajustable p. ej. a 5 %), 0 % exento. Se puede activar el regime forfettario. Las líneas sin IVA reciben automáticamente el código Natura (N1 suplidos, N2 no sujetas, N3 exportación/intracomunitarias, N4 exentas, N5 régimen del margen).</li>
-        <li><strong>Factura electrónica:</strong> en la ventana de la factura <em>Fattura elettronica (FatturaPA) → descargar XML</em> y envíe el archivo por el portal “Fatture e Corrispettivi”, por PEC al SdI o mediante su intermediario. Kuenta elige FPR12 o FPA12 para administraciones, notas de crédito TD04, imposta di bollo y split payment. La impresión es una copia de cortesía; las facturas impresas quedan bloqueadas.</li>
+        <li><strong>Factura electrónica:</strong> en la ventana de la factura <em>Fattura elettronica (FatturaPA) → descargar XML</em> y envíe el archivo por el portal “Fatture e Corrispettivi”, por PEC al SdI o mediante su intermediario. KuentaPOS elige FPR12 o FPA12 para administraciones, notas de crédito TD04, imposta di bollo y split payment. La impresión es una copia de cortesía; las facturas impresas quedan bloqueadas.</li>
         <li><strong>Caja:</strong> cada venta se registra como factura; el ticket indica “Documento non fiscale”. Para documentos comerciales hace falta un dispositivo RT homologado.</li>
         <li><strong>Liquidación del IVA:</strong> <span class="path">Finanzas → Exportación contable</span> muestra IVA repercutido, IVA soportado, split payment, saldo y el código de tributo del F24 (mensual o trimestral con 1 % de intereses) y exporta el registro de IVA de ventas en CSV. La LIPE y la declaración anual las presenta su asesor.</li>
       </ul>
@@ -617,14 +617,14 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Tipos:</strong> 17 %, 8 % (ajustable p. ej. a 3 %) y 14 % (código “AT-MwSt”), 0 % exento. Se puede activar la franquicia de pequeñas empresas (art. 57).</li>
         <li><strong>Factura electrónica (Peppol):</strong> obligatoria para las administraciones. Indique el NIF-IVA del cliente; es su dirección Peppol. En la ventana de la factura <em>E-Rechnung (Peppol) → descargar</em> y envíela mediante su proveedor Peppol.</li>
         <li><strong>Declaración de IVA:</strong> <span class="path">Finanzas → Exportación contable</span> muestra las casillas del formulario eCDF (012, 021, 022, 701–706, 046, 458, 105 …) y genera el XML para la plataforma eCDF. Para ello indique el matricule y el prefijo eCDF en la pestaña Lëtzebuerg. Las pequeñas empresas en franquicia solo presentan la declaración anual.</li>
-        <li><strong>Declaración anual:</strong> elija el año en la misma vista; Kuenta rellena las secciones I–IV (TVA_DECA). Las demás partes del formulario, entre ellas los anexos de gastos, las completa su asesor en eCDF.</li>
+        <li><strong>Declaración anual:</strong> elija el año en la misma vista; KuentaPOS rellena las secciones I–IV (TVA_DECA). Las demás partes del formulario, entre ellas los anexos de gastos, las completa su asesor en eCDF.</li>
         <li><strong>Declaración recapitulativa:</strong> entregas intracomunitarias (TVA_LICM / LICT) y servicios a empresas de otros países de la UE (TVA_PSIM / PSIT) por cliente, como XML para eCDF. Los clientes necesitan un NIF-IVA válido de su país.</li>
       </ul>
     </section>
 
     <section id="datev">
       <h2>Exportación DATEV para el asesor fiscal</h2>
-      <p class="lead">Kuenta contabiliza automáticamente facturas, pagos, facturas de proveedor y ventas de caja y los exporta como archivos DATEV. Su asesor fiscal los importa directamente en DATEV, el programa contable habitual en Alemania.</p>
+      <p class="lead">KuentaPOS contabiliza automáticamente facturas, pagos, facturas de proveedor y ventas de caja y los exporta como archivos DATEV. Su asesor fiscal los importa directamente en DATEV, el programa contable habitual en Alemania.</p>
       <h3>Configurar una vez</h3>
       <p>En <span class="path">Ajustes → Contabilidad</span>. Los valores se los da su asesor fiscal.</p>
       <div class="tablewrap"><table>
@@ -653,11 +653,11 @@ docker compose up -d --build</code></pre></div>
       <ol class="steps">
         <li><div><strong>Elegir el período</strong><span><span class="path">Finanzas → Exportación contable</span>, p. ej. el mes anterior. La lista muestra todos los asientos aún no exportados.</span></div></li>
         <li><div><strong>Exportar deudores/acreedores</strong><span>El archivo <code>EXTF_Debitoren_Kreditoren_….csv</code> contiene nombre, dirección, país y NIF-IVA de todos los clientes y proveedores con asientos en el período. Así el asesor ve nombres y no solo números de cuenta.</span></div></li>
-        <li><div><strong>Crear la exportación DATEV</strong><span>El archivo <code>EXTF_Buchungsstapel_….csv</code> contiene los asientos. Kuenta los marca como exportados para que no se repitan la próxima vez. «Exportación de prueba» crea el mismo archivo sin marcarlos.</span></div></li>
+        <li><div><strong>Crear la exportación DATEV</strong><span>El archivo <code>EXTF_Buchungsstapel_….csv</code> contiene los asientos. KuentaPOS los marca como exportados para que no se repitan la próxima vez. «Exportación de prueba» crea el mismo archivo sin marcarlos.</span></div></li>
         <li><div><strong>Enviar al asesor fiscal</strong><span>Ambos archivos. El asesor importa primero los deudores/acreedores y después el lote de asientos.</span></div></li>
       </ol>
       <div class="note warn"><strong>Tenga en cuenta</strong>
-        <span>Una exportación solo puede abarcar un ejercicio. Exporte diciembre y enero por separado. Kuenta lo advierte.</span>
+        <span>Una exportación solo puede abarcar un ejercicio. Exporte diciembre y enero por separado. KuentaPOS lo advierte.</span>
         <span>Las facturas en PDF no se incluyen. El asesor sigue recibiendo los justificantes por separado.</span>
         <span>La primera vez, pida a su asesor que importe ambos archivos de prueba (lote de asientos y deudores/acreedores) y revise las cuentas.</span>
         <span>Los asientos ya guardados conservan sus cuentas. Si antes se contabilizó para un cliente o proveedor con número corto (menor de 10000 o 70000), el asiento puede estar en una cuenta general. La exportación no lo detecta, porque p. ej. «3» es una cuenta general válida. Indique un n.º de deudor o acreedor para esos clientes y proveedores y pida al asesor que revise los asientos antiguos.</span></div>
@@ -667,25 +667,25 @@ docker compose up -d --build</code></pre></div>
     <section id="email">
       <h2>Envío de correos</h2>
       <p>Las facturas, presupuestos y reclamaciones se envían con <strong>Más funciones / clic derecho → Enviar por correo</strong>. Destinatario, asunto y texto vienen rellenados, y el documento se adjunta como PDF, ZUGFeRD o XRechnung. Puede añadir más archivos.</p>
-      <p>En <span class="path">Ajustes → Correo electrónico → Modo de envío</span> se elige cómo envía Kuenta el correo:</p>
+      <p>En <span class="path">Ajustes → Correo electrónico → Modo de envío</span> se elige cómo envía KuentaPOS el correo:</p>
       <div class="compare">
-        <div><span class="tag">Modo de envío 1</span><h4>Directamente desde Kuenta (SMTP)</h4>
-          <p>Kuenta envía el correo por sí mismo mediante el servidor de correo saliente de su proveedor.</p>
+        <div><span class="tag">Modo de envío 1</span><h4>Directamente desde KuentaPOS (SMTP)</h4>
+          <p>KuentaPOS envía el correo por sí mismo mediante el servidor de correo saliente de su proveedor.</p>
           <ul><li>funciona desde cualquier dispositivo, también desde la tableta</li><li>hay que indicar servidor SMTP, puerto, cifrado, usuario y contraseña</li><li>el correo <strong>no</strong> aparece en Thunderbird en «Enviados»; para ello use el registro de envíos o una copia CCO a usted mismo</li></ul></div>
         <div><span class="tag">Modo de envío 2</span><h4>Pasar al programa de correo</h4>
-          <p>Kuenta abre en Thunderbird un correo listo con el adjunto. Usted lo revisa y pulsa Enviar allí.</p>
-          <ul><li>después el correo está en la carpeta «Enviados» de Thunderbird</li><li>no hacen falta datos SMTP en Kuenta</li><li>sin Thunderbird, el programa de correo predeterminado (p. ej. Outlook) recibe un borrador</li><li>solo es posible en el PC donde se ejecuta Kuenta</li></ul></div>
+          <p>KuentaPOS abre en Thunderbird un correo listo con el adjunto. Usted lo revisa y pulsa Enviar allí.</p>
+          <ul><li>después el correo está en la carpeta «Enviados» de Thunderbird</li><li>no hacen falta datos SMTP en KuentaPOS</li><li>sin Thunderbird, el programa de correo predeterminado (p. ej. Outlook) recibe un borrador</li><li>solo es posible en el PC donde se ejecuta KuentaPOS</li></ul></div>
       </div>
       <h3>Configurar Thunderbird</h3>
       <ol class="steps">
         <li><div><strong>Cambiar el modo de envío</strong><span><span class="path">Ajustes → Correo electrónico → Modo de envío</span> a «Pasar al programa de correo (p. ej. Thunderbird)».</span></div></li>
-        <li><div><strong>Comprobar si se encontró</strong><span>Debajo, Kuenta indica si ha encontrado Thunderbird. En una instalación portátil o poco habitual, indique usted la ruta de <code>thunderbird.exe</code>.</span></div></li>
+        <li><div><strong>Comprobar si se encontró</strong><span>Debajo, KuentaPOS indica si ha encontrado Thunderbird. En una instalación portátil o poco habitual, indique usted la ruta de <code>thunderbird.exe</code>.</span></div></li>
         <li><div><strong>Probar</strong><span>«Guardar ajustes y probar el programa de correo» abre un correo de prueba en Thunderbird.</span></div></li>
       </ol>
       <div class="note warn"><strong>Tenga en cuenta</strong>
-        <span>En Kuenta la factura cuenta como «enviada por correo» en cuanto se entrega, aunque no envíe el correo en Thunderbird.</span>
-        <span>Kuenta añade su firma. Si Thunderbird también tiene una, aparecen las dos. Vacíe una de ellas.</span>
-        <span>Los adjuntos entregados se guardan en <code>%APPDATA%\Kuenta\mail-ausgang</code> y se borran a los 14 días.</span></div>
+        <span>En KuentaPOS la factura cuenta como «enviada por correo» en cuanto se entrega, aunque no envíe el correo en Thunderbird.</span>
+        <span>KuentaPOS añade su firma. Si Thunderbird también tiene una, aparecen las dos. Vacíe una de ellas.</span>
+        <span>Los adjuntos entregados se guardan en <code>%APPDATA%\KuentaPOS\mail-ausgang</code> y se borran a los 14 días.</span></div>
       <h3>Plantillas y marcadores</h3>
       <p>El asunto y el texto para documentos y reclamaciones, así como la firma, se configuran en <span class="path">Ajustes → Correo electrónico</span>. Los textos predeterminados siguen el idioma de los documentos. Se sustituyen estos marcadores:</p>
       <div class="tablewrap"><table>
@@ -707,12 +707,12 @@ docker compose up -d --build</code></pre></div>
 
     <section id="erinnerungen">
       <h2>Recordatorios por correo y SMS</h2>
-      <p class="lead">Kuenta recuerda la HU (ITV alemana), las revisiones y otros vencimientos de vehículos por carta, correo o SMS. Cada recordatorio queda registrado para que ningún cliente lo reciba dos veces.</p>
+      <p class="lead">KuentaPOS recuerda la HU (ITV alemana), las revisiones y otros vencimientos de vehículos por carta, correo o SMS. Cada recordatorio queda registrado para que ningún cliente lo reciba dos veces.</p>
       <h3>Cómo funciona</h3>
       <ol class="steps">
         <li><div><strong>Abrir la lista</strong><span><span class="path">Informes → Vencimientos de vehículos</span>, elija el vencimiento (p. ej. HU) y el período. La columna «último recordatorio» muestra quién ya ha recibido uno y por qué canal.</span></div></li>
         <li><div><strong>Elegir el canal</strong><span>«Cartas de recordatorio» imprime cartas; «Recordar por correo» y «Recordar por SMS» envían a todos los vehículos adecuados de la lista.</span></div></li>
-        <li><div><strong>Confirmar</strong><span>Kuenta indica el número. Los vehículos ya recordados se omiten por defecto. Después, un resumen muestra qué se ha enviado, omitido o fallado.</span></div></li>
+        <li><div><strong>Confirmar</strong><span>KuentaPOS indica el número. Los vehículos ya recordados se omiten por defecto. Después, un resumen muestra qué se ha enviado, omitido o fallado.</span></div></li>
       </ol>
       <div class="tablewrap"><table>
         <thead><tr><th>Se omite si …</th><th>Solución</th></tr></thead>
@@ -724,14 +724,14 @@ docker compose up -d --build</code></pre></div>
       </table></div>
       <h3>Textos</h3>
       <p>En <span class="path">Ajustes → Recordatorios y SMS</span> están el asunto y el texto del correo y el texto del SMS. Marcadores: <code>{Briefanrede}</code> <code>{Anrede}</code> <code>{Name}</code> <code>{Vorname}</code> <code>{Kennzeichen}</code> <code>{Fahrzeug}</code> <code>{Termin}</code> <code>{Terminart}</code> <code>{Firma}</code> <code>{Telefon}</code>. Un SMS tiene 160 caracteres. Los textos más largos se envían en varias partes y cuestan más.</p>
-      <p>Los correos usan el modo de envío de la pestaña «Correo electrónico». Con el envío directo (SMTP), Kuenta los envía todos a la vez. Con «Pasar al programa de correo» se abre una ventana por recordatorio, por eso como máximo 20 a la vez.</p>
-      <div class="note"><strong>El SMS forma parte de Kuenta Pro</strong><span>Los recordatorios por carta y correo son gratuitos. Para enviar SMS necesita una licencia Pro, véase <a href="#pro">Kuenta Pro</a>. La pasarela se puede configurar antes.</span></div>
+      <p>Los correos usan el modo de envío de la pestaña «Correo electrónico». Con el envío directo (SMTP), KuentaPOS los envía todos a la vez. Con «Pasar al programa de correo» se abre una ventana por recordatorio, por eso como máximo 20 a la vez.</p>
+      <div class="note"><strong>El SMS forma parte de KuentaPOS Pro</strong><span>Los recordatorios por carta y correo son gratuitos. Para enviar SMS necesita una licencia Pro, véase <a href="#pro">KuentaPOS Pro</a>. La pasarela se puede configurar antes.</span></div>
       <h3>Pasarela SMS: tres opciones</h3>
-      <p>Kuenta envía los SMS mediante una pasarela. En <span class="path">Ajustes → Recordatorios y SMS → Plantilla</span> hay una plantilla para cada opción que solo tiene que ajustar. Compruebe la configuración con «Guardar ajustes y enviar SMS de prueba».</p>
+      <p>KuentaPOS envía los SMS mediante una pasarela. En <span class="path">Ajustes → Recordatorios y SMS → Plantilla</span> hay una plantilla para cada opción que solo tiene que ajustar. Compruebe la configuración con «Guardar ajustes y enviar SMS de prueba».</p>
       <div class="tablewrap"><table>
         <thead><tr><th>Opción</th><th>Necesita</th><th>Conviene saber</th></tr></thead>
         <tbody>
-          <tr><td>Módem USB en otro ordenador (relé SMS de Kuenta)</td><td>un ordenador (p. ej. Raspberry Pi), un módem USB con modo módem, una tarjeta SIM, el programa <code>gammu</code></td><td>El relé viene con Kuenta en la carpeta <code>sms-relais</code> con sus propias instrucciones. Coste corriente solo de la tarjeta SIM.</td></tr>
+          <tr><td>Módem USB en otro ordenador (relé SMS de KuentaPOS)</td><td>un ordenador (p. ej. Raspberry Pi), un módem USB con modo módem, una tarjeta SIM, el programa <code>gammu</code></td><td>El relé viene con KuentaPOS en la carpeta <code>sms-relais</code> con sus propias instrucciones. Coste corriente solo de la tarjeta SIM.</td></tr>
           <tr><td>Móvil Android antiguo</td><td>móvil con tarjeta SIM y una app de pasarela, p. ej. «SMS Gateway for Android»</td><td>No hace falta otro ordenador. El móvil debe estar en la misma red y encendido. La dirección y las credenciales aparecen en la app.</td></tr>
           <tr><td>Proveedor de SMS en internet</td><td>cuenta de cliente, p. ej. en seven.io, y su clave API</td><td>Sin hardware. Coste por SMS. Otros proveedores también se pueden conectar mediante los campos libres (dirección, cabeceras, contenido).</td></tr>
         </tbody>
@@ -743,38 +743,38 @@ docker compose up -d --build</code></pre></div>
 
     <section id="krypto">
       <h2>Pago con criptomonedas: Bitcoin, Lightning, USDT</h2>
-      <p class="lead">Los clientes pueden pagar las facturas con Bitcoin, Lightning o USDT. Kuenta utiliza para ello su propio <strong>BTCPay Server</strong>, un software libre y gratuito que no custodia dinero: los pagos van directamente a su propio monedero. La función está incluida gratis en Kuenta.</p>
+      <p class="lead">Los clientes pueden pagar las facturas con Bitcoin, Lightning o USDT. KuentaPOS utiliza para ello su propio <strong>BTCPay Server</strong>, un software libre y gratuito que no custodia dinero: los pagos van directamente a su propio monedero. La función está incluida gratis en KuentaPOS.</p>
       <h3>Configurar una vez</h3>
       <ol class="steps">
         <li><div><strong>Disponer de un BTCPay Server</strong><span>El servidor debe ser accesible desde internet para que los clientes puedan pagar. Lo habitual es un servidor alquilado con la instalación Docker oficial (docs.btcpayserver.org) o un proveedor que opere BTCPay. Cree allí una tienda y conecte su monedero. Para Lightning necesita un nodo Lightning; para USDT, la red Liquid.</span></div></li>
         <li><div><strong>Crear una clave API</strong><span>En BTCPay, en <span class="path">Cuenta → Claves API</span>. Permisos necesarios: ver y modificar solicitudes de pago; ver, crear y modificar facturas; ver ajustes de la tienda. El ID de la tienda figura en los ajustes de la tienda.</span></div></li>
-        <li><div><strong>Introducirlo en Kuenta</strong><span><span class="path">Ajustes → Pago con criptomonedas</span>: active los pagos con criptomonedas, introduzca dirección, ID de la tienda y clave API y pulse «Guardar y probar la conexión». Kuenta muestra las formas de pago activas en la tienda.</span></div></li>
-        <li><div><strong>Aclarar la contabilidad</strong><span>Kuenta registra los cobros en la cuenta contable configurada, por defecto 1360 (dinero en tránsito, SKR03). Acuerde la cuenta con su asesor fiscal.</span></div></li>
+        <li><div><strong>Introducirlo en KuentaPOS</strong><span><span class="path">Ajustes → Pago con criptomonedas</span>: active los pagos con criptomonedas, introduzca dirección, ID de la tienda y clave API y pulse «Guardar y probar la conexión». KuentaPOS muestra las formas de pago activas en la tienda.</span></div></li>
+        <li><div><strong>Aclarar la contabilidad</strong><span>KuentaPOS registra los cobros en la cuenta contable configurada, por defecto 1360 (dinero en tránsito, SKR03). Acuerde la cuenta con su asesor fiscal.</span></div></li>
       </ol>
       <h3>Así funciona un pago</h3>
       <ul>
-        <li>Abra la factura, pestaña <span class="path">Pagos</span>, «Enlace de pago». Kuenta crea en BTCPay una página de pago por el importe pendiente en euros. Es válida 30 días (ajustable).</li>
+        <li>Abra la factura, pestaña <span class="path">Pagos</span>, «Enlace de pago». KuentaPOS crea en BTCPay una página de pago por el importe pendiente en euros. Es válida 30 días (ajustable).</li>
         <li>El código QR y el enlace aparecen luego automáticamente en la factura PDF y en el correo. En sus propias plantillas de correo, <code>{Zahlungslink}</code> inserta el enlace.</li>
         <li>El cliente paga el importe en euros con Bitcoin, Lightning o USDT, al tipo de cambio del día del pago.</li>
-        <li>Kuenta consulta BTCPay cada 2 minutos y registra automáticamente las facturas pagadas, con la forma de pago «Krypto (BTCPay)». Con «Comprobar pago» se hace al momento.</li>
-        <li>Si cambia el importe pendiente, p. ej. por un pago parcial por transferencia, el enlace antiguo desaparece del PDF. Cree entonces uno nuevo. Si la factura se paga por completo de otra forma, Kuenta cierra la página de pago en BTCPay.</li>
+        <li>KuentaPOS consulta BTCPay cada 2 minutos y registra automáticamente las facturas pagadas, con la forma de pago «Krypto (BTCPay)». Con «Comprobar pago» se hace al momento.</li>
+        <li>Si cambia el importe pendiente, p. ej. por un pago parcial por transferencia, el enlace antiguo desaparece del PDF. Cree entonces uno nuevo. Si la factura se paga por completo de otra forma, KuentaPOS cierra la página de pago en BTCPay.</li>
       </ul>
-      <p>Kuenta no necesita ser accesible desde internet para esto. Consulta él mismo a BTCPay.</p>
+      <p>KuentaPOS no necesita ser accesible desde internet para esto. Consulta él mismo a BTCPay.</p>
       <h3>En la caja</h3>
       <ul>
         <li>Si el pago con criptomonedas está configurado, la caja muestra el botón <strong>«₿ Bitcoin / Lightning»</strong>. «Cobrar orden» y «Cobrar factura» ofrecen entonces también «Cripto».</li>
         <li>La caja muestra un código QR, primero para Lightning y, si se desea, para Bitcoin o USDT. El cliente lo escanea con su monedero. El tipo de cambio queda fijo 15 minutos.</li>
         <li>En cuanto BTCPay comunica el pago, la ventana se cierra y se imprime el tique. Bitcoin on-chain cuenta en cuanto el pago está en la red, sin esperar confirmación. Lightning llega en segundos.</li>
-        <li>Kuenta comprueba el pago en BTCPay antes de emitir el tique. Solo entonces se crean factura y tique. Cada pago solo puede usarse para un tique.</li>
-        <li><strong>Cancelar:</strong> Kuenta marca el pago como no válido en BTCPay. Para ello la clave API necesita además el permiso «modificar facturas». Sin él, el pago caduca a los 15 minutos. Si el cliente paga de todos modos, la caja muestra un aviso al abrirse. Reembolse entonces el importe a través de BTCPay.</li>
-        <li><strong>Anulación:</strong> Kuenta registra la devolución. El dinero se reembolsa en BTCPay con la función «Reembolsar» (Refund) de la factura, o en efectivo.</li>
+        <li>KuentaPOS comprueba el pago en BTCPay antes de emitir el tique. Solo entonces se crean factura y tique. Cada pago solo puede usarse para un tique.</li>
+        <li><strong>Cancelar:</strong> KuentaPOS marca el pago como no válido en BTCPay. Para ello la clave API necesita además el permiso «modificar facturas». Sin él, el pago caduca a los 15 minutos. Si el cliente paga de todos modos, la caja muestra un aviso al abrirse. Reembolse entonces el importe a través de BTCPay.</li>
+        <li><strong>Anulación:</strong> KuentaPOS registra la devolución. El dinero se reembolsa en BTCPay con la función «Reembolsar» (Refund) de la factura, o en efectivo.</li>
         <li>Los pagos con criptomonedas no son en efectivo. No van al libro de caja, la TSE los firma como «no efectivo» y en la exportación DSFinV-K figuran como «Unbar / Krypto».</li>
       </ul>
     </section>
 
     <section id="pro">
-      <h2>Kuenta Pro</h2>
-      <p class="lead">Kuenta es de código abierto y gratuito. Algunas funciones adicionales existen como complementos. Se activan con una clave de licencia y cuestan 20 dólares estadounidenses cada una, pago único. Se paga con Bitcoin o Tether (USDT).</p>
+      <h2>KuentaPOS Pro</h2>
+      <p class="lead">KuentaPOS es de código abierto y gratuito. Algunas funciones adicionales existen como complementos. Se activan con una clave de licencia y cuestan 20 dólares estadounidenses cada una, pago único. Se paga con Bitcoin o Tether (USDT).</p>
       <div class="tablewrap"><table>
         <thead><tr><th>Complemento</th><th>desde</th><th>Precio</th></tr></thead>
         <tbody><tr><td>Recordatorios por SMS y pasarela SMS</td><td>1.0.8</td><td>20 $</td></tr></tbody>
@@ -785,12 +785,12 @@ docker compose up -d --build</code></pre></div>
       <ol class="steps">
         <li><div><strong>Copiar la clave</strong><span>Tras el pago recibe una clave que empieza por <code>KUENTA1.</code></span></div></li>
         <li><div><strong>Pegarla</strong><span><span class="path">Ajustes → Licencia</span>, pegue la clave completa, «Instalar licencia».</span></div></li>
-        <li><div><strong>Listo</strong><span>Kuenta muestra para quién es la licencia y hasta cuándo. No hace falta reiniciar.</span></div></li>
+        <li><div><strong>Listo</strong><span>KuentaPOS muestra para quién es la licencia y hasta cuándo. No hace falta reiniciar.</span></div></li>
       </ol>
       <div class="tablewrap"><table>
         <thead><tr><th>Pregunta</th><th>Respuesta</th></tr></thead>
         <tbody>
-          <tr><td>¿Necesita Kuenta internet para esto?</td><td>No. La clave está firmada digitalmente y se comprueba en el ordenador.</td></tr>
+          <tr><td>¿Necesita KuentaPOS internet para esto?</td><td>No. La clave está firmada digitalmente y se comprueba en el ordenador.</td></tr>
           <tr><td>¿Para cuántos puestos?</td><td>Para toda la instalación con todas las empresas. Los demás puestos trabajan en <a href="#netzwerk">modo red</a>.</td></tr>
           <tr><td>¿Dónde se guarda la licencia?</td><td>Como <code>lizenz.key</code> en la carpeta de datos. Las actualizaciones no la modifican. Al cambiar de ordenador, vuelva a instalar la clave.</td></tr>
           <tr><td>¿Caduca la licencia?</td><td>No, los complementos se pagan una vez y son indefinidos.</td></tr>
@@ -800,13 +800,13 @@ docker compose up -d --build</code></pre></div>
 
     <section id="netzwerk">
       <h2>Modo red</h2>
-      <p>Para que las tabletas y otros puestos puedan usar Kuenta, inicie en el PC del taller <span class="path">Menú Inicio → Kuenta (red)</span> (Linux/macOS: <code>kuenta --netzwerk</code>).</p>
+      <p>Para que las tabletas y otros puestos puedan usar KuentaPOS, inicie en el PC del taller <span class="path">Menú Inicio → KuentaPOS (red)</span> (Linux/macOS: <code>kuentapos --netzwerk</code>).</p>
       <ol>
         <li>La ventana de consola muestra la dirección para los demás dispositivos, p. ej. <code>http://192.168.1.20:3700</code>.</li>
         <li>Abra esa dirección en el navegador de la tableta.</li>
         <li>Si Windows pide permiso del cortafuegos, permítalo para «Redes privadas».</li>
       </ol>
-      <div class="note warn"><strong>Obligatorio en red</strong><span>Active el inicio de sesión (<span class="path">Ajustes → Valores predeterminados</span>) y cree usuarios. De lo contrario, cualquier dispositivo de la red puede abrir Kuenta sin contraseña.</span></div>
+      <div class="note warn"><strong>Obligatorio en red</strong><span>Active el inicio de sesión (<span class="path">Ajustes → Valores predeterminados</span>) y cree usuarios. De lo contrario, cualquier dispositivo de la red puede abrir KuentaPOS sin contraseña.</span></div>
       <p>Cada puesto puede elegir su propio idioma de interfaz. La entrega a Thunderbird solo funciona en el propio PC del taller. Desde otros dispositivos use el envío directo por SMTP.</p>
     </section>
 
@@ -816,34 +816,34 @@ docker compose up -d --build</code></pre></div>
       <div class="tablewrap"><table>
         <thead><tr><th>Sistema</th><th>Carpeta de datos</th></tr></thead>
         <tbody>
-          <tr><td>Windows</td><td><code>%APPDATA%\Kuenta</code> (p. ej. <code>C:\Users\&lt;nombre&gt;\AppData\Roaming\Kuenta</code>)</td></tr>
-          <tr><td>macOS</td><td><code>~/Library/Application Support/Kuenta</code></td></tr>
-          <tr><td>Linux</td><td><code>~/.local/share/kuenta</code></td></tr>
+          <tr><td>Windows</td><td><code>%APPDATA%\KuentaPOS</code> (p. ej. <code>C:\Users\&lt;nombre&gt;\AppData\Roaming\KuentaPOS</code>)</td></tr>
+          <tr><td>macOS</td><td><code>~/Library/Application Support/KuentaPOS</code></td></tr>
+          <tr><td>Linux</td><td><code>~/.local/share/kuentapos</code></td></tr>
         </tbody>
       </table></div>
       <p>En la carpeta de datos están, entre otros, la base de datos <code>kuenta.db</code>, documentos e imágenes (<code>dateien</code>), copias automáticas (<code>sicherungen</code>), copias previas a las importaciones (<code>sicherheitskopien</code>) y los adjuntos para el programa de correo (<code>mail-ausgang</code>).</p>
       <h3>Hacer copias</h3>
       <ul>
-        <li><strong>A mano:</strong> <span class="path">Kuenta → Copia de seguridad</span> crea un archivo <code>*.kuenta</code> con la base de datos y los documentos. Con contraseña se cifra con AES-256.</li>
-        <li><strong>Automáticamente:</strong> Kuenta hace una copia diaria en la carpeta <code>sicherungen</code>. La carpeta y el número de copias conservadas (predeterminado 14) se configuran en la misma página.</li>
-        <li><strong>Carpeta completa:</strong> también puede copiar toda la carpeta de datos con Kuenta detenido.</li>
+        <li><strong>A mano:</strong> <span class="path">KuentaPOS → Copia de seguridad</span> crea un archivo <code>*.kuentapos</code> con la base de datos y los documentos. Con contraseña se cifra con AES-256.</li>
+        <li><strong>Automáticamente:</strong> KuentaPOS hace una copia diaria en la carpeta <code>sicherungen</code>. La carpeta y el número de copias conservadas (predeterminado 14) se configuran en la misma página.</li>
+        <li><strong>Carpeta completa:</strong> también puede copiar toda la carpeta de datos con KuentaPOS detenido.</li>
       </ul>
       <div class="note"><strong>Recomendación</strong><span>Ponga la carpeta de copias en otra unidad, un NAS o una memoria USB. Una copia en el mismo disco no sirve si ese disco falla.</span></div>
-      <div class="note warn"><strong>La carpeta de datos no va en una unidad de red</strong><span>Las copias van al NAS; la carpeta de datos, no. Kuenta trabaja continuamente en su base de datos, y a través de una unidad compartida puede dañarse, p. ej. por un corte breve de la red. Si la carpeta de datos está en una unidad de red, Kuenta avisa al iniciarse. Para varios puestos use el <a href="#netzwerk">modo red</a>: un ordenador guarda los datos y los demás trabajan en el navegador.</span></div>
+      <div class="note warn"><strong>La carpeta de datos no va en una unidad de red</strong><span>Las copias van al NAS; la carpeta de datos, no. KuentaPOS trabaja continuamente en su base de datos, y a través de una unidad compartida puede dañarse, p. ej. por un corte breve de la red. Si la carpeta de datos está en una unidad de red, KuentaPOS avisa al iniciarse. Para varios puestos use el <a href="#netzwerk">modo red</a>: un ordenador guarda los datos y los demás trabajan en el navegador.</span></div>
     </section>
 
     <section id="update">
       <h2>Actualizar y desplegar</h2>
       <p>Para actualizar, simplemente ejecute el nuevo instalador. Se encarga de todo:</p>
       <ol class="steps">
-        <li><div><strong>Buscar un Kuenta en marcha</strong><span>El instalador busca procesos de Kuenta de la carpeta del programa, incluida la ventana de consola.</span></div></li>
-        <li><div><strong>Detenerlo limpiamente</strong><span>Se pide a Kuenta que se detenga, y cierra la base de datos correctamente. Si no responde, se fuerza el cierre.</span></div></li>
+        <li><div><strong>Buscar un KuentaPOS en marcha</strong><span>El instalador busca procesos de KuentaPOS de la carpeta del programa, incluida la ventana de consola.</span></div></li>
+        <li><div><strong>Detenerlo limpiamente</strong><span>Se pide a KuentaPOS que se detenga, y cierra la base de datos correctamente. Si no responde, se fuerza el cierre.</span></div></li>
         <li><div><strong>Instalar la actualización</strong><span>Se sustituyen los archivos del programa. Los datos del perfil de usuario no cambian.</span></div></li>
-        <li><div><strong>Volver a iniciar</strong><span>Kuenta se inicia en el mismo modo que antes (local o red). Se abre una pestaña nueva en el navegador.</span></div></li>
+        <li><div><strong>Volver a iniciar</strong><span>KuentaPOS se inicia en el mismo modo que antes (local o red). Se abre una pestaña nueva en el navegador.</span></div></li>
       </ol>
       <h3>Desplegar sin preguntas</h3>
       <p>Para scripts o distribución de software:</p>
-      <div class="codeblock"><pre><code>Kuenta-Setup-1.8.2.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART</code></pre></div>
+      <div class="codeblock"><pre><code>KuentaPOS-Setup-1.8.3.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART</code></pre></div>
       <div class="tablewrap"><table>
         <thead><tr><th>Opción</th><th>Efecto</th></tr></thead>
         <tbody>
@@ -851,23 +851,23 @@ docker compose up -d --build</code></pre></div>
           <tr><td><code>/SUPPRESSMSGBOXES</code></td><td>sin preguntas</td></tr>
           <tr><td><code>/NORESTART</code></td><td>no reiniciar Windows</td></tr>
           <tr><td><code>/ALLUSERS</code> · <code>/CURRENTUSER</code></td><td>instalar para todos los usuarios o solo para el actual (predeterminado: como en la primera instalación)</td></tr>
-          <tr><td><code>/NOSTART</code></td><td>no volver a iniciar Kuenta tras la actualización</td></tr>
-          <tr><td><code>/LOG="C:\Temp\kuenta-setup.log"</code></td><td>escribir un registro de la instalación</td></tr>
+          <tr><td><code>/NOSTART</code></td><td>no volver a iniciar KuentaPOS tras la actualización</td></tr>
+          <tr><td><code>/LOG="C:\Temp\kuentapos-setup.log"</code></td><td>escribir un registro de la instalación</td></tr>
         </tbody>
       </table></div>
-      <div class="note"><strong>Actualizar desde la versión 1.0.0</strong><span>La versión 1.0.0 aún no conoce el cierre limpio. En la primera actualización desde ella, Kuenta se cierra a la fuerza. Los datos no sufren daños.</span></div>
-      <div class="note warn"><strong>Cuenta del sistema</strong><span>Si la instalación se ejecuta con la cuenta del sistema (típico en la distribución de software), Kuenta se detiene pero no se vuelve a iniciar. De lo contrario se ejecutaría en el perfil equivocado con datos vacíos. Los usuarios inician luego Kuenta desde el menú Inicio como siempre.</span></div>
+      <div class="note"><strong>Actualizar desde la versión 1.0.0</strong><span>La versión 1.0.0 aún no conoce el cierre limpio. En la primera actualización desde ella, KuentaPOS se cierra a la fuerza. Los datos no sufren daños.</span></div>
+      <div class="note warn"><strong>Cuenta del sistema</strong><span>Si la instalación se ejecuta con la cuenta del sistema (típico en la distribución de software), KuentaPOS se detiene pero no se vuelve a iniciar. De lo contrario se ejecutaría en el perfil equivocado con datos vacíos. Los usuarios inician luego KuentaPOS desde el menú Inicio como siempre.</span></div>
       <p><strong>Linux / macOS:</strong> obtenga la nueva versión (<code>git pull</code> o archivo) y ejecute de nuevo <code>./installer/unix/install.sh</code>.</p>
     </section>
 
     <section id="deinstallation">
       <h2>Desinstalación</h2>
       <ul>
-        <li><strong>Windows:</strong> <span class="path">Configuración → Aplicaciones → Kuenta</span> o menú Inicio <span class="path">Desinstalar Kuenta</span>. Antes se detiene un Kuenta en marcha y se elimina la regla del cortafuegos.</li>
+        <li><strong>Windows:</strong> <span class="path">Configuración → Aplicaciones → KuentaPOS</span> o menú Inicio <span class="path">Desinstalar KuentaPOS</span>. Antes se detiene un KuentaPOS en marcha y se elimina la regla del cortafuegos.</li>
         <li><strong>Linux / macOS:</strong> <code>./installer/unix/install.sh --uninstall</code></li>
       </ul>
-      <p>En Windows también puede volver a iniciar el instalador: si Kuenta ya está instalado, ofrece actualizar o desinstalar.</p>
-      <p>Después Kuenta pregunta si también se borran los datos. Por defecto <strong>se conservan</strong>. Si los borra, puede guardar antes una copia: en Windows como ZIP en el escritorio, en Linux/macOS como <code>.tar.gz</code> en la carpeta personal. Si la copia falla, no se borra nada. Tenga en cuenta los plazos de conservación: facturas y datos de caja suelen conservarse hasta 10 años.</p>
+      <p>En Windows también puede volver a iniciar el instalador: si KuentaPOS ya está instalado, ofrece actualizar o desinstalar.</p>
+      <p>Después KuentaPOS pregunta si también se borran los datos. Por defecto <strong>se conservan</strong>. Si los borra, puede guardar antes una copia: en Windows como ZIP en el escritorio, en Linux/macOS como <code>.tar.gz</code> en la carpeta personal. Si la copia falla, no se borra nada. Tenga en cuenta los plazos de conservación: facturas y datos de caja suelen conservarse hasta 10 años.</p>
       <p>Para herramientas de distribución: <code>unins000.exe /VERYSILENT</code> conserva los datos, <code>/DELETEDATA</code> los borra tras una copia, con <code>/NOBACKUP</code> sin copia. En Linux/macOS use <code>--delete-data</code> y <code>--no-backup</code>.</p>
     </section>
 
@@ -877,29 +877,29 @@ docker compose up -d --build</code></pre></div>
       <div class="modules">
         <div class="module"><h3>Datos y copias</h3><div class="where"><a href="#sicherung">Copias de seguridad</a> · <a href="#datenuebernahme">Importar datos</a></div>
           <ul>
-            <li>No ponga nunca la carpeta de datos en una unidad de red o NAS. Kuenta avisa al iniciarse.</li>
+            <li>No ponga nunca la carpeta de datos en una unidad de red o NAS. KuentaPOS avisa al iniciarse.</li>
             <li>Las copias, en cambio, a otra unidad, un NAS o una memoria USB.</li>
-            <li>Una importación de KFZ-Faktura sustituye clientes, facturas, etc. por el estado de la copia. Los datos propios de Kuenta se conservan.</li>
-            <li>No trabaje mucho tiempo en paralelo en KFZ-Faktura y Kuenta. Las facturas de Kuenta, también las de la caja, se sobrescriben con la siguiente importación.</li>
-            <li>Antes de cada importación Kuenta crea una copia de seguridad.</li>
+            <li>Una importación de KFZ-Faktura sustituye clientes, facturas, etc. por el estado de la copia. Los datos propios de KuentaPOS se conservan.</li>
+            <li>No trabaje mucho tiempo en paralelo en KFZ-Faktura y KuentaPOS. Las facturas de KuentaPOS, también las de la caja, se sobrescriben con la siguiente importación.</li>
+            <li>Antes de cada importación KuentaPOS crea una copia de seguridad.</li>
           </ul></div>
         <div class="module"><h3>Red y contenedor</h3><div class="where"><a href="#netzwerk">Modo red</a> · <a href="#installation">Instalación</a></div>
           <ul>
             <li>En modo red y en el contenedor, active de inmediato el inicio de sesión y cree usuarios.</li>
             <li>Para varios puestos use el modo red. No hay base de datos externa.</li>
-            <li>Para los tipos del dólar, la libra, el franco y el bitcoin en el resumen, el ordenador de Kuenta necesita internet (BCE, Bitstamp). Son solo visualización; las facturas siguen en la moneda de la empresa.</li>
+            <li>Para los tipos del dólar, la libra, el franco y el bitcoin en el resumen, el ordenador de KuentaPOS necesita internet (BCE, Bitstamp). Son solo visualización; las facturas siguen en la moneda de la empresa.</li>
             <li>En el contenedor no hay programa de correo. Envíe allí por SMTP.</li>
             <li>La imagen de contenedor aún no se ha construido en un entorno Docker o Podman real. Compruébelo en el primer uso.</li>
           </ul></div>
         <div class="module"><h3>Correo</h3><div class="where"><a href="#email">Envío de correos</a></div>
           <ul>
-            <li>La entrega a Thunderbird solo funciona en el PC donde se ejecuta Kuenta.</li>
+            <li>La entrega a Thunderbird solo funciona en el PC donde se ejecuta KuentaPOS.</li>
             <li>La factura cuenta como «enviada por correo» en cuanto se entrega, aunque el correo no se envíe en Thunderbird.</li>
             <li>Si Thunderbird tiene firma propia, aparecen dos firmas. Vacíe una de ellas.</li>
             <li>Los adjuntos entregados se guardan en <code>mail-ausgang</code> y se borran a los 14 días.</li>
             <li>Con el envío directo por SMTP, el correo no aparece en Thunderbird. Para eso están el registro de envíos o una copia CCO.</li>
             <li>Recordatorios por correo o SMS solo a clientes que lo hayan aceptado. Anote las bajas con «Sin recordatorios» en el cliente.</li>
-            <li>El envío de SMS requiere una licencia de Kuenta Pro. Guarde la clave y vuelva a instalarla al cambiar de ordenador.</li>
+            <li>El envío de SMS requiere una licencia de KuentaPOS Pro. Guarde la clave y vuelva a instalarla al cambiar de ordenador.</li>
             <li>Para SMS use un módem LTE en lugar de uno UMTS. Compruebe si su tarifa permite envíos masivos.</li>
           </ul></div>
         <div class="module"><h3>DATEV</h3><div class="where"><a href="#datev">Exportación DATEV</a></div>
@@ -913,16 +913,16 @@ docker compose up -d --build</code></pre></div>
           </ul></div>
         <div class="module"><h3>Actualización e instalación</h3><div class="where"><a href="#update">Actualizar</a> · <a href="#deinstallation">Desinstalación</a></div>
           <ul>
-            <li>El instalador detiene un Kuenta en marcha y lo vuelve a iniciar después. Se abre una pestaña nueva en el navegador.</li>
-            <li>Con la cuenta del sistema (distribución de software), Kuenta no se vuelve a iniciar.</li>
-            <li>La primera actualización desde la versión 1.0.0 cierra Kuenta a la fuerza. Los datos quedan intactos.</li>
+            <li>El instalador detiene un KuentaPOS en marcha y lo vuelve a iniciar después. Se abre una pestaña nueva en el navegador.</li>
+            <li>Con la cuenta del sistema (distribución de software), KuentaPOS no se vuelve a iniciar.</li>
+            <li>La primera actualización desde la versión 1.0.0 cierra KuentaPOS a la fuerza. Los datos quedan intactos.</li>
             <li>Las actualizaciones no tocan la carpeta de datos; al desinstalar se pregunta. Cada usuario de Windows tiene la suya.</li>
           </ul></div>
         <div class="module"><h3>Caja y legislación</h3><div class="where"><a href="#grenzen">Avisos y límites</a></div>
           <ul>
             <li>Compruebe la TSE con una cuenta de prueba de fiskaly antes de usarla en real y comunique la caja a Hacienda (alemana).</li>
             <li>Compruebe el terminal de tarjetas y la DSFinV-K antes de usarlos o de una inspección.</li>
-            <li>Kuenta está pensado para Alemania, España, el Reino Unido, Estados Unidos, Francia, Austria, Suiza, Italia, los Países Bajos, Bélgica y Luxemburgo (vea <a href="#spanien">España</a>, <a href="#uk">Reino Unido</a>, <a href="#usa">Estados Unidos</a>, <a href="#frankreich">Francia</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Suiza</a>, <a href="#italien">Italia</a>, <a href="#niederlande">Países Bajos</a>, <a href="#belgien">Bélgica</a> y <a href="#luxemburg">Luxemburgo</a>). TicketBAI, Navarra e IGIC no están soportados.</li>
+            <li>KuentaPOS está pensado para Alemania, España, el Reino Unido, Estados Unidos, Francia, Austria, Suiza, Italia, los Países Bajos, Bélgica y Luxemburgo (vea <a href="#spanien">España</a>, <a href="#uk">Reino Unido</a>, <a href="#usa">Estados Unidos</a>, <a href="#frankreich">Francia</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Suiza</a>, <a href="#italien">Italia</a>, <a href="#niederlande">Países Bajos</a>, <a href="#belgien">Bélgica</a> y <a href="#luxemburg">Luxemburgo</a>). TicketBAI, Navarra e IGIC no están soportados.</li>
             <li>Los contratos de compraventa son modelos y no sustituyen el asesoramiento jurídico.</li>
           </ul></div>
       </div>
@@ -931,26 +931,26 @@ docker compose up -d --build</code></pre></div>
     <section id="probleme">
       <h2>Preguntas y problemas frecuentes</h2>
       <dl class="faq">
-        <div><dt>Al iniciar aparece «Kuenta ya se está ejecutando en el puerto 3700».</dt><dd>Kuenta ya está en marcha, p. ej. en otra ventana de consola. El navegador abre el Kuenta en marcha y la nueva ventana se cierra sola.</dd></div>
+        <div><dt>Al iniciar aparece «KuentaPOS ya se está ejecutando en el puerto 3700».</dt><dd>KuentaPOS ya está en marcha, p. ej. en otra ventana de consola. El navegador abre el KuentaPOS en marcha y la nueva ventana se cierra sola.</dd></div>
         <div><dt>«No se encontró Node.js».</dt><dd>Solo ocurre sin el instalador. Instale Node.js LTS desde nodejs.org o use el instalador de Windows, que incluye Node.js.</dd></div>
-        <div><dt>La tableta no accede a Kuenta.</dt><dd>Kuenta debe haberse iniciado con «Kuenta (red)» («Kuenta im Netzwerk» con el instalador en alemán). Compruebe la dirección que muestra la ventana de consola y el permiso del cortafuegos para redes privadas. Tableta y PC deben estar en la misma red.</dd></div>
+        <div><dt>La tableta no accede a KuentaPOS.</dt><dd>KuentaPOS debe haberse iniciado con «KuentaPOS (red)» («KuentaPOS im Netzwerk» con el instalador en alemán). Compruebe la dirección que muestra la ventana de consola y el permiso del cortafuegos para redes privadas. Tableta y PC deben estar en la misma red.</dd></div>
         <div><dt>«No se encontró Thunderbird».</dt><dd>Indique la ruta de <code>thunderbird.exe</code> en <span class="path">Ajustes → Correo electrónico</span>, p. ej. <code>C:\Program Files\Mozilla Thunderbird\thunderbird.exe</code>.</dd></div>
-        <div><dt>«El programa de correo solo puede abrirse en el ordenador donde se ejecuta Kuenta».</dt><dd>Está trabajando en otro dispositivo de la red. Envíe allí por SMTP o abra el correo en el PC del taller.</dd></div>
+        <div><dt>«El programa de correo solo puede abrirse en el ordenador donde se ejecuta KuentaPOS».</dt><dd>Está trabajando en otro dispositivo de la red. Envíe allí por SMTP o abra el correo en el PC del taller.</dd></div>
         <div><dt>«No se ha configurado ningún servidor de correo».</dt><dd>El modo de envío es SMTP, pero faltan los datos del servidor. Indíquelos en <span class="path">Ajustes → Correo electrónico</span> o cambie a «Pasar al programa de correo».</dd></div>
         <div><dt>Las facturas impresas ya no se pueden modificar.</dt><dd>El bloqueo GoBD está activo (<span class="path">Ajustes → Valores predeterminados</span>). Los cambios se hacen entonces con una factura rectificativa.</dd></div>
         <div><dt>Exportación DATEV: «El período sobrepasa el ejercicio».</dt><dd>DATEV solo acepta asientos de un ejercicio. Exporte por separado, p. ej. hasta el 31.12 y desde el 01.01. Para un ejercicio distinto, indique el mes de inicio en <span class="path">Ajustes → Contabilidad</span>.</dd></div>
         <div><dt>Exportación DATEV: «Cuentas no válidas para DATEV».</dt><dd>Un asiento tiene una cuenta con demasiados dígitos o sin número. Revise los documentos indicados y las cuentas en <span class="path">Ajustes → Contabilidad</span>, sobre todo la longitud de las cuentas.</dd></div>
-        <div><dt>Los datos han desaparecido tras la actualización.</dt><dd>Las actualizaciones no tocan la carpeta de datos. Compruebe si Kuenta se ejecuta con otro usuario de Windows. Cada usuario tiene su propia carpeta de datos.</dd></div>
+        <div><dt>Los datos han desaparecido tras la actualización.</dt><dd>Las actualizaciones no tocan la carpeta de datos. Compruebe si KuentaPOS se ejecuta con otro usuario de Windows. Cada usuario tiene su propia carpeta de datos.</dd></div>
         <div><dt>Una parte de la pantalla sigue en alemán.</dt><dd>Puede que algunos textos aún no estén traducidos. Comunique las traducciones que falten, véase <code>CONTRIBUTING.md</code>.</dd></div>
       </dl>
     </section>
 
     <section id="rechnungsnummern">
       <h2>Números de factura</h2>
-      <p>Los números de factura son correlativos, como en KFZ-Faktura. Kuenta asigna el número al guardar: último número asignado más 1. Por eso el campo del número de factura está bloqueado. En una factura nueva solo muestra una sugerencia. Si otro puesto guarda antes una factura, la suya recibe el siguiente número libre.</p>
+      <p>Los números de factura son correlativos, como en KFZ-Faktura. KuentaPOS asigna el número al guardar: último número asignado más 1. Por eso el campo del número de factura está bloqueado. En una factura nueva solo muestra una sugerencia. Si otro puesto guarda antes una factura, la suya recibe el siguiente número libre.</p>
       <ul>
         <li><strong>Series propias:</strong> las facturas y las facturas rectificativas (también anulaciones y abonos) se numeran por separado. Los ajustes están en <span class="path">Ajustes → Series de numeración</span>.</li>
-        <li><strong>Tras importar de KFZ-Faktura</strong> Kuenta continúa desde el último número asignado.</li>
+        <li><strong>Tras importar de KFZ-Faktura</strong> KuentaPOS continúa desde el último número asignado.</li>
         <li><strong>Sin reinicio a fin de año:</strong> los números simplemente continúan. Una base de datos nueva empieza en año + 0001, p. ej. 20260001.</li>
       </ul>
       <h3>Cómo pueden surgir huecos</h3>
@@ -972,7 +972,7 @@ docker compose up -d --build</code></pre></div>
         <li><strong>DATEV:</strong> el lote de asientos y los deudores/acreedores siguen el formato DATEV, pero no se han verificado en un programa DATEV. No se incluyen los justificantes (PDF) ni la conexión con DATEV Unternehmen online.</li>
         <li><strong>Pago con criptomonedas:</strong> probado con un BTCPay Server simulado, aún no con uno real. USDT solo funciona mediante la red Liquid, como lo ofrece BTCPay. No se admite USDT en Tron ni en Ethereum.</li>
         <li><strong>Contenedor:</strong> la imagen solo se ha comprobado fuera de un entorno Docker o Podman real.</li>
-        <li><strong>Base de datos:</strong> Kuenta usa una base de datos integrada (SQLite). No se admiten bases de datos externas como PostgreSQL. Varios puestos trabajan mediante el modo red.</li>
+        <li><strong>Base de datos:</strong> KuentaPOS usa una base de datos integrada (SQLite). No se admiten bases de datos externas como PostgreSQL. Varios puestos trabajan mediante el modo red.</li>
         <li><strong>Países e idiomas:</strong> Alemania, España, el Reino Unido y Estados Unidos (se cambia por empresa). En España no se soportan TicketBAI, Navarra, IGIC ni el REBU en VERI*FACTU. La interfaz existe en alemán, inglés, español, francés, italiano y neerlandés.</li>
       </ul>
     </section>
@@ -984,21 +984,21 @@ docker compose up -d --build</code></pre></div>
         <thead><tr><th>Variable</th><th>Predeterminado</th><th>Significado</th></tr></thead>
         <tbody>
           <tr><td><code>PORT</code></td><td><code>3700</code></td><td>puerto del servidor</td></tr>
-          <tr><td><code>HOST</code></td><td><code>127.0.0.1</code></td><td><code>0.0.0.0</code> comparte Kuenta en la red</td></tr>
-          <tr><td><code>KUENTA_DATA</code></td><td>perfil de usuario</td><td>otra carpeta de datos en una unidad local, p. ej. un segundo disco. No la ponga en una unidad de red ni en un NAS (véase <a href="#sicherung">Copias de seguridad</a>).</td></tr>
-          <tr><td><code>KUENTA_LANG</code></td><td>idioma de Windows</td><td><code>de</code>, <code>en</code>, <code>es</code>, <code>fr</code>, <code>it</code> o <code>nl</code>: idioma de la ventana de consola y de las instalaciones nuevas</td></tr>
+          <tr><td><code>HOST</code></td><td><code>127.0.0.1</code></td><td><code>0.0.0.0</code> comparte KuentaPOS en la red</td></tr>
+          <tr><td><code>KUENTAPOS_DATA</code></td><td>perfil de usuario</td><td>otra carpeta de datos en una unidad local, p. ej. un segundo disco. No la ponga en una unidad de red ni en un NAS (véase <a href="#sicherung">Copias de seguridad</a>).</td></tr>
+          <tr><td><code>KUENTAPOS_LANG</code></td><td>idioma de Windows</td><td><code>de</code>, <code>en</code>, <code>es</code>, <code>fr</code>, <code>it</code> o <code>nl</code>: idioma de la ventana de consola y de las instalaciones nuevas</td></tr>
         </tbody>
       </table></div>
       <h3>Desarrollo e instalador</h3>
       <div class="codeblock"><pre><code>npm test                    # pruebas automáticas
 npm run server              # iniciar el servidor sin navegador
 npm run installer:windows   # crear el instalador de Windows</code></pre></div>
-      <p>Para el instalador se necesitan Windows, <a href="https://jrsoftware.org/isdl.php">Inno Setup 6</a> y acceso a internet (Node.js se descarga de nodejs.org y se verifica con SHA-256). El resultado queda en <code>build\Kuenta-Setup-&lt;versión&gt;.exe</code>; la versión sale de <code>package.json</code>.</p>
+      <p>Para el instalador se necesitan Windows, <a href="https://jrsoftware.org/isdl.php">Inno Setup 6</a> y acceso a internet (Node.js se descarga de nodejs.org y se verifica con SHA-256). El resultado queda en <code>build\KuentaPOS-Setup-&lt;versión&gt;.exe</code>; la versión sale de <code>package.json</code>.</p>
       <p>Estructura: <code>server/</code> (servidor, lógica de negocio, importación, factura electrónica, PDF/A, correo, caja, copias), <code>public/</code> (interfaz), <code>installer/</code> (instalador de Windows, script de Linux/macOS). La base de datos es SQLite con los nombres de tablas y columnas de KFZ-Faktura. Los comentarios del código están en inglés. Las traducciones de la interfaz están en <code>public/js/lang/</code>; <code>node tools/i18n/missing.js</code> muestra las que faltan. Los datos de clientes y de la empresa nunca van en el repositorio.</p>
     </section>
   </main>
 
-  <footer>Kuenta 1.8.2 · © 2026 Doc · Código abierto bajo la GNU AGPL 3.0, funciones Pro con licencia · Fuente de los documentos: Liberation Sans (SIL Open Font License) · Código QR: qrcode-generator (MIT)</footer>
+  <footer>KuentaPOS 1.8.3 · © 2026 Doc · Código abierto bajo la GNU AGPL 3.0, funciones Pro con licencia · Fuente de los documentos: Liberation Sans (SIL Open Font License) · Código QR: qrcode-generator (MIT)</footer>
 </div>
 
 <script>

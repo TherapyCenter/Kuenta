@@ -6,7 +6,7 @@
 // 015 other exemptions, 481 small business scheme, 423 services to EU businesses), 022 taxable turnover.
 // II. tax due: base and tax per rate (701/702 17 %, 703/704 14 %, 705/706 8 %, 031/040 3 %), 037 / 046 / 076.
 // III./IV. input tax 458 / 093 / 102, 103 total tax due, 104 deductible, 105 balance.
-// The annual return has further parts (appendices on expenses and others) that Kuenta does not fill.
+// The annual return has further parts (appendices on expenses and others) that KuentaPOS does not fill.
 // Recapitulative statement: TVA_LICM / TVA_LICT (intra-community supplies of goods, fields 01-04, triangular 05-08)
 // and TVA_PSIM / TVA_PSIT (services to EU businesses, fields 01-04), corrections of earlier periods (16) as zero.
 const L = require('../lib');

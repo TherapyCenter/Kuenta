@@ -86,7 +86,7 @@ function gbakToSqlite(gbakBuf, targetFile, log = () => {}) {
     catch (e) { skipped.push(`${rel.name}: ${e.message}`); }
   });
   d.exec('COMMIT');
-  // Extra columns that only exist in Kuenta (not in the backup) - their values are kept during import
+  // Extra columns that only exist in KuentaPOS (not in the backup) - their values are kept during import
   const ownCols = {};
   for (const [t, cols] of Object.entries(dbm.EXT_COLUMNS)) {
     const ausSicherung = relCols[t] || new Set();
@@ -152,13 +152,13 @@ function mimeOf(name) {
   return ({ '.pdf': 'application/pdf', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.gif': 'image/gif', '.bmp': 'image/bmp', '.txt': 'text/plain', '.doc': 'application/msword', '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', '.xls': 'application/vnd.ms-excel', '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })[ext] || 'application/octet-stream';
 }
 
-// ---------- Keep Kuenta's own data during import ----------
-// Tables from KFZ-Faktura that can be edited in Kuenta. Whatever was created or changed in
-// Kuenta since the last import is replaced by the state of the backup.
+// ---------- Keep KuentaPOS's own data during import ----------
+// Tables from KFZ-Faktura that can be edited in KuentaPOS. Whatever was created or changed in
+// KuentaPOS since the last import is replaced by the state of the backup.
 const KFZ_TABELLEN = { KUNDEN: 'Kunden', FAHRZEUGE: 'Fahrzeuge', ARTIKEL: 'Artikel', LEISTUNG: 'Arbeitswerte', LIEFERANTEN: 'Lieferanten',
   REIFENEINLAGERUNG: 'Reifeneinlagerungen', ANGEBOTE: 'Angebote', AUFTRAEGE: 'Aufträge', LIEFERSCHEIN: 'Lieferscheine',
   RECHNUNGEN: 'Rechnungen/Korrekturen', ZAHLUNGSEINGAENGE: 'Zahlungen', KASSENBUCH: 'Kassenbucheinträge' };
-// Kuenta's own tables with a label for display
+// KuentaPOS's own tables with a label for display
 const SW_NAMEN = { SW_EINSTELLUNGEN: 'Einstellungen (E-Mail, Kasse, Sicherung …)', SW_TERMINE: 'Termine', SW_AUFGABEN: 'Aufgaben', SW_BRIEFE: 'Briefe',
   SW_DOKUMENTE: 'Dokumente', SW_MAILS: 'E-Mail-Protokoll', SW_EINGANG: 'Eingangsrechnungen', SW_ZEIT: 'Zeiterfassung', SW_FZVERKAUF: 'Fahrzeughandel',
   SW_KAUFVERTRAG: 'Kaufverträge', SW_KASSE_BON: 'Kassenbons', SW_KASSE_ABSCHLUSS: 'Kassenabschlüsse', SW_ANZAHLUNGEN: 'Anzahlungen', SW_PROTOKOLL: 'Änderungsprotokoll' };
@@ -195,8 +195,8 @@ function importVorschau() {
   return { letzterImport: seit, ersetzt, bleibt };
 }
 
-// Copy Kuenta's own data from the previous database into the freshly imported one
-function keepKuentaData(tmpFile, ownCols = {}) {
+// Copy KuentaPOS's own data from the previous database into the freshly imported one
+function keepKuentaPOSData(tmpFile, ownCols = {}) {
   const live = dbm.DB_FILE;
   if (!fs.existsSync(live)) return null;
   try { dbm.get().exec('PRAGMA wal_checkpoint(TRUNCATE)'); } catch { /* ignore */ }
@@ -205,7 +205,7 @@ function keepKuentaData(tmpFile, ownCols = {}) {
   try {
     d.exec(`ATTACH DATABASE '${live.replace(/'/g, "''")}' AS alt`);
     d.exec('BEGIN');
-    // 1. Kuenta's own tables (SW_...)
+    // 1. KuentaPOS's own tables (SW_...)
     const swTables = d.prepare("SELECT name, sql FROM alt.sqlite_master WHERE type='table' AND substr(name, 1, 3) = 'SW_'").all();
     for (const { name: t, sql } of swTables) {
       if (!hasTable(d, 'main', t)) d.exec(sql);
@@ -218,7 +218,7 @@ function keepKuentaData(tmpFile, ownCols = {}) {
       if (t === 'SW_EINSTELLUNGEN') {
         d.exec(`INSERT OR REPLACE INTO main."${t}" (${list}) SELECT ${list} FROM alt."${t}" WHERE SCHLUESSEL NOT LIKE 'import.%'`);
       } else if (t === 'SW_DOKUMENTE') {
-        // documents from the backup are already there; only add those added in Kuenta (with a new ID)
+        // documents from the backup are already there; only add those added in KuentaPOS (with a new ID)
         cols = cols.filter(c => !pk || c !== pk.name);
         const l2 = cols.map(c => `"${c}"`).join(',');
         d.exec(`INSERT INTO main."${t}" (${l2}) SELECT ${l2} FROM alt."${t}" WHERE PFAD IS NULL OR PFAD NOT IN (SELECT PFAD FROM main."${t}" WHERE PFAD IS NOT NULL)`);
@@ -228,7 +228,7 @@ function keepKuentaData(tmpFile, ownCols = {}) {
       const added = d.prepare(`SELECT COUNT(*) n FROM main."${t}"`).get().n - before;
       if (added > 0) out.tabellen[t] = added;
     }
-    // 2. Kuenta's own extra columns in tables from KFZ-Faktura (e.g. e-invoice flag on the customer)
+    // 2. KuentaPOS's own extra columns in tables from KFZ-Faktura (e.g. e-invoice flag on the customer)
     for (const [t, cols] of Object.entries(ownCols)) {
       if (!cols.length || !hasTable(d, 'alt', t)) continue;
       const altHave = new Set(colsIn(d, 'alt', t).map(c => c.name.toUpperCase()));
@@ -247,7 +247,7 @@ function keepKuentaData(tmpFile, ownCols = {}) {
     d.exec('COMMIT');
   } catch (e) {
     try { d.exec('ROLLBACK'); } catch { /* ignore */ }
-    throw new Error('Kuenta-eigene Daten konnten nicht übernommen werden. Der Import wurde abgebrochen, die bisherigen Daten sind unverändert. (' + e.message + ')');
+    throw new Error('KuentaPOS-eigene Daten konnten nicht übernommen werden. Der Import wurde abgebrochen, die bisherigen Daten sind unverändert. (' + e.message + ')');
   } finally {
     try { d.exec('DETACH DATABASE alt'); } catch { /* ignore */ }
     d.close();
@@ -293,7 +293,7 @@ function importBuffer(buf, opts = {}) {
     const d = new DatabaseSync(tmp);
     try { res.files = importFiles(fileList, d); } finally { d.close(); }
   }
-  if (opts.behalten !== false) res.behalten = keepKuentaData(tmp, res.ownCols);
+  if (opts.behalten !== false) res.behalten = keepKuentaPOSData(tmp, res.ownCols);
   delete res.ownCols;
   res.safetyCopy = activate(tmp);
   return res;
@@ -324,7 +324,7 @@ function importFolder(dir, opts = {}) {
     const d = new DatabaseSync(tmp);
     try { res.files = importFiles(list, d); } finally { d.close(); }
   }
-  if (opts.behalten !== false) res.behalten = keepKuentaData(tmp, res.ownCols);
+  if (opts.behalten !== false) res.behalten = keepKuentaPOSData(tmp, res.ownCols);
   delete res.ownCols;
   res.safetyCopy = activate(tmp);
   return res;
@@ -341,7 +341,7 @@ function backupWithEmbeddedGbak(dir, fdb, log = () => {}) {
   if (process.platform !== 'win32') throw new Error('Der direkte Datenbankzugriff ist nur unter Windows möglich. Bitte erstellen Sie in KFZ-Faktura eine Datensicherung (*.kfz) und importieren Sie diese.');
   const gbakExe = path.join(dir, 'gbak.exe');
   if (!fs.existsSync(gbakExe)) throw new Error('gbak.exe wurde im KFZ-Faktura-Ordner nicht gefunden.');
-  const work = fs.mkdtempSync(path.join(os.tmpdir(), 'kuenta-fb-'));
+  const work = fs.mkdtempSync(path.join(os.tmpdir(), 'kuentapos-fb-'));
   try {
     // copy Firebird runtime; embedded engine must be named fbclient.dll
     for (const f of fs.readdirSync(dir)) {
@@ -365,4 +365,4 @@ function backupWithEmbeddedGbak(dir, fdb, log = () => {}) {
   }
 }
 
-module.exports = { inspect, importBuffer, importFolder, gbakToSqlite, importVorschau, keepKuentaData };
+module.exports = { inspect, importBuffer, importFolder, gbakToSqlite, importVorschau, keepKuentaPOSData };

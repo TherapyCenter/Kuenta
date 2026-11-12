@@ -1,11 +1,11 @@
-# Kuenta SMS relay (USB modem with SIM card)
+# KuentaPOS SMS relay (USB modem with SIM card)
 
 **English** · [Deutsch](README.de.md)
 
-The relay runs on a separate computer (e.g. an old PC, mini PC or Raspberry Pi) with a USB modem stick and SIM card plugged in. Kuenta sends the reminder SMS over the network to the relay, and the relay sends them via the stick.
+The relay runs on a separate computer (e.g. an old PC, mini PC or Raspberry Pi) with a USB modem stick and SIM card plugged in. KuentaPOS sends the reminder SMS over the network to the relay, and the relay sends them via the stick.
 
 ```
-Kuenta  ──(network, POST /sms)──►  relay computer  ──(gammu)──►  USB modem + SIM  ──►  customer
+KuentaPOS  ──(network, POST /sms)──►  relay computer  ──(gammu)──►  USB modem + SIM  ──►  customer
 ```
 
 ## What you need
@@ -42,21 +42,21 @@ gammu sendsms TEXT +4917012345678 -text "Test"   # test SMS to your phone
 If that works, start the relay (choose any token, a long random word):
 
 ```sh
-KUENTA_SMS_TOKEN=YourSecretToken node kuenta-sms-relais.js
+KUENTAPOS_SMS_TOKEN=YourSecretToken node kuentapos-sms-relais.js
 ```
 
 ### As a background service
 
 ```ini
-# /etc/systemd/system/kuenta-sms-relais.service
+# /etc/systemd/system/kuentapos-sms-relais.service
 [Unit]
-Description=Kuenta SMS relay
+Description=KuentaPOS SMS relay
 After=network-online.target
 
 [Service]
 User=pi
-Environment=KUENTA_SMS_TOKEN=YourSecretToken
-ExecStart=/usr/bin/node /opt/kuenta-sms-relais/kuenta-sms-relais.js
+Environment=KUENTAPOS_SMS_TOKEN=YourSecretToken
+ExecStart=/usr/bin/node /opt/kuentapos-sms-relais/kuentapos-sms-relais.js
 Restart=on-failure
 
 [Install]
@@ -64,7 +64,7 @@ WantedBy=multi-user.target
 ```
 
 ```sh
-sudo systemctl daemon-reload && sudo systemctl enable --now kuenta-sms-relais
+sudo systemctl daemon-reload && sudo systemctl enable --now kuentapos-sms-relais
 ```
 
 The user needs access to the stick: `sudo usermod -aG dialout pi`.
@@ -73,24 +73,24 @@ The user needs access to the stick: `sudo usermod -aG dialout pi`.
 
 1. Install gammu for Windows and add the folder containing `gammu.exe` to the `PATH`.
 2. In Device Manager under "Ports (COM & LPT)", read the modem port of the stick, e.g. `COM5`.
-3. Create a `gammurc`, e.g. `C:\kuenta-sms\gammurc`:
+3. Create a `gammurc`, e.g. `C:\kuentapos-sms\gammurc`:
    ```ini
    [gammu]
    device = COM5:
    connection = at
    ```
-4. Test: `gammu -c C:\kuenta-sms\gammurc identify`
+4. Test: `gammu -c C:\kuentapos-sms\gammurc identify`
 5. Start (PowerShell):
    ```powershell
-   $env:KUENTA_SMS_TOKEN = "YourSecretToken"
-   $env:KUENTA_SMS_GAMMURC = "C:\kuenta-sms\gammurc"
-   node kuenta-sms-relais.js
+   $env:KUENTAPOS_SMS_TOKEN = "YourSecretToken"
+   $env:KUENTAPOS_SMS_GAMMURC = "C:\kuentapos-sms\gammurc"
+   node kuentapos-sms-relais.js
    ```
 6. Allow port 3790 for the private network in the Windows firewall.
 
-## Entering it in Kuenta
+## Entering it in KuentaPOS
 
-Insert and adjust the template *Settings → Reminders & SMS → SMS gateway → template "Kuenta SMS relay"*:
+Insert and adjust the template *Settings → Reminders & SMS → SMS gateway → template "KuentaPOS SMS relay"*:
 
 | Field | Value |
 |---|---|
@@ -104,11 +104,11 @@ Then "Save settings & send test SMS".
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `KUENTA_SMS_TOKEN` | – (required) | must match the header `X-Token` in Kuenta |
+| `KUENTAPOS_SMS_TOKEN` | – (required) | must match the header `X-Token` in KuentaPOS |
 | `PORT` | `3790` | port of the relay |
-| `HOST` | `0.0.0.0` | network interface; `127.0.0.1` if Kuenta runs on the same computer |
-| `KUENTA_SMS_BEFEHL` | `gammu` | with a running `gammu-smsd` use `gammu-smsd-inject` instead |
-| `KUENTA_SMS_GAMMURC` | – | path to the gammu configuration |
+| `HOST` | `0.0.0.0` | network interface; `127.0.0.1` if KuentaPOS runs on the same computer |
+| `KUENTAPOS_SMS_BEFEHL` | `gammu` | with a running `gammu-smsd` use `gammu-smsd-inject` instead |
+| `KUENTAPOS_SMS_GAMMURC` | – | path to the gammu configuration |
 
 ## Notes
 

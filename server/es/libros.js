@@ -1,6 +1,6 @@
 'use strict';
 // Spanish VAT books (libros registro de IVA, art. 62 RIVA) as CSV for the tax adviser (gestor) and an
-// overview for the quarterly VAT return (modelo 303). The figures come from the invoices in Kuenta.
+// overview for the quarterly VAT return (modelo 303). The figures come from the invoices in KuentaPOS.
 const L = require('../lib');
 const ES = require('./index');
 const NIF = require('../../public/js/nif.js');

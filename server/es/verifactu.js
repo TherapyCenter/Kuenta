@@ -1,4 +1,5 @@
 'use strict';
+require('../env'); // accept old KUENTA_* variables
 // VERI*FACTU (RD 1007/2023, Orden HAC/1177/2024): every issued invoice gets a billing record ("registro de
 // facturación de alta") with a SHA-256 hash chain and a QR code. The records are sent to the AEAT with the
 // company's electronic certificate (mode "VERI*FACTU", art. 16 of the regulation).
@@ -262,7 +263,7 @@ function xmlAnulacion(a, prev, sif, generado, huella) {
 
 function sifPruefen() {
   const sif = productor();
-  if (!sif.nif && !(sif.idOtro && sif.idOtro.id)) throw new L.HttpError(500, 'Die Steuerkennung des Softwareherstellers fehlt (server/es/sistema.js oder KUENTA_SIF_NIF / KUENTA_SIF_IDOTRO). Ohne sie nimmt die AEAT keine Datensätze an.');
+  if (!sif.nif && !(sif.idOtro && sif.idOtro.id)) throw new L.HttpError(500, 'Die Steuerkennung des Softwareherstellers fehlt (server/es/sistema.js oder KUENTAPOS_SIF_NIF / KUENTAPOS_SIF_IDOTRO). Ohne sie nimmt die AEAT keine Datensätze an.');
   return sif;
 }
 function guardar(rec) {
@@ -352,7 +353,7 @@ function sobre(recs) {
     recs.map(r => `<sum:RegistroFactura>${r.XML}</sum:RegistroFactura>`).join('') +
     '</sum:RegFactuSistemaFacturacion></soapenv:Body></soapenv:Envelope>';
 }
-const urlEnvio = () => process.env.KUENTA_VERIFACTU_URL || URLS[entorno()][L.sw('verifactu.certificado', 'personal') === 'sello' ? 'sello' : 'personal'];
+const urlEnvio = () => process.env.KUENTAPOS_VERIFACTU_URL || URLS[entorno()][L.sw('verifactu.certificado', 'personal') === 'sello' ? 'sello' : 'personal'];
 let transporte = null; // tests replace the HTTPS transport
 function post(xml, { method = 'POST' } = {}) {
   if (transporte) return Promise.resolve(transporte(xml, method));

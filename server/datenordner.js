@@ -46,8 +46,8 @@ function istNetzlaufwerk(dir) {
 async function warnung(dir) {
   const netz = await istNetzlaufwerk(path.resolve(dir)).catch(() => false);
   if (!netz) return null;
-  return `Der Datenordner liegt auf einem Netzlaufwerk (${dir}). Dort kann die Kuenta-Datenbank beschädigt werden. `
-    + 'Bitte einen Ordner auf einer lokalen Festplatte verwenden (Umgebungsvariable KUENTA_DATA entfernen oder ändern) und für mehrere Arbeitsplätze den Netzwerkbetrieb nutzen. Sicherungen dürfen auf dem Netzlaufwerk liegen.';
+  return `Der Datenordner liegt auf einem Netzlaufwerk (${dir}). Dort kann die KuentaPOS-Datenbank beschädigt werden. `
+    + 'Bitte einen Ordner auf einer lokalen Festplatte verwenden (Umgebungsvariable KUENTAPOS_DATA entfernen oder ändern) und für mehrere Arbeitsplätze den Netzwerkbetrieb nutzen. Sicherungen dürfen auf dem Netzlaufwerk liegen.';
 }
 
 module.exports = { warnung, istNetzlaufwerk, typAusMounts };

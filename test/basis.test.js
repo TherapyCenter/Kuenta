@@ -6,8 +6,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'kuenta-test-'));
-process.env.KUENTA_DATA = tmp;
+const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'kuentapos-test-'));
+process.env.KUENTAPOS_DATA = tmp;
 
 const { writeZip, readZip } = require('../server/import/zip');
 const dbm = require('../server/db');
@@ -87,7 +87,7 @@ test('Rechnung → Zahlung → Storno → E-Rechnung → Sicherung', () => {
   dbm.get().prepare("UPDATE KUNDEN SET NAME='geändert' WHERE KUNID=?").run(k.KUNID);
   BK.restoreBackup(b.buffer, { password: 'sicher123' });
   assert.strictEqual(dbm.get().prepare('SELECT NAME FROM KUNDEN WHERE KUNID=?').get(k.KUNID).NAME, 'Mustermann');
-  assert.match(b.filename, /^Kuenta-Sicherung_.*\.kuenta$/);
+  assert.match(b.filename, /^KuentaPOS-Sicherung_.*\.kuentapos$/);
   // backups of the predecessor versions (KFZ-Faktotum *.kft, Schraubwerk *.swb) stay readable
   const neu = readZip(BK.createBackup({}).buffer);
   for (const alt of ['faktotum', 'schraubwerk']) {
@@ -102,11 +102,11 @@ test('Rechnung → Zahlung → Storno → E-Rechnung → Sicherung', () => {
   }
 });
 
-// Optional: check a real KFZ-Faktura data set (KUENTA_TEST_GBAK=path to DB1.bak)
-test('KFZ-Faktura gbak-Import (optional)', { skip: !process.env.KUENTA_TEST_GBAK }, () => {
+// Optional: check a real KFZ-Faktura data set (KUENTAPOS_TEST_GBAK=path to DB1.bak)
+test('KFZ-Faktura gbak-Import (optional)', { skip: !process.env.KUENTAPOS_TEST_GBAK }, () => {
   const { gbakToSqlite } = require('../server/import/kfz');
   const out = path.join(tmp, 'gbak.db');
-  const r = gbakToSqlite(fs.readFileSync(process.env.KUENTA_TEST_GBAK), out);
+  const r = gbakToSqlite(fs.readFileSync(process.env.KUENTAPOS_TEST_GBAK), out);
   assert.ok(r.stats.KUNDEN > 0);
   assert.strictEqual(r.skippedCount, 0);
 });

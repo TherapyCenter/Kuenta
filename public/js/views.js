@@ -106,13 +106,13 @@ Views.start = async (main) => {
   main.append(t,
     h('div', { class: 'view-scroll' },
       (!d.zaehler.kunden && !d.zaehler.rechnungen) ? h('div', { class: 'panel', style: { marginBottom: '8px' } },
-        h('h3', null, 'Willkommen bei Kuenta'),
+        h('h3', null, 'Willkommen bei KuentaPOS'),
         h('div', { class: 'pb' },
           h('p', { style: { margin: '0 0 8px' } }, 'Der Datenbestand ist noch leer. Tragen Sie zuerst Ihre Firmendaten ein oder übernehmen Sie vorhandene Daten:'),
           h('div', { style: { display: 'flex', flexWrap: 'wrap', gap: '6px' } },
             h('button', { class: 'btn primary', onclick: () => App.go('einstellungen') }, '🏢 Firmendaten eintragen'),
             h('button', { class: 'btn', onclick: () => App.go('import') }, '📥 Aus KFZ-Faktura importieren'),
-            h('button', { class: 'btn', onclick: () => App.go('sicherung') }, '💾 Sicherung wiederherstellen (*.kuenta)'),
+            h('button', { class: 'btn', onclick: () => App.go('sicherung') }, '💾 Sicherung wiederherstellen (*.kuentapos)'),
             h('button', { class: 'btn', onclick: () => App.go('datenimport') }, '🔌 CSV / DATANORM importieren')))) : null,
       h('div', { class: 'cards' },
         card('Umsatz aktueller Monat (netto)', A.betrag(d.umsatzMonat.n), `${d.umsatzMonat.c} Rechnungen`, () => App.go('umsatz')),
@@ -445,7 +445,7 @@ Views.termine = async (main) => {
       h('button', { class: 'btn', onclick: brief }, '✉️ Erinnerungsschreiben'),
       h('button', { class: 'btn', onclick: () => erinnern('email') }, '📧 Per E-Mail erinnern'),
       App.pro('sms') ? h('button', { class: 'btn primary', onclick: () => erinnern('sms') }, '📱 Per SMS erinnern')
-        : h('button', { class: 'btn', title: 'Funktion von Kuenta Pro', onclick: () => App.proHinweis('sms') }, '🔒 Per SMS erinnern (Pro)')));
+        : h('button', { class: 'btn', title: 'Funktion von KuentaPOS Pro', onclick: () => App.proHinweis('sms') }, '🔒 Per SMS erinnern (Pro)')));
   await load();
 };
 
@@ -658,9 +658,9 @@ Views.einstellungen = async (main) => {
       h('div', { class: 'fld hint' }, 'Die Oberfläche gilt nur für diesen Arbeitsplatz. Die Sprache der Belege gilt für den ganzen Mandanten. Gesetzliche Angaben (z. B. § 19 UStG) werden mit übersetzt, die Rechtslage bleibt die deutsche.')))));
   addTab('E-Mail', p => p.append(h('div', { class: 'groups' },
     grp('Versandart',
-      (() => { const x = h('select', null, [['smtp', 'Direkt aus Kuenta senden (SMTP)'], ['programm', 'An Mailprogramm übergeben (z. B. Thunderbird)']].map(([k, l]) => h('option', { value: k, selected: (s.sw['mail.versand'] || 'smtp') === k }, l))); x.addEventListener('change', () => { changes.sw['mail.versand'] = x.value; }); return fld('E-Mails versenden', x); })(),
-      h('div', { class: 'fld hint' }, 'Bei „An Mailprogramm übergeben“ öffnet Kuenta eine fertige E-Mail mit Anhang in Thunderbird (oder dem Standard-Mailprogramm). Sie senden sie dort selbst – so liegt sie im Ordner „Gesendet“. Funktioniert nur an dem Rechner, auf dem Kuenta läuft; die SMTP-Daten unten werden dann nicht benötigt.'),
-      (() => { const x = h('input', { type: 'text', value: s.sw['mail.programm'] || '', placeholder: 'leer = Thunderbird automatisch suchen' }); x.addEventListener('change', () => { changes.sw['mail.programm'] = x.value; }); const info = h('div', { class: 'hint' }); api('/api/mail/programm').then(r => { info.textContent = T(r.container ? 'Kuenta läuft in einem Container – die Übergabe an ein Mailprogramm ist dort nicht möglich. Bitte SMTP verwenden.' : r.thunderbird ? 'Gefunden: ' + r.thunderbird : 'Thunderbird nicht gefunden – es wird das Standard-Mailprogramm verwendet.'); }).catch(() => {}); return h('label', { class: 'fld' }, h('span', null, 'Pfad zu Thunderbird (optional)'), x, info); })(),
+      (() => { const x = h('select', null, [['smtp', 'Direkt aus KuentaPOS senden (SMTP)'], ['programm', 'An Mailprogramm übergeben (z. B. Thunderbird)']].map(([k, l]) => h('option', { value: k, selected: (s.sw['mail.versand'] || 'smtp') === k }, l))); x.addEventListener('change', () => { changes.sw['mail.versand'] = x.value; }); return fld('E-Mails versenden', x); })(),
+      h('div', { class: 'fld hint' }, 'Bei „An Mailprogramm übergeben“ öffnet KuentaPOS eine fertige E-Mail mit Anhang in Thunderbird (oder dem Standard-Mailprogramm). Sie senden sie dort selbst – so liegt sie im Ordner „Gesendet“. Funktioniert nur an dem Rechner, auf dem KuentaPOS läuft; die SMTP-Daten unten werden dann nicht benötigt.'),
+      (() => { const x = h('input', { type: 'text', value: s.sw['mail.programm'] || '', placeholder: 'leer = Thunderbird automatisch suchen' }); x.addEventListener('change', () => { changes.sw['mail.programm'] = x.value; }); const info = h('div', { class: 'hint' }); api('/api/mail/programm').then(r => { info.textContent = T(r.container ? 'KuentaPOS läuft in einem Container – die Übergabe an ein Mailprogramm ist dort nicht möglich. Bitte SMTP verwenden.' : r.thunderbird ? 'Gefunden: ' + r.thunderbird : 'Thunderbird nicht gefunden – es wird das Standard-Mailprogramm verwendet.'); }).catch(() => {}); return h('label', { class: 'fld' }, h('span', null, 'Pfad zu Thunderbird (optional)'), x, info); })(),
       h('div', { class: 'fld' }, h('button', { class: 'btn', onclick: async () => { try { await api('/api/einstellungen', { method: 'PUT', body: changes }); const r = await api('/api/mail/programm-test', { method: 'POST', body: {} }); toast('Testnachricht an ' + r.programm + ' übergeben', 'ok'); } catch (e) { showError(e); } } }, '✉️ Einstellungen speichern & Mailprogramm testen'))),
     grp('Postausgangsserver (SMTP)', si('smtp.host', 'Server (z. B. smtp.ionos.de)', ''), si('smtp.port', 'Port', '587', true),
       (() => { const x = h('select', null, [['starttls', 'STARTTLS (Port 587)'], ['ssl', 'SSL/TLS (Port 465)'], ['none', 'unverschlüsselt']].map(([k, l]) => h('option', { value: k, selected: (s.sw['smtp.sicherheit'] || 'starttls') === k }, l))); x.addEventListener('change', () => { changes.sw['smtp.sicherheit'] = x.value; }); return fld('Verschlüsselung', x, true); })(),
@@ -689,7 +689,7 @@ Views.einstellungen = async (main) => {
     const url = eingabe('sms.url'); const header = textfeld('sms.header', 2); const body = textfeld('sms.body', 3);
     const benutzer = eingabe('sms.benutzer'); const passwort = eingabe('sms.passwort', 'password'); const absender = eingabe('sms.absender');
     const VORLAGEN = {
-      relais: { name: 'Kuenta-SMS-Relais (Surfstick mit SIM-Karte an einem anderen Rechner)', methode: 'POST', url: 'http://RECHNER:3790/sms', format: 'json', header: 'X-Token: IHR-TOKEN', body: '{"nummer":"{nummer}","text":"{text}"}', benutzer: '', passwort: '' },
+      relais: { name: 'KuentaPOS-SMS-Relais (Surfstick mit SIM-Karte an einem anderen Rechner)', methode: 'POST', url: 'http://RECHNER:3790/sms', format: 'json', header: 'X-Token: IHR-TOKEN', body: '{"nummer":"{nummer}","text":"{text}"}', benutzer: '', passwort: '' },
       android: { name: 'Android-Telefon mit der App „SMS Gateway for Android“ (lokaler Server)', methode: 'POST', url: 'http://HANDY-IP:8080/message', format: 'json', header: '', body: '{"textMessage":{"text":"{text}"},"phoneNumbers":["{nummer}"]}', benutzer: 'sms', passwort: '' },
       seven: { name: 'SMS-Anbieter seven.io (Internet, kostenpflichtig)', methode: 'POST', url: 'https://gateway.seven.io/api/sms', format: 'form', header: 'X-Api-Key: IHR-API-SCHLÜSSEL', body: 'to={nummer}&text={text}&from={absender}', benutzer: '', passwort: '' },
     };
@@ -715,7 +715,7 @@ Views.einstellungen = async (main) => {
       grp('Erinnerungen an Fahrzeugtermine', fld('Betreff der E-Mail', betreff), fld('Text der E-Mail', text), fld('Text der SMS', sms), zaehler,
         h('div', { class: 'fld hint' }, 'Platzhalter: {Briefanrede} {Anrede} {Name} {Vorname} {Kennzeichen} {Fahrzeug} {Termin} {Terminart} {Firma} {Telefon}. Feld leeren = Vorgabe. E-Mails gehen über die Versandart im Reiter „E-Mail“.'),
         h('div', { class: 'fld' }, h('button', { class: 'btn', onclick: protokoll }, '📋 Erinnerungsprotokoll'))),
-      grp('SMS-Gateway', ...(App.pro('sms') ? [] : [h('div', { class: 'fld note info' }, 'SMS-Versand ist eine Funktion von Kuenta Pro. Sie können das Gateway schon einrichten, senden lassen sich SMS erst mit Lizenz (Reiter „Lizenz“).')]), fld('Vorlage', vorlage), fld('Methode', methode, true), fld('Format', format, true), fld('Adresse (URL)', url),
+      grp('SMS-Gateway', ...(App.pro('sms') ? [] : [h('div', { class: 'fld note info' }, 'SMS-Versand ist eine Funktion von KuentaPOS Pro. Sie können das Gateway schon einrichten, senden lassen sich SMS erst mit Lizenz (Reiter „Lizenz“).')]), fld('Vorlage', vorlage), fld('Methode', methode, true), fld('Format', format, true), fld('Adresse (URL)', url),
         fld('Zusätzliche Kopfzeilen (je Zeile „Name: Wert“)', header), fld('Inhalt (bei POST)', body),
         fld('Benutzer (Basic-Anmeldung)', benutzer, true), fld('Passwort', passwort, true), fld('Absender (höchstens 11 Zeichen, falls unterstützt)', absender),
         h('div', { class: 'fld hint' }, 'Platzhalter für das Gateway: {nummer} (+4917…), {nummer_ohne_plus}, {text}, {absender}. Sie werden automatisch passend kodiert.'),
@@ -727,7 +727,7 @@ Views.einstellungen = async (main) => {
       const datum = d => d ? d.split('-').reverse().join('.') : '';
       const eingabe = h('textarea', { rows: 4, placeholder: 'KUENTA1.…', style: { fontFamily: 'monospace', fontSize: '12px' } });
       const einspielen = async () => {
-        try { const r = await api('/api/lizenz', { method: 'PUT', body: { schluessel: eingabe.value } }); App.session.pro = r.funktionen; toast('Lizenz eingespielt. Kuenta Pro ist freigeschaltet.', 'ok'); zeige(r); }
+        try { const r = await api('/api/lizenz', { method: 'PUT', body: { schluessel: eingabe.value } }); App.session.pro = r.funktionen; toast('Lizenz eingespielt. KuentaPOS Pro ist freigeschaltet.', 'ok'); zeige(r); }
         catch (e) { showError(e); }
       };
       const entfernen = async () => {
@@ -737,11 +737,11 @@ Views.einstellungen = async (main) => {
       const zustand = !st.vorhanden ? h('div', { class: 'fld' }, 'Keine Lizenz eingespielt. Alle Grundfunktionen sind frei nutzbar.')
         : st.fehler ? h('div', { class: 'fld note warn' }, 'Die gespeicherte Lizenz ist ungültig: ' + st.fehler)
         : h('div', { class: 'fld' }, h('table', { class: 'simple' }, h('tbody', null, [
-          ['Lizenziert für', st.kunde], ['Lizenz-Nr.', st.id], ['Umfang', st.lizenziert.includes('pro') ? 'Kuenta Pro (alle Pro-Funktionen)' : st.lizenziert.map(f => st.katalog[f] || f).join(', ')],
+          ['Lizenziert für', st.kunde], ['Lizenz-Nr.', st.id], ['Umfang', st.lizenziert.includes('pro') ? 'KuentaPOS Pro (alle Pro-Funktionen)' : st.lizenziert.map(f => st.katalog[f] || f).join(', ')],
           ['Ausgestellt', datum(st.ausgestellt)], ['Gültig bis', st.bis ? datum(st.bis) + (st.abgelaufen ? ' – abgelaufen' : '') : 'unbefristet']].map(([a, b]) => h('tr', null, h('td', null, h('b', null, a)), h('td', null, b))))));
       box.innerHTML = '';
       box.append(
-        grp('Kuenta Pro', zustand,
+        grp('KuentaPOS Pro', zustand,
           h('div', { class: 'fld' }, h('b', null, 'Pro-Funktionen'), h('ul', { style: { margin: '4px 0 0 18px', padding: 0 } }, Object.entries(st.katalog).map(([k, l]) => h('li', null, `${st.funktionen.includes(k) ? '✅' : '🔒'} ${l}`)))),
           h('div', { class: 'fld hint' }, st.angebot.text, ' ', h('a', { href: st.angebot.seite, target: '_blank', rel: 'noopener' }, 'Preise und Bestellung')),
           st.angebot.shop ? h('div', { class: 'fld' }, h('a', { class: 'btn primary', href: st.angebot.shop, target: '_blank', rel: 'noopener' }, '₿ Jetzt online kaufen (Bitcoin, Lightning, USDT)'), h('div', { class: 'hint' }, 'Der Lizenzschlüssel kommt nach der Zahlung per E-Mail.')) : null),
@@ -773,7 +773,7 @@ Views.einstellungen = async (main) => {
       grp('Rechnungen',
         si('btcpay.gueltigtage', 'Zahlungslink gültig (Tage)', '30', true),
         sb('btcpay.pdf', 'QR-Code und Link auf die PDF-Rechnung drucken, wenn ein Zahlungslink angelegt ist', '1'),
-        h('div', { class: 'fld hint' }, 'Den Zahlungslink legen Sie in der Rechnung im Reiter „Zahlungen“ an. Der Euro-Betrag steht fest, umgerechnet wird zum Kurs am Zahltag. Kuenta fragt alle 2 Minuten bei BTCPay nach und bucht bezahlte Rechnungen automatisch. In E-Mails setzt der Platzhalter {Zahlungslink} den Link ein, ohne Platzhalter kommt ein Hinweis vor den Gruß.')),
+        h('div', { class: 'fld hint' }, 'Den Zahlungslink legen Sie in der Rechnung im Reiter „Zahlungen“ an. Der Euro-Betrag steht fest, umgerechnet wird zum Kurs am Zahltag. KuentaPOS fragt alle 2 Minuten bei BTCPay nach und bucht bezahlte Rechnungen automatisch. In E-Mails setzt der Platzhalter {Zahlungslink} den Link ein, ohne Platzhalter kommt ein Hinweis vor den Gruß.')),
       grp('Buchhaltung',
         si('btcpay.konto', 'FIBU-Konto für Krypto-Zahlungseingänge', '1360', true),
         h('div', { class: 'fld hint' }, 'Vorgabe ist 1360 (Geldtransit, SKR03). Wie Krypto-Bestände gebucht werden, stimmen Sie bitte mit Ihrem Steuerberater ab. Die Zahlungen erscheinen mit der Zahlungsart „Krypto (BTCPay)“.'))));
@@ -859,7 +859,7 @@ Views.sicherung = async (main) => {
   const anzahl = h('input', { type: 'text', class: 'num', value: s.sw['sicherung.anzahl'] || '14' });
   const restorePw = h('input', { type: 'password' });
   const status = h('div');
-  main.append(title('Datensicherung', 'Kuenta-Sicherung (*.kuenta)'), h('div', { class: 'view-scroll' }, h('div', { class: 'groups' },
+  main.append(title('Datensicherung', 'KuentaPOS-Sicherung (*.kuentapos)'), h('div', { class: 'view-scroll' }, h('div', { class: 'groups' },
     h('fieldset', { class: 'grp' }, h('legend', null, 'Daten sichern'), h('div', { class: 'fgrid' },
       h('div', { class: 'fld hint' }, `Letzte Sicherung: ${s.sw['sicherung.letzte'] ? fmt.datetime(s.sw['sicherung.letzte']) : 'noch keine'}`),
       fld('Passwort (verschlüsselt mit AES-256)', pw, true), fld('Passwort wiederholen', pw2, true),
@@ -868,7 +868,7 @@ Views.sicherung = async (main) => {
         if (pw.value && pw.value.length < 6) { toast('Das Passwort muss mindestens 6 Zeichen haben.', 'err'); return; }
         if (pw.value !== pw2.value) { toast('Die Passwörter stimmen nicht überein.', 'err'); return; }
         status.innerHTML = ''; status.append(h('div', { class: 'note info' }, 'Sicherung wird erstellt …'));
-        try { await downloadUrl('/api/sicherung?' + qs({ passwort: pw.value, ohneDateien: ohne.checked ? 1 : '' }), 'Kuenta.kuenta'); status.innerHTML = ''; status.append(h('div', { class: 'note ok' }, '✔ Die Datensicherung wurde erstellt und heruntergeladen. Bewahren Sie sie an einem sicheren Ort auf (z. B. USB-Stick, NAS).')); }
+        try { await downloadUrl('/api/sicherung?' + qs({ passwort: pw.value, ohneDateien: ohne.checked ? 1 : '' }), 'KuentaPOS.kuentapos'); status.innerHTML = ''; status.append(h('div', { class: 'note ok' }, '✔ Die Datensicherung wurde erstellt und heruntergeladen. Bewahren Sie sie an einem sicheren Ort auf (z. B. USB-Stick, NAS).')); }
         catch (e) { status.innerHTML = ''; showError(e); }
       } }, '💾 Jetzt sichern & herunterladen')), status)),
     h('fieldset', { class: 'grp' }, h('legend', null, 'Automatische Sicherung'), h('div', { class: 'fgrid' },
@@ -879,7 +879,7 @@ Views.sicherung = async (main) => {
       h('div', { class: 'fld note' }, 'Achtung: Die aktuellen Daten werden durch die Sicherung ersetzt. Vorher wird automatisch eine Sicherheitskopie im Datenverzeichnis angelegt.'),
       fld('Passwort der Sicherung (falls vergeben)', restorePw),
       h('div', { class: 'fld' }, h('button', { class: 'btn', onclick: async () => {
-        const f = await pickFile('.kuenta,.kft,.swb'); if (!f) return;
+        const f = await pickFile('.kuentapos,.kuenta,.kft,.swb'); if (!f) return;
         if (!(await confirmDlg(`Daten aus "${f.name}" wiederherstellen?\nAlle aktuellen Daten werden ersetzt.`, { danger: true, ok: 'Wiederherstellen' }))) return;
         try {
           const r = await api('/api/sicherung/wiederherstellen', { method: 'POST', body: f, headers: { 'X-Passwort': encodeURIComponent(restorePw.value) } });
@@ -906,8 +906,8 @@ Views.import = async (main) => {
       r.files ? h('div', null, `Dokumente/Bilder: ${r.files.dokumente}${r.files.logo ? ' · Firmenlogo übernommen' : ''}`) : null,
       r.header ? h('div', { class: 'hint' }, `Quelle: ${r.header.file || ''} · Sicherung vom ${r.header.date || ''}`) : null,
       r.skippedCount ? h('div', { class: 'hint' }, `${r.skippedCount} Datensätze konnten nicht übernommen werden.`) : null,
-      r.behalten ? h('div', null, '✔ Kuenta-eigene Daten übernommen' + (Object.keys(r.behalten.tabellen || {}).length ? ': ' + Object.entries(r.behalten.tabellen).map(([t, c]) => `${t.replace(/^SW_/, '').toLowerCase()} ${c.toLocaleString(LOCALE)}`).join(' · ') : '') + '.') : null,
-      r.safetyCopy ? h('div', { class: 'hint' }, `Die vorherigen Kuenta-Daten wurden gesichert: ${r.safetyCopy}`) : null),
+      r.behalten ? h('div', null, '✔ KuentaPOS-eigene Daten übernommen' + (Object.keys(r.behalten.tabellen || {}).length ? ': ' + Object.entries(r.behalten.tabellen).map(([t, c]) => `${t.replace(/^SW_/, '').toLowerCase()} ${c.toLocaleString(LOCALE)}`).join(' · ') : '') + '.') : null,
+      r.safetyCopy ? h('div', { class: 'hint' }, `Die vorherigen KuentaPOS-Daten wurden gesichert: ${r.safetyCopy}`) : null),
       h('button', { class: 'btn primary', style: { marginTop: '8px' }, onclick: () => { location.hash = '#start'; location.reload(); } }, 'Weiter zur Übersicht'));
   };
   const busy = msg => { status.innerHTML = ''; status.append(h('div', { class: 'note info' }, '⏳ ' + msg)); };
@@ -920,13 +920,13 @@ Views.import = async (main) => {
     const content = h('div', { style: { display: 'grid', gap: '10px', lineHeight: 1.5 } },
       h('div', null, `Daten aus „${quelle}“ importieren?`),
       v.ersetzt.length ? h('div', { class: 'note warn' },
-        h('b', null, v.letzterImport ? `Seit dem letzten Import (${fmt.datetime(v.letzterImport)}) in Kuenta angelegt oder geändert – wird durch den Stand aus KFZ-Faktura ersetzt:` : 'Diese Daten in Kuenta werden durch den Stand aus KFZ-Faktura ersetzt:'),
+        h('b', null, v.letzterImport ? `Seit dem letzten Import (${fmt.datetime(v.letzterImport)}) in KuentaPOS angelegt oder geändert – wird durch den Stand aus KFZ-Faktura ersetzt:` : 'Diese Daten in KuentaPOS werden durch den Stand aus KFZ-Faktura ersetzt:'),
         h('ul', { style: { margin: '4px 0 0', paddingLeft: '18px' } }, v.ersetzt.map(e => h('li', null, `${e.name}: ${n(e.anzahl)}`)))) : null,
       v.bleibt.length ? h('div', { class: 'note ok' },
-        h('b', null, 'Bleibt erhalten (gibt es nur in Kuenta):'),
+        h('b', null, 'Bleibt erhalten (gibt es nur in KuentaPOS):'),
         h('ul', { style: { margin: '4px 0 0', paddingLeft: '18px' } }, v.bleibt.map(e => h('li', null, `${e.name}: ${n(e.anzahl)}`))),
-        h('div', { class: 'hint' }, 'Ebenso Kuenta-eigene Felder wie E-Rechnungs-Einstellungen der Kunden.')) : null,
-      h('label', { class: 'fld chk' }, behalten, h('span', null, 'Kuenta-eigene Daten behalten (empfohlen). Ohne Haken wird alles durch die Sicherung ersetzt.')),
+        h('div', { class: 'hint' }, 'Ebenso KuentaPOS-eigene Felder wie E-Rechnungs-Einstellungen der Kunden.')) : null,
+      h('label', { class: 'fld chk' }, behalten, h('span', null, 'KuentaPOS-eigene Daten behalten (empfohlen). Ohne Haken wird alles durch die Sicherung ersetzt.')),
       h('div', { class: 'hint' }, 'Vorher wird automatisch eine Sicherheitskopie der bisherigen Daten angelegt.'));
     const ok = await dialog('Import bestätigen', content, [{ label: 'Importieren', cls: 'primary', value: true }, { label: 'Abbrechen', value: false }], { width: 620 });
     return ok ? { behalten: behalten.checked } : null;
@@ -953,7 +953,7 @@ Views.import = async (main) => {
   dz.addEventListener('dragleave', () => dz.classList.remove('over'));
   dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); importFile(e.dataTransfer.files[0]); });
   main.append(title('Daten aus KFZ-Faktura übernehmen'), h('div', { class: 'view-scroll' },
-    h('div', { class: 'note info', style: { marginBottom: '10px', lineHeight: 1.6 } }, 'Übernommen werden alle Daten: Kunden, Fahrzeuge, Artikel, Arbeitswerte, Lieferanten, Reifeneinlagerungen, Angebote, Aufträge, Lieferscheine, Rechnungen, Rechnungskorrekturen, Zahlungen, Offene Posten, Mahnungen, Kassenbuch, FIBU-Buchungen, Textbausteine, Einstellungen, Nummernkreise sowie Dokumente, Bilder und das Firmenlogo. Daten, die es nur in Kuenta gibt (E-Mail- und Kasseneinstellungen, Kassenbons, Zeiterfassung, Termine, Eingangsrechnungen, Kuenta-eigene Felder), bleiben dabei erhalten.'),
+    h('div', { class: 'note info', style: { marginBottom: '10px', lineHeight: 1.6 } }, 'Übernommen werden alle Daten: Kunden, Fahrzeuge, Artikel, Arbeitswerte, Lieferanten, Reifeneinlagerungen, Angebote, Aufträge, Lieferscheine, Rechnungen, Rechnungskorrekturen, Zahlungen, Offene Posten, Mahnungen, Kassenbuch, FIBU-Buchungen, Textbausteine, Einstellungen, Nummernkreise sowie Dokumente, Bilder und das Firmenlogo. Daten, die es nur in KuentaPOS gibt (E-Mail- und Kasseneinstellungen, Kassenbons, Zeiterfassung, Termine, Eingangsrechnungen, KuentaPOS-eigene Felder), bleiben dabei erhalten.'),
     h('div', { class: 'groups' },
       h('fieldset', { class: 'grp' }, h('legend', null, '1. Aus einer KFZ-Faktura-Datensicherung (empfohlen)'), h('div', { class: 'fgrid' },
         h('div', { class: 'fld hint' }, 'In KFZ-Faktura: Menü "KFZ-Faktura" → "Daten sichern" erzeugt eine Datei KFZ-FakturaBackup_….kfz.'),

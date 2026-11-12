@@ -8,10 +8,10 @@ const path = require('path');
 const http = require('http');
 const crypto = require('crypto');
 
-const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'kuenta-shop-'));
-process.env.KUENTA_LIZENZ_HOME = tmp;
-process.env.KUENTA_LANG = 'de';   // messages are checked in German
-process.env.KUENTA_DATA = path.join(tmp, 'daten');
+const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'kuentapos-shop-'));
+process.env.KUENTAPOS_LIZENZ_HOME = tmp;
+process.env.KUENTAPOS_LANG = 'de';   // messages are checked in German
+process.env.KUENTAPOS_DATA = path.join(tmp, 'daten');
 
 const { privateKey, publicKey } = crypto.generateKeyPairSync('ed25519');
 fs.writeFileSync(path.join(tmp, 'privat.pem'), privateKey.export({ format: 'pem', type: 'pkcs8' }));

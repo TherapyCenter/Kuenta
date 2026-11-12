@@ -1,8 +1,8 @@
-﻿# Kuenta – build the Windows installer
+﻿# KuentaPOS – build the Windows installer
 #
 #   powershell -ExecutionPolicy Bypass -File installer\windows\build.ps1
 #
-# Result: build\Kuenta-Setup-<version>.exe
+# Result: build\KuentaPOS-Setup-<version>.exe
 # Requires Inno Setup 6 (https://jrsoftware.org/isdl.php). Node.js is downloaded automatically
 # (checksum verified against nodejs.org) and packed into the installer, so nothing else
 # needs to be installed on the target computer.
@@ -20,7 +20,7 @@ $stage = Join-Path $build 'stage'
 $cache = Join-Path $build 'cache'
 $pkg = Get-Content (Join-Path $root 'package.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 $version = $pkg.version
-Write-Host "Kuenta $version  (Node.js $NodeVersion)"
+Write-Host "KuentaPOS $version  (Node.js $NodeVersion)"
 
 # --- fetch and verify Node.js ---
 New-Item -ItemType Directory -Force $cache | Out-Null
@@ -45,7 +45,7 @@ New-Item -ItemType Directory -Force $stage | Out-Null
 foreach ($d in 'server', 'public', 'docs') { Copy-Item -Recurse (Join-Path $root $d) (Join-Path $stage $d) }
 # SMS relay for the computer with the USB modem (started separately there)
 Copy-Item -Recurse (Join-Path (Join-Path $root 'installer') 'sms-relais') (Join-Path $stage 'sms-relais')
-foreach ($f in 'package.json', 'README.md', 'README.de.md', 'INSTALL.md', 'INSTALL.de.md', 'LICENSE', 'PRO.md', 'PRO.de.md', 'Kuenta starten.bat', 'Kuenta im Netzwerk starten.bat') {
+foreach ($f in 'package.json', 'README.md', 'README.de.md', 'INSTALL.md', 'INSTALL.de.md', 'LICENSE', 'PRO.md', 'PRO.de.md', 'KuentaPOS starten.bat', 'KuentaPOS im Netzwerk starten.bat') {
   $p = Join-Path $root $f
   if (Test-Path $p) { Copy-Item $p $stage }
 }
@@ -71,6 +71,6 @@ if (-not $Iscc) {
   if (-not $Iscc) { $c = Get-Command iscc -ErrorAction SilentlyContinue; if ($c) { $Iscc = $c.Source } }
 }
 if (-not $Iscc) { throw 'Inno Setup 6 (ISCC.exe) not found. Please install it: https://jrsoftware.org/isdl.php  (or pass -Iscc <path>)' }
-& $Iscc "/DAppVersion=$version" "/DStageDir=$stage" "/DOutDir=$build" (Join-Path $PSScriptRoot 'kuenta.iss')
+& $Iscc "/DAppVersion=$version" "/DStageDir=$stage" "/DOutDir=$build" (Join-Path $PSScriptRoot 'kuentapos.iss')
 if ($LASTEXITCODE -ne 0) { throw "Inno Setup reports an error ($LASTEXITCODE)." }
-Write-Host "`nDone: $build\Kuenta-Setup-$version.exe"
+Write-Host "`nDone: $build\KuentaPOS-Setup-$version.exe"

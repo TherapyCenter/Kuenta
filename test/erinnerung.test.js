@@ -8,8 +8,8 @@ const path = require('path');
 const http = require('http');
 const net = require('net');
 
-const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'kuenta-erinnerung-'));
-process.env.KUENTA_DATA = tmp;
+const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'kuentapos-erinnerung-'));
+process.env.KUENTAPOS_DATA = tmp;
 
 const dbm = require('../server/db');
 const L = require('../server/lib');
@@ -17,7 +17,7 @@ const SMS = require('../server/pro/sms');
 const LIZENZ = require('../server/lizenz');
 const ER = require('../server/erinnerung');
 const FI = require('../server/api/finanzen');
-const RELAIS = require('../installer/sms-relais/kuenta-sms-relais');
+const RELAIS = require('../installer/sms-relais/kuentapos-sms-relais');
 
 test.after(() => { dbm.closeAll(); fs.rmSync(tmp, { recursive: true, force: true }); });
 

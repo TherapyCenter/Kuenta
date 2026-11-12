@@ -17,7 +17,7 @@ const BeUI = {
         si('be.rpr', 'RPR / RPM (z. B. Gent, afdeling Gent)', '', true),
         h('div', { class: 'fld hint' }, 'Unternehmensnummer und Rechtsgebiet des Unternehmensgerichts stehen in der Fußzeile jedes Belegs.')),
       grp('E-facturatie / Facturation électronique (Peppol)',
-        h('div', { class: 'fld hint' }, 'Seit 2026 gehen Rechnungen zwischen belgischen Unternehmen als E-Rechnung über Peppol (BIS Billing 3.0). Kuenta erzeugt die XML-Datei (Rechnung → E-Rechnung (Peppol)); senden Sie sie über Ihren Peppol-Dienstleister (Access Point) oder Hermes. Kunden ohne Peppol (Privatkunden) bekommen weiter PDF oder Papier.'))));
+        h('div', { class: 'fld hint' }, 'Seit 2026 gehen Rechnungen zwischen belgischen Unternehmen als E-Rechnung über Peppol (BIS Billing 3.0). KuentaPOS erzeugt die XML-Datei (Rechnung → E-Rechnung (Peppol)); senden Sie sie über Ihren Peppol-Dienstleister (Access Point) oder Hermes. Kunden ohne Peppol (Privatkunden) bekommen weiter PDF oder Papier.'))));
   },
 };
 
@@ -49,7 +49,7 @@ Views.beAangifte = async (main) => {
         h('button', { class: 'btn primary', onclick: berekenen }, '🧮 ' + T('Berechnen')),
         h('label', { class: 'inline' }, terug, T('Erstattung beantragen')),
         h('button', { class: 'btn', onclick: () => downloadUrl('/api/be/aangifte/xml?' + qs({ von, bis, terug: terug.checked ? '1' : '0' }), 'btw-aangifte.xml') }, '⬇ ' + T('XML für Intervat'))),
-      h('div', { class: 'hint', style: { maxWidth: '900px', margin: '4px 0 10px' } }, 'Die XML-Datei laden Sie in Intervat hoch (Raster nach dem amtlichen Formular). Vorsteuer und Einkäufe aus den Eingangsrechnungen (Raster 82 / 59). Differenzbesteuerung (Raster 00) und Sonderfälle mit dem Buchhalter abstimmen; die Kundenliste (jaarlijkse klantenlisting) und die innergemeinschaftliche Liste erstellt Kuenta nicht.'),
+      h('div', { class: 'hint', style: { maxWidth: '900px', margin: '4px 0 10px' } }, 'Die XML-Datei laden Sie in Intervat hoch (Raster nach dem amtlichen Formular). Vorsteuer und Einkäufe aus den Eingangsrechnungen (Raster 82 / 59). Differenzbesteuerung (Raster 00) und Sonderfälle mit dem Buchhalter abstimmen; die Kundenliste (jaarlijkse klantenlisting) und die innergemeinschaftliche Liste erstellt KuentaPOS nicht.'),
       out));
   berekenen();
 };

@@ -37,7 +37,7 @@ function setOpt(name, value, typ = 500) {
   }
 }
 
-// ---- Kuenta settings ----
+// ---- KuentaPOS settings ----
 function sw(key, def = null) {
   const r = db().prepare('SELECT WERT FROM SW_EINSTELLUNGEN WHERE SCHLUESSEL=?').get(key);
   return r ? r.WERT : def;

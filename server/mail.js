@@ -32,7 +32,7 @@ function buildMessage({ from, fromName, to, cc, bcc, subject, text, html, attach
     `Message-ID: <${crypto.randomBytes(12).toString('hex')}@${domain}>`,
     'MIME-Version: 1.0',
     `Content-Type: multipart/mixed; boundary="${boundary}"`,
-    'X-Mailer: Kuenta',
+    'X-Mailer: KuentaPOS',
     unsent ? 'X-Unsent: 1' : null,
   ].filter(Boolean).join('\r\n');
   const parts = [];
@@ -89,7 +89,7 @@ function connect(s) {
 }
 
 async function send(mail, override) {
-  // With a complete override (host) it works without the Kuenta database, e.g. from the license tool
+  // With a complete override (host) it works without the KuentaPOS database, e.g. from the license tool
   const s = override && override.host ? { port: 587, secure: 'starttls', rejectUnauthorized: true, user: '', pass: '', fromName: '', bcc: '', ...override } : { ...settings(), ...(override || {}) };
   if (!s.host) throw new L.HttpError(400, 'Es ist kein Mailserver eingerichtet (Einstellungen → E-Mail).');
   if (!s.from) throw new L.HttpError(400, 'Es ist keine Absenderadresse eingerichtet (Einstellungen → E-Mail).');
@@ -97,7 +97,7 @@ async function send(mail, override) {
   if (!addrList(mail.to).length) throw new L.HttpError(400, 'Bitte einen Empfänger angeben.');
   const msg = buildMessage({ ...mail, from: s.from, fromName: s.fromName });
   const c = new SmtpConn(await connect(s));
-  const host = os.hostname().replace(/[^\w.-]/g, '') || 'kuenta';
+  const host = os.hostname().replace(/[^\w.-]/g, '') || 'kuentapos';
   try {
     await c.cmd(null, [220]);
     let ehlo = await c.cmd(`EHLO ${host}`, [250]);

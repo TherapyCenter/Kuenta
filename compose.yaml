@@ -1,27 +1,28 @@
-# Kuenta with Docker Compose or Podman Compose
+# KuentaPOS with Docker Compose or Podman Compose
 #
 #   docker compose up -d --build        (or: podman compose up -d --build)
 #   docker compose logs -f              show the output
 #   docker compose down                 stop (the data in the volume is kept)
 #
 # Then in the browser: http://<computer>:3700
-# IMPORTANT: this makes Kuenta reachable on the whole network. Right after the first start, enable
+# IMPORTANT: this makes KuentaPOS reachable on the whole network. Right after the first start, enable
 # login under Settings → Defaults (Einstellungen → Vorgabewerte) and create users.
 services:
-  kuenta:
+  kuentapos:
     build: .
-    image: kuenta:1.0.7
-    container_name: kuenta
+    image: kuentapos:1.0.7
+    container_name: kuentapos
     restart: unless-stopped
     ports:
       - "3700:3700"            # this computer only: "127.0.0.1:3700:3700"
     environment:
       TZ: Europe/Berlin
     volumes:
+      # the volume keeps its name from the time the program was called Kuenta (up to 1.8.2), so existing data is found
       - kuenta-daten:/data
       # additional backups to a NAS/other drive (the folder must exist),
-      # then enter /sicherungen as the backup folder in Kuenta under "Daten sichern":
-      # - /mnt/nas/kuenta-sicherungen:/sicherungen
+      # then enter /sicherungen as the backup folder in KuentaPOS under "Daten sichern":
+      # - /mnt/nas/kuentapos-sicherungen:/sicherungen
     stop_grace_period: 20s
 
 volumes:

@@ -16,10 +16,10 @@ const RIGHT_OF = { kunden: 'Kunden', fahrzeuge: 'Fahrzeuge', artikel: 'Artikel',
 const App = {
   session: {}, settings: {}, current: null, route: null,
   pro(f) { return (this.session.pro || []).includes(f); },
-  // Kuenta Pro notice with a jump to the license tab
+  // KuentaPOS Pro notice with a jump to the license tab
   async proHinweis(f, meldung) {
-    const text = meldung || 'Diese Funktion gehört zu Kuenta Pro. Kuenta selbst ist Open Source und bleibt kostenlos. Pro-Funktionen schalten Sie mit einem Lizenzschlüssel frei, bezahlt wird mit Bitcoin oder Tether (USDT).';
-    if (await dialog('Kuenta Pro', h('div', { style: { lineHeight: 1.5, maxWidth: '460px' } }, text), [{ label: 'Zur Lizenz', cls: 'primary', value: true }, { label: 'Schließen', value: false }])) { this.einstellungenTab = 'Lizenz'; this.go('einstellungen'); }
+    const text = meldung || 'Diese Funktion gehört zu KuentaPOS Pro. KuentaPOS selbst ist Open Source und bleibt kostenlos. Pro-Funktionen schalten Sie mit einem Lizenzschlüssel frei, bezahlt wird mit Bitcoin oder Tether (USDT).';
+    if (await dialog('KuentaPOS Pro', h('div', { style: { lineHeight: 1.5, maxWidth: '460px' } }, text), [{ label: 'Zur Lizenz', cls: 'primary', value: true }, { label: 'Schließen', value: false }])) { this.einstellungenTab = 'Lizenz'; this.go('einstellungen'); }
   },
   denied(right) { const d = this.session.user && this.session.user.denied; return !!(d && (d.includes(right) || d.includes(right + '|anzeigen'))); },
   setting(k, def) { return this.settings.sw && this.settings.sw[k] != null ? this.settings.sw[k] : def; },
@@ -55,7 +55,7 @@ const App = {
     const mand = (this.session.mandanten || []).find(m => m.id === this.session.mandant);
     $('#status-left').textContent = `${this.session.firma || ''}${mand && (this.session.mandanten || []).length > 1 ? ' · ' + T('Mandant') + ': ' + mand.name : ''}`;
     this.logoPruefen();
-    $('#status-right').textContent = T(`Kuenta ${this.session.version} · F2 Artikel · F3 Arbeitswert · Strg+S Speichern · Strg+P Drucken`);
+    $('#status-right').textContent = T(`KuentaPOS ${this.session.version} · F2 Artikel · F3 Arbeitswert · Strg+S Speichern · Strg+P Drucken`);
     window.addEventListener('hashchange', () => this.go(location.hash.slice(1) || 'start', false));
     this.go(location.hash.slice(1) || 'start', false);
     if (this.session.warnung) alertDlg(this.session.warnung, 'Achtung: Datenordner');
@@ -94,14 +94,14 @@ const App = {
       ev.preventDefault();
       try { await api('/api/login', { method: 'POST', body: { user: u.value, pass: p.value }, noLogin: true }); location.reload(); }
       catch (e) { err.textContent = T(e.message); err.classList.remove('hidden'); }
-    } }, h('h2', null, h('img', { src: 'img/icon.svg', width: 28 }), 'Kuenta'), u, p, err, h('button', { class: 'btn primary', type: 'submit' }, 'Anmelden'),
+    } }, h('h2', null, h('img', { src: 'img/icon.svg', width: 28 }), 'KuentaPOS'), u, p, err, h('button', { class: 'btn primary', type: 'submit' }, 'Anmelden'),
       h('select', { class: 'lang', onchange: e => this.setLang(e.target.value) }, Object.entries(I18N.UI_LANGS).map(([k, l]) => h('option', { value: k, selected: k === I18N.lang }, l.name))));
     document.body.append(h('div', { class: 'login' }, form));
     setTimeout(() => u.focus(), 50);
   },
   buildMenus() {
     const M = [
-      { l: 'Kuenta', items: [['Übersicht', () => this.go('start')], ['Mandant wechseln …', () => mandantenDialog()], '-', ['Daten sichern …', () => this.go('sicherung')], ['Daten wiederherstellen …', () => this.go('sicherung')], ['Daten aus KFZ-Faktura importieren …', () => this.go('import')], ['Datenimport (CSV, DATANORM) …', () => this.go('datenimport')], '-', { sub: 'Sprache / Language', items: this.langMenu() }, '-', ...(this.session.user ? [['Abmelden', async () => { await api('/api/logout', { method: 'POST' }); location.reload(); }]] : [])] },
+      { l: 'KuentaPOS', items: [['Übersicht', () => this.go('start')], ['Mandant wechseln …', () => mandantenDialog()], '-', ['Daten sichern …', () => this.go('sicherung')], ['Daten wiederherstellen …', () => this.go('sicherung')], ['Daten aus KFZ-Faktura importieren …', () => this.go('import')], ['Datenimport (CSV, DATANORM) …', () => this.go('datenimport')], '-', { sub: 'Sprache / Language', items: this.langMenu() }, '-', ...(this.session.user ? [['Abmelden', async () => { await api('/api/logout', { method: 'POST' }); location.reload(); }]] : [])] },
       { l: 'Artikel', items: [['Artikelübersicht', () => this.go('artikel')], ['Neuer Artikel', () => editRecord('artikel', null)], '-', ['Warengruppen', () => Views.tabelleDialog('warengruppen')], ['Hersteller', () => Views.tabelleDialog('hersteller')], ['Einheiten', () => Views.tabelleDialog('einheiten')]] },
       { l: 'Stammdaten', items: [...NAV[0].items.map(([k, , l]) => [l, () => this.go(k)]), '-', ['Zahlungsbedingungen', () => Views.tabelleDialog('zahlungsbedingungen')], ['Stundenverrechnungssätze', () => Views.tabelleDialog('kostensaetze')], ['Textbausteine', () => Views.tabelleDialog('textbausteine')], ['Einleitungs-/Schlusstexte', () => Views.tabelleDialog('drucktexte')], ['Auftragsarten', () => Views.tabelleDialog('auftragsarten')], '-', ['Benutzer / Mitarbeiter', () => Views.tabelleDialog('benutzer')], ['Einstellungen', () => this.go('einstellungen')]] },
       { l: 'Büro', items: NAV[1].items.map(([k, , l]) => [l, () => this.go(k)]) },
@@ -110,7 +110,7 @@ const App = {
       { l: 'Fahrzeughandel', items: NAV[4].items.map(([k, , l]) => [l, () => this.go(k)]) },
       { l: 'Finanzen', items: NAV[5].items.map(([k, , l]) => [l, () => this.go(k)]) },
       { l: 'Auswertung', items: NAV[6].items.map(([k, , l]) => [l, () => this.go(k)]) },
-      { l: 'Hilfe', items: [['Handbuch (F1)', () => this.handbuch()], ['Tastenkürzel', () => this.help()], '-', ['Über Kuenta', () => this.about()]] },
+      { l: 'Hilfe', items: [['Handbuch (F1)', () => this.handbuch()], ['Tastenkürzel', () => this.help()], '-', ['Über KuentaPOS', () => this.about()]] },
     ];
     const host = $('#menus'); host.innerHTML = '';
     let openMenu = null;
@@ -194,10 +194,10 @@ const App = {
       ['Umschalt / Strg + Klick', 'Mehrere Einträge markieren'], ['Entf', 'Eintrag / Position löschen'], ['F2 (im Vorgang)', 'Artikel einfügen'], ['F3 (im Vorgang)', 'Arbeitswert einfügen'], ['Strg + S', 'Vorgang speichern'], ['Strg + P', 'Vorgang drucken'], ['Strg + Enter', 'Formular speichern (OK)'], ['Esc', 'Fenster schließen']].map(([a, b]) => h('tr', null, h('td', null, h('b', null, a)), h('td', null, b))))) });
   },
   about() {
-    Win.open({ title: 'Über Kuenta', width: 480, content: h('div', { style: { lineHeight: 1.6 } }, h('h2', { style: { margin: '0 0 6px', color: 'var(--accent)' } }, 'Kuenta ' + this.session.version),
+    Win.open({ title: 'Über KuentaPOS', width: 480, content: h('div', { style: { lineHeight: 1.6 } }, h('h2', { style: { margin: '0 0 6px', color: 'var(--accent)' } }, 'KuentaPOS ' + this.session.version),
       h('p', null, 'Werkstatt-Faktura für Kfz-Betriebe als plattformunabhängige Webanwendung (Windows, macOS, Linux, Tablet).'),
       h('p', null, 'Kompatibel mit Datensicherungen von KFZ-Faktura (*.kfz, DB1.bak). E-Rechnung nach EN 16931 (XRechnung CII/UBL).'),
-      h('p', null, '© 2026 Doc · Open Source unter der GNU AGPL 3.0. ', (this.session.pro || []).length ? 'Kuenta Pro ist freigeschaltet.' : 'Pro-Funktionen (z. B. SMS) mit Lizenzschlüssel.')) });
+      h('p', null, '© 2026 Doc · Open Source unter der GNU AGPL 3.0. ', (this.session.pro || []).length ? 'KuentaPOS Pro ist freigeschaltet.' : 'Pro-Funktionen (z. B. SMS) mit Lizenzschlüssel.')) });
   },
 };
 window.App = App;

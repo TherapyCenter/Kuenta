@@ -52,7 +52,7 @@ function mentions(typ, k, pos) {
   return out;
 }
 
-// checks of § 11 UStG before an invoice leaves Kuenta
+// checks of § 11 UStG before an invoice leaves KuentaPOS
 function pruefen(typ, k, kunde = {}) {
   const w = [];
   if (typ !== 'rechnung' && typ !== 'korrektur') return w;

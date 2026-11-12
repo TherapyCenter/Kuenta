@@ -8,7 +8,7 @@ const GbUI = {
   client() {
     return encodeURIComponent(JSON.stringify({ screens: [{ width: screen.width, height: screen.height, scaling: window.devicePixelRatio || 1, colourDepth: screen.colorDepth }], window: { width: window.innerWidth, height: window.innerHeight } }));
   },
-  hm(path, opts = {}) { return api(path, { ...opts, headers: { ...(opts.headers || {}), 'X-Kuenta-Client': GbUI.client() } }); },
+  hm(path, opts = {}) { return api(path, { ...opts, headers: { ...(opts.headers || {}), 'X-KuentaPOS-Client': GbUI.client() } }); },
 
   settingsTab(p, { s, changes, si, grp, fld, ob }) {
     const sel = (k, label, opts, def) => {
@@ -66,7 +66,7 @@ const GbUI = {
       grp('Making Tax Digital (HMRC)',
         sel('gb.mtd.entorno', 'Umgebung', [['sandbox', 'Sandbox (test-api.service.hmrc.gov.uk) – zum Testen'], ['production', 'Produktion']], 'sandbox'),
         si('gb.mtd.redirect', 'Redirect URI (leer = http://localhost:3700/api/gb/oauth/callback)', ''),
-        h('div', { class: 'fld hint' }, 'Kuenta reicht die VAT return direkt bei HMRC ein. Einmalig: Zugangsdaten aus dem HMRC Developer Hub hinterlegen (die Redirect URI muss dort eingetragen sein), dann „Mit HMRC verbinden“ und mit dem Government Gateway des Unternehmens anmelden. Die Verbindung hält 18 Monate. Anmeldedaten liegen im Datenordner unter „gb“, nicht in der Sicherung.'),
+        h('div', { class: 'fld hint' }, 'KuentaPOS reicht die VAT return direkt bei HMRC ein. Einmalig: Zugangsdaten aus dem HMRC Developer Hub hinterlegen (die Redirect URI muss dort eingetragen sein), dann „Mit HMRC verbinden“ und mit dem Government Gateway des Unternehmens anmelden. Die Verbindung hält 18 Monate. Anmeldedaten liegen im Datenordner unter „gb“, nicht in der Sicherung.'),
         h('div', { class: 'fld inline' },
           h('button', { class: 'btn', onclick: zugang }, '🔑 Developer-Hub-Zugangsdaten'),
           h('button', { class: 'btn primary', onclick: verbinden }, '🔗 Mit HMRC verbinden'),

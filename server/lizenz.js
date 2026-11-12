@@ -3,7 +3,7 @@
 //
 // A license key is a record signed with Ed25519:
 //   KUENTA1.<base64url(JSON)>.<base64url(signature)>
-// Kuenta only contains the public key and can verify licenses with it, but cannot create
+// KuentaPOS only contains the public key and can verify licenses with it, but cannot create
 // any. They are issued with tools/lizenz/lizenz-werkzeug.js and the private key, which
 // only the publisher holds.
 //
@@ -23,9 +23,9 @@ const FUNKTIONEN = {
   sms: 'SMS-Erinnerungen und SMS-Gateway',
 };
 
-// Purchase information shown in Kuenta (to be adjusted by the publisher before release)
+// Purchase information shown in KuentaPOS (to be adjusted by the publisher before release)
 const ANGEBOT = {
-  seite: 'https://github.com/TherapyCenter/Kuenta/blob/main/PRO.md',
+  seite: 'https://github.com/TherapyCenter/KuentaPOS/blob/main/PRO.md',
   // Address of the BTCPay "Point of Sale" app (license shop). Empty = order by email only.
   shop: '',
   text: 'Add-ons kosten je 20 US-Dollar (einmalig) und werden mit Bitcoin (BTC, auch Lightning) oder Tether (USDT) bezahlt. Bestellung an heidepower@proton.me, nach Zahlungseingang erhalten Sie Ihren Lizenzschlüssel.',
@@ -40,10 +40,10 @@ function b64url(buf) { return Buffer.from(buf).toString('base64url'); }
 function pruefen(text, oeffentlich = OEFFENTLICH) {
   const s = String(text || '').replace(/\s+/g, '');
   const teile = s.split('.');
-  if (teile.length !== 3 || teile[0] !== PRAEFIX) throw new Error('Das ist kein Kuenta-Lizenzschlüssel.');
+  if (teile.length !== 3 || teile[0] !== PRAEFIX) throw new Error('Das ist kein KuentaPOS-Lizenzschlüssel.');
   let key;
   try { key = crypto.createPublicKey({ key: { kty: 'OKP', crv: 'Ed25519', x: oeffentlich }, format: 'jwk' }); }
-  catch { throw new Error('In dieser Kuenta-Version ist kein gültiger Prüfschlüssel hinterlegt.'); }
+  catch { throw new Error('In dieser KuentaPOS-Version ist kein gültiger Prüfschlüssel hinterlegt.'); }
   const ok = crypto.verify(null, Buffer.from(teile[0] + '.' + teile[1]), key, Buffer.from(teile[2], 'base64url'));
   if (!ok) throw new Error('Der Lizenzschlüssel ist ungültig (Signatur stimmt nicht). Bitte vollständig und unverändert einfügen.');
   let d;
@@ -76,7 +76,7 @@ function brauche(funktion) {
   if (hat(funktion)) return;
   const c = laden();
   const name = FUNKTIONEN[funktion] || funktion;
-  const grund = c && c.daten && abgelaufen(c.daten) ? `Ihre Kuenta-Pro-Lizenz ist am ${c.daten.bis.split('-').reverse().join('.')} abgelaufen.` : `„${name}“ ist eine Funktion von Kuenta Pro.`;
+  const grund = c && c.daten && abgelaufen(c.daten) ? `Ihre KuentaPOS-Pro-Lizenz ist am ${c.daten.bis.split('-').reverse().join('.')} abgelaufen.` : `„${name}“ ist eine Funktion von KuentaPOS Pro.`;
   const e = new HttpError(402, `${grund} Den Lizenzschlüssel tragen Sie unter Einstellungen → Lizenz ein.`);
   e.code = 'PRO';
   throw e;

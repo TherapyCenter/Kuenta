@@ -1,4 +1,5 @@
 'use strict';
+require('./env'); // accept old KUENTA_* variables
 // Translations on the server: the same tables as in the browser (public/js/lang).
 // Documents (PDF, email) use the document language from the settings (beleg.sprache).
 const I18N = require('../public/js/i18n');
@@ -11,10 +12,10 @@ I18N.add('fr', require('../public/js/lang/fr'));
 function docLang() {
   try { return require('./lib').sw('beleg.sprache', 'de') || 'de'; } catch { return 'de'; }
 }
-// Language of the console and of new installations: KUENTA_LANG, otherwise the operating system
+// Language of the console and of new installations: KUENTAPOS_LANG, otherwise the operating system
 // (German, Spanish, French, Italian or Dutch system → that language, anything else → English)
 function systemLang() {
-  const set = String(process.env.KUENTA_LANG || '').toLowerCase().slice(0, 2);
+  const set = String(process.env.KUENTAPOS_LANG || '').toLowerCase().slice(0, 2);
   if (I18N.UI_LANGS[set]) return set;
   let loc = '';
   try { loc = Intl.DateTimeFormat().resolvedOptions().locale || ''; } catch { /* ignore */ }

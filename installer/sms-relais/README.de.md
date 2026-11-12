@@ -1,11 +1,11 @@
-# Kuenta-SMS-Relais (Surfstick mit SIM-Karte)
+# KuentaPOS-SMS-Relais (Surfstick mit SIM-Karte)
 
 [English](README.md) · **Deutsch**
 
-Das Relais läuft auf einem eigenen Rechner (z. B. altem PC, Mini-PC oder Raspberry Pi), an dem ein USB-Surfstick mit SIM-Karte steckt. Kuenta schickt die Erinnerungs-SMS über das Netzwerk an das Relais, das Relais verschickt sie über den Stick.
+Das Relais läuft auf einem eigenen Rechner (z. B. altem PC, Mini-PC oder Raspberry Pi), an dem ein USB-Surfstick mit SIM-Karte steckt. KuentaPOS schickt die Erinnerungs-SMS über das Netzwerk an das Relais, das Relais verschickt sie über den Stick.
 
 ```
-Kuenta  ──(Netzwerk, POST /sms)──►  Relais-Rechner  ──(gammu)──►  Surfstick + SIM  ──►  Kunde
+KuentaPOS  ──(Netzwerk, POST /sms)──►  Relais-Rechner  ──(gammu)──►  Surfstick + SIM  ──►  Kunde
 ```
 
 ## Was Sie brauchen
@@ -42,21 +42,21 @@ gammu sendsms TEXT +4917012345678 -text "Test"   # Test-SMS an Ihr Handy
 Funktioniert das, das Relais starten (Token frei wählen, langes Zufallswort):
 
 ```sh
-KUENTA_SMS_TOKEN=IhrGeheimesToken node kuenta-sms-relais.js
+KUENTAPOS_SMS_TOKEN=IhrGeheimesToken node kuentapos-sms-relais.js
 ```
 
 ### Als Dienst im Hintergrund
 
 ```ini
-# /etc/systemd/system/kuenta-sms-relais.service
+# /etc/systemd/system/kuentapos-sms-relais.service
 [Unit]
-Description=Kuenta-SMS-Relais
+Description=KuentaPOS-SMS-Relais
 After=network-online.target
 
 [Service]
 User=pi
-Environment=KUENTA_SMS_TOKEN=IhrGeheimesToken
-ExecStart=/usr/bin/node /opt/kuenta-sms-relais/kuenta-sms-relais.js
+Environment=KUENTAPOS_SMS_TOKEN=IhrGeheimesToken
+ExecStart=/usr/bin/node /opt/kuentapos-sms-relais/kuentapos-sms-relais.js
 Restart=on-failure
 
 [Install]
@@ -64,7 +64,7 @@ WantedBy=multi-user.target
 ```
 
 ```sh
-sudo systemctl daemon-reload && sudo systemctl enable --now kuenta-sms-relais
+sudo systemctl daemon-reload && sudo systemctl enable --now kuentapos-sms-relais
 ```
 
 Der Benutzer braucht Zugriff auf den Stick: `sudo usermod -aG dialout pi`.
@@ -73,24 +73,24 @@ Der Benutzer braucht Zugriff auf den Stick: `sudo usermod -aG dialout pi`.
 
 1. gammu für Windows installieren und den Ordner mit `gammu.exe` zum `PATH` hinzufügen.
 2. Im Geräte-Manager unter „Anschlüsse (COM & LPT)“ den Modem-Anschluss des Sticks ablesen, z. B. `COM5`.
-3. `gammurc` anlegen, z. B. `C:\kuenta-sms\gammurc`:
+3. `gammurc` anlegen, z. B. `C:\kuentapos-sms\gammurc`:
    ```ini
    [gammu]
    device = COM5:
    connection = at
    ```
-4. Testen: `gammu -c C:\kuenta-sms\gammurc identify`
+4. Testen: `gammu -c C:\kuentapos-sms\gammurc identify`
 5. Starten (PowerShell):
    ```powershell
-   $env:KUENTA_SMS_TOKEN = "IhrGeheimesToken"
-   $env:KUENTA_SMS_GAMMURC = "C:\kuenta-sms\gammurc"
-   node kuenta-sms-relais.js
+   $env:KUENTAPOS_SMS_TOKEN = "IhrGeheimesToken"
+   $env:KUENTAPOS_SMS_GAMMURC = "C:\kuentapos-sms\gammurc"
+   node kuentapos-sms-relais.js
    ```
 6. In der Windows-Firewall Port 3790 für das private Netzwerk freigeben.
 
-## In Kuenta eintragen
+## In KuentaPOS eintragen
 
-*Einstellungen → Erinnerungen & SMS → SMS-Gateway → Vorlage „Kuenta-SMS-Relais“* einsetzen und anpassen:
+*Einstellungen → Erinnerungen & SMS → SMS-Gateway → Vorlage „KuentaPOS-SMS-Relais“* einsetzen und anpassen:
 
 | Feld | Wert |
 |---|---|
@@ -104,11 +104,11 @@ Dann „Einstellungen speichern & Test-SMS senden“.
 
 | Variable | Standard | Bedeutung |
 |---|---|---|
-| `KUENTA_SMS_TOKEN` | – (Pflicht) | Muss mit der Kopfzeile `X-Token` in Kuenta übereinstimmen |
+| `KUENTAPOS_SMS_TOKEN` | – (Pflicht) | Muss mit der Kopfzeile `X-Token` in KuentaPOS übereinstimmen |
 | `PORT` | `3790` | Port des Relais |
-| `HOST` | `0.0.0.0` | Netzwerkkarte; `127.0.0.1`, wenn Kuenta auf demselben Rechner läuft |
-| `KUENTA_SMS_BEFEHL` | `gammu` | Mit laufendem `gammu-smsd` stattdessen `gammu-smsd-inject` |
-| `KUENTA_SMS_GAMMURC` | – | Pfad zur gammu-Konfiguration |
+| `HOST` | `0.0.0.0` | Netzwerkkarte; `127.0.0.1`, wenn KuentaPOS auf demselben Rechner läuft |
+| `KUENTAPOS_SMS_BEFEHL` | `gammu` | Mit laufendem `gammu-smsd` stattdessen `gammu-smsd-inject` |
+| `KUENTAPOS_SMS_GAMMURC` | – | Pfad zur gammu-Konfiguration |
 
 ## Hinweise
 

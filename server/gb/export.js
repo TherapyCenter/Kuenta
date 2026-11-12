@@ -79,11 +79,11 @@ function sage(o) {
   const rows = [];
   for (const f of facturas(r)) for (const g of f.grupos) {
     const credit = Number(f.k.TYP) === 2 || g.net < 0;
-    rows.push([credit ? 'SC' : 'SI', sageRef(f.k.KUNNUMMER ? 'C' + f.k.KUNNUMMER : 'CASH'), ventas, '0', fecha(f.k.DATUM), String(f.k.RECHNUNGNUMMER), nombre(f.k).slice(0, 60), n2(Math.abs(g.net)), SAGE[g.cat], n2(Math.abs(g.vat)), '', '', 'Kuenta', '', '']);
+    rows.push([credit ? 'SC' : 'SI', sageRef(f.k.KUNNUMMER ? 'C' + f.k.KUNNUMMER : 'CASH'), ventas, '0', fecha(f.k.DATUM), String(f.k.RECHNUNGNUMMER), nombre(f.k).slice(0, 60), n2(Math.abs(g.net)), SAGE[g.cat], n2(Math.abs(g.vat)), '', '', 'KuentaPOS', '', '']);
   }
   for (const { e } of compras(r)) {
     const credit = Number(e.BRUTTO) < 0; const code = !GB.registrado() ? 'T9' : Number(e.STEUERSATZ) === GB.tasas().reduced ? 'T5' : Number(e.STEUERSATZ) > 0 ? 'T1' : 'T0';
-    rows.push([credit ? 'PC' : 'PI', sageRef(e.LIEFID ? 'S' + e.LIEFID : 'SUPPLIER'), e.GEGENKONTO || comprasN, '0', fecha(e.DATUM), String(e.RECHNUNGSNR || ''), String(e.LIEFNAME || '').slice(0, 60), n2(Math.abs(e.NETTO)), code, n2(Math.abs(e.MWST)), '', '', 'Kuenta', '', '']);
+    rows.push([credit ? 'PC' : 'PI', sageRef(e.LIEFID ? 'S' + e.LIEFID : 'SUPPLIER'), e.GEGENKONTO || comprasN, '0', fecha(e.DATUM), String(e.RECHNUNGSNR || ''), String(e.LIEFNAME || '').slice(0, 60), n2(Math.abs(e.NETTO)), code, n2(Math.abs(e.MWST)), '', '', 'KuentaPOS', '', '']);
   }
   return { buffer: csv(head, rows), filename: `Sage50_audit_trail_${r.von}_${r.bis}.csv` };
 }

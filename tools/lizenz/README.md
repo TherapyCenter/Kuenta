@@ -2,15 +2,15 @@
 
 **English** · [Deutsch](README.de.md)
 
-The license tool issues Kuenta Pro licenses. It needs the private key
-`~/.kuenta-lizenz/privat.pem`. That key must **never** go into the repository or onto a server.
+The license tool issues KuentaPOS Pro licenses. It needs the private key
+`~/.kuentapos-lizenz/privat.pem`. That key must **never** go into the repository or onto a server.
 
 ```
 node tools/lizenz/lizenz-werkzeug.js ausstellen --kunde "Werkstatt Muster" --funktionen sms --email kunde@example.de
 node tools/lizenz/lizenz-werkzeug.js pruefen <key>
 ```
 
-All issued licenses are listed in `~/.kuenta-lizenz/ausgestellt.csv`.
+All issued licenses are listed in `~/.kuentapos-lizenz/ausgestellt.csv`.
 **Back up `privat.pem` and `ausgestellt.csv`**, e.g. on an encrypted USB stick.
 
 ## License shop via BTCPay Server
@@ -23,7 +23,7 @@ cannot create licenses itself.
 ### 1. Create the shop in BTCPay
 
 1. In the store, create an app of type **Point of Sale**, display "Product list" or "Cart".
-2. Create one item per add-on. **The item ID must be the Kuenta feature name:**
+2. Create one item per add-on. **The item ID must be the KuentaPOS feature name:**
    `sms` (SMS add-on, $20), optionally `pro` (all add-ons). Map different IDs in
    `shop.json` under `artikel`, e.g. `"sms-addon": "sms"`.
 3. Under *Forms*, create a form with the fields **`buyerName`** (label "Workshop name",
@@ -37,7 +37,7 @@ cannot create licenses itself.
 node tools/lizenz/lizenz-werkzeug.js shop einrichten
 ```
 
-This creates `~/.kuenta-lizenz/shop.json`. Enter there:
+This creates `~/.kuentapos-lizenz/shop.json`. Enter there:
 - `btcpay.url`, `btcpay.storeId`, `btcpay.apiKey`
 - `smtp`: mail server for sending the keys (`secure`: `starttls`, `ssl` or `none`)
 
@@ -57,7 +57,7 @@ node tools/lizenz/lizenz-werkzeug.js shop
 ```
 
 - On the **first run** the tool remembers the time. Older payments are not delivered afterwards.
-- Each order is delivered **only once**. The state is kept in `~/.kuenta-lizenz/shop-stand.json`.
+- Each order is delivered **only once**. The state is kept in `~/.kuentapos-lizenz/shop-stand.json`.
 - If someone buys another add-on with the same email address, the new key contains
   **all** add-ons of that address.
 - If the email fails, the key is kept and sent again on the next run.
@@ -67,14 +67,14 @@ node tools/lizenz/lizenz-werkzeug.js shop
 On Windows, automatically every 15 minutes (run once in a command prompt, adjust the paths):
 
 ```
-schtasks /Create /TN "Kuenta Lizenz-Shop" /SC MINUTE /MO 15 /TR "\"C:\Program Files\nodejs\node.exe\" \"C:\Users\admin\claude\Kuenta\tools\lizenz\lizenz-werkzeug.js\" shop"
+schtasks /Create /TN "KuentaPOS Lizenz-Shop" /SC MINUTE /MO 15 /TR "\"C:\Program Files\nodejs\node.exe\" \"C:\Users\admin\claude\KuentaPOS\tools\lizenz\lizenz-werkzeug.js\" shop"
 ```
 
 Licenses only go out while your PC is running. That is intentional, because the private key
 stays offline this way. If needed, mention it in the shop text ("The key usually arrives
 within a few hours").
 
-The emails with the key are sent in German, English or Spanish: set `"sprache": "de"`, `"en"` or `"es"` in `shop.json` (default German). If the BTCPay form has a field `sprache` or `language`, the customer's choice wins for that order. The console output of the tool follows the system language (`KUENTA_LANG=de|en|es`).
+The emails with the key are sent in German, English or Spanish: set `"sprache": "de"`, `"en"` or `"es"` in `shop.json` (default German). If the BTCPay form has a field `sprache` or `language`, the customer's choice wins for that order. The console output of the tool follows the system language (`KUENTAPOS_LANG=de|en|es`).
 
 ### Invoices for your customers
 

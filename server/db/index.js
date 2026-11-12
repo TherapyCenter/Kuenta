@@ -1,4 +1,5 @@
 'use strict';
+require('../env'); // accept old KUENTA_* variables
 const fs = require('fs');
 const path = require('path');
 const { DatabaseSync } = require('node:sqlite');
@@ -6,16 +7,22 @@ const { DatabaseSync } = require('node:sqlite');
 const { AsyncLocalStorage } = require('async_hooks');
 
 // Tenants: tenant 1 lives directly in the data folder, further ones under mandanten/<id>
-// Data folder: KUENTA_DATA, otherwise in the user profile (never in the program folder, so
+// Data folder: KUENTAPOS_DATA, otherwise in the user profile (never in the program folder, so
 // installations under "Program Files" work and no data ends up in the source code).
 function defaultDataDir() {
   const os = require('os');
   const home = os.homedir();
-  if (process.platform === 'win32') return path.join(process.env.APPDATA || path.join(home, 'AppData', 'Roaming'), 'Kuenta');
-  if (process.platform === 'darwin') return path.join(home, 'Library', 'Application Support', 'Kuenta');
-  return path.join(process.env.XDG_DATA_HOME || path.join(home, '.local', 'share'), 'kuenta');
+  if (process.platform === 'win32') return path.join(process.env.APPDATA || path.join(home, 'AppData', 'Roaming'), 'KuentaPOS');
+  if (process.platform === 'darwin') return path.join(home, 'Library', 'Application Support', 'KuentaPOS');
+  return path.join(process.env.XDG_DATA_HOME || path.join(home, '.local', 'share'), 'kuentapos');
 }
-const ROOT = path.resolve(process.env.KUENTA_DATA || defaultDataDir());
+// up to version 1.8.2 the folder was called Kuenta (kuenta): keep using it if only that one exists
+function dataDir() {
+  const neu = defaultDataDir();
+  const alt = path.join(path.dirname(neu), path.basename(neu) === 'kuentapos' ? 'kuenta' : 'Kuenta');
+  return !fs.existsSync(neu) && fs.existsSync(alt) ? alt : neu;
+}
+const ROOT = path.resolve(process.env.KUENTAPOS_DATA || dataDir());
 const DB_NAME = 'kuenta.db';
 const als = new AsyncLocalStorage();
 const MANDANTEN_FILE = path.join(ROOT, 'mandanten.json');
@@ -32,7 +39,7 @@ function current() {
 }
 function runAs(mandant, fn) { return als.run({ mandant }, fn); }
 
-// Extension columns/tables of Kuenta (on top of the KFZ-Faktura base schema)
+// Extension columns/tables of KuentaPOS (on top of the KFZ-Faktura base schema)
 const EXT_COLUMNS = {
   KUNDEN: { LEITWEGID: 'TEXT', ERECHNUNG: 'INTEGER DEFAULT 0', EMAILRECHNUNG: 'TEXT', AKTIV: 'INTEGER DEFAULT 1' },
   FIRMENDATEN: { LAND: "TEXT DEFAULT 'DE'", HANDELSREGISTER: 'TEXT', GESCHAEFTSFUEHRER: 'TEXT', MOBIL: 'TEXT', FUSSZEILE: 'TEXT' },

@@ -1,6 +1,6 @@
 'use strict';
 // Spanish tax system (per tenant): IVA rates, recargo de equivalencia, invoice series, NIF of the issuer.
-// Switched on with the setting steuer.land = ES; without it Kuenta works with German tax law as before.
+// Switched on with the setting steuer.land = ES; without it KuentaPOS works with German tax law as before.
 const L = require('../lib');
 const NIF = require('../../public/js/nif.js');
 

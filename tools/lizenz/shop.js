@@ -4,7 +4,7 @@
 // The BTCPay Server only needs read rights for this and cannot create licenses.
 //
 // Orders come from a BTCPay "Point of Sale" app. The item IDs of the app are the
-// Kuenta feature names (e.g. "sms", "pro"). Different IDs can be mapped in shop.json under
+// KuentaPOS feature names (e.g. "sms", "pro"). Different IDs can be mapped in shop.json under
 // "artikel". The BTCPay form asks for the workshop name and email.
 //
 // Language of the license emails: "sprache" in shop.json (de, en, es; default de). An order can
@@ -18,7 +18,7 @@ const { C } = require('../../server/i18n');
 
 const VORLAGE = {
   btcpay: { url: 'https://pay.example.de', storeId: 'STORE-ID', apiKey: 'API-SCHLÜSSEL (nur Recht: Rechnungen ansehen)' },
-  smtp: { host: 'smtp.example.de', port: 587, secure: 'starttls', user: 'benutzer', pass: 'passwort', from: 'lizenz@example.de', fromName: 'Kuenta Pro', bcc: '' },
+  smtp: { host: 'smtp.example.de', port: 587, secure: 'starttls', user: 'benutzer', pass: 'passwort', from: 'lizenz@example.de', fromName: 'KuentaPOS Pro', bcc: '' },
   sprache: 'de',
   artikel: { sms: 'sms', pro: 'pro' },
   bekannteFunktionen: ['sms', 'pro'],
@@ -123,18 +123,18 @@ function mailSprache(c, meta) {
 
 function mailText(daten, key, rechnungId, lang = 'de') {
   const t = (k, v) => I18N.t(k, v, lang);
-  const fn = daten.funktionen.includes('pro') ? t('Kuenta Pro (alle Add-ons, auch künftige)') : daten.funktionen.join(', ');
+  const fn = daten.funktionen.includes('pro') ? t('KuentaPOS Pro (alle Add-ons, auch künftige)') : daten.funktionen.join(', ');
   return [
     t('Guten Tag,'), '',
-    t('vielen Dank für Ihren Kauf. Hier ist Ihr Lizenzschlüssel für Kuenta ({fn}), lizenziert für „{kunde}“:', { fn, kunde: daten.kunde }), '',
+    t('vielen Dank für Ihren Kauf. Hier ist Ihr Lizenzschlüssel für KuentaPOS ({fn}), lizenziert für „{kunde}“:', { fn, kunde: daten.kunde }), '',
     key, '',
     t('So spielen Sie ihn ein:'),
-    t('1. In Kuenta Einstellungen → Lizenz öffnen.'),
+    t('1. In KuentaPOS Einstellungen → Lizenz öffnen.'),
     t('2. Den Schlüssel vollständig in das Feld einfügen (oder die angehängte Datei öffnen und den Inhalt kopieren).'),
-    t('3. „Lizenz einspielen“ klicken. Kuenta muss dafür nicht ins Internet.'), '',
+    t('3. „Lizenz einspielen“ klicken. KuentaPOS muss dafür nicht ins Internet.'), '',
     t('Der Schlüssel gilt unbefristet für eine Installation mit allen Mandanten. Bitte bewahren Sie diese E-Mail auf.'), '',
     t('Lizenz-Nr. {id} · Zahlung {zahlung}', { id: daten.id, zahlung: rechnungId }), '',
-    t('Mit freundlichen Grüßen'), 'Kuenta Pro',
+    t('Mit freundlichen Grüßen'), 'KuentaPOS Pro',
   ].join('\n');
 }
 
@@ -179,8 +179,8 @@ async function abholen({ home, erzeugen, senden, probe = false, log = console.lo
     if (probe) { log(C(`[Probe] ${inv.id}: würde Lizenz ${lizenz.daten.id} erneut an ${kunde.email} senden.`)); continue; }
     try {
       await senden({
-        to: kunde.email, subject: I18N.t('Ihr Kuenta-Lizenzschlüssel', null, mailSprache(c, meta)), text: mailText(lizenz.daten, lizenz.key, inv.id, mailSprache(c, meta)),
-        attachments: [{ filename: 'kuenta-lizenz.txt', content: Buffer.from(lizenz.key + '\r\n', 'utf8'), contentType: 'text/plain' }],
+        to: kunde.email, subject: I18N.t('Ihr KuentaPOS-Lizenzschlüssel', null, mailSprache(c, meta)), text: mailText(lizenz.daten, lizenz.key, inv.id, mailSprache(c, meta)),
+        attachments: [{ filename: 'kuentapos-lizenz.txt', content: Buffer.from(lizenz.key + '\r\n', 'utf8'), contentType: 'text/plain' }],
       }, c.smtp);
       st.erledigt[inv.id] = { ...st.erledigt[inv.id], status: 'versendet', versendet: new Date().toISOString() };
       speichereStand(home, st);

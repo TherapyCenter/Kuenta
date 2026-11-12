@@ -119,7 +119,7 @@ function buchungsstapel(q) {
   const rows = buchungen(q);
   pruefeKonten(rows);
   const cols = ['Umsatz (ohne Soll/Haben-Kz)', 'Soll/Haben-Kennzeichen', 'WKZ Umsatz', 'Kurs', 'Basis-Umsatz', 'WKZ Basis-Umsatz', 'Konto', 'Gegenkonto (ohne BU-Schlüssel)', 'BU-Schlüssel', 'Belegdatum', 'Belegfeld 1', 'Belegfeld 2', 'Skonto', 'Buchungstext'];
-  const lines = [kopf({ kategorie: 21, formatname: 'Buchungsstapel', formatversion: 13, wjBeginn: wj.beginn, von, bis, bezeichnung: `Kuenta ${dmy(von)}-${dmy(bis)}`, buchungstyp: 1 }), cols.join(';')];
+  const lines = [kopf({ kategorie: 21, formatname: 'Buchungsstapel', formatversion: 13, wjBeginn: wj.beginn, von, bis, bezeichnung: `KuentaPOS ${dmy(von)}-${dmy(bis)}`, buchungstyp: 1 }), cols.join(';')];
   for (const r of rows) {
     const betrag = Number(r.BETRAG) || 0;
     const dt = r.BELEGDATUM ? r.BELEGDATUM.slice(8, 10) + r.BELEGDATUM.slice(5, 7) : '';
@@ -180,7 +180,7 @@ function stammdaten(q) {
   konten.sort((x, y) => x - y);
   const cols = ['Konto', 'Name (Adressattyp Unternehmen)', 'Unternehmensgegenstand', 'Name (Adressattyp natürl. Person)', 'Vorname (Adressattyp natürl. Person)', 'Name (Adressattyp keine Angabe)',
     'Adressattyp', 'Kurzbezeichnung', 'EU-Land', 'EU-UStID', 'Anrede', 'Titel/Akad. Grad', 'Adelstitel', 'Namensvorsatz', 'Adressart', 'Straße', 'Postfach', 'Postleitzahl', 'Ort', 'Land'];
-  const lines = [kopf({ kategorie: 16, formatname: 'Debitoren/Kreditoren', formatversion: 5, wjBeginn: wj.beginn, bezeichnung: 'Kuenta Stammdaten' }), cols.join(';')];
+  const lines = [kopf({ kategorie: 16, formatname: 'Debitoren/Kreditoren', formatversion: 5, wjBeginn: wj.beginn, bezeichnung: 'KuentaPOS Stammdaten' }), cols.join(';')];
   for (const konto of konten) {
     const r = map.get(konto); const u = ustid(r.ustid);
     const cut = (s, n) => esc(String(s || '').trim().slice(0, n));

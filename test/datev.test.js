@@ -6,8 +6,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'kuenta-datev-'));
-process.env.KUENTA_DATA = tmp;
+const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'kuentapos-datev-'));
+process.env.KUENTAPOS_DATA = tmp;
 
 const dbm = require('../server/db');
 const L = require('../server/lib');

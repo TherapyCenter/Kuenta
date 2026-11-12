@@ -66,7 +66,7 @@ async function senden({ feld, von, bis, fahrids, kanal, user, offenAm }) {
   if (kanal === 'sms' && !SMS.einstellungen().url) throw new L.HttpError(400, 'Es ist kein SMS-Gateway eingerichtet (Einstellungen → Erinnerungen & SMS).');
   if (viaProgramm) {
     const MC = require('./mailclient');
-    if (!offenAm || !MC.isLocalRequest(offenAm)) throw new L.HttpError(400, 'Das Mailprogramm kann nur an dem Rechner geöffnet werden, auf dem Kuenta läuft. Für Sammel-Erinnerungen bitte den direkten Versand (SMTP) wählen.');
+    if (!offenAm || !MC.isLocalRequest(offenAm)) throw new L.HttpError(400, 'Das Mailprogramm kann nur an dem Rechner geöffnet werden, auf dem KuentaPOS läuft. Für Sammel-Erinnerungen bitte den direkten Versand (SMTP) wählen.');
     const n = rows.filter(r => empfaenger(r, 'email').an).length;
     if (n > 20) throw new L.HttpError(400, `Das wären ${n} Fenster im Mailprogramm. Bitte höchstens 20 auf einmal auswählen oder unter Einstellungen → E-Mail den direkten Versand (SMTP) wählen.`);
   }

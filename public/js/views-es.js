@@ -28,7 +28,7 @@ const EsUI = {
           zeile('Datensätze', Object.entries(c).map(([k, n]) => `${T(EsUI.ESTADOS[k] || k)}: ${n}`).join(' · ') || '0'),
           zeile('Letzter Versand', r.ultimoEnvio || '–'),
           ...(r.ultimoError ? [zeile('Letzter Fehler', r.ultimoError, 'note err')] : []),
-          zeile('Softwarehersteller', `${r.productor.nombre} · ${r.productor.id || T('Steuerkennung fehlt')} · Kuenta ${r.productor.version}`, r.productor.id ? '' : 'note err'));
+          zeile('Softwarehersteller', `${r.productor.nombre} · ${r.productor.id || T('Steuerkennung fehlt')} · KuentaPOS ${r.productor.version}`, r.productor.id ? '' : 'note err'));
       } catch (e) { status.textContent = '❌ ' + e.message; }
     };
     const speichern = () => api('/api/einstellungen', { method: 'PUT', body: changes });
@@ -67,7 +67,7 @@ const EsUI = {
       grp('VERI*FACTU (Meldung an die AEAT)',
         sel('verifactu.entorno', 'Umgebung', [['pruebas', 'Test (prewww.aeat.es) – nichts wird registriert'], ['produccion', 'Produktion – Rechnungen werden registriert']], 'pruebas'),
         sel('verifactu.certificado', 'Art des Zertifikats', [['personal', 'Zertifikat der Firma oder des Vertreters'], ['sello', 'Elektronisches Siegel (sello electrónico)']], 'personal'),
-        h('div', { class: 'fld hint' }, 'Jede Rechnung bekommt beim Ausstellen (Drucken, PDF, E-Mail, Kasse) einen Datensatz mit Hash-Kette und QR-Code. Kuenta sendet ihn sofort an die AEAT, ohne Internet später automatisch. Danach ist die Rechnung gesperrt; Änderungen nur per Rechnungskorrektur. Zertifikat, Hash-Kette und eine Kopie aller Datensätze liegen im Datenordner unter „verifactu“ und sind nicht Teil der Sicherung – diesen Ordner bitte zusätzlich sichern.'),
+        h('div', { class: 'fld hint' }, 'Jede Rechnung bekommt beim Ausstellen (Drucken, PDF, E-Mail, Kasse) einen Datensatz mit Hash-Kette und QR-Code. KuentaPOS sendet ihn sofort an die AEAT, ohne Internet später automatisch. Danach ist die Rechnung gesperrt; Änderungen nur per Rechnungskorrektur. Zertifikat, Hash-Kette und eine Kopie aller Datensätze liegen im Datenordner unter „verifactu“ und sind nicht Teil der Sicherung – diesen Ordner bitte zusätzlich sichern.'),
         h('div', { class: 'fld inline' },
           h('button', { class: 'btn', onclick: zertifikat }, '🔐 Zertifikat (.p12 / .pfx) hinterlegen'),
           h('button', { class: 'btn', onclick: probar }, '🔌 Speichern & Verbindung testen'),

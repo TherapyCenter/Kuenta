@@ -8,8 +8,8 @@ const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
 
-process.env.KUENTA_DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'kuenta-at-'));
-process.env.KUENTA_LANG = 'de';
+process.env.KUENTAPOS_DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'kuentapos-at-'));
+process.env.KUENTAPOS_LANG = 'de';
 const L = require('../server/lib');
 const dbm = require('../server/db');
 const VG = require('../server/api/vorgang');

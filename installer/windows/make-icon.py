@@ -1,4 +1,4 @@
-"""Creates kuenta.ico from the logo (redrawn from public/img/icon.svg). Requires Pillow.
+"""Creates kuentapos.ico from the logo (redrawn from public/img/icon.svg). Requires Pillow.
 Usage: python installer/windows/make-icon.py"""
 import os
 from PIL import Image, ImageDraw
@@ -28,7 +28,7 @@ ImageDraw.Draw(mask).rounded_rectangle([0, 0, S - 1, S - 1], radius=14 * k, fill
 img.putalpha(Image.composite(img.getchannel('A'), mask, mask))
 # hole in the handle
 r = 1.8 * k; d = ImageDraw.Draw(img); d.ellipse([16 * k - r, 45 * k - r, 16 * k + r, 45 * k + r], fill=blue)
-out = os.path.join(os.path.dirname(__file__), 'kuenta.ico')
+out = os.path.join(os.path.dirname(__file__), 'kuentapos.ico')
 big = img.resize((256, 256), Image.LANCZOS)
 big.save(out, sizes=[(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)])
 if os.environ.get('ICON_PREVIEW_DIR'):

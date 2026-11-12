@@ -1,4 +1,5 @@
 'use strict';
+require('./env'); // accept old KUENTA_* variables
 // Routes of the add-on modules: PDF/ZUGFeRD, email, purchasing, time tracking, vehicle trading, register, interfaces, tenants
 const L = require('./lib');
 const dbm = require('./db');
@@ -23,7 +24,7 @@ module.exports = function register(route, { json, readBody }) {
   // ---------- PDF / ZUGFeRD ----------
   function vorgangPdf(typ, id, { zugferd, vorschau } = {}) {
     const v = V[typ]; if (!v) throw new L.HttpError(404, 'Unbekannter Vorgang');
-    // Spain: an invoice that leaves Kuenta as PDF is issued (VERI*FACTU record with QR code)
+    // Spain: an invoice that leaves KuentaPOS as PDF is issued (VERI*FACTU record with QR code)
     if (v.table === 'RECHNUNGEN' && !vorschau && require('./es').activo()) require('./es/verifactu').emitir(Number(id));
     if (zugferd && v.table === 'RECHNUNGEN') { const z = PDF.zugferd(id); return { buf: z.pdf, name: `${v.title}_${z.nr}.pdf`, problems: z.problems }; }
     const d = VG.load(typ, id);
@@ -83,7 +84,7 @@ module.exports = function register(route, { json, readBody }) {
     for (const a of b.anhaenge || []) atts.push({ filename: a.name, content: Buffer.from(a.base64, 'base64'), contentType: a.type || 'application/octet-stream' });
     const entry = { to: b.to, subject: b.betreff, bezug: b.art === 'mahnung' ? 'MAHNUNG' : b.typ, bezugId: b.id, anhaenge: atts.map(a => a.filename).join(', '), user: ctx.user && ctx.user.name };
     const viaProgramm = L.sw('mail.versand', 'smtp') === 'programm';
-    if (viaProgramm && !MAILCLIENT.isLocalRequest(ctx.req)) throw new L.HttpError(400, 'Das Mailprogramm kann nur an dem Rechner geöffnet werden, auf dem Kuenta läuft. Für andere Geräte bitte unter Einstellungen → E-Mail den direkten Versand (SMTP) wählen.');
+    if (viaProgramm && !MAILCLIENT.isLocalRequest(ctx.req)) throw new L.HttpError(400, 'Das Mailprogramm kann nur an dem Rechner geöffnet werden, auf dem KuentaPOS läuft. Für andere Geräte bitte unter Einstellungen → E-Mail den direkten Versand (SMTP) wählen.');
     try {
       let programm = null;
       if (viaProgramm) {
@@ -99,13 +100,13 @@ module.exports = function register(route, { json, readBody }) {
       return { ok: true, anhaenge: entry.anhaenge, programm };
     } catch (e) { MAIL.log({ ...entry, status: 'Fehler', fehler: e.message }); throw e; }
   });
-  route('POST', '/api/mail/test', async (ctx) => { const b = await json(ctx.req); await MAIL.send({ to: b.to, subject: 'Testnachricht von Kuenta', text: 'Der E-Mail-Versand aus Kuenta funktioniert.' }); return { ok: true }; });
+  route('POST', '/api/mail/test', async (ctx) => { const b = await json(ctx.req); await MAIL.send({ to: b.to, subject: 'Testnachricht von KuentaPOS', text: 'Der E-Mail-Versand aus KuentaPOS funktioniert.' }); return { ok: true }; });
   route('POST', '/api/mail/programm-test', async (ctx) => {
     await json(ctx.req);
-    if (!MAILCLIENT.isLocalRequest(ctx.req)) throw new L.HttpError(400, 'Das Mailprogramm kann nur an dem Rechner geöffnet werden, auf dem Kuenta läuft.');
-    return MAILCLIENT.open({ to: L.firma().EMAIL || '', subject: 'Testnachricht von Kuenta', text: 'Die Übergabe von Kuenta an das Mailprogramm funktioniert.\nUmlaute: äöü ÄÖÜ ß' });
+    if (!MAILCLIENT.isLocalRequest(ctx.req)) throw new L.HttpError(400, 'Das Mailprogramm kann nur an dem Rechner geöffnet werden, auf dem KuentaPOS läuft.');
+    return MAILCLIENT.open({ to: L.firma().EMAIL || '', subject: 'Testnachricht von KuentaPOS', text: 'Die Übergabe von KuentaPOS an das Mailprogramm funktioniert.\nUmlaute: äöü ÄÖÜ ß' });
   });
-  route('GET', '/api/mail/programm', () => process.env.KUENTA_CONTAINER ? { thunderbird: null, container: true } : { thunderbird: MAILCLIENT.findThunderbird() });
+  route('GET', '/api/mail/programm', () => process.env.KUENTAPOS_CONTAINER ? { thunderbird: null, container: true } : { thunderbird: MAILCLIENT.findThunderbird() });
   route('GET', '/api/mail/protokoll', () => L.db().prepare('SELECT * FROM SW_MAILS ORDER BY ID DESC LIMIT 1000').all());
 
   // ---------- Purchasing ----------

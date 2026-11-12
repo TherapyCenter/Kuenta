@@ -17,7 +17,7 @@ const tag = ts => new Date(ts * 1000).toISOString().slice(0, 10);
 const unix = iso => Math.floor(Date.parse(iso + 'T00:00:00Z') / 1000);
 
 async function holen(url, als = 'text') {
-  const r = await fetch(url, { headers: { 'User-Agent': 'Kuenta' }, signal: AbortSignal.timeout(20000) });
+  const r = await fetch(url, { headers: { 'User-Agent': 'KuentaPOS' }, signal: AbortSignal.timeout(20000) });
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   return als === 'json' ? r.json() : r.text();
 }

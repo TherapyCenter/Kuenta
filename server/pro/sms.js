@@ -1,8 +1,8 @@
 'use strict';
-// Kuenta Pro – not open source. Use only with a valid Kuenta Pro license, see server/pro/LICENSE.md.
+// KuentaPOS Pro – not open source. Use only with a valid KuentaPOS Pro license, see server/pro/LICENSE.md.
 //
 // SMS sending via a freely configurable HTTP gateway: an SMS provider on the internet, an Android phone with
-// a gateway app, or the Kuenta SMS relay (USB modem with SIM card on another computer, see installer/sms-relais).
+// a gateway app, or the KuentaPOS SMS relay (USB modem with SIM card on another computer, see installer/sms-relais).
 const L = require('../lib');
 const LIZENZ = require('../lizenz');
 
@@ -62,7 +62,7 @@ async function senden(an, text, override) {
   const n = nummer(an);
   if (!n) throw new L.HttpError(400, `„${an}“ ist keine gültige Rufnummer.`);
   const werte = { nummer: n, nummer_ohne_plus: n.slice(1), text: String(text || ''), absender: c.absender };
-  const headers = { 'User-Agent': 'Kuenta' };
+  const headers = { 'User-Agent': 'KuentaPOS' };
   for (const z of String(c.header || '').split(/\r?\n/)) { const i = z.indexOf(':'); if (i > 0) headers[z.slice(0, i).trim()] = z.slice(i + 1).trim(); }
   if (c.benutzer) headers.Authorization = 'Basic ' + Buffer.from(`${c.benutzer}:${c.passwort || ''}`).toString('base64');
   const opts = { method: c.methode, headers, signal: AbortSignal.timeout(20000) };

@@ -40,7 +40,7 @@ function calcular({ von, bis } = {}) {
   }
   z['399'] = r2(zeilen.reduce((s, x) => s + x.steuer, 0));
   z['400'] = saldo ? 0 : v.steuer; // input tax on material and services
-  z['405'] = 0;                    // input tax on investments: not separated in Kuenta's purchase invoices
+  z['405'] = 0;                    // input tax on investments: not separated in KuentaPOS's purchase invoices
   z['479'] = r2(z['400'] + z['405']);
   const saldoBetrag = r2(z['399'] - z['479']);
   z['500'] = saldoBetrag > 0 ? saldoBetrag : 0;

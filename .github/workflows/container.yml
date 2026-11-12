@@ -1,5 +1,5 @@
 # Container image for x86_64 and ARM64 (Docker, Podman, Umbrel) in the GitHub Container Registry:
-#   ghcr.io/therapycenter/kuenta:<version> and :latest
+#   ghcr.io/therapycenter/kuentapos:<version> and :latest
 # Built for every release tag (v1.2.3) and on demand (Actions → Container image → Run workflow).
 name: Container image
 
@@ -36,7 +36,7 @@ jobs:
           push: true
           build-args: VERSION=${{ steps.v.outputs.version }}
           tags: |
-            ghcr.io/therapycenter/kuenta:${{ steps.v.outputs.version }}
-            ghcr.io/therapycenter/kuenta:latest
+            ghcr.io/therapycenter/kuentapos:${{ steps.v.outputs.version }}
+            ghcr.io/therapycenter/kuentapos:latest
       - name: Digest
-        run: echo "ghcr.io/therapycenter/kuenta:${{ steps.v.outputs.version }}@${{ steps.push.outputs.digest }}" | tee -a "$GITHUB_STEP_SUMMARY"
+        run: echo "ghcr.io/therapycenter/kuentapos:${{ steps.v.outputs.version }}@${{ steps.push.outputs.digest }}" | tee -a "$GITHUB_STEP_SUMMARY"

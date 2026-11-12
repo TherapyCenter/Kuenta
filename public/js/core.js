@@ -1,7 +1,7 @@
 'use strict';
 /* global ENT, I18N */
 // ---------- Language ----------
-// Chosen per workstation (Kuenta menu or settings), German by default; ?lang=en in the address also sets it
+// Chosen per workstation (KuentaPOS menu or settings), German by default; ?lang=en in the address also sets it
 I18N.lang = (() => {
   const q = new URLSearchParams(location.search).get('lang');
   try {

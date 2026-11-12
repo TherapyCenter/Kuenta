@@ -1,5 +1,5 @@
 'use strict';
-// UK VAT return (9 boxes) from the invoices and purchase invoices in Kuenta.
+// UK VAT return (9 boxes) from the invoices and purchase invoices in KuentaPOS.
 // Schemes: standard (tax point = invoice date), cash accounting (VAT when paid), flat rate scheme
 // (VAT Notice 733: box 1 = flat rate × VAT-inclusive turnover, box 6 incl. VAT, boxes 4 and 7 normally 0).
 // Second-hand vehicles (margin scheme, VAT Notice 718): VAT on the margin in box 1, selling price less that VAT in box 6.

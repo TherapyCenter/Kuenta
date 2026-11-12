@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 'use strict';
-// Kuenta license tool for the publisher. Runs without the Kuenta server, needs only Node.js.
+require('../../server/env'); // accept old KUENTA_* variables
+// KuentaPOS license tool for the publisher. Runs without the KuentaPOS server, needs only Node.js.
 //
 //   node tools/lizenz/lizenz-werkzeug.js schluessel
 //       Creates the key pair once. The private key is stored in
-//       ~/.kuenta-lizenz/privat.pem (NEVER put it into the repository!). Enter the printed public
+//       ~/.kuentapos-lizenz/privat.pem (NEVER put it into the repository!). Enter the printed public
 //       key in server/lizenz.js at OEFFENTLICH.
 //
 //   node tools/lizenz/lizenz-werkzeug.js ausstellen --kunde "Werkstatt Muster" --funktionen sms
 //       [--bis 2027-12-31] [--zahlung "BTC 0.0012, txid …"] [--email kunde@example.de]
-//       Prints the license key and records it in ~/.kuenta-lizenz/ausgestellt.csv.
+//       Prints the license key and records it in ~/.kuentapos-lizenz/ausgestellt.csv.
 //
 //   node tools/lizenz/lizenz-werkzeug.js pruefen <key>
 //       Shows the content of a key and verifies the signature.
@@ -17,18 +18,19 @@
 //   node tools/lizenz/lizenz-werkzeug.js shop einrichten | shop test [--mail-an address]
 //   node tools/lizenz/lizenz-werkzeug.js shop [--probe]
 //       License shop: fetches paid add-on orders from the BTCPay Server, issues the keys
-//       and sends them by email (settings in ~/.kuenta-lizenz/shop.json, see
+//       and sends them by email (settings in ~/.kuentapos-lizenz/shop.json, see
 //       tools/lizenz/README.md). "shop erledigt <ID>" records an order that was handled by hand.
 //
-// Change the folder: environment variable KUENTA_LIZENZ_HOME. Output follows the system language
-// (KUENTA_LANG=de|en|es to choose).
+// Change the folder: environment variable KUENTAPOS_LIZENZ_HOME. Output follows the system language
+// (KUENTAPOS_LANG=de|en|es to choose).
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
 const { C } = require('../../server/i18n');
 
-const HOME = process.env.KUENTA_LIZENZ_HOME || path.join(os.homedir(), '.kuenta-lizenz');
+// up to version 1.8.2 the folder was ~/.kuenta-lizenz: keep using it if it exists (it holds the private key)
+const HOME = process.env.KUENTAPOS_LIZENZ_HOME || [path.join(os.homedir(), '.kuentapos-lizenz'), path.join(os.homedir(), '.kuenta-lizenz')].find(d => fs.existsSync(d)) || path.join(os.homedir(), '.kuentapos-lizenz');
 const PRIVAT = path.join(HOME, 'privat.pem');
 const REGISTER = path.join(HOME, 'ausgestellt.csv');
 const PRAEFIX = 'KUENTA1';
@@ -91,7 +93,7 @@ function ausstellen(o) {
 function pruefen(key) {
   if (!key) throw new Error(C('Schlüssel fehlt.'));
   const teile = String(key).replace(/\s+/g, '').split('.');
-  if (teile.length !== 3 || teile[0] !== PRAEFIX) throw new Error(C('Kein Kuenta-Lizenzschlüssel.'));
+  if (teile.length !== 3 || teile[0] !== PRAEFIX) throw new Error(C('Kein KuentaPOS-Lizenzschlüssel.'));
   const daten = JSON.parse(Buffer.from(teile[1], 'base64url').toString('utf8'));
   console.log(JSON.stringify(daten, null, 2));
   if (fs.existsSync(PRIVAT)) {
@@ -113,7 +115,7 @@ async function shop(unter, o, rest) {
     console.log(C('Verbindung zum BTCPay Server in Ordnung.'));
     if (o['mail-an'] && o['mail-an'] !== true) {
       const c = JSON.parse(fs.readFileSync(path.join(HOME, 'shop.json'), 'utf8'));
-      await require('../../server/mail').send({ to: o['mail-an'], subject: 'Test vom Kuenta-Lizenz-Shop', text: 'Der E-Mail-Versand funktioniert.' }, c.smtp);
+      await require('../../server/mail').send({ to: o['mail-an'], subject: 'Test vom KuentaPOS-Lizenz-Shop', text: 'Der E-Mail-Versand funktioniert.' }, c.smtp);
       console.log(C(`Test-E-Mail an ${o['mail-an']} verschickt.`));
     }
   } else if (unter === 'erledigt') {

@@ -177,7 +177,7 @@ function save(typ, payload, user) {
   const pos = (payload.pos || []).map(p => ({ ...p }));
   const id = Number(kopfIn[v.pk]) || null;
   if (v.table === 'RECHNUNGEN') {
-    // Only Kuenta assigns invoice numbers: a new invoice gets the next number, an existing one keeps its number.
+    // Only KuentaPOS assigns invoice numbers: a new invoice gets the next number, an existing one keeps its number.
     // So typing cannot create gaps, and two workstations never get the same number.
     const old = id ? d.prepare(`SELECT ${v.nr} nr FROM ${v.table} WHERE ${v.pk}=?`).get(id) : null;
     kopfIn[v.nr] = old ? old.nr : L.nextNumber(v.numKey, v.table, v.nr, `TYP=${v.typ}`);

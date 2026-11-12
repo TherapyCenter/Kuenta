@@ -6,14 +6,14 @@ installer
 test
 node_modules
 *.bat
-kuenta.sh
+kuentapos.sh
 
 # never put data into the image
 data
 *.db
 *.db-wal
 *.db-shm
-*.kuenta
+*.kuentapos
 *.kft
 *.swb
 *.kfz

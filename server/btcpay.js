@@ -1,12 +1,12 @@
 'use strict';
 // Bitcoin, Lightning and USDT payments through your own BTCPay Server (Greenfield API).
 //
-// Invoices: Kuenta creates a "Payment Request". That is a long-lived payment page for the
+// Invoices: KuentaPOS creates a "Payment Request". That is a long-lived payment page for the
 // open euro amount. The exchange rate is only fixed when the customer actually pays, so the
 // link can go on the PDF invoice and into the email. Which payment methods (BTC, Lightning,
-// USDT on Liquid …) are offered is configured in the BTCPay store, not in Kuenta.
+// USDT on Liquid …) are offered is configured in the BTCPay store, not in KuentaPOS.
 //
-// Incoming payments: Kuenta polls BTCPay regularly (no webhook needed, Kuenta usually sits
+// Incoming payments: KuentaPOS polls BTCPay regularly (no webhook needed, KuentaPOS usually sits
 // behind a router) and books paid invoices automatically.
 const L = require('./lib');
 
@@ -119,7 +119,7 @@ async function link(rid, { neu = false } = {}) {
     amount: offen, currency: L.waehrung(), allowCustomPaymentAmounts: false,
     expiryDate: Math.floor(new Date(ablauf + 'T23:59:59').getTime() / 1000),
     email: (kd && (kd.EMAILRECHNUNG || kd.EMAIL)) || undefined,
-    referenceId: `KUENTA-RE-${r.RECHNUNGNUMMER}`,
+    referenceId: `KUENTAPOS-RE-${r.RECHNUNGNUMMER}`,
   }, c);
   if (!pr || !pr.id) throw new L.HttpError(502, 'BTCPay hat keine Payment-Request-ID geliefert.');
   const url = `${c.url}/payment-requests/${encodeURIComponent(pr.id)}`;
@@ -223,7 +223,7 @@ async function kasseStart({ betrag, text } = {}) {
   if (!(eur > 0)) throw new L.HttpError(400, 'Der Betrag muss größer als 0 sein.');
   const inv = await call('POST', `/stores/${encodeURIComponent(c.store)}/invoices`, {
     amount: eur, currency: L.waehrung(),
-    metadata: { orderId: `KUENTA-KASSE-${Date.now()}`, itemDesc: String(text || 'Einkauf').slice(0, 100) },
+    metadata: { orderId: `KUENTAPOS-KASSE-${Date.now()}`, itemDesc: String(text || 'Einkauf').slice(0, 100) },
     checkout: { speedPolicy: 'HighSpeed', expirationMinutes: KASSE_MINUTEN, defaultLanguage: 'de-DE' },
   }, c);
   if (!inv || !inv.id) throw new L.HttpError(502, 'BTCPay hat keine Rechnungs-ID geliefert.');
@@ -249,7 +249,7 @@ function kasseEintrag(id) {
   if (!e) throw new L.HttpError(404, 'Krypto-Zahlung nicht gefunden');
   return e;
 }
-// BTCPay status → Kuenta: offen | bestaetigung | bezahlt | abgelaufen | ungueltig
+// BTCPay status → KuentaPOS: offen | bestaetigung | bezahlt | abgelaufen | ungueltig
 async function kasseStatus(id) {
   const c = cfg(); pruefeBereit(c);
   const e = kasseEintrag(id);

@@ -22,7 +22,7 @@ const AtUI = {
       } catch (e) { rksvBox.textContent = e.message; }
     };
     const aktivieren = async () => {
-      if (!(await confirmDlg('Registrierkasse jetzt in Betrieb nehmen? Kuenta erzeugt den AES-Schlüssel und den Startbeleg. Kassen-ID und Schlüssel sind danach in FinanzOnline zu registrieren, der Startbeleg ist mit der BMF-Belegcheck-App zu prüfen.', { ok: 'Aktivieren' }))) return;
+      if (!(await confirmDlg('Registrierkasse jetzt in Betrieb nehmen? KuentaPOS erzeugt den AES-Schlüssel und den Startbeleg. Kassen-ID und Schlüssel sind danach in FinanzOnline zu registrieren, der Startbeleg ist mit der BMF-Belegcheck-App zu prüfen.', { ok: 'Aktivieren' }))) return;
       try {
         await api('/api/einstellungen', { method: 'PUT', body: changes });
         const r = await api('/api/at/rksv/aktivieren', { method: 'POST', body: {} });
@@ -105,7 +105,7 @@ Views.atSteuer = async (main) => {
         h('div', { class: 'searchbar' },
           h('button', { class: 'btn', onclick: journal }, '📋 ' + T('Belege')), h('button', { class: 'btn', onclick: pruefen }, '🔍 ' + T('Prüfen')),
           h('button', { class: 'btn', onclick: () => downloadUrl('/api/at/rksv/dep', 'DEP.json') }, '⬇ ' + T('DEP-Export')),
-          h('button', { class: 'btn', onclick: () => nullbeleg('JAHR', 'Jahresbeleg erstellen? (Der Monatsbeleg für Dezember; Kuenta erstellt Monats- und Jahresbelege beim Monatswechsel auch selbst.)') }, T('Jahresbeleg')),
+          h('button', { class: 'btn', onclick: () => nullbeleg('JAHR', 'Jahresbeleg erstellen? (Der Monatsbeleg für Dezember; KuentaPOS erstellt Monats- und Jahresbelege beim Monatswechsel auch selbst.)') }, T('Jahresbeleg')),
           h('button', { class: 'btn', onclick: () => nullbeleg('NULL', 'Nullbeleg erstellen (z. B. zur Kontrolle)?') }, T('Nullbeleg')),
           h('button', { class: 'btn', onclick: () => nullbeleg('SCHLUSS', 'Schlussbeleg erstellen? Danach ist die Kasse in FinanzOnline außer Betrieb zu nehmen.') }, T('Schlussbeleg'))),
         h('div', { class: 'hint' }, 'Das Datenerfassungsprotokoll (DEP) enthält alle signierten Belege im Exportformat der RKSV und ist der Finanzverwaltung auf Verlangen zu übergeben.'))));

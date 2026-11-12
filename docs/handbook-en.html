@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <meta charset="utf-8">
-<title>Kuenta Handbook</title>
+<title>KuentaPOS Handbook</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -154,9 +154,9 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
 <div class="shell">
   <header class="masthead">
     <div class="kicker">Invoicing &amp; POS for auto repair shops · use, setup, operation</div>
-    <h1>Kuenta Handbook</h1>
-    <p>Everything you need to know about installing and setting up Kuenta, daily work, sending email, updates and backups.</p>
-    <div class="meta"><span>Version <b>1.8.2</b></span><span>As of <b>November 2026</b></span><span>Windows · macOS · Linux · Tablet</span><span><a href="handbuch.html" hreflang="de">Deutsch</a> · <a href="handbook-es.html" hreflang="es">Español</a></span></div>
+    <h1>KuentaPOS Handbook</h1>
+    <p>Everything you need to know about installing and setting up KuentaPOS, daily work, sending email, updates and backups.</p>
+    <div class="meta"><span>Version <b>1.8.3</b></span><span>As of <b>November 2026</b></span><span>Windows · macOS · Linux · Tablet</span><span><a href="handbuch.html" hreflang="de">Deutsch</a> · <a href="handbook-es.html" hreflang="es">Español</a></span></div>
   </header>
 
   <nav class="toc" aria-label="Contents">
@@ -167,20 +167,20 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
   <main>
     <details class="toc-mobile"><summary>Contents</summary><ol id="toc-m"></ol></details>
 
-    <div class="note"><strong>About this translation</strong><span>Kuenta is built for workshops in Germany: tax, e-invoicing, cash register (TSE) and DATEV follow German law. This handbook uses the menu names of the English user interface. German terms such as HU (the German MOT), TSE or GoBD are kept where they refer to German rules.</span></div>
+    <div class="note"><strong>About this translation</strong><span>KuentaPOS is built for workshops in Germany: tax, e-invoicing, cash register (TSE) and DATEV follow German law. This handbook uses the menu names of the English user interface. German terms such as HU (the German MOT), TSE or GoBD are kept where they refer to German rules.</span></div>
 
     <section id="ueberblick">
-      <h2>What is Kuenta?</h2>
-      <p class="lead">Kuenta is invoicing software for car workshops. You use it to write quotes, orders and invoices, manage customers and vehicles, run the cash register and the stock, and create e-invoices.</p>
-      <p>Kuenta is a web application: a small program runs in the background on the workshop PC (the Kuenta server). You use Kuenta in the browser, on the same PC or on tablets and other workstations in the network. Screens and workflow follow <strong>KFZ-Faktura</strong>, whose data Kuenta takes over completely.</p>
-      <div class="diagram" role="img" aria-label="Setup: the workshop PC runs the Kuenta server and stores the data in the user profile. A browser on the same PC as well as tablets and other workstations connect through the network.">
+      <h2>What is KuentaPOS?</h2>
+      <p class="lead">KuentaPOS is invoicing software for car workshops. You use it to write quotes, orders and invoices, manage customers and vehicles, run the cash register and the stock, and create e-invoices.</p>
+      <p>KuentaPOS is a web application: a small program runs in the background on the workshop PC (the KuentaPOS server). You use KuentaPOS in the browser, on the same PC or on tablets and other workstations in the network. Screens and workflow follow <strong>KFZ-Faktura</strong>, whose data KuentaPOS takes over completely.</p>
+      <div class="diagram" role="img" aria-label="Setup: the workshop PC runs the KuentaPOS server and stores the data in the user profile. A browser on the same PC as well as tablets and other workstations connect through the network.">
         <svg viewBox="0 0 760 210" xmlns="http://www.w3.org/2000/svg">
           <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="arrow"/></marker></defs>
           <rect class="box main" x="250" y="20" width="260" height="110" rx="8"/>
           <text x="380" y="50" text-anchor="middle" font-weight="700" font-size="16">Workshop PC</text>
-          <text x="380" y="74" text-anchor="middle" font-size="14">Kuenta server (console window)</text>
+          <text x="380" y="74" text-anchor="middle" font-size="14">KuentaPOS server (console window)</text>
           <text x="380" y="96" text-anchor="middle" class="sub">Address: http://127.0.0.1:3700</text>
-          <text x="380" y="116" text-anchor="middle" class="sub">Data: %APPDATA%\Kuenta</text>
+          <text x="380" y="116" text-anchor="middle" class="sub">Data: %APPDATA%\KuentaPOS</text>
           <rect class="box" x="20" y="45" width="170" height="60" rx="8"/>
           <text x="105" y="72" text-anchor="middle" font-weight="600" font-size="14">Browser on the PC</text>
           <text x="105" y="92" text-anchor="middle" class="sub">always possible</text>
@@ -198,7 +198,7 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
           <path class="wire dash" d="M380 130 V148" marker-end="url(#ah)"/>
         </svg>
       </div>
-      <div class="note"><strong>Good to know</strong><span>The console window is the Kuenta server. It must stay open while Kuenta is in use. Closing it stops Kuenta.</span></div>
+      <div class="note"><strong>Good to know</strong><span>The console window is the KuentaPOS server. It must stay open while KuentaPOS is in use. Closing it stops KuentaPOS.</span></div>
     </section>
 
     <section id="installation">
@@ -207,13 +207,13 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
 
       <h3>Windows 10 / 11 (64 bit)</h3>
       <ol class="steps">
-        <li><div><strong>Run <code>Kuenta-Setup-1.8.2.exe</code>.</strong><span>Node.js is included in the installer, nothing else needs to be installed.</span></div></li>
-        <li><div><strong>Choose the installation type.</strong><span><em>For all users</em> (default, needs administrator rights) installs to <code>C:\Program Files\Kuenta</code>. <em>Only for me</em> needs no administrator rights and installs into the user profile.</span></div></li>
+        <li><div><strong>Run <code>KuentaPOS-Setup-1.8.3.exe</code>.</strong><span>Node.js is included in the installer, nothing else needs to be installed.</span></div></li>
+        <li><div><strong>Choose the installation type.</strong><span><em>For all users</em> (default, needs administrator rights) installs to <code>C:\Program Files\KuentaPOS</code>. <em>Only for me</em> needs no administrator rights and installs into the user profile.</span></div></li>
         <li><div><strong>Choose options.</strong><span>Desktop shortcut and, for network mode, the firewall rule (only when installing for all users).</span></div></li>
-        <li><div><strong>Start:</strong><span>Start menu <span class="path">Kuenta</span>. The console window opens, and the browser opens <code>http://127.0.0.1:3700</code>.</span></div></li>
+        <li><div><strong>Start:</strong><span>Start menu <span class="path">KuentaPOS</span>. The console window opens, and the browser opens <code>http://127.0.0.1:3700</code>.</span></div></li>
       </ol>
-      <p>The installer speaks English, German or Spanish and picks the language of Windows. The start menu has three entries: <strong>Kuenta</strong> (this PC only), <strong>Kuenta (network)</strong> (for tablets and other workstations) and <strong>Uninstall Kuenta</strong>. With the German installer they are called <em>Kuenta</em>, <em>Kuenta im Netzwerk</em> and <em>Kuenta deinstallieren</em>.</p>
-      <p>A new installation starts in the language of Windows (German, Spanish, otherwise English). The console window uses the same language. To switch the user interface, use the menu <span class="path">Kuenta → Sprache / Language</span> or the language box on the login page.</p>
+      <p>The installer speaks English, German or Spanish and picks the language of Windows. The start menu has three entries: <strong>KuentaPOS</strong> (this PC only), <strong>KuentaPOS (network)</strong> (for tablets and other workstations) and <strong>Uninstall KuentaPOS</strong>. With the German installer they are called <em>KuentaPOS</em>, <em>KuentaPOS im Netzwerk</em> and <em>KuentaPOS deinstallieren</em>.</p>
+      <p>A new installation starts in the language of Windows (German, Spanish, otherwise English). The console window uses the same language. To switch the user interface, use the menu <span class="path">KuentaPOS → Sprache / Language</span> or the language box on the login page.</p>
 
       <h3>Linux</h3>
       <p>Node.js version 22.13 or later is required. Check with <code>node -v</code>.</p>
@@ -227,69 +227,69 @@ footer { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18
           <tr><td>without root</td><td><a href="https://github.com/nvm-sh/nvm">nvm</a>: <code>nvm install 24</code></td></tr>
         </tbody>
       </table></div>
-      <div class="codeblock"><pre><code>git clone &lt;repository URL&gt; kuenta     # or unpack the archive
-cd kuenta
+      <div class="codeblock"><pre><code>git clone &lt;repository URL&gt; kuentapos     # or unpack the archive
+cd kuentapos
 ./installer/unix/install.sh</code></pre></div>
-      <p>The script installs for the current user without root: the program goes to <code>~/.local/lib/kuenta</code>, the start command is <code>~/.local/bin/kuenta</code>, and an entry is added to the application menu. For a different location use <code>PREFIX=/opt/kuenta ./installer/unix/install.sh</code>.</p>
-      <div class="codeblock"><pre><code>kuenta              # this computer only
-kuenta --netzwerk   # share with tablets / other workstations</code></pre></div>
+      <p>The script installs for the current user without root: the program goes to <code>~/.local/lib/kuentapos</code>, the start command is <code>~/.local/bin/kuentapos</code>, and an entry is added to the application menu. For a different location use <code>PREFIX=/opt/kuentapos ./installer/unix/install.sh</code>.</p>
+      <div class="codeblock"><pre><code>kuentapos              # this computer only
+kuentapos --netzwerk   # share with tablets / other workstations</code></pre></div>
       <p>Stop with <kbd>Ctrl</kbd>+<kbd>C</kbd> or by closing the terminal.</p>
       <h4>Optional: as a service without a screen</h4>
       <div class="codeblock"><pre><code>mkdir -p ~/.config/systemd/user
-cat &gt; ~/.config/systemd/user/kuenta.service &lt;&lt;'EOF'
+cat &gt; ~/.config/systemd/user/kuentapos.service &lt;&lt;'EOF'
 [Unit]
-Description=Kuenta
+Description=KuentaPOS
 
 [Service]
 Environment=HOST=0.0.0.0
-ExecStart=/usr/bin/env node %h/.local/lib/kuenta/server/index.js
+ExecStart=/usr/bin/env node %h/.local/lib/kuentapos/server/index.js
 Restart=on-failure
 
 [Install]
 WantedBy=default.target
 EOF
 systemctl --user daemon-reload
-systemctl --user enable --now kuenta
+systemctl --user enable --now kuentapos
 loginctl enable-linger "$USER"</code></pre></div>
       <p>If a firewall is active, open port 3700/TCP, e.g. <code>sudo ufw allow 3700/tcp</code>.</p>
 
       <h3>macOS</h3>
       <ol class="steps">
         <li><div><strong>Install Node.js</strong><span>Package from <a href="https://nodejs.org/en">nodejs.org</a> (LTS) or <code>brew install node@24</code>.</span></div></li>
-        <li><div><strong>Install Kuenta</strong><span>In the terminal, as on Linux: <code>./installer/unix/install.sh</code>. The app <em>Kuenta</em> is then in <code>~/Applications</code>.</span></div></li>
-        <li><div><strong>Start</strong><span>Double-click <em>Kuenta</em> or run <code>kuenta</code> in the terminal. On first opening, macOS may warn about an unsigned app: right-click it in the Finder → <em>Open</em>.</span></div></li>
+        <li><div><strong>Install KuentaPOS</strong><span>In the terminal, as on Linux: <code>./installer/unix/install.sh</code>. The app <em>KuentaPOS</em> is then in <code>~/Applications</code>.</span></div></li>
+        <li><div><strong>Start</strong><span>Double-click <em>KuentaPOS</em> or run <code>kuentapos</code> in the terminal. On first opening, macOS may warn about an unsigned app: right-click it in the Finder → <em>Open</em>.</span></div></li>
       </ol>
 
       <h3>Container (Docker / Podman)</h3>
-      <p>For Linux servers, NAS systems, Raspberry Pi or Macs, Kuenta also runs in a container. The image includes Node.js and runs on x86_64 and ARM64. The Kuenta folder contains a <code>Dockerfile</code> and a <code>compose.yaml</code> for this.</p>
+      <p>For Linux servers, NAS systems, Raspberry Pi or Macs, KuentaPOS also runs in a container. The image includes Node.js and runs on x86_64 and ARM64. The KuentaPOS folder contains a <code>Dockerfile</code> and a <code>compose.yaml</code> for this.</p>
       <div class="codeblock"><pre><code># Podman (for Docker replace podman with docker)
-podman build -t kuenta:1.8.2 .
-podman run -d --name kuenta --restart unless-stopped \
-  -p 3700:3700 -v kuenta-daten:/data kuenta:1.8.2
+podman build -t kuentapos:1.8.3 .
+podman run -d --name kuentapos --restart unless-stopped \
+  -p 3700:3700 -v kuentapos-daten:/data kuentapos:1.8.3
 
 # or with Compose
 docker compose up -d --build</code></pre></div>
       <p>Then open <code>http://&lt;computer&gt;:3700</code> in the browser.</p>
-      <div class="note warn"><strong>Switch on login</strong><span>In a container Kuenta can be reached from the whole network. Switch on login right after the first start (<span class="path">Settings → Defaults</span>). For this computer only: <code>-p 127.0.0.1:3700:3700</code>.</span></div>
+      <div class="note warn"><strong>Switch on login</strong><span>In a container KuentaPOS can be reached from the whole network. Switch on login right after the first start (<span class="path">Settings → Defaults</span>). For this computer only: <code>-p 127.0.0.1:3700:3700</code>.</span></div>
       <div class="tablewrap"><table>
         <thead><tr><th>Topic</th><th>In the container</th></tr></thead>
         <tbody>
-          <tr><td>Data</td><td>in the volume <code>kuenta-daten</code> (<code>/data</code> in the container). It is kept when the container is rebuilt. Own folder: <code>-v /srv/kuenta:/data</code>; it must belong to UID 1000. With rootless Podman append <code>:Z,U</code>.</td></tr>
-          <tr><td>Backups</td><td>also mount a folder from the NAS, e.g. <code>-v /mnt/nas/kuenta-sicherungen:/sicherungen</code>, and enter <code>/sicherungen</code> as the backup folder in Kuenta.</td></tr>
+          <tr><td>Data</td><td>in the volume <code>kuentapos-daten</code> (<code>/data</code> in the container). It is kept when the container is rebuilt. Own folder: <code>-v /srv/kuentapos:/data</code>; it must belong to UID 1000. With rootless Podman append <code>:Z,U</code>.</td></tr>
+          <tr><td>Backups</td><td>also mount a folder from the NAS, e.g. <code>-v /mnt/nas/kuentapos-sicherungen:/sicherungen</code>, and enter <code>/sicherungen</code> as the backup folder in KuentaPOS.</td></tr>
           <tr><td>Time zone</td><td>default <code>Europe/Berlin</code>, change with <code>-e TZ=Europe/Madrid</code>.</td></tr>
           <tr><td>Email</td><td>direct sending via SMTP only. Handing over to Thunderbird is not available in the container.</td></tr>
           <tr><td>KFZ-Faktura import</td><td>upload the backup <code>*.kfz</code> or <code>DB1.bak</code>. The direct import from the program folder is only available on Windows.</td></tr>
-          <tr><td>Stop</td><td><code>podman stop kuenta</code> closes the database cleanly.</td></tr>
-          <tr><td>Update</td><td>build the image with the new version, remove the container with <code>podman rm -f kuenta</code> and create it again with the new image. The data in the volume is kept.</td></tr>
+          <tr><td>Stop</td><td><code>podman stop kuentapos</code> closes the database cleanly.</td></tr>
+          <tr><td>Update</td><td>build the image with the new version, remove the container with <code>podman rm -f kuentapos</code> and create it again with the new image. The data in the volume is kept.</td></tr>
         </tbody>
       </table></div>
       <p>Automatic start with Podman via a Quadlet file and more details: see <code>INSTALL.md</code>, section "Container".</p>
 
       <h3>Umbrel</h3>
-      <p>On an Umbrel (umbrelOS) open the <strong>App Store</strong>, top right <strong>⋯ → Community App Stores</strong>, add <code>https://github.com/TherapyCenter/umbrel-app-store</code>, open the <strong>TherapyCenter</strong> store and install <strong>Kuenta</strong>. Kuenta then runs at <code>http://umbrel.local:3700</code>, protected by the Umbrel login. The data lives on the Umbrel and is kept during updates; also keep a backup elsewhere via <span class="path">Kuenta → Back up data</span>.</p>
+      <p>On an Umbrel (umbrelOS) open the <strong>App Store</strong>, top right <strong>⋯ → Community App Stores</strong>, add <code>https://github.com/TherapyCenter/umbrel-app-store</code>, open the <strong>TherapyCenter</strong> store and install <strong>KuentaPOS</strong>. KuentaPOS then runs at <code>http://umbrel.local:3700</code>, protected by the Umbrel login. The data lives on the Umbrel and is kept during updates; also keep a backup elsewhere via <span class="path">KuentaPOS → Back up data</span>.</p>
 
       <h3>Without installation</h3>
-      <p>With Node.js (22.13 or later) installed, directly from the unpacked folder: <code>Kuenta starten.bat</code> (Windows), <code>./kuenta.sh</code> (Linux/macOS) or <code>node server/index.js --open</code>.</p>
+      <p>With Node.js (22.13 or later) installed, directly from the unpacked folder: <code>KuentaPOS starten.bat</code> (Windows), <code>./kuentapos.sh</code> (Linux/macOS) or <code>node server/index.js --open</code>.</p>
     </section>
 
     <section id="einrichtung">
@@ -301,7 +301,7 @@ docker compose up -d --build</code></pre></div>
         <li><div><strong>Number ranges</strong><span>Each field holds the last number used. The next invoice gets this number plus 1. If numbering should start at a certain number, e.g. at the beginning of the year, enter the number before it. More under <a href="#rechnungsnummern">Invoice numbers</a>.</span></div></li>
         <li><div><strong>Email</strong><span>Choose the sending method (direct or via Thunderbird), see <a href="#email">Sending email</a>.</span></div></li>
         <li><div><strong>Users and login</strong><span>Create users under <span class="path">Master data → Users / employees</span>, tick "Login allowed" and switch on login under <span class="path">Settings → Defaults</span>. This is required in network mode.</span></div></li>
-        <li><div><strong>Language</strong><span>User interface and document language under <span class="path">Settings → Defaults</span>, see <a href="#bedienung">Using Kuenta</a>.</span></div></li>
+        <li><div><strong>Language</strong><span>User interface and document language under <span class="path">Settings → Defaults</span>, see <a href="#bedienung">Using KuentaPOS</a>.</span></div></li>
       </ol>
       <h3>All settings tabs</h3>
       <div class="tablewrap"><table>
@@ -314,7 +314,7 @@ docker compose up -d --build</code></pre></div>
           <tr><td>Crypto payment</td><td>BTCPay Server for Bitcoin, Lightning and USDT, validity of payment links, accounting account (see <a href="#krypto">Crypto payment</a>)</td></tr>
           <tr><td>Defaults</td><td>gross/net entry, small parts surcharge, paint material, GoBD lock, login, colour scheme (light/dark) and colour, language of the user interface and of documents</td></tr>
           <tr><td>Email</td><td>sending method, Thunderbird path, SMTP server, templates, signature, sending log</td></tr>
-          <tr><td>License</td><td>install or remove the Kuenta Pro license key, license status (see <a href="#pro">Kuenta Pro</a>)</td></tr>
+          <tr><td>License</td><td>install or remove the KuentaPOS Pro license key, license status (see <a href="#pro">KuentaPOS Pro</a>)</td></tr>
           <tr><td>Reminders &amp; SMS</td><td>texts of due date reminders by email and SMS, SMS gateway with templates and test, reminder log (see <a href="#erinnerungen">Reminders</a>)</td></tr>
           <tr><td>Cash register</td><td>TSE (fiskaly), card terminal (ZVT), quick keys, cash sale customer</td></tr>
           <tr><td>Time tracking</td><td>time tracking defaults, federal state for public holidays</td></tr>
@@ -329,45 +329,45 @@ docker compose up -d --build</code></pre></div>
     <section id="datenuebernahme">
       <h2>Taking over data</h2>
       <div class="tablewrap"><table>
-        <thead><tr><th>Source</th><th>Where in Kuenta</th></tr></thead>
+        <thead><tr><th>Source</th><th>Where in KuentaPOS</th></tr></thead>
         <tbody>
-          <tr><td>KFZ-Faktura</td><td><span class="path">Kuenta → Import data from KFZ-Faktura</span></td></tr>
-          <tr><td>Kuenta backup <code>*.kuenta</code>, KFZ-Faktotum <code>*.kft</code>, Schraubwerk <code>*.swb</code></td><td><span class="path">Kuenta → Restore data</span></td></tr>
-          <tr><td>CSV, DATANORM 4/5</td><td><span class="path">Kuenta → Data import</span></td></tr>
+          <tr><td>KFZ-Faktura</td><td><span class="path">KuentaPOS → Import data from KFZ-Faktura</span></td></tr>
+          <tr><td>KuentaPOS backup <code>*.kuentapos</code>, KFZ-Faktotum <code>*.kft</code>, Schraubwerk <code>*.swb</code></td><td><span class="path">KuentaPOS → Restore data</span></td></tr>
+          <tr><td>CSV, DATANORM 4/5</td><td><span class="path">KuentaPOS → Data import</span></td></tr>
         </tbody>
       </table></div>
       <h3>From KFZ-Faktura</h3>
       <ol>
-        <li><strong>Backup <code>*.kfz</code>:</strong> in KFZ-Faktura use "Daten sichern", then upload the file in Kuenta (drag and drop). Password-protected backups are supported.</li>
+        <li><strong>Backup <code>*.kfz</code>:</strong> in KFZ-Faktura use "Daten sichern", then upload the file in KuentaPOS (drag and drop). Password-protected backups are supported.</li>
         <li><strong>Database backup</strong> <code>DB1.bak</code> or <code>*.fbk</code>: upload directly.</li>
         <li><strong>Program folder</strong> (Windows only), e.g. <code>C:\KFZ-Faktura</code>. Close KFZ-Faktura first. The original database is only copied, never changed.</li>
       </ol>
       <p>All tables are taken over: customers, vehicles, articles, labour items, suppliers, tyre storage, all documents, payments, open items, dunning letters, cash book, accounting entries, text modules, settings, number ranges, KBA vehicle codes and the postcode directory, plus documents, images and the company logo.</p>
       <h3>Importing again: what is kept, what is replaced</h3>
-      <p>You can import KFZ-Faktura data more than once, e.g. during a transition period. Before the import Kuenta shows an overview:</p>
+      <p>You can import KFZ-Faktura data more than once, e.g. during a transition period. Before the import KuentaPOS shows an overview:</p>
       <div class="compare">
-        <div><span class="tag">is kept</span><h4>Data that only exists in Kuenta</h4>
-          <ul><li>settings: email, register, TSE, backup, printing</li><li>register receipts and closings</li><li>time tracking, appointments, tasks, letters</li><li>incoming invoices, vehicle trading, purchase contracts, down payments</li><li>documents uploaded in Kuenta, email and change log</li><li>Kuenta's own fields in master data, e.g. e-invoice format and Leitweg ID of the customer, IBAN of the supplier, target hours of employees</li></ul></div>
+        <div><span class="tag">is kept</span><h4>Data that only exists in KuentaPOS</h4>
+          <ul><li>settings: email, register, TSE, backup, printing</li><li>register receipts and closings</li><li>time tracking, appointments, tasks, letters</li><li>incoming invoices, vehicle trading, purchase contracts, down payments</li><li>documents uploaded in KuentaPOS, email and change log</li><li>KuentaPOS's own fields in master data, e.g. e-invoice format and Leitweg ID of the customer, IBAN of the supplier, target hours of employees</li></ul></div>
         <div><span class="tag">is replaced</span><h4>Data from KFZ-Faktura</h4>
           <ul><li>customers, vehicles, articles, labour items, suppliers</li><li>quotes, orders, delivery notes, invoices</li><li>payments, cash book, number ranges</li></ul>
-          <p>Beforehand Kuenta tells you how many of these records were created or changed in Kuenta since the last import. They are replaced by the state from the backup.</p></div>
+          <p>Beforehand KuentaPOS tells you how many of these records were created or changed in KuentaPOS since the last import. They are replaced by the state from the backup.</p></div>
       </div>
-      <p>With the tick "Keep Kuenta's own data" (default) the above applies. Without the tick the import replaces everything with the backup.</p>
-      <div class="note ok"><strong>Safety copy</strong><span>Before every import Kuenta saves a copy of the previous data in the subfolder <code>sicherheitskopien</code> of the data folder.</span></div>
-      <div class="note warn"><strong>Working in parallel</strong><span>Do not work on the same invoices in KFZ-Faktura and Kuenta at the same time. Invoices you write in Kuenta (also automatically at the register) are overwritten by the next import.</span></div>
+      <p>With the tick "Keep KuentaPOS's own data" (default) the above applies. Without the tick the import replaces everything with the backup.</p>
+      <div class="note ok"><strong>Safety copy</strong><span>Before every import KuentaPOS saves a copy of the previous data in the subfolder <code>sicherheitskopien</code> of the data folder.</span></div>
+      <div class="note warn"><strong>Working in parallel</strong><span>Do not work on the same invoices in KFZ-Faktura and KuentaPOS at the same time. Invoices you write in KuentaPOS (also automatically at the register) are overwritten by the next import.</span></div>
       <div class="note warn"><strong>7-Zip backups</strong><span>Newer KFZ-Faktura versions pack the <code>.kfz</code> file in 7-Zip format. In that case unpack the file with 7-Zip and upload <code>db\DB1.bak</code>.</span></div>
       <h3>CSV and DATANORM</h3>
-      <p>The import assistant takes over customers, vehicles, articles, labour items and suppliers from CSV files. Columns are mapped to Kuenta fields, and the mapping can be saved as a template. Article data from wholesalers comes via DATANORM 4/5.</p>
+      <p>The import assistant takes over customers, vehicles, articles, labour items and suppliers from CSV files. Columns are mapped to KuentaPOS fields, and the mapping can be saved as a template. Article data from wholesalers comes via DATANORM 4/5.</p>
       <h3>Moving to another computer</h3>
-      <p>On the old computer <span class="path">Kuenta → Back up data</span>, on the new one <span class="path">Kuenta → Restore data</span>.</p>
+      <p>On the old computer <span class="path">KuentaPOS → Back up data</span>, on the new one <span class="path">KuentaPOS → Restore data</span>.</p>
     </section>
 
     <section id="bedienung">
-      <h2>Using Kuenta</h2>
+      <h2>Using KuentaPOS</h2>
       <div class="tablewrap"><table>
         <thead><tr><th>Element</th><th>What for</th></tr></thead>
         <tbody>
-          <tr><td>Menu bar</td><td>At the top: Kuenta, Master data, Office, Purchasing, Sales, Vehicle trading, Finance, Reports. "New invoice", batch print, backup and import are here too.</td></tr>
+          <tr><td>Menu bar</td><td>At the top: KuentaPOS, Master data, Office, Purchasing, Sales, Vehicle trading, Finance, Reports. "New invoice", batch print, backup and import are here too.</td></tr>
           <tr><td>Navigation</td><td>On the left: all overviews, grouped by area.</td></tr>
           <tr><td>Quick bar</td><td>Frequent actions with one click.</td></tr>
           <tr><td>Search</td><td>At the top of the bar, reachable with <kbd>Ctrl</kbd>+<kbd>F</kbd>. Finds customers, vehicles, documents.</td></tr>
@@ -401,7 +401,7 @@ docker compose up -d --build</code></pre></div>
       </table></div>
       <div class="note"><strong>Display only</strong><span>Invoices, payments, bookings, DATEV and all printouts always stay in the company's currency (euros, pounds in the UK, dollars in the US, francs in Switzerland). The switch only changes how the figures are shown on the overview.</span></div>
       <p>The rates come from the European Central Bank (US dollar, pound sterling and Swiss franc, reference rate of the last banking day) and from the Bitstamp exchange (bitcoin, current rate).</p>
-      <div class="note"><strong>Internet</strong><span>For the rates the Kuenta computer asks the ECB and Bitstamp, at most every three hours. No data from Kuenta is sent. Kuenta caches the rates. Without internet the last loaded rates apply. If no rates were ever loaded, the display stays in euros.</span></div>
+      <div class="note"><strong>Internet</strong><span>For the rates the KuentaPOS computer asks the ECB and Bitstamp, at most every three hours. No data from KuentaPOS is sent. KuentaPOS caches the rates. Without internet the last loaded rates apply. If no rates were ever loaded, the display stays in euros.</span></div>
 
       <h3>Colours</h3>
       <p>Under <span class="path">Settings → Defaults → Appearance</span> you set two things:</p>
@@ -414,7 +414,7 @@ docker compose up -d --build</code></pre></div>
       <h3>Language</h3>
       <p>The user interface and documents are available in German, English, Spanish, French, Italian and Dutch. There are two settings:</p>
       <ul>
-        <li><strong>Language of the user interface:</strong> in the menu <span class="path">Kuenta → Sprache / Language</span>, on the login page or under <span class="path">Settings → Defaults</span>. It applies only to the current workstation. In English, numbers appear as 1,234.50 and dates as 31/12/2026.</li>
+        <li><strong>Language of the user interface:</strong> in the menu <span class="path">KuentaPOS → Sprache / Language</span>, on the login page or under <span class="path">Settings → Defaults</span>. It applies only to the current workstation. In English, numbers appear as 1,234.50 and dates as 31/12/2026.</li>
         <li><strong>Language of documents:</strong> under <span class="path">Settings → Defaults</span>. It applies to the whole company and affects PDF documents, printing, dunning letters and the templates for emails and reminders. You can choose German, English, Spanish, Italian, Dutch and French.</li>
       </ul>
       <p>What you enter yourself stays as it is: article texts, customer names and your own text templates are not translated. Legal notes such as § 19 UStG appear translated, but the law of the chosen tax system still applies; the legal texts of the other countries (France, Italy, Netherlands, Belgium) are printed in the national language. The e-invoice (XRechnung) stays in German.</p>
@@ -442,7 +442,7 @@ docker compose up -d --build</code></pre></div>
       </div>
       <h3>System</h3>
       <ul>
-        <li><strong>Companies:</strong> keep several businesses or demo data separate, <span class="path">Kuenta → Switch company</span>.</li>
+        <li><strong>Companies:</strong> keep several businesses or demo data separate, <span class="path">KuentaPOS → Switch company</span>.</li>
         <li><strong>Users and permissions:</strong> define per user which areas may be shown, created, edited or deleted and whether purchase prices are visible.</li>
         <li><strong>Logs:</strong> change log and email sending log.</li>
       </ul>
@@ -450,7 +450,7 @@ docker compose up -d --build</code></pre></div>
 
     <section id="erechnung">
       <h2>E-invoice</h2>
-      <p>Kuenta creates e-invoices according to EN 16931 and reads incoming e-invoices.</p>
+      <p>KuentaPOS creates e-invoices according to EN 16931 and reads incoming e-invoices.</p>
       <div class="tablewrap"><table>
         <thead><tr><th>Format</th><th>Description</th></tr></thead>
         <tbody>
@@ -470,26 +470,26 @@ docker compose up -d --build</code></pre></div>
 
     <section id="spanien">
       <h2>Spain: IVA and VERI*FACTU</h2>
-      <p>Kuenta can work with Spanish tax law per company. Switch it under <span class="path">Settings → Tax / dunning / register → Tax system</span> (the settings are in the tab <span class="path">Spain / VERI*FACTU</span>), then save and reload the program. For Spanish documents set the document language to Español under <span class="path">Settings → Defaults → Language</span>. Other companies, existing invoices, backups and the import from KFZ-Faktura stay unchanged.</p>
+      <p>KuentaPOS can work with Spanish tax law per company. Switch it under <span class="path">Settings → Tax / dunning / register → Tax system</span> (the settings are in the tab <span class="path">Spain / VERI*FACTU</span>), then save and reload the program. For Spanish documents set the document language to Español under <span class="path">Settings → Defaults → Language</span>. Other companies, existing invoices, backups and the import from KFZ-Faktura stay unchanged.</p>
       <h3>What changes</h3>
       <ul>
         <li><strong>IVA:</strong> 21 %, 10 % and 4 % (adjustable), exempt items and suplidos (amounts paid on behalf of the customer, e.g. the ITV fee; enter them as pass-through items).</li>
         <li><strong>Recargo de equivalencia:</strong> switch it on in the customer under <span class="path">Tax & accounting</span>. The surcharge (5.2 / 1.4 / 0.5 %) is added to the invoice automatically.</li>
         <li><strong>NIF:</strong> in the customer in the field <em>VAT ID / NIF</em>. Your own NIF goes into <span class="path">Company details → Tax number</span>.</li>
         <li><strong>Invoice numbers:</strong> series + consecutive number, e.g. F20260001; corrective invoices use the series R.</li>
-        <li><strong>Invoice types:</strong> customers with a NIF get a full invoice (F1), others a simplified invoice (F2) up to 400 €. Above that Kuenta asks for the NIF.</li>
+        <li><strong>Invoice types:</strong> customers with a NIF get a full invoice (F1), others a simplified invoice (F2) up to 400 €. Above that KuentaPOS asks for the NIF.</li>
         <li><strong>Register:</strong> every sale is an invoice; the receipt shows series, number, NIF and the QR code. VERI*FACTU replaces the TSE.</li>
         <li><strong>Accounting:</strong> <span class="path">Finance → FIBU export</span> offers the books <em>facturas expedidas</em> and <em>recibidas</em> as CSV and an overview for the <em>modelo 303</em>.</li>
         <li><strong>E-invoice for public administrations:</strong> Facturae 3.2.2. Enter the DIR3 codes of the administration in the customer's Leitweg ID field as <code>Office/Body/Unit</code>. Sign the file with AutoFirma before uploading it to FACe.</li>
       </ul>
       <h3>VERI*FACTU</h3>
-      <p>An invoice is <strong>issued</strong> as soon as it leaves Kuenta: print, PDF, email or register. Kuenta asks first. A record with hash chain is created, and its QR code is printed at the top of the invoice. Kuenta sends the record to the AEAT, or automatically later when there is no internet. From then on the invoice is locked; corrections only by a corrective invoice (cancel invoice). The status is shown in the invoice window next to the buttons.</p>
+      <p>An invoice is <strong>issued</strong> as soon as it leaves KuentaPOS: print, PDF, email or register. KuentaPOS asks first. A record with hash chain is created, and its QR code is printed at the top of the invoice. KuentaPOS sends the record to the AEAT, or automatically later when there is no internet. From then on the invoice is locked; corrections only by a corrective invoice (cancel invoice). The status is shown in the invoice window next to the buttons.</p>
       <ol>
         <li>Store the company's electronic certificate (.p12 / .pfx) under <span class="path">Settings → Spain / VERI*FACTU</span> and <em>test the connection</em>.</li>
         <li>Issue some invoices in the <em>Test</em> environment and check that they are accepted. Best use a separate test company, because test invoices stay locked as well.</li>
         <li>Switch to <em>Production</em>. From now on the invoices are registered with the AEAT.</li>
       </ol>
-      <p>Certificate, hash chain and a copy of all records are in the data folder under <code>verifactu</code>. This folder is not part of the Kuenta backup and is kept when a backup is restored, so no record is lost and no reported number is used twice. Please back up this folder as well.</p>
+      <p>Certificate, hash chain and a copy of all records are in the data folder under <code>verifactu</code>. This folder is not part of the KuentaPOS backup and is kept when a backup is restored, so no record is lost and no reported number is used twice. Please back up this folder as well.</p>
       <p>Not supported: TicketBAI (Basque Country), Navarre, IGIC (Canary Islands), margin scheme (REBU) in VERI*FACTU, the "No VERI*FACTU" mode and SII.</p>
     </section>
 
@@ -520,11 +520,11 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Tax-exempt customers</strong> (resale, government, non-profit): in the customer under <span class="path">Tax & accounting</span> with the exemption certificate number.</li>
         <li><strong>Invoice requirements:</strong> the shop's registration number in the footer, condition of parts (new, used, rebuilt) on the line, odometer in and out, what happened to replaced parts (tab <em>Other</em>).</li>
         <li><strong>Shop supplies and fees:</strong> buttons in the line toolbar. Shop supplies are a percentage of labor with a maximum; fees (hazardous waste, tires per tire, core charge) are a list in the settings.</li>
-        <li><strong>Estimate authorization:</strong> record every authorization of the customer with amount, date, method and person in the tab <em>Other</em>. It is printed on the order and invoice; if the invoice is above it, Kuenta asks before printing. The estimate carries the notice and a signature line.</li>
+        <li><strong>Estimate authorization:</strong> record every authorization of the customer with amount, date, method and person in the tab <em>Other</em>. It is printed on the order and invoice; if the invoice is above it, KuentaPOS asks before printing. The estimate carries the notice and a signature line.</li>
         <li><strong>Register:</strong> prices before tax; the sales tax is added to the total.</li>
         <li><strong>Accounting:</strong> <span class="path">Finance → FIBU export</span> creates a CSV for the invoice import into QuickBooks Online (tax code TAX/NON).</li>
       </ul>
-      <p>Kuenta does not look up rates automatically and does not file returns; your accountant or QuickBooks does that.</p>
+      <p>KuentaPOS does not look up rates automatically and does not file returns; your accountant or QuickBooks does that.</p>
     </section>
 
     <section id="frankreich">
@@ -552,8 +552,8 @@ docker compose up -d --build</code></pre></div>
       <h3>Cash register (RKSV)</h3>
       <ol>
         <li>On the tab Österreich enter the cash register ID and choose the signature device: A-Trust a.sign RK (user name and password from A-Trust) or the trial mode with a local key. The trial mode is not RKSV compliant.</li>
-        <li><em>Activate cash register</em>: Kuenta creates the AES key and the start receipt. Register the cash register ID and the AES key in FinanzOnline and check the start receipt with the BMF receipt check app.</li>
-        <li>Every sale and cancellation at the register gets a signed receipt with QR code. At the change of month Kuenta creates the monthly receipt, in December the yearly receipt. Check the yearly receipt and keep it.</li>
+        <li><em>Activate cash register</em>: KuentaPOS creates the AES key and the start receipt. Register the cash register ID and the AES key in FinanzOnline and check the start receipt with the BMF receipt check app.</li>
+        <li>Every sale and cancellation at the register gets a signed receipt with QR code. At the change of month KuentaPOS creates the monthly receipt, in December the yearly receipt. Check the yearly receipt and keep it.</li>
         <li>If the signature device fails, receipts read “Sicherheitseinrichtung ausgefallen”, followed by a collective receipt once it works again. Report failures longer than 48 hours in FinanzOnline.</li>
       </ol>
       <p><span class="path">Finance → FIBU export</span> (view “Steuer (Österreich)”) lists all RKSV receipts, checks chain, turnover counter and signatures and exports the data collection protocol (DEP).</p>
@@ -580,7 +580,7 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Company data:</strong> partita IVA (11 digits) into VAT ID, codice fiscale into Tax number (empty = same as partita IVA). Province, REA, share capital, single shareholder and liquidation on the tab Italia.</li>
         <li><strong>Customers:</strong> partita IVA into VAT ID; codice fiscale, SdI recipient code (7 characters, public bodies 6) or PEC and split payment under <span class="path">Tax & accounting</span>. Enter the town with the province, e.g. “Torino (TO)”.</li>
         <li><strong>Rates:</strong> 22 % (full VAT), 10 % (reduced VAT), 4 % (code “AT-MwSt”, adjustable e.g. to 5 %), 0 % exempt. The flat rate scheme can be switched on. Lines without VAT get the nature code automatically (N1 disbursements, N2 not subject, N3 export/intra-EU, N4 exempt, N5 margin scheme).</li>
-        <li><strong>Electronic invoice:</strong> in the invoice window <em>Fattura elettronica (FatturaPA) → download XML</em> and send the file through the portal “Fatture e Corrispettivi”, by PEC to the SdI or through your intermediary. Kuenta chooses FPR12 or FPA12 for public bodies, credit notes as TD04, stamp duty and split payment. The printout is a courtesy copy; printed invoices are locked.</li>
+        <li><strong>Electronic invoice:</strong> in the invoice window <em>Fattura elettronica (FatturaPA) → download XML</em> and send the file through the portal “Fatture e Corrispettivi”, by PEC to the SdI or through your intermediary. KuentaPOS chooses FPR12 or FPA12 for public bodies, credit notes as TD04, stamp duty and split payment. The printout is a courtesy copy; printed invoices are locked.</li>
         <li><strong>Register:</strong> every sale becomes an invoice; the receipt reads “Documento non fiscale”. Commercial documents need an approved RT device.</li>
         <li><strong>VAT settlement:</strong> <span class="path">Finance → FIBU export</span> shows output VAT, input VAT, split payment, balance and the F24 payment code (monthly, or quarterly with 1 % interest) and exports the sales VAT register as CSV. The LIPE and the annual VAT return are filed by your accountant.</li>
       </ul>
@@ -617,14 +617,14 @@ docker compose up -d --build</code></pre></div>
         <li><strong>Rates:</strong> 17 % (full VAT), 8 % (reduced VAT, adjustable e.g. to 3 %), 14 % (code “AT-MwSt”), 0 % exempt. The small business franchise (art. 57) can be switched on.</li>
         <li><strong>E-invoice (Peppol):</strong> mandatory for public bodies. Enter the customer's VAT number; it is the customer's Peppol address. In the invoice window <em>E-Rechnung (Peppol) → download</em> and send it through your Peppol service provider.</li>
         <li><strong>VAT return:</strong> <span class="path">Finance → FIBU export</span> shows the fields of the eCDF form (012, 021, 022, 701–706, 046, 458, 105 …) and creates the XML file for the eCDF platform. Enter the national identification number (matricule) and the eCDF prefix on the tab Lëtzebuerg. Small businesses under the franchise file only the annual return.</li>
-        <li><strong>Annual return:</strong> choose the year in the same view; Kuenta fills sections I–IV (TVA_DECA). The further parts of the form, among them the appendices on expenses, are completed by your accountant on eCDF.</li>
+        <li><strong>Annual return:</strong> choose the year in the same view; KuentaPOS fills sections I–IV (TVA_DECA). The further parts of the form, among them the appendices on expenses, are completed by your accountant on eCDF.</li>
         <li><strong>Recapitulative statement:</strong> intra-community supplies (TVA_LICM / LICT) and services to businesses in other EU countries (TVA_PSIM / PSIT) per customer, as XML for eCDF. Customers need a valid VAT number of their country.</li>
       </ul>
     </section>
 
     <section id="datev">
       <h2>DATEV export for the tax adviser</h2>
-      <p class="lead">Kuenta books invoices, payments, incoming invoices and register sales automatically and exports them as DATEV files. Your tax adviser reads them directly into DATEV, the accounting software common in Germany.</p>
+      <p class="lead">KuentaPOS books invoices, payments, incoming invoices and register sales automatically and exports them as DATEV files. Your tax adviser reads them directly into DATEV, the accounting software common in Germany.</p>
       <h3>Set up once</h3>
       <p>Under <span class="path">Settings → Accounting</span>. Your tax adviser gives you the values.</p>
       <div class="tablewrap"><table>
@@ -653,11 +653,11 @@ docker compose up -d --build</code></pre></div>
       <ol class="steps">
         <li><div><strong>Choose the period</strong><span><span class="path">Finance → Accounting export</span>, e.g. the previous month. The list shows all bookings not yet exported.</span></div></li>
         <li><div><strong>Export debtors/creditors</strong><span>The file <code>EXTF_Debitoren_Kreditoren_….csv</code> contains name, address, country and VAT ID of all customers and suppliers with bookings in the period. That way the tax adviser sees names instead of just account numbers.</span></div></li>
-        <li><div><strong>Create the DATEV export</strong><span>The file <code>EXTF_Buchungsstapel_….csv</code> contains the bookings. Kuenta marks them as exported so they do not come twice next time. "Preview export" creates the same file without marking.</span></div></li>
+        <li><div><strong>Create the DATEV export</strong><span>The file <code>EXTF_Buchungsstapel_….csv</code> contains the bookings. KuentaPOS marks them as exported so they do not come twice next time. "Preview export" creates the same file without marking.</span></div></li>
         <li><div><strong>Send to the tax adviser</strong><span>Both files. The adviser reads the debtors/creditors first, then the booking batch.</span></div></li>
       </ol>
       <div class="note warn"><strong>Please note</strong>
-        <span>One export may only cover one fiscal year. Export December and January separately. Kuenta points this out.</span>
+        <span>One export may only cover one fiscal year. Export December and January separately. KuentaPOS points this out.</span>
         <span>The invoices as PDF are not included. The tax adviser still gets the documents separately.</span>
         <span>The first time, have your tax adviser read both files as a test (booking batch and debtors/creditors) and check the accounts.</span>
         <span>Bookings already saved keep their accounts. If bookings were made earlier for a customer or supplier with a short number (below 10000 or 70000), the booking may be on a general ledger account. The export cannot detect this, because e.g. "3" is a valid general ledger account. Enter a debtor or creditor no. for such customers and suppliers and have older bookings checked by the tax adviser.</span></div>
@@ -667,25 +667,25 @@ docker compose up -d --build</code></pre></div>
     <section id="email">
       <h2>Sending email</h2>
       <p>Send invoices, quotes and dunning letters via <strong>More functions / right click → Send by email</strong>. Recipient, subject and text are filled in, and the document is attached as PDF, ZUGFeRD or XRechnung. You can add more files.</p>
-      <p>Under <span class="path">Settings → Email → Sending method</span> you choose how Kuenta sends the mail:</p>
+      <p>Under <span class="path">Settings → Email → Sending method</span> you choose how KuentaPOS sends the mail:</p>
       <div class="compare">
-        <div><span class="tag">Sending method 1</span><h4>Directly from Kuenta (SMTP)</h4>
-          <p>Kuenta sends the mail itself via your provider's outgoing mail server.</p>
+        <div><span class="tag">Sending method 1</span><h4>Directly from KuentaPOS (SMTP)</h4>
+          <p>KuentaPOS sends the mail itself via your provider's outgoing mail server.</p>
           <ul><li>works from every device, including the tablet</li><li>SMTP server, port, encryption, user and password must be entered</li><li>the mail does <strong>not</strong> appear in Thunderbird under "Sent"; use the sending log or a BCC copy to yourself instead</li></ul></div>
         <div><span class="tag">Sending method 2</span><h4>Hand over to mail program</h4>
-          <p>Kuenta opens a finished mail with attachment in Thunderbird. You check it and click Send there.</p>
-          <ul><li>afterwards the mail is in Thunderbird's "Sent" folder</li><li>no SMTP details needed in Kuenta</li><li>without Thunderbird, the default mail program (e.g. Outlook) gets a draft</li><li>only possible on the PC Kuenta runs on</li></ul></div>
+          <p>KuentaPOS opens a finished mail with attachment in Thunderbird. You check it and click Send there.</p>
+          <ul><li>afterwards the mail is in Thunderbird's "Sent" folder</li><li>no SMTP details needed in KuentaPOS</li><li>without Thunderbird, the default mail program (e.g. Outlook) gets a draft</li><li>only possible on the PC KuentaPOS runs on</li></ul></div>
       </div>
       <h3>Setting up Thunderbird</h3>
       <ol class="steps">
         <li><div><strong>Change the sending method</strong><span><span class="path">Settings → Email → Sending method</span> to "Hand over to mail program (e.g. Thunderbird)".</span></div></li>
-        <li><div><strong>Check what was found</strong><span>Below, Kuenta shows whether Thunderbird was found. For a portable or unusual installation enter the path to <code>thunderbird.exe</code> yourself.</span></div></li>
+        <li><div><strong>Check what was found</strong><span>Below, KuentaPOS shows whether Thunderbird was found. For a portable or unusual installation enter the path to <code>thunderbird.exe</code> yourself.</span></div></li>
         <li><div><strong>Test</strong><span>"Save settings &amp; test mail program" opens a test mail in Thunderbird.</span></div></li>
       </ol>
       <div class="note warn"><strong>Please note</strong>
-        <span>In Kuenta the invoice counts as "sent by mail" as soon as it is handed over, even if you do not send the mail in Thunderbird.</span>
-        <span>Kuenta adds its signature. If Thunderbird has one too, both appear. Empty one of them.</span>
-        <span>The handed-over attachments are stored in <code>%APPDATA%\Kuenta\mail-ausgang</code> and deleted after 14 days.</span></div>
+        <span>In KuentaPOS the invoice counts as "sent by mail" as soon as it is handed over, even if you do not send the mail in Thunderbird.</span>
+        <span>KuentaPOS adds its signature. If Thunderbird has one too, both appear. Empty one of them.</span>
+        <span>The handed-over attachments are stored in <code>%APPDATA%\KuentaPOS\mail-ausgang</code> and deleted after 14 days.</span></div>
       <h3>Templates and placeholders</h3>
       <p>Subject and text for documents and dunning letters as well as the signature are set under <span class="path">Settings → Email</span>. The default texts follow the document language. These placeholders are replaced:</p>
       <div class="tablewrap"><table>
@@ -707,12 +707,12 @@ docker compose up -d --build</code></pre></div>
 
     <section id="erinnerungen">
       <h2>Reminders by email and SMS</h2>
-      <p class="lead">Kuenta reminds customers of the HU, service and other vehicle due dates by letter, email or SMS. Every reminder is logged so no customer gets it twice.</p>
+      <p class="lead">KuentaPOS reminds customers of the HU, service and other vehicle due dates by letter, email or SMS. Every reminder is logged so no customer gets it twice.</p>
       <h3>How it works</h3>
       <ol class="steps">
         <li><div><strong>Open the list</strong><span><span class="path">Reports → Vehicle due dates</span>, choose the due date (e.g. HU) and the period. The column "last reminded" shows who already got a reminder and by which channel.</span></div></li>
         <li><div><strong>Choose the channel</strong><span>"Reminder letters" prints letters; "Remind by email" and "Remind by SMS" send to all matching vehicles in the list.</span></div></li>
-        <li><div><strong>Confirm</strong><span>Kuenta shows the number. Vehicles already reminded are skipped by default. A summary then shows what was sent, skipped or failed.</span></div></li>
+        <li><div><strong>Confirm</strong><span>KuentaPOS shows the number. Vehicles already reminded are skipped by default. A summary then shows what was sent, skipped or failed.</span></div></li>
       </ol>
       <div class="tablewrap"><table>
         <thead><tr><th>Skipped if …</th><th>Remedy</th></tr></thead>
@@ -724,14 +724,14 @@ docker compose up -d --build</code></pre></div>
       </table></div>
       <h3>Texts</h3>
       <p>Under <span class="path">Settings → Reminders &amp; SMS</span> you find subject and text of the email and the text of the SMS. Placeholders: <code>{Briefanrede}</code> <code>{Anrede}</code> <code>{Name}</code> <code>{Vorname}</code> <code>{Kennzeichen}</code> <code>{Fahrzeug}</code> <code>{Termin}</code> <code>{Terminart}</code> <code>{Firma}</code> <code>{Telefon}</code>. An SMS has 160 characters. Longer texts are sent in several parts and cost more accordingly.</p>
-      <p>Emails use the sending method in the "Email" tab. With direct sending (SMTP), Kuenta sends all at once. With "Hand over to mail program", one window opens for each reminder, so at most 20 at a time.</p>
-      <div class="note"><strong>SMS is part of Kuenta Pro</strong><span>Reminders by letter and email are free. For sending SMS you need a Pro license, see <a href="#pro">Kuenta Pro</a>. You can set up the gateway beforehand.</span></div>
+      <p>Emails use the sending method in the "Email" tab. With direct sending (SMTP), KuentaPOS sends all at once. With "Hand over to mail program", one window opens for each reminder, so at most 20 at a time.</p>
+      <div class="note"><strong>SMS is part of KuentaPOS Pro</strong><span>Reminders by letter and email are free. For sending SMS you need a Pro license, see <a href="#pro">KuentaPOS Pro</a>. You can set up the gateway beforehand.</span></div>
       <h3>SMS gateway: three options</h3>
-      <p>Kuenta sends SMS via a gateway. Under <span class="path">Settings → Reminders &amp; SMS → Template</span> there is a template for each option that you only need to adjust. Check the setup with "Save settings &amp; send test SMS".</p>
+      <p>KuentaPOS sends SMS via a gateway. Under <span class="path">Settings → Reminders &amp; SMS → Template</span> there is a template for each option that you only need to adjust. Check the setup with "Save settings &amp; send test SMS".</p>
       <div class="tablewrap"><table>
         <thead><tr><th>Option</th><th>You need</th><th>Good to know</th></tr></thead>
         <tbody>
-          <tr><td>USB modem on another computer (Kuenta SMS relay)</td><td>a computer (e.g. Raspberry Pi), a USB modem with modem mode, a SIM card, the program <code>gammu</code></td><td>The relay comes with Kuenta in the folder <code>sms-relais</code> with its own instructions. Running costs only for the SIM card.</td></tr>
+          <tr><td>USB modem on another computer (KuentaPOS SMS relay)</td><td>a computer (e.g. Raspberry Pi), a USB modem with modem mode, a SIM card, the program <code>gammu</code></td><td>The relay comes with KuentaPOS in the folder <code>sms-relais</code> with its own instructions. Running costs only for the SIM card.</td></tr>
           <tr><td>Old Android phone</td><td>phone with SIM card and a gateway app, e.g. "SMS Gateway for Android"</td><td>No extra computer needed. The phone must be in the same network and stay switched on. Address and credentials are shown in the app.</td></tr>
           <tr><td>SMS provider on the internet</td><td>customer account, e.g. at seven.io, and its API key</td><td>No hardware. Cost per SMS. Other providers can be connected via the free fields (address, headers, body) as well.</td></tr>
         </tbody>
@@ -743,38 +743,38 @@ docker compose up -d --build</code></pre></div>
 
     <section id="krypto">
       <h2>Crypto payment: Bitcoin, Lightning, USDT</h2>
-      <p class="lead">Customers can pay invoices with Bitcoin, Lightning or USDT. Kuenta uses your own <strong>BTCPay Server</strong> for this. It is free open source software that holds no money: payments go directly into your own wallet. The feature is included in Kuenta free of charge.</p>
+      <p class="lead">Customers can pay invoices with Bitcoin, Lightning or USDT. KuentaPOS uses your own <strong>BTCPay Server</strong> for this. It is free open source software that holds no money: payments go directly into your own wallet. The feature is included in KuentaPOS free of charge.</p>
       <h3>Set up once</h3>
       <ol class="steps">
         <li><div><strong>Provide a BTCPay Server</strong><span>The server must be reachable from the internet so customers can pay. Usual is a rented server with the official Docker setup (docs.btcpayserver.org) or a provider that runs BTCPay. Create a store there and connect your wallet. For Lightning you need a Lightning node, for USDT the Liquid network.</span></div></li>
         <li><div><strong>Create an API key</strong><span>In BTCPay under <span class="path">Account → API keys</span>. Required rights: view and modify payment requests, view, create and modify invoices, view store settings. The store ID is shown in the store settings.</span></div></li>
-        <li><div><strong>Enter it in Kuenta</strong><span><span class="path">Settings → Crypto payment</span>: enable crypto payments, enter address, store ID and API key, then "Save &amp; test connection". Kuenta shows the payment methods active in the store.</span></div></li>
-        <li><div><strong>Clarify the accounting</strong><span>Kuenta books incoming payments to the configured accounting account, default 1360 (money in transit, SKR03). Agree the account with your tax adviser.</span></div></li>
+        <li><div><strong>Enter it in KuentaPOS</strong><span><span class="path">Settings → Crypto payment</span>: enable crypto payments, enter address, store ID and API key, then "Save &amp; test connection". KuentaPOS shows the payment methods active in the store.</span></div></li>
+        <li><div><strong>Clarify the accounting</strong><span>KuentaPOS books incoming payments to the configured accounting account, default 1360 (money in transit, SKR03). Agree the account with your tax adviser.</span></div></li>
       </ol>
       <h3>How a payment works</h3>
       <ul>
-        <li>Open the invoice, tab <span class="path">Payments</span>, "Payment link". Kuenta creates a payment page at BTCPay for the open euro amount. It is valid for 30 days (adjustable).</li>
+        <li>Open the invoice, tab <span class="path">Payments</span>, "Payment link". KuentaPOS creates a payment page at BTCPay for the open euro amount. It is valid for 30 days (adjustable).</li>
         <li>QR code and link then appear automatically on the PDF invoice and in the email. In your own email templates <code>{Zahlungslink}</code> inserts the link.</li>
         <li>The customer pays the euro amount in Bitcoin, Lightning or USDT, converted at the rate on the day of payment.</li>
-        <li>Kuenta checks with BTCPay every 2 minutes and books paid invoices automatically, with the payment type "Krypto (BTCPay)". "Check for payment" does it immediately.</li>
-        <li>If the open amount changes, e.g. after a partial payment by bank transfer, the old link disappears from the PDF. Create a new one then. If the invoice is paid in full some other way, Kuenta closes the payment page at BTCPay.</li>
+        <li>KuentaPOS checks with BTCPay every 2 minutes and books paid invoices automatically, with the payment type "Krypto (BTCPay)". "Check for payment" does it immediately.</li>
+        <li>If the open amount changes, e.g. after a partial payment by bank transfer, the old link disappears from the PDF. Create a new one then. If the invoice is paid in full some other way, KuentaPOS closes the payment page at BTCPay.</li>
       </ul>
-      <p>Kuenta does not need to be reachable from the internet for this. It asks BTCPay itself.</p>
+      <p>KuentaPOS does not need to be reachable from the internet for this. It asks BTCPay itself.</p>
       <h3>At the register</h3>
       <ul>
         <li>Once crypto payment is set up, the register shows the button <strong>"₿ Bitcoin / Lightning"</strong>. "Pay order" and "Pay invoice" then offer "Crypto" too.</li>
         <li>The register shows a QR code, first for Lightning, on request for Bitcoin or USDT. The customer scans it with their wallet. The rate is fixed for 15 minutes.</li>
         <li>As soon as BTCPay reports the payment, the window closes and the receipt is printed. Bitcoin on-chain counts as soon as the payment is in the network, without waiting for a confirmation. Lightning arrives within seconds.</li>
-        <li>Kuenta verifies the payment with BTCPay itself before the receipt. Only then are invoice and receipt created. Each payment can only be used for one receipt.</li>
-        <li><strong>Cancel:</strong> Kuenta marks the payment as invalid at BTCPay. For this the API key also needs the right "modify invoices". Without it the payment expires after 15 minutes. If the customer still pays, the register shows a notice when opened. Refund the amount via BTCPay then.</li>
-        <li><strong>Void:</strong> Kuenta books the refund. Refund the money in BTCPay with the "Refund" function on the invoice, or in cash.</li>
+        <li>KuentaPOS verifies the payment with BTCPay itself before the receipt. Only then are invoice and receipt created. Each payment can only be used for one receipt.</li>
+        <li><strong>Cancel:</strong> KuentaPOS marks the payment as invalid at BTCPay. For this the API key also needs the right "modify invoices". Without it the payment expires after 15 minutes. If the customer still pays, the register shows a notice when opened. Refund the amount via BTCPay then.</li>
+        <li><strong>Void:</strong> KuentaPOS books the refund. Refund the money in BTCPay with the "Refund" function on the invoice, or in cash.</li>
         <li>Crypto payments are non-cash. They do not go into the cash book, the TSE signs them as non-cash, and in the DSFinV-K export they appear as "Unbar / Krypto".</li>
       </ul>
     </section>
 
     <section id="pro">
-      <h2>Kuenta Pro</h2>
-      <p class="lead">Kuenta is open source and free. Some extra features are available as add-ons. They are unlocked with a license key and cost $20 each, one-off. Payment is made with Bitcoin or Tether (USDT).</p>
+      <h2>KuentaPOS Pro</h2>
+      <p class="lead">KuentaPOS is open source and free. Some extra features are available as add-ons. They are unlocked with a license key and cost $20 each, one-off. Payment is made with Bitcoin or Tether (USDT).</p>
       <div class="tablewrap"><table>
         <thead><tr><th>Add-on</th><th>since</th><th>Price</th></tr></thead>
         <tbody><tr><td>SMS reminders and SMS gateway</td><td>1.0.8</td><td>$20</td></tr></tbody>
@@ -785,12 +785,12 @@ docker compose up -d --build</code></pre></div>
       <ol class="steps">
         <li><div><strong>Copy the key</strong><span>After payment you receive a key that starts with <code>KUENTA1.</code></span></div></li>
         <li><div><strong>Paste it</strong><span><span class="path">Settings → License</span>, paste the complete key, "Install license".</span></div></li>
-        <li><div><strong>Done</strong><span>Kuenta shows who the license is for and until when. No restart is needed.</span></div></li>
+        <li><div><strong>Done</strong><span>KuentaPOS shows who the license is for and until when. No restart is needed.</span></div></li>
       </ol>
       <div class="tablewrap"><table>
         <thead><tr><th>Question</th><th>Answer</th></tr></thead>
         <tbody>
-          <tr><td>Does Kuenta need internet for this?</td><td>No. The key is digitally signed and checked on the computer.</td></tr>
+          <tr><td>Does KuentaPOS need internet for this?</td><td>No. The key is digitally signed and checked on the computer.</td></tr>
           <tr><td>For how many workstations?</td><td>For the whole installation with all companies. The other workstations work in <a href="#netzwerk">network mode</a>.</td></tr>
           <tr><td>Where is the license stored?</td><td>As <code>lizenz.key</code> in the data folder. Updates do not change it. When moving to a new computer, install the key again.</td></tr>
           <tr><td>Does the license expire?</td><td>No, add-ons are paid once and unlimited.</td></tr>
@@ -800,13 +800,13 @@ docker compose up -d --build</code></pre></div>
 
     <section id="netzwerk">
       <h2>Network mode</h2>
-      <p>So that tablets and other workstations can use Kuenta, start <span class="path">Start menu → Kuenta (network)</span> on the workshop PC (Linux/macOS: <code>kuenta --netzwerk</code>).</p>
+      <p>So that tablets and other workstations can use KuentaPOS, start <span class="path">Start menu → KuentaPOS (network)</span> on the workshop PC (Linux/macOS: <code>kuentapos --netzwerk</code>).</p>
       <ol>
         <li>The console window shows the address for the other devices, e.g. <code>http://192.168.1.20:3700</code>.</li>
         <li>Open this address in the browser on the tablet.</li>
         <li>If Windows asks for a firewall permission, allow it for "Private networks".</li>
       </ol>
-      <div class="note warn"><strong>Required in the network</strong><span>Switch on login (<span class="path">Settings → Defaults</span>) and create users. Otherwise every device in the network can open Kuenta without a password.</span></div>
+      <div class="note warn"><strong>Required in the network</strong><span>Switch on login (<span class="path">Settings → Defaults</span>) and create users. Otherwise every device in the network can open KuentaPOS without a password.</span></div>
       <p>Each workstation can choose its own interface language. Handing over to Thunderbird only works on the workshop PC itself. From other devices use direct sending via SMTP.</p>
     </section>
 
@@ -816,34 +816,34 @@ docker compose up -d --build</code></pre></div>
       <div class="tablewrap"><table>
         <thead><tr><th>System</th><th>Data folder</th></tr></thead>
         <tbody>
-          <tr><td>Windows</td><td><code>%APPDATA%\Kuenta</code> (e.g. <code>C:\Users\&lt;name&gt;\AppData\Roaming\Kuenta</code>)</td></tr>
-          <tr><td>macOS</td><td><code>~/Library/Application Support/Kuenta</code></td></tr>
-          <tr><td>Linux</td><td><code>~/.local/share/kuenta</code></td></tr>
+          <tr><td>Windows</td><td><code>%APPDATA%\KuentaPOS</code> (e.g. <code>C:\Users\&lt;name&gt;\AppData\Roaming\KuentaPOS</code>)</td></tr>
+          <tr><td>macOS</td><td><code>~/Library/Application Support/KuentaPOS</code></td></tr>
+          <tr><td>Linux</td><td><code>~/.local/share/kuentapos</code></td></tr>
         </tbody>
       </table></div>
       <p>Among other things, the data folder contains the database <code>kuenta.db</code>, documents and images (<code>dateien</code>), automatic backups (<code>sicherungen</code>), safety copies before imports (<code>sicherheitskopien</code>) and the attachments for the mail program (<code>mail-ausgang</code>).</p>
       <h3>Backing up</h3>
       <ul>
-        <li><strong>By hand:</strong> <span class="path">Kuenta → Back up data</span> creates a <code>*.kuenta</code> file with database and documents. With a password it is AES-256 encrypted.</li>
-        <li><strong>Automatically:</strong> Kuenta backs up daily into the folder <code>sicherungen</code>. Folder and number of backups kept (default 14) are set on the same page.</li>
-        <li><strong>Whole folder:</strong> alternatively copy the complete data folder while Kuenta is stopped.</li>
+        <li><strong>By hand:</strong> <span class="path">KuentaPOS → Back up data</span> creates a <code>*.kuentapos</code> file with database and documents. With a password it is AES-256 encrypted.</li>
+        <li><strong>Automatically:</strong> KuentaPOS backs up daily into the folder <code>sicherungen</code>. Folder and number of backups kept (default 14) are set on the same page.</li>
+        <li><strong>Whole folder:</strong> alternatively copy the complete data folder while KuentaPOS is stopped.</li>
       </ul>
       <div class="note"><strong>Recommendation</strong><span>Put the backup folder on another drive, a NAS or a USB stick. A backup on the same hard disk does not help if that disk fails.</span></div>
-      <div class="note warn"><strong>Do not put the data folder on a network drive</strong><span>Backups belong on the NAS, the data folder itself does not. Kuenta works in its database all the time. Over a network share it can get damaged, e.g. during a short network outage. If the data folder is on a network drive, Kuenta warns at start. For several workstations use <a href="#netzwerk">network mode</a>: one computer holds the data, all others work in the browser.</span></div>
+      <div class="note warn"><strong>Do not put the data folder on a network drive</strong><span>Backups belong on the NAS, the data folder itself does not. KuentaPOS works in its database all the time. Over a network share it can get damaged, e.g. during a short network outage. If the data folder is on a network drive, KuentaPOS warns at start. For several workstations use <a href="#netzwerk">network mode</a>: one computer holds the data, all others work in the browser.</span></div>
     </section>
 
     <section id="update">
       <h2>Updating and rolling out</h2>
       <p>To update, simply run the new installer. It does everything itself:</p>
       <ol class="steps">
-        <li><div><strong>Find a running Kuenta</strong><span>The installer looks for Kuenta processes from the program folder, including the console window.</span></div></li>
-        <li><div><strong>Stop cleanly</strong><span>Kuenta is asked to stop and closes the database properly. If it does not respond, it is killed.</span></div></li>
+        <li><div><strong>Find a running KuentaPOS</strong><span>The installer looks for KuentaPOS processes from the program folder, including the console window.</span></div></li>
+        <li><div><strong>Stop cleanly</strong><span>KuentaPOS is asked to stop and closes the database properly. If it does not respond, it is killed.</span></div></li>
         <li><div><strong>Install the update</strong><span>Program files are replaced. The data in the user profile stays unchanged.</span></div></li>
-        <li><div><strong>Start again</strong><span>Kuenta starts in the same mode as before (local or network). A new tab opens in the browser.</span></div></li>
+        <li><div><strong>Start again</strong><span>KuentaPOS starts in the same mode as before (local or network). A new tab opens in the browser.</span></div></li>
       </ol>
       <h3>Rolling out without questions</h3>
       <p>For scripts or software distribution:</p>
-      <div class="codeblock"><pre><code>Kuenta-Setup-1.8.2.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART</code></pre></div>
+      <div class="codeblock"><pre><code>KuentaPOS-Setup-1.8.3.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART</code></pre></div>
       <div class="tablewrap"><table>
         <thead><tr><th>Switch</th><th>Effect</th></tr></thead>
         <tbody>
@@ -851,23 +851,23 @@ docker compose up -d --build</code></pre></div>
           <tr><td><code>/SUPPRESSMSGBOXES</code></td><td>no questions</td></tr>
           <tr><td><code>/NORESTART</code></td><td>do not restart Windows</td></tr>
           <tr><td><code>/ALLUSERS</code> · <code>/CURRENTUSER</code></td><td>install for all users or only the current one (default: as in the first installation)</td></tr>
-          <tr><td><code>/NOSTART</code></td><td>do not start Kuenta again after the update</td></tr>
-          <tr><td><code>/LOG="C:\Temp\kuenta-setup.log"</code></td><td>write an installation log</td></tr>
+          <tr><td><code>/NOSTART</code></td><td>do not start KuentaPOS again after the update</td></tr>
+          <tr><td><code>/LOG="C:\Temp\kuentapos-setup.log"</code></td><td>write an installation log</td></tr>
         </tbody>
       </table></div>
-      <div class="note"><strong>Updating from version 1.0.0</strong><span>Version 1.0.0 does not know the clean stop yet. On the first update from it Kuenta is therefore killed. The data is not harmed.</span></div>
-      <div class="note warn"><strong>System account</strong><span>If the installation runs under the system account (typical for software distribution), Kuenta is stopped but not started again. Otherwise it would run in the wrong user profile with empty data. Users then start Kuenta from the start menu as usual.</span></div>
+      <div class="note"><strong>Updating from version 1.0.0</strong><span>Version 1.0.0 does not know the clean stop yet. On the first update from it KuentaPOS is therefore killed. The data is not harmed.</span></div>
+      <div class="note warn"><strong>System account</strong><span>If the installation runs under the system account (typical for software distribution), KuentaPOS is stopped but not started again. Otherwise it would run in the wrong user profile with empty data. Users then start KuentaPOS from the start menu as usual.</span></div>
       <p><strong>Linux / macOS:</strong> get the new version (<code>git pull</code> or archive) and run <code>./installer/unix/install.sh</code> again.</p>
     </section>
 
     <section id="deinstallation">
       <h2>Uninstalling</h2>
       <ul>
-        <li><strong>Windows:</strong> <span class="path">Settings → Apps → Kuenta</span> or start menu <span class="path">Uninstall Kuenta</span>. A running Kuenta is stopped first and the firewall rule removed.</li>
+        <li><strong>Windows:</strong> <span class="path">Settings → Apps → KuentaPOS</span> or start menu <span class="path">Uninstall KuentaPOS</span>. A running KuentaPOS is stopped first and the firewall rule removed.</li>
         <li><strong>Linux / macOS:</strong> <code>./installer/unix/install.sh --uninstall</code></li>
       </ul>
-      <p>On Windows you can also start the installer again: if Kuenta is already installed it offers to update or to uninstall.</p>
-      <p>Afterwards Kuenta asks whether to delete the data too. The default is <strong>keep the data</strong>. If you delete it, you can save a copy first: on Windows as a ZIP on the desktop, on Linux/macOS as a <code>.tar.gz</code> in the home folder. If the copy fails, nothing is deleted. Keep the retention periods in mind: invoices and cash register data usually have to be kept for up to 10 years.</p>
+      <p>On Windows you can also start the installer again: if KuentaPOS is already installed it offers to update or to uninstall.</p>
+      <p>Afterwards KuentaPOS asks whether to delete the data too. The default is <strong>keep the data</strong>. If you delete it, you can save a copy first: on Windows as a ZIP on the desktop, on Linux/macOS as a <code>.tar.gz</code> in the home folder. If the copy fails, nothing is deleted. Keep the retention periods in mind: invoices and cash register data usually have to be kept for up to 10 years.</p>
       <p>For deployment tools: <code>unins000.exe /VERYSILENT</code> keeps the data, <code>/DELETEDATA</code> deletes it after a copy, with <code>/NOBACKUP</code> without a copy. On Linux/macOS use <code>--delete-data</code> and <code>--no-backup</code>.</p>
     </section>
 
@@ -877,29 +877,29 @@ docker compose up -d --build</code></pre></div>
       <div class="modules">
         <div class="module"><h3>Data and backup</h3><div class="where"><a href="#sicherung">Backup</a> · <a href="#datenuebernahme">Taking over data</a></div>
           <ul>
-            <li>Never put the data folder on a network drive or NAS. Kuenta warns at start.</li>
+            <li>Never put the data folder on a network drive or NAS. KuentaPOS warns at start.</li>
             <li>Backups, on the other hand, go to another drive, a NAS or a USB stick.</li>
-            <li>A KFZ-Faktura import replaces customers, invoices etc. with the state of the backup. Kuenta's own data is kept.</li>
-            <li>Do not work in KFZ-Faktura and Kuenta in parallel for long. Invoices from Kuenta, including those from the register, are overwritten by the next import.</li>
-            <li>Kuenta creates a safety copy before every import.</li>
+            <li>A KFZ-Faktura import replaces customers, invoices etc. with the state of the backup. KuentaPOS's own data is kept.</li>
+            <li>Do not work in KFZ-Faktura and KuentaPOS in parallel for long. Invoices from KuentaPOS, including those from the register, are overwritten by the next import.</li>
+            <li>KuentaPOS creates a safety copy before every import.</li>
           </ul></div>
         <div class="module"><h3>Network and container</h3><div class="where"><a href="#netzwerk">Network mode</a> · <a href="#installation">Installation</a></div>
           <ul>
             <li>In network mode and in the container, switch on login immediately and create users.</li>
             <li>Use network mode for several workstations. There is no external database.</li>
-            <li>For dollar, pound, franc and bitcoin rates on the overview the Kuenta computer needs internet (ECB, Bitstamp). The rates are display only; invoices stay in the company's currency.</li>
+            <li>For dollar, pound, franc and bitcoin rates on the overview the KuentaPOS computer needs internet (ECB, Bitstamp). The rates are display only; invoices stay in the company's currency.</li>
             <li>There is no mail program in the container. Send via SMTP there.</li>
             <li>The container image has not yet been built in a real Docker or Podman environment. Please check on first use.</li>
           </ul></div>
         <div class="module"><h3>Email</h3><div class="where"><a href="#email">Sending email</a></div>
           <ul>
-            <li>Handing over to Thunderbird only works on the PC Kuenta runs on.</li>
+            <li>Handing over to Thunderbird only works on the PC KuentaPOS runs on.</li>
             <li>The invoice counts as "sent by mail" as soon as it is handed over, even if the mail is not sent in Thunderbird.</li>
             <li>If Thunderbird has its own signature, two signatures appear. Empty one of them.</li>
             <li>Handed-over attachments are stored in <code>mail-ausgang</code> and deleted after 14 days.</li>
             <li>With direct sending via SMTP the mail does not appear in Thunderbird. Use the sending log or a BCC copy instead.</li>
             <li>Reminders by email or SMS only to customers who have agreed. Record opt-outs with "No reminders" for the customer.</li>
-            <li>Sending SMS needs a Kuenta Pro license. Keep the license key and install it again when changing computers.</li>
+            <li>Sending SMS needs a KuentaPOS Pro license. Keep the license key and install it again when changing computers.</li>
             <li>For SMS use an LTE stick instead of a UMTS stick. Check whether your tariff allows bulk sending.</li>
           </ul></div>
         <div class="module"><h3>DATEV</h3><div class="where"><a href="#datev">DATEV export</a></div>
@@ -913,16 +913,16 @@ docker compose up -d --build</code></pre></div>
           </ul></div>
         <div class="module"><h3>Update and installation</h3><div class="where"><a href="#update">Update</a> · <a href="#deinstallation">Uninstalling</a></div>
           <ul>
-            <li>The installer stops a running Kuenta and starts it again afterwards. A new tab opens in the browser.</li>
-            <li>Under the system account (software distribution) Kuenta is not started again.</li>
-            <li>The first update from version 1.0.0 kills Kuenta. The data stays intact.</li>
+            <li>The installer stops a running KuentaPOS and starts it again afterwards. A new tab opens in the browser.</li>
+            <li>Under the system account (software distribution) KuentaPOS is not started again.</li>
+            <li>The first update from version 1.0.0 kills KuentaPOS. The data stays intact.</li>
             <li>Updates leave the data folder untouched, uninstalling asks. Each Windows user has their own.</li>
           </ul></div>
         <div class="module"><h3>Register and law</h3><div class="where"><a href="#grenzen">Notes and limits</a></div>
           <ul>
             <li>Check the TSE with a fiskaly test account before going live and register the register with the tax office.</li>
             <li>Check the card terminal and DSFinV-K before use or before an audit.</li>
-            <li>Kuenta is designed for Germany, Spain, the United Kingdom, the United States, France, Austria, Switzerland, Italy, the Netherlands, Belgium and Luxembourg (see <a href="#spanien">Spain</a>, <a href="#uk">United Kingdom</a>, <a href="#usa">United States</a>, <a href="#frankreich">France</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Switzerland</a>, <a href="#italien">Italy</a>, <a href="#niederlande">the Netherlands</a>, <a href="#belgien">Belgium</a> and <a href="#luxemburg">Luxembourg</a>). Other countries are not supported.</li>
+            <li>KuentaPOS is designed for Germany, Spain, the United Kingdom, the United States, France, Austria, Switzerland, Italy, the Netherlands, Belgium and Luxembourg (see <a href="#spanien">Spain</a>, <a href="#uk">United Kingdom</a>, <a href="#usa">United States</a>, <a href="#frankreich">France</a>, <a href="#oesterreich">Austria</a>, <a href="#schweiz">Switzerland</a>, <a href="#italien">Italy</a>, <a href="#niederlande">the Netherlands</a>, <a href="#belgien">Belgium</a> and <a href="#luxemburg">Luxembourg</a>). Other countries are not supported.</li>
             <li>Purchase contracts are templates and do not replace legal advice.</li>
           </ul></div>
       </div>
@@ -931,26 +931,26 @@ docker compose up -d --build</code></pre></div>
     <section id="probleme">
       <h2>Frequent questions and problems</h2>
       <dl class="faq">
-        <div><dt>At start "Kuenta is already running on port 3700" appears.</dt><dd>Kuenta is already running, e.g. in another console window. The browser opens the running Kuenta, and the new window closes by itself.</dd></div>
+        <div><dt>At start "KuentaPOS is already running on port 3700" appears.</dt><dd>KuentaPOS is already running, e.g. in another console window. The browser opens the running KuentaPOS, and the new window closes by itself.</dd></div>
         <div><dt>"Node.js was not found".</dt><dd>Only happens without the installer. Install Node.js LTS from nodejs.org or use the Windows installer, which includes Node.js.</dd></div>
-        <div><dt>The tablet cannot reach Kuenta.</dt><dd>Kuenta must have been started via "Kuenta (network)" ("Kuenta im Netzwerk" with the German installer). Check the address shown in the console window and the firewall permission for private networks. Tablet and PC must be in the same network.</dd></div>
+        <div><dt>The tablet cannot reach KuentaPOS.</dt><dd>KuentaPOS must have been started via "KuentaPOS (network)" ("KuentaPOS im Netzwerk" with the German installer). Check the address shown in the console window and the firewall permission for private networks. Tablet and PC must be in the same network.</dd></div>
         <div><dt>"Thunderbird not found".</dt><dd>Enter the path to <code>thunderbird.exe</code> under <span class="path">Settings → Email</span>, e.g. <code>C:\Program Files\Mozilla Thunderbird\thunderbird.exe</code>.</dd></div>
-        <div><dt>"The mail program can only be opened on the computer Kuenta runs on".</dt><dd>You are working on another device in the network. Send via SMTP there or open the mail on the workshop PC.</dd></div>
+        <div><dt>"The mail program can only be opened on the computer KuentaPOS runs on".</dt><dd>You are working on another device in the network. Send via SMTP there or open the mail on the workshop PC.</dd></div>
         <div><dt>"No mail server has been set up".</dt><dd>The sending method is SMTP, but the server details are missing. Enter them under <span class="path">Settings → Email</span> or switch to "Hand over to mail program".</dd></div>
         <div><dt>Printed invoices can no longer be changed.</dt><dd>The GoBD lock is active (<span class="path">Settings → Defaults</span>). Changes are then made with an invoice correction.</dd></div>
         <div><dt>DATEV export: "The period goes beyond the fiscal year".</dt><dd>DATEV only accepts bookings from one fiscal year. Export separately, e.g. up to 31.12. and from 01.01. For a different fiscal year enter the start month under <span class="path">Settings → Accounting</span>.</dd></div>
         <div><dt>DATEV export: "Invalid accounts for DATEV".</dt><dd>A booking has an account with too many digits or without a number. Check the documents listed and the accounts under <span class="path">Settings → Accounting</span>, especially the account length.</dd></div>
-        <div><dt>The data is gone after the update.</dt><dd>Updates do not touch the data folder. Check whether Kuenta runs under a different Windows user. Each user has their own data folder.</dd></div>
+        <div><dt>The data is gone after the update.</dt><dd>Updates do not touch the data folder. Check whether KuentaPOS runs under a different Windows user. Each user has their own data folder.</dd></div>
         <div><dt>Part of the screen is still in German.</dt><dd>A few texts may not be translated yet. Please report missing translations, see <code>CONTRIBUTING.md</code>.</dd></div>
       </dl>
     </section>
 
     <section id="rechnungsnummern">
       <h2>Invoice numbers</h2>
-      <p>Invoice numbers are sequential, as in KFZ-Faktura. Kuenta assigns the number itself when saving: last number used plus 1. The invoice number field is therefore locked. For a new invoice it only shows a suggestion. If another workstation saves an invoice first, your invoice gets the next free number.</p>
+      <p>Invoice numbers are sequential, as in KFZ-Faktura. KuentaPOS assigns the number itself when saving: last number used plus 1. The invoice number field is therefore locked. For a new invoice it only shows a suggestion. If another workstation saves an invoice first, your invoice gets the next free number.</p>
       <ul>
         <li><strong>Separate number ranges:</strong> invoices and invoice corrections (including cancellations and credit notes) are counted separately. The settings are under <span class="path">Settings → Number ranges</span>.</li>
-        <li><strong>After importing from KFZ-Faktura</strong> Kuenta continues from the last number used.</li>
+        <li><strong>After importing from KFZ-Faktura</strong> KuentaPOS continues from the last number used.</li>
         <li><strong>No restart at the turn of the year:</strong> the numbers simply continue. A new database starts at year + 0001, e.g. 20260001.</li>
       </ul>
       <h3>How gaps can occur</h3>
@@ -972,7 +972,7 @@ docker compose up -d --build</code></pre></div>
         <li><strong>DATEV:</strong> booking batch and debtors/creditors follow the DATEV format but have not been cross-checked in a DATEV program. Documents (PDF) and a connection to DATEV Unternehmen online are not included.</li>
         <li><strong>Crypto payment:</strong> tested against a simulated BTCPay Server, not yet against a real one. USDT only works via the Liquid network, as offered by BTCPay. USDT on Tron or Ethereum is not supported.</li>
         <li><strong>Container:</strong> the image has so far only been checked outside a real Docker or Podman environment.</li>
-        <li><strong>Database:</strong> Kuenta uses a built-in database (SQLite). An external database such as PostgreSQL is not supported. Several workstations work via network mode.</li>
+        <li><strong>Database:</strong> KuentaPOS uses a built-in database (SQLite). An external database such as PostgreSQL is not supported. Several workstations work via network mode.</li>
         <li><strong>Countries and languages:</strong> Germany, Spain, the United Kingdom and the United States (switchable per company). Not supported in Spain: TicketBAI, Navarre, IGIC and REBU in VERI*FACTU; in the UK: Northern Ireland EU trade. The interface is available in German, English, Spanish, French, Italian and Dutch.</li>
       </ul>
     </section>
@@ -984,21 +984,21 @@ docker compose up -d --build</code></pre></div>
         <thead><tr><th>Variable</th><th>Default</th><th>Meaning</th></tr></thead>
         <tbody>
           <tr><td><code>PORT</code></td><td><code>3700</code></td><td>port of the server</td></tr>
-          <tr><td><code>HOST</code></td><td><code>127.0.0.1</code></td><td><code>0.0.0.0</code> shares Kuenta in the network</td></tr>
-          <tr><td><code>KUENTA_DATA</code></td><td>user profile</td><td>a different data folder on a local drive, e.g. a second hard disk. Do not put it on a network drive or NAS (see <a href="#sicherung">Backup</a>).</td></tr>
-          <tr><td><code>KUENTA_LANG</code></td><td>language of Windows</td><td><code>de</code>, <code>en</code>, <code>es</code>, <code>fr</code>, <code>it</code> or <code>nl</code>: language of the console window and of new installations</td></tr>
+          <tr><td><code>HOST</code></td><td><code>127.0.0.1</code></td><td><code>0.0.0.0</code> shares KuentaPOS in the network</td></tr>
+          <tr><td><code>KUENTAPOS_DATA</code></td><td>user profile</td><td>a different data folder on a local drive, e.g. a second hard disk. Do not put it on a network drive or NAS (see <a href="#sicherung">Backup</a>).</td></tr>
+          <tr><td><code>KUENTAPOS_LANG</code></td><td>language of Windows</td><td><code>de</code>, <code>en</code>, <code>es</code>, <code>fr</code>, <code>it</code> or <code>nl</code>: language of the console window and of new installations</td></tr>
         </tbody>
       </table></div>
       <h3>Development and installer</h3>
       <div class="codeblock"><pre><code>npm test                    # automated tests
 npm run server              # start the server without a browser
 npm run installer:windows   # build the Windows installer</code></pre></div>
-      <p>The installer needs Windows, <a href="https://jrsoftware.org/isdl.php">Inno Setup 6</a> and internet access (Node.js is downloaded from nodejs.org and verified with SHA-256). The result is in <code>build\Kuenta-Setup-&lt;version&gt;.exe</code>; the version comes from <code>package.json</code>.</p>
+      <p>The installer needs Windows, <a href="https://jrsoftware.org/isdl.php">Inno Setup 6</a> and internet access (Node.js is downloaded from nodejs.org and verified with SHA-256). The result is in <code>build\KuentaPOS-Setup-&lt;version&gt;.exe</code>; the version comes from <code>package.json</code>.</p>
       <p>Structure: <code>server/</code> (server, business logic, import, e-invoice, PDF/A, email, register, backup), <code>public/</code> (user interface), <code>installer/</code> (Windows installer, Linux/macOS script). The database is SQLite with the table and column names of KFZ-Faktura. Code comments are in English. Translations of the interface are in <code>public/js/lang/</code>; <code>node tools/i18n/missing.js</code> lists missing ones. Customer and company data never belongs in the repository.</p>
     </section>
   </main>
 
-  <footer>Kuenta 1.8.2 · © 2026 Doc · Open source under the GNU AGPL 3.0, Pro features with a license · Font in documents: Liberation Sans (SIL Open Font License) · QR code: qrcode-generator (MIT)</footer>
+  <footer>KuentaPOS 1.8.3 · © 2026 Doc · Open source under the GNU AGPL 3.0, Pro features with a license · Font in documents: Liberation Sans (SIL Open Font License) · QR code: qrcode-generator (MIT)</footer>
 </div>
 
 <script>

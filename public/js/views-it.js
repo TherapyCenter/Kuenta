@@ -20,7 +20,7 @@ const ItUI = {
         si('it.capitale', 'Capitale sociale € (z. B. 10.000,00)', '', true),
         sb('it.sociounico', 'Socio unico', '0'), sb('it.liquidazione', 'Società in liquidazione', '0')),
       grp('Fattura elettronica (SdI)',
-        h('div', { class: 'fld hint' }, 'Jede Rechnung ist in Italien eine elektronische Rechnung im Format FatturaPA. Kuenta erzeugt die XML-Datei (Rechnung → Fattura elettronica). Sie senden sie selbst über das Portal „Fatture e Corrispettivi“ der Agenzia delle Entrate, per PEC an das SdI oder über Ihren Dienstleister. Der Ausdruck ist eine copia di cortesia. An der Kasse wird jeder Verkauf als Rechnung erfasst; der Bon selbst ist kein Steuerbeleg (für documenti commerciali ist ein zugelassenes RT-Gerät nötig).'))));
+        h('div', { class: 'fld hint' }, 'Jede Rechnung ist in Italien eine elektronische Rechnung im Format FatturaPA. KuentaPOS erzeugt die XML-Datei (Rechnung → Fattura elettronica). Sie senden sie selbst über das Portal „Fatture e Corrispettivi“ der Agenzia delle Entrate, per PEC an das SdI oder über Ihren Dienstleister. Der Ausdruck ist eine copia di cortesia. An der Kasse wird jeder Verkauf als Rechnung erfasst; der Bon selbst ist kein Steuerbeleg (für documenti commerciali ist ein zugelassenes RT-Gerät nötig).'))));
   },
 };
 

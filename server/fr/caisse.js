@@ -177,12 +177,12 @@ function archive({ von, bis } = {}) {
   const csv = Buffer.from([COLS.join(';'), ...rows.map(r => COLS.map(c => q(r[c])).join(';'))].join('\r\n') + '\r\n', 'utf8');
   const hash = crypto.createHash('sha256').update(csv).digest('hex');
   const sig = crypto.sign('sha256', Buffer.from(hash), { key: claves().priv, dsaEncoding: 'ieee-p1363' }).toString('base64url');
-  const info = JSON.stringify({ logiciel: 'Kuenta', version: pkg.version, siren: require('./index').siren(), caisse: kasse(), du: von, au: bis, entrees: rows.length, sha256: hash, signature: sig, algorithme: 'ECDSA P-256 SHA-256 (IEEE P1363, base64url)' }, null, 2);
+  const info = JSON.stringify({ logiciel: 'KuentaPOS', version: pkg.version, siren: require('./index').siren(), caisse: kasse(), du: von, au: bis, entrees: rows.length, sha256: hash, signature: sig, algorithme: 'ECDSA P-256 SHA-256 (IEEE P1363, base64url)' }, null, 2);
   const zip = require('../import/zip').writeZip([
     { name: 'journal.csv', data: csv }, { name: 'archive.json', data: Buffer.from(info) }, { name: 'cle-publique.pem', data: Buffer.from(claves().pub) },
-    { name: 'LISEZMOI.txt', data: Buffer.from('Archive signée Kuenta. journal.csv contient toutes les entrées (tickets, clôtures, événements) avec leur signature chaînée.\r\narchive.json contient l\'empreinte SHA-256 de journal.csv et sa signature, vérifiable avec cle-publique.pem.\r\n') }]);
+    { name: 'LISEZMOI.txt', data: Buffer.from('Archive signée KuentaPOS. journal.csv contient toutes les entrées (tickets, clôtures, événements) avec leur signature chaînée.\r\narchive.json contient l\'empreinte SHA-256 de journal.csv et sa signature, vérifiable avec cle-publique.pem.\r\n') }]);
   jet('ARCHIVE', { du: von, au: bis, entrees: rows.length, sha256: hash });
-  return { buffer: zip, filename: `Kuenta_archive_${von}_${bis}.zip` };
+  return { buffer: zip, filename: `KuentaPOS_archive_${von}_${bis}.zip` };
 }
 
 function liste({ typ, limit = 500 } = {}) {
